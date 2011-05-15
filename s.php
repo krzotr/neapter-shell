@@ -111,6 +111,11 @@ class Shell
 	private $bFuncGroupById = FALSE;
 
 	/**
+	 * @ignore
+	 */
+	private $sPhpInfo;
+
+	/**
 	 * Konstruktor
 	 *
 	 * @uses   Request
@@ -145,6 +150,18 @@ class Shell
 		 */
 		$this -> bFuncOwnerById = function_exists( 'posix_getpwuid' );
 		$this -> bFuncGroupById = function_exists( 'posix_getgrgid' );
+
+		/**
+		 * W zasadzie nic to nie robi, ale za to Netbeans ma problemy z formatowaniem
+		 * i podpowiadaniem skladni z tym wlasnie kodem ;), nacisnij ALT + SHIFT + M
+		 * to taki FEATURE ;]
+		 */
+		$sPhpInfo = <<<CONTENT
+
+phpinfo
+CONTENT;
+
+		$this -> sPhpInfo = substr( $sPhpInfo, -7 );
 
 		/**
 		 * Jesli SafeMode jest wylaczony
@@ -1062,7 +1079,7 @@ HELP;
 phpinfo - Informacje o PHP
 
 	Użycie:
-		phpinfo
+		{$this -> sPhpInfo}
 HELP;
 		}
 
@@ -1381,7 +1398,7 @@ HELP;
 				case 'help':
 					$sConsole = $this -> getCommandHelp();
 					break;
-				case 'phpinfo':
+				case $this -> sPhpInfo:
 					$sConsole = $this -> getCommandPhpInfo();
 					break;
 				case 'remove':
