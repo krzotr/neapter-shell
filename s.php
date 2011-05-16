@@ -77,6 +77,14 @@ class Shell
 	private $aArgv = array();
 
 	/**
+	 * Lista opcji
+	 *
+	 * @access private
+	 * @var    array
+	 */
+	private $aOptv = array();
+
+	/**
 	 * Ilosc parametrow
 	 *
 	 * @access private
@@ -961,27 +969,12 @@ HELP;
 		$sOutput = NULL;
 
 		/**
-		 * Lista opcji
-		 */
-		$aOptions = array();
-
-		/**
-		 * Sprawdzanie czy wystepuja opcje
-		 */
-		if( isset( $this -> aArgv[0] ) && substr( $this -> aArgv[0], 0, 1 ) === '-' )
-		{
-			$aOptions = str_split( substr( $this -> aArgv[0], 1 ) );
-			array_shift( $this -> aArgv );
-			$this -> sArgv = implode( ' ', $this -> aArgv );
-		}
-
-		/**
 		 * Domyslny katalog jezeli nie podano sciezki
 		 */
 		$sDir = ( ! empty( $this -> sArgv ) ? $this -> sArgv : dirname( __FILE__ ) );
 
-		$bList      = in_array( 'l', $aOptions );
-		$bRecursive = in_array( 'R', $aOptions );
+		$bList      = in_array( 'l', $this -> aOptv );
+		$bRecursive = in_array( 'R', $this -> aOptv );
 
 		try
 		{
@@ -1227,19 +1220,7 @@ download, down, get - Pobieranie pliku
 HELP;
 		}
 
-		$aOptions = array();
-
-		/**
-		 * Sprawdzanie czy wystepuja opcje
-		 */
-		if( isset( $this -> aArgv[0] ) && substr( $this -> aArgv[0], 0, 1 ) === '-' )
-		{
-			$aOptions = str_split( substr( $this -> aArgv[0], 1 ) );
-			array_shift( $this -> aArgv );
-			$this -> sArgv = implode( ' ', $this -> aArgv );
-		}
-
-		$bGzip = in_array( 'g', $aOptions );
+		$bGzip = in_array( 'g', in_array( 'R', $this -> aOptv ) );
 
 		/**
 		 * Plik zrodlowy musi istniec
@@ -1423,6 +1404,54 @@ HELP;
 	}
 
 	/**
+	 * Komenda - chmod
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandChmod()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc === 2 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+chmod - Zmiana uprawnień dla pliku
+
+	Użycie:
+		chmod uprawnienie plik_lub_katalog
+
+	Przykład:
+		chmod 777 /tmp/plik
+HELP;
+		}
+
+		/**
+		 * Chmod jest wymagany
+		 */
+		if( ! ctype_digit( $this -> aArgv[0] ) || strlen( $this -> aArgv[0] ) !== 3 )
+		{
+			return sprintf( 'Błędny chmod "%d"', $this -> aArgv[0] );
+		}
+
+		/**
+		 * Plik musi istniec
+		 */
+		if( ! is_file( $this -> aArgv[1] ) )
+		{
+			return sprintf( 'Plik "%s" nie istnieje', $this -> aArgv[1] );
+		}
+
+		if( chmod( $this -> aArgv[1], $this -> aArgv[0] ) )
+		{
+			return 'Uprawnienia <span class="green">zostały zmienione</span>';
+		}
+
+		return 'Uprawnienia <span class="red">nie zostały zmienione</span>';
+	}
+
+	/**
 	 * Komenda - help
 	 *
 	 * @access private
@@ -1533,7 +1562,7 @@ HELP;
 				$this -> sCmd = substr( $sCmd, 1 );
 			}
 
-			$this -> sArgv = preg_replace( sprintf( '~^\:%s[\s+]?~', $this -> sCmd ), NULL, $sCmd );
+			$this -> sArgv = ltrim( preg_replace( sprintf( '~^\:%s[\s+]?~', $this -> sCmd ), NULL, $sCmd ) );
 
 			/**
 			 * Rozdzielanie argumentow
@@ -1564,6 +1593,13 @@ HELP;
 					}
 				);
 				$this -> aArgv = $aMatch[0];
+
+				if( isset( $this -> aArgv[0] ) && substr( $this -> aArgv[0], 0, 1 ) === '-' )
+				{
+					$this -> aOptv = str_split( substr( $this -> aArgv[0], 1 ) );
+					array_shift( $this -> aArgv );
+					$this -> sArgv = ltrim( implode( ' ', $this -> aArgv ) );
+				}
 			}
 
 			$this -> iArgc = count( $this -> aArgv );
@@ -1641,6 +1677,9 @@ HELP;
 				case 'delete':
 				case 'del':
 					$sConsole = $this -> getCommandRemove();
+					break ;
+				case 'chmod':
+					$sConsole = $this -> getCommandChmod();
 					break ;
 				default :
 					$sConsole = sprintf( 'Nie ma takiej komendy "%s"', $this -> sCmd );
