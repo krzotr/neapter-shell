@@ -112,6 +112,9 @@ $sData = preg_replace( '~(_GET|_POST|_SERVER|_FILES|null|true);[\r\n]+~i', '$1;'
 
 $sData = preg_replace( '~\';[\r\n+]~i', '\';', $sData );
 
+echo $sData; die;
+
+
 $sData = '?>' . $sData . '<?php';
 
 

