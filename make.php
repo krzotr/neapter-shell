@@ -3,7 +3,7 @@
 $sFilePath = __DIR__ . '/Tmp/prod.php';
 
 $sData = "<?php\n";
-foreach( array( 'Lib/Arr', 'Lib/Form', 'Lib/Html', 'Lib/Request', 'shell' ) as $sFile )
+foreach( array( 'Lib/Arr', 'Lib/Form', 'Lib/Html', 'Lib/Request', 'Lib/MysqlDumper', 'shell' ) as $sFile )
 {
 	$sData .= file_get_contents( $sFile . '.php', NULL, NULL, 6 );
 }

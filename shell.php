@@ -11,6 +11,7 @@ require_once __DIR__ . '/Lib/Arr.php';
 require_once __DIR__ . '/Lib/Request.php';
 require_once __DIR__ . '/Lib/Form.php';
 require_once __DIR__ . '/Lib/Html.php';
+require_once __DIR__ . '/Lib/MysqlDumper.php';
 
 /**
  * class Shell - Zarzadzanie serwerem ;)
@@ -18,9 +19,8 @@ require_once __DIR__ . '/Lib/Html.php';
  * @version    0.11
  *
  * @todo
- *      MysqlDumper - oparty na poleceniu systemowym mysqldump oraz bibliotece PHP MysqlDumper
  *      Edycja pliku
- *      Inne przydatne dziwactwa, ktore sie przydadza
+ *      Wysylanie emaili
  *
  * @uses       Request
  * @uses       Form
@@ -960,7 +960,6 @@ HELP;
 		return htmlspecialchars( sprintf( 'Plik "%s" został pomyślnie wgrany an FTP', $this -> aArgv[2] ) );
 	}
 
-
 	/**
 	 * Komenda - mysql
 	 *
@@ -1090,6 +1089,87 @@ HELP;
 			return sprintf( 'Wystąpił błąd: %s', $oException -> getMessage() );
 		}
 	}
+
+	/**
+	 * Komenda - mysqldumper
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandMysqlDump()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc < 4 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+mysqldump, mysqldumper, mysqlbackup, dumpdb - Kopia bazy danych MySQL
+
+	Użycie:
+		mysqldump host:port login@hasło nazwa_bazy [tabela1] [tabela2]
+
+	Przykład:
+		mysqldump localhost:3306 test@test mysql users
+HELP;
+		}
+
+		$aHost = $this -> getHost( $this -> aArgv[0] );
+
+		/**
+		 * Domyslny port to 3306
+		 */
+		if( $aHost[1] === 0 )
+		{
+			$aHost[1] = 3306;
+		}
+
+		/**
+		 * login@pass
+		 */
+		list( $sUsername, $sPassword ) = explode( '@', $this -> aArgv[1], 2 );
+
+		/**
+		 * PDO jest wymagane
+		 */
+		if( ! extension_loaded( 'pdo' ) )
+		{
+			return 'Brak rozszerzenia PDO';
+		}
+
+		try
+		{
+			/**
+			 * Polaczenie do bazy
+			 */
+			$oPdo = new PDO( sprintf( 'mysql:host=%s;port=%d;dbname=%s', $aHost[0], $aHost[1], $this -> aArgv[2] ), $sUsername, $sPassword );
+
+			$oDumper = new MysqlDumper();
+			$oDumper -> setPdo( $oPdo )
+				 -> setDownload( 1 )
+				 -> setExtendedInsert( 1 );
+
+			if( $this -> iArgc > 3 )
+			{
+				$oDumper -> setTables( array_slice( $this -> aArgv, 3 ) );
+			}
+			$oDumper -> get();
+			exit ;
+
+		}
+		/**
+		 * Wyjatek
+		 */
+		catch( PDOException $oException )
+		{
+			return sprintf( 'Wystąpił błąd: %s', $oException -> getMessage() );
+		}
+		catch( MysqlDumperException $oException )
+		{
+			return sprintf( 'Wystąpił błąd: %s', $oException -> getMessage() );
+		}
+	}
+
 
 	/**
 	 * Komenda - ftpdownload
@@ -1711,6 +1791,9 @@ Jakies sugestie, pytania ? Piszcie śmiało: <strong>Krzychu</strong> - <a href=
 ps, sprawdziłeś komendę <strong>:g4m3</strong> ?
 
 Changelog:
+2011-05-21
+----------
+* dodano polecenie: <strong>mysqldump</strong>
 
 2011-05-20
 ----------
@@ -2242,6 +2325,12 @@ HELP;
 				case 'mysql':
 					$sConsole = $this -> getCommandMysql();
 					break ;
+				case 'mysqldump':
+				case 'mysqldumper':
+				case 'mysqlbackup':
+				case 'dumpdb':
+					$sConsole = $this -> getCommandMysqlDump();
+					break ;
 				case 'etcpasswd':
 					$sConsole = $this -> getCommandEtcPasswd();
 					break ;
@@ -2443,8 +2532,7 @@ CONTENT;
  */
 for( $i = 0; $i < ob_get_level(); $i++ )
 {
-	ob_clean();
-	ob_end_flush();
+	ob_end_clean();
 }
 
 $oShell = new Shell();
