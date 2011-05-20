@@ -1,9 +1,9 @@
 <?php
 
-$sFilePath = __DIR__ . '/s-prod.php';
+$sFilePath = __DIR__ . '/Tmp/prod.php';
 
 $sData = "<?php\n";
-foreach( array( 'Arr', 'Form', 'Html', 'Request', 's' ) as $sFile )
+foreach( array( 'Lib/Arr', 'Lib/Form', 'Lib/Html', 'Lib/Request', 'shell' ) as $sFile )
 {
 	$sData .= file_get_contents( $sFile . '.php', NULL, NULL, 6 );
 }
@@ -102,8 +102,6 @@ $sData = preg_replace( '~\s+\.\s+(\'|")~', '.$1', $sData );
  * Usuwanie znakow nowej lini przed i za znakami '{' '}'
  */
 $sData = preg_replace( '~[\r\n]+{[\r\n]+~', '{', $sData );
-$sData = preg_replace( '~(?<!CONTENT;)(?<!HELP;)\n\}[\r\n]+~', '}', $sData );
-
 
 /**
  * Usuwanie linii
@@ -112,28 +110,14 @@ $sData = preg_replace( '~(_GET|_POST|_SERVER|_FILES|null|true);[\r\n]+~i', '$1;'
 
 $sData = preg_replace( '~\';[\r\n+]~i', '\';', $sData );
 
-echo $sData; die;
+
+$sData = '?>' . $sData . '<?';
 
 
-$sData = '?>' . $sData . '<?php';
-
-
-for( $i = 0; $i < 2; $i++ )
+for( $i = 0; $i < 10; $i++ )
 {
-	$sData = sprintf( "\$sData=<<<'CONTENT_DATA%d'\n%s\nCONTENT_DATA%d;\neval(gzuncompress(\$sData));", $i, gzcompress( $sData, 9 ), $i );
+	$sData = sprintf( "eval(gzuncompress(base64_decode('%s')));", base64_encode( gzcompress( $sData, 9 ) ) );
 }
 
-
-printf( "<?php \$sData=<<<'CONTENT'\r\n%s\nCONTENT;\neval( gzuncompress( \$sData ) );", gzcompress( $sData, 9 ) );
-
-
-exit ;
-
-
-
-
-
-
-
-echo '<pre>';
-echo htmlspecialchars( $sData );
+file_put_contents( __DIR__ . '/Tmp/final.php', sprintf( "<?php eval(gzuncompress(base64_decode('%s')));", base64_encode( gzcompress( $sData, 9 ) ) ) );
+exit;

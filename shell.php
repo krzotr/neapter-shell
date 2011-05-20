@@ -7,10 +7,10 @@
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 
-require_once __DIR__ . '/Arr.php';
-require_once __DIR__ . '/Request.php';
-require_once __DIR__ . '/Form.php';
-require_once __DIR__ . '/Html.php';
+require_once __DIR__ . '/Lib/Arr.php';
+require_once __DIR__ . '/Lib/Request.php';
+require_once __DIR__ . '/Lib/Form.php';
+require_once __DIR__ . '/Lib/Html.php';
 
 /**
  * class Shell - Zarzadzanie serwerem ;)
