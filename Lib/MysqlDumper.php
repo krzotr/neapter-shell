@@ -3,7 +3,7 @@
 /**
  * Neapter Framework
  *
- * @version   $Id: MysqlDumper.php 569 2011-05-13 10:20:10Z krzotr $
+ * @version   $Id: MysqlDumper.php 580 2011-05-31 11:15:24Z krzotr $
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2010-2011, Krzysztof Otręba
@@ -22,11 +22,21 @@
 class MysqlDumperException extends Exception {}
 
 /**
- * class CdnClient - CDN Serwer
+ * class MysqlDumper - Zrzucanie zawartosci bazy danych
+ *
+ * Biblioteke mozna uruchomic w srodowisku PHP 5.2.X, wystarczy usunac linie 15-19
+ * ----------------------
+ *    namespace Neapter\Lib;
+ *
+ *    use Neapter\Core\SetLib,
+ *        \Exception,
+ *        \PDO;
+ * ----------------------
  *
  * @package    Lib
  * @subpackage MysqlDumper
  *
+ * @uses       Neapter\Core\SetLib
  * @uses       Neapter\Lib\MysqlDumperException
  */
 class MysqlDumper
@@ -330,7 +340,6 @@ class MysqlDumper
 		{
 			throw new MysqlDumperException( $oException -> getMessage() );
 		}
-
 
 		/**
 		 * Naglowek - pobieranie pliku
