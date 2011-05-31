@@ -7,11 +7,11 @@
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 
-require_once __DIR__ . '/Lib/Arr.php';
-require_once __DIR__ . '/Lib/Request.php';
-require_once __DIR__ . '/Lib/Form.php';
-require_once __DIR__ . '/Lib/Html.php';
-require_once __DIR__ . '/Lib/MysqlDumper.php';
+require_once dirname( __FILE__ ) . '/Lib/Arr.php';
+require_once dirname( __FILE__ ) . '/Lib/Request.php';
+require_once dirname( __FILE__ ) . '/Lib/Form.php';
+require_once dirname( __FILE__ ) . '/Lib/Html.php';
+require_once dirname( __FILE__ ) . '/Lib/MysqlDumper.php';
 
 /**
  * class Shell - Zarzadzanie serwerem ;)
@@ -192,14 +192,29 @@ CONTENT;
 		if( ( $sDisableFunctions = ini_get( 'disable_functions' ) ) !== '' )
 		{
 			$aDisableFunctions = explode( ',', $sDisableFunctions );
-			array_walk( $aDisableFunctions, function( $sValue )
-				{
-					return strtolower( trim( $sValue ) );
-				}
-			);
+			array_walk( $aDisableFunctions, create_function( '$sValue', 'return strtolower( trim( $sValue ) );' ) );
 
 			$this -> aDisableFunctions = $aDisableFunctions;
 		}
+	}
+
+
+	private function parseArgv( & $sVar )
+	{
+		$sVar = strtr( $sVar, array
+			(
+				'\\\'' => '\'',
+				'\\"'  => '"'
+			)
+		);
+
+		if(    ( ( substr( $sVar, 0, 1 ) === '"' ) && ( substr( $sVar, -1 ) === '"' ) )
+		    || ( ( substr( $sVar, 0, 1 ) === '\'' ) && ( substr( $sVar, -1 ) === '\'' ) )
+		)
+		{
+			$sVar = substr( $sVar, 1, -1 );
+		}
+
 	}
 
 	/**
@@ -1033,11 +1048,7 @@ HELP;
 			/**
 			 * Domyslnie dlugosc pola to dlugosc kolumny
 			 */
-			array_walk( $aDataLength, function( & $sVal, $sKey )
-				{
-					$sVal = strlen( $sKey );
-				}
-			);
+			array_walk( $aDataLength, create_function( '& $sVal, $sKey', '$sVal = strlen( $sKey );' ) );
 
 			/**
 			 * Obliczanie dlugosci ciagu
@@ -1101,7 +1112,7 @@ HELP;
 		/**
 		 * Help
 		 */
-		if( ( $this -> iArgc < 4 ) || ( $this -> aArgv[0] === 'help' ) )
+		if( ( $this -> iArgc < 3 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
 mysqldump, mysqldumper, mysqlbackup, dumpdb - Kopia bazy danych MySQL
@@ -2261,24 +2272,8 @@ HELP;
 				/**
 				 * Usuwanie koncowych znakow " oraz ', zamienianie \" na " i \' na '
 				 */
-				array_walk( $aMatch[0], function( & $sVar )
-					{
-						$sVar = strtr( $sVar, array
-							(
-								'\\\'' => '\'',
-								'\\"'  => '"'
-							)
-						);
+				array_walk( $aMatch[0], array( $this, 'parseArgv' ) );
 
-						if(    ( ( substr( $sVar, 0, 1 ) === '"' ) && ( substr( $sVar, -1 ) === '"' ) )
-						    || ( ( substr( $sVar, 0, 1 ) === '\'' ) && ( substr( $sVar, -1 ) === '\'' ) )
-						)
-						{
-							$sVar = substr( $sVar, 1, -1 );
-						}
-
-					}
-				);
 				$this -> aArgv = $aMatch[0];
 
 				if( isset( $this -> aArgv[0] ) && substr( $this -> aArgv[0], 0, 1 ) === '-' )
