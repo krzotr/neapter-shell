@@ -10,7 +10,6 @@ foreach( array( 'Lib/Arr', 'Lib/Form', 'Lib/Html', 'Lib/Request', 'Lib/MysqlDump
 
 $sData = preg_replace( '~require_once.+?[\r\n]~', NULL, $sData ) . "?>";
 
-
 file_put_contents( $sFilePath, $sData );
 
 /**
@@ -34,9 +33,14 @@ $sData = preg_replace( '~\s+\?\s~', '?', $sData );
 $sData = preg_replace( '~\s+\:\s~', ':', $sData );
 
 /**
- * Usuwanie komentarzy, tabulatorow
+ * Usuwanie komentarzy
  */
-$sData = preg_replace( '~/\*(.+?)\*/|\t~s', NULL, $sData );
+$sData = preg_replace( '~/\*(.+?)\*/~s', NULL, $sData );
+
+/**
+ * Usuwanie tabualtorow
+ */
+$sData = preg_replace( '~\t~s', NULL, $sData );
 
 /**
  * Redukcja \r\n
@@ -110,9 +114,7 @@ $sData = preg_replace( '~(_GET|_POST|_SERVER|_FILES|null|true);[\r\n]+~i', '$1;'
 
 $sData = preg_replace( '~\';[\r\n+]~i', '\';', $sData );
 
-
 $sData = '?>' . $sData . '<?';
-
 
 for( $i = 0; $i < 10; $i++ )
 {

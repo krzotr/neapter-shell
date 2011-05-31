@@ -146,7 +146,7 @@ class MysqlDumper
 			throw new MysqlDumperException( 'Limit musi być z przedziału 10 - 50000' );
 		}
 
-		$this -> aValue = (int) $iValue;
+		$this -> iLimit = (int) $iValue;
 
 		return $this;
 	}
