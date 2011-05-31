@@ -70,10 +70,33 @@ class Request
 	 */
 	public static function init()
 	{
+		if( get_magic_quotes_gpc() )
+		{
+			self::striSlashes( $_GET );
+			self::striSlashes( $_POST );
+			self::striSlashes( $_FILES );
+			self::striSlashes( $_SERVER );
+		}
+
 		self::$aGet    = $_GET;
 		self::$aPost   = $_POST;
 		self::$aFiles  = $_FILES;
 		self::$aServer = $_SERVER;
+	}
+
+	/**
+	 * Usuwanie backslashow z tablicy
+	 *
+	 * @access private
+	 * @param  array   $aData Tablica
+	 * @return void
+	 */
+	private static function striSlashes( array & $mData )
+	{
+		array_walk_recursive( $mData, create_function( '& $sData',
+				'$sData = stripslashes( $sData ); '
+			)
+		);
 	}
 
 	/**

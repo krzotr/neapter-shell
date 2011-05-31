@@ -16,7 +16,7 @@ require_once dirname( __FILE__ ) . '/Lib/MysqlDumper.php';
 /**
  * class Shell - Zarzadzanie serwerem ;)
  *
- * @version    0.11
+ * @version    0.2
  *
  * @todo
  *      Edycja pliku
@@ -173,7 +173,7 @@ class Shell
 		 */
 		$sPhpInfo = <<<CONTENT
 
-phpinfo
+/phpinfo
 CONTENT;
 
 		$this -> sPhpInfo = substr( $sPhpInfo, -7 );
@@ -183,17 +183,17 @@ CONTENT;
 		 */
 		if( ! $this -> bSafeMode )
 		{
-			//ini_set( 'display_errors', 0 );
-			ini_set( 'max_execution_time', 0 );
-			ini_set( 'memory_limit', '1024M' );
+			ini_set( 'display_errors',         0 );
+			ini_set( 'max_execution_time',     0 );
+			ini_set( 'memory_limit',           '1024M' );
 			ini_set( 'default_socket_timeout', 5 );
-			ini_set( 'date.timezone', 'Europe/Warsaw' );
+			ini_set( 'date.timezone',          'Europe/Warsaw' );
 		}
 
 		/**
 		 * Config
 		 */
-		error_reporting( -1 );
+		error_reporting( 0 );
 		ignore_user_abort( 0 );
 		date_default_timezone_set( 'Europe/Warsaw' );
 
