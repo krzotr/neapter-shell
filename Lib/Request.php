@@ -92,7 +92,7 @@ class Request
 
 		$sFullPath = 'http' . ( ( strncasecmp( self::getServer( 'HTTPS' ), 'on', 2 ) === 0 ) ? 's' : NULL ) . '://' . self::getServer( 'HTTP_HOST' ) . self::getServer( 'SCRIPT_NAME' ) ;
 
-		return $sFullPath . '?' . self::getServer( 'QUERY_STRING' );
+		return $sFullPath . ( ( ( $sQuery = self::getServer( 'QUERY_STRING' ) ) === '' ) ? '' : '?' . $sQuery );
 	}
 
 	/**

