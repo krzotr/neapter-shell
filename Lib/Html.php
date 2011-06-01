@@ -40,7 +40,7 @@ class Html
 			return preg_replace( '~([\r\n\t]+|[ ]{2,})~', NULL, $sData );
 		}
 
-		return preg_replace_callback( '~((?si)<textarea[^>]*>.+?</textarea>|(?si)<pre[^>]*>.+?</pre>|[\r\n\t]+| {2,})~', 'self::shrinkPre', $sData );
+		return preg_replace_callback( '~((?si)<textarea[^>]*>.+?</textarea>|(?si)<pre[^>]*>.+?</pre>|[\r\n\t]+| {2,})~', 'Html::shrinkPre', $sData );
 	}
 
 	/**
@@ -51,7 +51,7 @@ class Html
 	 * @param  array     $aMatched Nadmiarowe spacje
 	 * @return string              Sformatowany ciag
 	 */
-	protected static function shrinkPre( array $aMatched )
+	public static function shrinkPre( array $aMatched )
 	{
 		if( ! isset( $aMatched[1] ) || ( trim( $aMatched[1] ) === '' ) )
 		{
