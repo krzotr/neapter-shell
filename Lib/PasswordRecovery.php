@@ -93,6 +93,25 @@ class PasswordRecovery
 	protected $rCurl;
 
 	/**
+	 * Konstruktor
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function __construct()
+	{
+		/**
+		 * Dostepnosc rozszerzen / funkcji
+		 */
+		$this -> bCurl       = extension_loaded( 'curl' );
+		$this -> bFsockopen  = function_exists( 'fsockopen' );
+		$this -> bPfsockopen = function_exists( 'pfsockopen' );
+		$this -> bMysqli     = extension_loaded( 'mysqli' );
+		$this -> bPdo        = ( extension_loaded( 'pdo' ) && extension_loaded( 'pdo_mysql' ) );
+		$this -> bFtp        = function_exists( 'ftp_connect' );
+	}
+
+	/**
 	 * Ustawianie host'a
 	 *
 	 * @access public
@@ -117,18 +136,6 @@ class PasswordRecovery
 	}
 
 	/**
-	 * Ustawianie portu
-	 *
-	 * @access public
-	 * @param  integer          $iValue Port
-	 * @return PasswordRecovery         Obiekt PasswordRecovery
-	 */
-	public function setPort( $iValue )
-	{
-		return $this;
-	}
-
-	/**
 	 * Ustawianie typu ataku
 	 *
 	 * @access public
@@ -148,14 +155,8 @@ class PasswordRecovery
 		{
 			throw new PasswordRecoveryException( 'Rozszerzenie SSH2 jest wymagane' );
 		}
-
-		$this -> bCurl = extension_loaded( 'curl' );
-
-		if( $sValue === 'mysql' )
+		else if( $sValue === 'mysql' )
 		{
-			$this -> bMysqli = extension_loaded( 'mysqli' );
-			$this -> bPdo    = ( extension_loaded( 'pdo' ) && extension_loaded( 'pdo_mysql' ) );
-
 			if( ! $this -> bMysqli && ! $this -> bPdo && ! extension_loaded( 'mysqli' ) )
 			{
 				throw new PasswordRecoveryException( 'Żadne z rozszerzeń mysql, mysql, pdo_mysql nie jest dostepne' );
@@ -167,8 +168,6 @@ class PasswordRecovery
 			{
 				throw new PasswordRecoveryException( 'Rozszerzenie FTP nie jest dostępne' );
 			}
-
-			$this -> bFtp = function_exists( 'ftp_connect' );
 		}
 		else if( ( $sValue === 'http' ) && ! $this -> bCurl )
 		{
@@ -346,7 +345,7 @@ class PasswordRecovery
 				 */
 				if( $this -> login( $sUser, $sPassword ) )
 				{
-					printf( "\r\nOdzyskano hasło: %s - %s:%d\n%s:%s\r\n\r\n", $this -> sType, $this -> sHost, $this -> iPort, $sUser, $sPassword );
+					printf( "\r\nOdzyskano hasło: %s - %s:%d\r\n%s:%s\r\n\r\n", $this -> sType, $this -> sHost, $this -> iPort, $sUser, $sPassword );
 
 					@ ob_flush();
 					@ flush();

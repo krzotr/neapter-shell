@@ -2,8 +2,8 @@
 
 $sFilePath = __DIR__ . '/Tmp/prod.php';
 
-$sData = "<?php\n";
-foreach( array( 'Lib/Arr', 'Lib/Form', 'Lib/Html', 'Lib/Request', 'Lib/MysqlDumper', 'Lib/PasswordRecovery', 'shell' ) as $sFile )
+$sData = "<?php\r\n";
+foreach( array( 'Lib/Arr', 'Lib/Form', 'Lib/Html', 'Lib/Request', 'Lib/MysqlDumper', 'Lib/PasswordRecovery', 'Lib/Dos', 'shell' ) as $sFile )
 {
 	$sData .= file_get_contents( $sFile . '.php', NULL, NULL, 6 );
 }
@@ -45,12 +45,12 @@ $sData = preg_replace( '~\t~s', NULL, $sData );
 /**
  * Redukcja \r\n
  */
-$sData = preg_replace( '~[\r\n]{2,}~', "\n", $sData );
+$sData = preg_replace( '~[\r\n]{2,}~', "\r\n", $sData );
 
 /**
  * Redukcja spacji
  */
-$sData = preg_replace( '~ {2,}~', "\n", $sData );
+$sData = preg_replace( '~ {2,}~', "\r\n", $sData );
 
 /**
  * Tablica $mConfig[ $sParam ] -> $mConfig[$sParam]
