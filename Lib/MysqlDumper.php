@@ -3,7 +3,7 @@
 /**
  * Neapter Framework
  *
- * @version   $Id: MysqlDumper.php 580 2011-05-31 11:15:24Z krzotr $
+ * @version   $Id: MysqlDumper.php 582 2011-06-02 16:07:16Z krzotr $
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2010-2011, Krzysztof Otręba
@@ -374,10 +374,10 @@ class MysqlDumper
 			/**
 			 * Wyswietlanie struktury tabeli + DISABLE KEYS
 			 */
-			printf( "-- ----------------------------------------------------\n" .
-				"-- Struktura tabeli %s\n" .
-				"-- ----------------------------------------------------\n" .
-				"%s;\n\n/*!40000 ALTER TABLE `%s` DISABLE KEYS */;\n",
+			printf( "-- ----------------------------------------------------\r\n" .
+				"-- Struktura tabeli %s\r\n" .
+				"-- ----------------------------------------------------\r\n" .
+				"%s;\r\n\r\n/*!40000 ALTER TABLE `%s` DISABLE KEYS */;\r\n",
 				$sTablename, $aRow['Create Table'], $sTablename
 			);
 
@@ -471,7 +471,14 @@ class MysqlDumper
 							 * Bin
 							 */
 							case 'binary':
-								$sRow .= '0x' . bin2hex( $mValue ) . ', ';
+								if( $mValue == '' )
+								{
+									$sRow .= '\'\', ';
+								}
+								else
+								{
+									$sRow .= '0x' . bin2hex( $mValue ) . ', ';
+								}
 								break ;
 							/**
 							 * String, data itp
@@ -495,11 +502,11 @@ class MysqlDumper
 					 */
 					if( $this -> bExtendedInsert )
 					{
-						$sRow = substr( $sRow, 0, -2 ) . "),\n";
+						$sRow = substr( $sRow, 0, -2 ) . "),\r\n";
 					}
 					else
 					{
-						echo substr( $sRow, 0, -2 ) . ";\n";
+						echo substr( $sRow, 0, -2 ) . ";\r\n";
 					}
 				}
 
@@ -508,7 +515,7 @@ class MysqlDumper
 				 */
 				if( $this -> bExtendedInsert )
 				{
-					echo substr( $sRow, 0, -2 ) . ";\n\n";
+					echo substr( $sRow, 0, -3 ) . ";\r\n\r\n";
 				}
 
 				/**
@@ -524,7 +531,7 @@ class MysqlDumper
 			/**
 			 * ENABLE KEYS - szybszy import pliku SQL
 			 */
-			echo "/*!40000 ALTER TABLE `{$sTablename}` ENABLE KEYS */;\n\n";
+			echo "/*!40000 ALTER TABLE `{$sTablename}` ENABLE KEYS */;\r\n\r\n";
 		}
 
 		printf( '-- Wygenerowano w: %5f', microtime( 1 ) - $fStart );
