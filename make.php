@@ -1,7 +1,5 @@
 <?php
 
-$sFilePath = __DIR__ . '/Tmp/prod.php';
-
 $sData = "<?php\r\n";
 
 $aFiles = array( 'LibProd/Arr', 'LibProd/Form', 'LibProd/Request' );
@@ -19,7 +17,7 @@ foreach( $aFiles as $sFile )
 
 $sData = preg_replace( '~^require_once.+?[\r\n]+~m', NULL, $sData ) . "?>";
 
-
+file_put_contents( __DIR__ . '/Tmp/dev.php', $sData );
 
 /**
  * Wyrazenie " ! " -> "!"
@@ -49,7 +47,16 @@ $sData = preg_replace( '~/\*(.+?)\*/~s', NULL, $sData );
 /**
  * Usuwanie tabualtorow
  */
-//$sData = preg_replace( '~\t~s', NULL, $sData );
+$sData = preg_replace_callback( '~(<<<DATA(.+?)DATA;|\t)~s', function( $aVal )
+	{
+		if( $aVal[0] !== "\t" )
+		{
+			return $aVal[0];
+		}
+
+	}
+	, $sData
+);
 
 /**
  * Redukcja \r\n
@@ -122,7 +129,9 @@ $sData = preg_replace( '~[\r\n]+{[\r\n]+~', '{', $sData );
 $sData = preg_replace( '~(_GET|_POST|_SERVER|_FILES|null|true);[\r\n]+~i', '$1;', $sData );
 
 $sData = preg_replace( '~\';[\r\n+]~i', '\';', $sData );
-file_put_contents( $sFilePath, $sData );
+
+file_put_contents( __DIR__ . '/Tmp/prod.php', $sData );
+
 $sData = '?>' . $sData . '<?';
 
 for( $i = 0; $i < 10; $i++ )
