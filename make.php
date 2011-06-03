@@ -3,12 +3,21 @@
 $sFilePath = __DIR__ . '/Tmp/prod.php';
 
 $sData = "<?php\r\n";
-foreach( array( 'Lib/Arr', 'Lib/Form', 'Lib/Html', 'Lib/Request', 'Lib/MysqlDumper', 'Lib/PasswordRecovery', 'Lib/Dos', 'shell' ) as $sFile )
+
+$aFiles = array( 'LibProd/Arr', 'LibProd/Form', 'LibProd/Request' );
+if( isset( $argv[1] ) && ( $argv[1] !== 'lite' ) )
+{
+	$aFiles = array_merge( $aFiles, array( 'LibProd/ModuleMysqlDumper', 'LibProd/ModulePasswordRecovery', 'LibProd/ModuleDos', 'LibProd/ModuleProxy' ) );
+}
+$aFiles = array_merge( $aFiles, array( 'shell' ) );
+
+foreach( $aFiles as $sFile )
 {
 	$sData .= file_get_contents( $sFile . '.php', NULL, NULL, 6 );
 }
 
-$sData = preg_replace( '~require_once.+?[\r\n]~', NULL, $sData ) . "?>";
+
+$sData = preg_replace( '~^require_once.+?[\r\n]+~m', NULL, $sData ) . "?>";
 
 file_put_contents( $sFilePath, $sData );
 

@@ -72,10 +72,10 @@ class Request
 	{
 		if( get_magic_quotes_gpc() )
 		{
-			self::striSlashes( $_GET );
-			self::striSlashes( $_POST );
-			self::striSlashes( $_FILES );
-			self::striSlashes( $_SERVER );
+			self::stripSlashes( $_GET );
+			self::stripSlashes( $_POST );
+			self::stripSlashes( $_FILES );
+			self::stripSlashes( $_SERVER );
 		}
 
 		self::$aGet    = $_GET;
@@ -91,7 +91,7 @@ class Request
 	 * @param  array   $aData Tablica
 	 * @return void
 	 */
-	private static function striSlashes( array & $mData )
+	private static function stripSlashes( array & $mData )
 	{
 		array_walk_recursive( $mData, create_function( '& $sData',
 				'$sData = stripslashes( $sData ); '
@@ -134,18 +134,6 @@ class Request
 	}
 
 	/**
-	 * Pobieranie tablicy $_GET
-	 *
-	 * @static
-	 * @access public
-	 * @return array  Tablica $_GET
-	 */
-	public static function getGetAll()
-	{
-		return self::$aGet;
-	}
-
-	/**
 	 * Pobieranie klucza ze $_POST
 	 *
 	 * @uses   Arr
@@ -161,18 +149,6 @@ class Request
 	}
 
 	/**
-	 * Pobieranie tablicy $_POST
-	 *
-	 * @static
-	 * @access public
-	 * @return array  Tablica $_POST
-	 */
-	public static function getPostAll()
-	{
-		return self::$aPost;
-	}
-
-	/**
 	 * Pobieranie klucza ze $_FILES
 	 *
 	 * @uses   Neapter\Core\Arr
@@ -185,18 +161,6 @@ class Request
 	public static function getFiles( $sName = NULL )
 	{
 		return Arr::get( $sName, self::$aFiles );
-	}
-
-	/**
-	 * Pobieranie tablicy $_FILES
-	 *
-	 * @static
-	 * @access public
-	 * @return array  Tablica $_FILES
-	 */
-	public static function getFilesAll()
-	{
-		return self::$aFiles;
 	}
 
 	/**
@@ -227,66 +191,6 @@ class Request
 	public static function getServerAll()
 	{
 		return self::$aServer;
-	}
-
-	/**
-	 * Pobieranie UserAgenta
-	 *
-	 * @static
-	 * @access public
-	 * @return string
-	 */
-	public static function getUerAgent()
-	{
-		return self::getServer( 'HTTP_USER_AGENT' );
-	}
-
-	/**
-	 * Pobieranie adresu IP uzytkownika
-	 *
-	 * @static
-	 * @access public
-	 * @return string
-	 */
-	public static function getUserIp()
-	{
-		return self::getServer( 'REMOTE_ADDR' );
-	}
-
-	/**
-	 * Pobieranie refereru
-	 *
-	 * @static
-	 * @access public
-	 * @return string
-	 */
-	public static function getReferer()
-	{
-		return self::getServer( 'HTTP_REFERER' );
-	}
-
-	/**
-	 * Czy dane wysylane sa metoda GET
-	 *
-	 * @static
-	 * @access public
-	 * @return boolean TRUE jesli dane sa wysylane metoda GET
-	 */
-	public static function isGet()
-	{
-		return ( self::getServer( 'REQUEST_METHOD' ) === 'GET' );
-	}
-
-	/**
-	 * Czy dane wysylane sa metoda POST
-	 *
-	 * @static
-	 * @access public
-	 * @return boolean TRUE jesli dane sa wysylane metoda POST
-	 */
-	public static function isPost()
-	{
-		return ( self::getServer( 'REQUEST_METHOD' ) === 'POST' );
 	}
 
 }

