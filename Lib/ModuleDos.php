@@ -13,6 +13,11 @@ class DosException extends Exception {}
 class Dos
 {
 	/**
+	 * Wersja
+	 */
+	const VERSION = '1.0';
+
+	/**
 	 * Adres hosta
 	 *
 	 * @access protected

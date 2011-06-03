@@ -42,6 +42,11 @@ class MysqlDumperException extends Exception {}
 class MysqlDumper
 {
 	/**
+	 * Wersja
+	 */
+	const VERSION = '1.0';
+
+	/**
 	 * Obiekt PDO
 	 *
 	 * @access protected

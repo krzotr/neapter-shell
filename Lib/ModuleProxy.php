@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /**
  * ProxyException - Proxy wyjatki
@@ -10,6 +10,11 @@ class ProxyException extends Exception {}
  */
 class Proxy
 {
+	/**
+	 * Wersja
+	 */
+	const VERSION = '1.0';
+
 	/**
 	 * Numer portu
 	 *
@@ -25,7 +30,6 @@ class Proxy
 	 * @var    boolean
 	 */
 	protected $bNoImages = FALSE;
-
 
 	/**
 	 * Konstruktor
@@ -58,7 +62,7 @@ class Proxy
 		 */
 		if( ( $iValue < 0 ) || ( $iValue > 65535 ) )
 		{
-			throw new ProxyException( sprintf( 'BĹ‚Ä™dny port "%d"', $iValue ) );
+			throw new ProxyException( sprintf( 'Błędny port "%d"', $iValue ) );
 		}
 
 		$this -> iPort = (int) $iValue;
@@ -98,7 +102,7 @@ class Proxy
 		 */
 		if( ! ( $rSock = socket_create( AF_INET, SOCK_STREAM, getProtoByName( 'tcp' ) ) ) )
 		{
-			throw new ProxyException( 'Nie moĹĽna utworzyÄ‡ socketa' );
+			throw new ProxyException( 'Nie można utworzyć socketa' );
 		}
 
 		/**
@@ -106,7 +110,7 @@ class Proxy
 		 */
 		if( ! socket_bind( $rSock, '0.0.0.0', $this -> iPort ) )
 		{
-			throw new ProxyException( sprintf( 'Nie moĹĽna zbindowaÄ‡ 0.0.0.0:%d', $this -> iPort ) );
+			throw new ProxyException( sprintf( 'Nie można zbindować 0.0.0.0:%d', $this -> iPort ) );
 		}
 
 		/**
@@ -119,7 +123,7 @@ class Proxy
 		 */
 		if( ! socket_listen( $rSock ) )
 		{
-			throw new ProxyException( 'Nie moĹĽna nasĹ‚uchiwaÄ‡' );
+			throw new ProxyException( 'Nie można nasłuchiwać' );
 		}
 
 

