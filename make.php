@@ -116,9 +116,14 @@ $sData = preg_replace( '~\[\s+(.+?)\s+\]~s', '[$1]', $sData );
 $sData = preg_replace( '~\s+=>\s+~', '=>', $sData );
 
 /**
- * Obiekty $this -> prop    -> $this->prop
+ * Obiekty $this -> prop   $this->prop
  */
 $sData = preg_replace( '~\s+->\s+~', '->', $sData );
+
+/**
+ * break ;, exit ;, continue ; -> break;, exit;, continue
+ */
+$sData = preg_replace( '~(break|continue|exit) ;~', '$1;', $sData );
 
 /**
  * private $a;
@@ -165,7 +170,17 @@ $sData = preg_replace( '~[\r\n]+{[\r\n]+~', '{', $sData );
  */
 $sData = preg_replace( '~(_GET|_POST|_SERVER|_FILES|null|true);[\r\n]+~i', '$1;', $sData );
 
-$sData = preg_replace( '~\';[\r\n+]~i', '\';', $sData );
+$sData = preg_replace( '~\';[\r\n+]~', '\';', $sData );
+
+
+$sData = preg_replace( '~\r\n~', "\n", $sData );
+
+
+$sData = preg_replace( '~\}\n\}\n\}\n?~', '}}}', $sData );
+$sData = preg_replace( '~}\n\}\n?~', '}}', $sData );
+$sData = preg_replace( '~}\n?~', '}', $sData );
+
+$sData = preg_replace( '~(?<!\nDATA);\n~', ';', $sData );
 
 if( isset( $argv[1] ) && $argv[1] === 'modules' )
 {
@@ -179,9 +194,9 @@ else
 
 $sData = '?>' . $sData . '<?';
 
-for( $i = 0; $i < 10; $i++ )
+for( $i = 0; $i < 1; $i++ )
 {
 	$sData = sprintf( "eval(gzuncompress(base64_decode('%s')));", base64_encode( gzcompress( $sData, 9 ) ) );
 }
 
-file_put_contents( __DIR__ . '/Tmp/final.php', sprintf( "<?php eval(gzuncompress(base64_decode('%s')));", base64_encode( gzcompress( $sData, 9 ) ) ) );
+file_put_contents( __DIR__ . '/Tmp/final.php', sprintf( "<?php eval(gzuncompress(base64_decode('%s')));?>", base64_encode( gzcompress( $sData, 9 ) ) ) );

