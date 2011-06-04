@@ -342,3 +342,140 @@ class Proxy
 	}
 
 }
+
+/**
+ * =================================================================================================
+ */
+
+/**
+ * ModuleProxy - Proxy
+ */
+class ModuleProxy implements ShellInterface
+{
+	/**
+	 * Obiekt Shell
+	 *
+	 * @access private
+	 * @var    object
+	 */
+	private $oShell;
+
+	/**
+	 * Konstruktor
+	 *
+	 * @access public
+	 * @param  object $oShell Obiekt Shell
+	 * @return void
+	 */
+	public function __construct( Shell $oShell )
+	{
+		$this -> oShell = $oShell;
+	}
+
+	/**
+	 * Dostepna lista komend
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function getCommands()
+	{
+		return array( 'proxy' );
+	}
+
+	/**
+	 * Zwracanie wersji modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function getVersion()
+	{
+		/**
+		 * Wersja Data Autor
+		 */
+		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+	}
+
+	/**
+	 * Zwracanie pomocy modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function getHelp()
+	{
+		return <<<DATA
+Proxy HTTP
+
+	Proxy nie ma wielowątkowości, i ma poblemy z flushowaniem !!!
+	Należy zmienić ilość polaczeń do serwera
+		Opera:
+			Narzedzia -> Preferencje -> Siec
+			Maksymalna liczba polaczen z serweram: 2
+			Maksymalna laczna liczba polaczen:     8
+
+	Jeśli jedna osoba pobiera duży plik to następne żądania są zablokowane.
+	Blokada jest zwolniona po tym jak użytkownik przerwie lub ściągnie plik
+	Proxy te nie sluży do przeglądania youtuba, a wyłacznie do pobieranie małych plików tekstowych
+
+	Aby zatrzymać serwer nalezy wyslac do niego polecenie ':exit' lub odwiedzić hosta 'command.exit'
+
+	Użycie:
+		proxy [opcja] port
+
+	Opcje:
+		-i - ignorowanie obrazków, jeśli wystąpi żądanie na plik .jpg .gif .png .ico .psd .bmp
+		     zostanie wysłany plik graficzny gif 1x1 px
+
+	Przykład:
+		proxy 2222
+		proxy -i 2222
+DATA;
+	}
+
+	/**
+	 * Wywolanie modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function get()
+	{
+		/**
+		 * Czy modul jest zaladowany
+		 */
+		if( ! class_exists( 'Proxy' ) )
+		{
+			return 'proxy - !!! moduł nie został załadowany';
+		}
+
+		/**
+		 * Help
+		 */
+		if( $this -> oShell -> iArgc !== 1 )
+		{
+			return $this -> getHelp();
+		}
+
+		try
+		{
+			ob_start();
+
+			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
+
+			$oProxy = new Proxy();
+			$oProxy -> setPort( $this -> oShell -> aArgv[0] )
+				-> setNoImages( in_array( 'i', $this -> oShell -> aOptv ) )
+				-> get();
+			ob_end_flush();
+			exit ;
+		}
+		catch( ProxyException $oException )
+		{
+			header( 'Content-Type: text/html; charset=utf-8', TRUE );
+			return $oException -> getMessage();
+		}
+	}
+
+}

