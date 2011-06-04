@@ -2,6 +2,9 @@
 
 /**
  * ModuleDummy - Szkielet modulu
+ *
+ * Klasa musi dzialac na php 5.2.X !!!
+ * Zamiast __FILE__ uzyj 'Request::getServer( 'SCRIPT_FILENAME' )'
  */
 class ModuleDummy implements ShellInterface
 {
@@ -57,7 +60,7 @@ class ModuleDummy implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+		return '1.0 2011-06-04 - <adres_autora>';
 	}
 
 	/**
@@ -90,28 +93,28 @@ DATA;
 	public function get()
 	{
 		/**
-		 * $oShell -> bSafeMode - SafeMode
+		 * $this -> oShell -> bSafeMode - SafeMode
 		 *   TRUE jezeli wlaczone
 		 *
-		 * $oShell -> bWindows  - Czy dzialamy na systemie Windows ?
-		 *   TRUE jezeli dzialamy na windowsie
+		 * $this -> oShell -> bWindows  - Czy dzialamy na systemie Windows ?
+		 *   TRUE jezeli dzialamy na Windowsie
 		 *
-		 * $oShell -> sCmd      - Komenda - (:test param1 param2)
+		 * $this -> oShell -> sCmd      - Komenda - (:test param1 param2)
 		 *   test
 		 *
-		 * $oShell -> aArgv     - Argumenty (:test param1 param2)
+		 * $this -> oShell -> aArgv     - Argumenty (:test param1 param2)
 		 *   [0] => param1
 		 *   [1] => param2
 		 *
-		 * $oShell -> iArgc     - Ilosc parametrow (:test param1 param2)
+		 * $this -> oShell -> iArgc     - Ilosc parametrow (:test param1 param2)
 		 *   2
 		 *
-		 * $oShell -> aOptv     - Opcje (:test -ab -c param1 param2)
+		 * $this -> oShell -> aOptv     - Opcje (:test -ab -c param1 param2)
 		 *   [0] => a
 		 *   [1] => b
 		 *   [2] => c
 		 *
-		 * $oSHell -> sArgv     - Caly ciag parametrow (:test -ab -c param1 param2)
+		 * $this -> oShell -> sArgv     - Caly ciag parametrow (:test -ab -c param1 param2)
 		 *   -ab -c param1 param2
 		 */
 	}

