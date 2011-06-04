@@ -693,7 +693,7 @@ DATA;
 			return strip_tags( $sConsole );
 		}
 
-		$sContent  = sprintf( '<pre id="console">%s</pre<div>', $sConsole ) .
+		$sContent  = sprintf( '<pre id="console">%s</pre><div>', $sConsole ) .
 		             sprintf( '<form action="%s" method="post">', Request::getCurrentUrl() ) .
 		             sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', ( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : $sCmd ) ) .
 			     '<input type="submit" name="submit" value="Execute" id="cmd-send" /></form></div>';

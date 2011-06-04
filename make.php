@@ -180,7 +180,7 @@ $sData = preg_replace( '~\}\n\}\n\}\n?~', '}}}', $sData );
 $sData = preg_replace( '~}\n\}\n?~', '}}', $sData );
 $sData = preg_replace( '~}\n?~', '}', $sData );
 
-$sData = preg_replace( '~(?<!\nDATA);\n~', ';', $sData );
+$sData = preg_replace( '~(?<!\nDATA);\n(<!DATA;)~', ';', $sData );
 
 if( isset( $argv[1] ) && $argv[1] === 'modules' )
 {
