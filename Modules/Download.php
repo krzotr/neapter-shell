@@ -52,7 +52,7 @@ class ModuleDownload implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+		return '1.01 2011-06-18 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -94,12 +94,12 @@ DATA;
 			return $this -> getHelp();
 		}
 
-		$bGzip = in_array( 'g', in_array( 'R', $this -> oShell -> aOptv ) );
+		$bGzip = in_array( 'g', $this -> oShell -> aOptv );
 
 		/**
 		 * Plik zrodlowy musi istniec
 		 */
-		if( ! is_file( $this -> sArgv ) )
+		if( ! is_file( $this -> oShell -> sArgv ) )
 		{
 			return sprintf( 'Plik "%s" nie istnieje', $this -> oShell -> sArgv );
 		}

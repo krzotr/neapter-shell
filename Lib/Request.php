@@ -113,9 +113,16 @@ class Request
 	{
 		static $sFullPath;
 
-		$sFullPath = 'http' . ( ( strncasecmp( self::getServer( 'HTTPS' ), 'on', 2 ) === 0 ) ? 's' : NULL ) . '://' . self::getServer( 'HTTP_HOST' ) . self::getServer( 'SCRIPT_NAME' ) ;
+		if( $sFullPath === NULL )
+		{
+			$sFullPath = sprintf( 'http%s://%s%s%s',
+				( ( strncasecmp( self::getServer( 'HTTPS' ), 'on', 2 ) === 0 ) ? 's' : NULL ),
+				self::getServer( 'HTTP_HOST' ), self::getServer( 'SCRIPT_NAME' ),
+				( ( ( $sQuery = self::getServer( 'QUERY_STRING' ) ) === '' ) ? '' : '?' . $sQuery )
+			);
+		}
 
-		return $sFullPath . ( ( ( $sQuery = self::getServer( 'QUERY_STRING' ) ) === '' ) ? '' : '?' . $sQuery );
+		return $sFullPath;
 	}
 
 	/**
