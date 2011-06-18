@@ -4,6 +4,8 @@
  * ModuleDummy - Szkielet modulu
  *
  * Klasa musi dzialac na php 5.2.X !!!
+ *
+ * Jezeli uzyjemy 'eval' to stale __FILE__, __DIR__ itp nie zadzialaja !!!
  * Zamiast __FILE__ uzyj 'Request::getServer( 'SCRIPT_FILENAME' )'
  */
 class ModuleDummy implements ShellInterface

@@ -15,9 +15,7 @@ require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
 /**
  * class Shell - Zarzadzanie serwerem
  *
- *  jezeli uzyjemy 'eval' to stale __FILE__, __DIR__ itp nie dzialaja !!!
- *
- * @version 0.2
+ * @version 0.21
  *
  * @uses Arr
  * @uses Request

@@ -4,7 +4,7 @@ Changelog:
 
 2011-06-18 v0.21
 ----------------
-*	Usunięto błąd związany z umieszczeniem parametru w cudzysłowie lub apostrofie (:down "/sciezka/   do     / katalogu     /")
+*	Usunięto błąd związany z umieszczeniem parametru w cudzysłowie lub apostrofie (:down "/sciezka/ do/ katalogu /")
 *	Usunięto XSS w lini poleceń
 *	Poprawiono pobieranie plików
 *	DoS na HTTP z użyciem CURL'a jest efektywniejszy
@@ -30,7 +30,7 @@ Changelog:
 	*	passwordrecovery
 	*	cr3d1ts
 *	możliwość wczytania danego modułu
-*	polecenie 'cr3d1ts' nie wyświetla się w help'ie (&#069;&#097;&#115;&#116;&#101;&#114;&#032;&#101;&#103;&#103;)
+*	polecenie 'cr3d1ts' nie wyświetla się w help'ie
 *	'php' jest aliasem dla 'eval
 
 
