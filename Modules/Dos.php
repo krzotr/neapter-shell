@@ -530,7 +530,7 @@ class ModuleDos implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+		return '1.01 2011-06-18 - <krzotr@gmail.com>';
 	}
 
 	/**

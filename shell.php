@@ -28,7 +28,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.2 b110605';
+	const VERSION = '0.21 b110618';
 
 	/**
 	 * Czas generowania strony
