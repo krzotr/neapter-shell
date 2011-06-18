@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleMv - Przenoszenie pliku / katalogu
  */
 class ModuleMv implements ShellInterface
 {

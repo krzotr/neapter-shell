@@ -13,11 +13,6 @@ class PasswordRecoveryException extends Exception {}
 class PasswordRecovery
 {
 	/**
-	 * Wersja
-	 */
-	const VERSION = '1.0';
-
-	/**
 	 * Adres hosta
 	 *
 	 * @access protected
@@ -495,7 +490,7 @@ class PasswordRecovery
  */
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModulePasswordRecovery - Odzyskiwanie hasel
  */
 class ModulePasswordRecovery implements ShellInterface
 {

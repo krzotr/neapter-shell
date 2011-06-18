@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleG4m3 - Gra
  */
 class ModuleG4m3 implements ShellInterface
 {

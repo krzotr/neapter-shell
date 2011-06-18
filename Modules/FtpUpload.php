@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleFtpUpload - Wysylanie pliku na FTP
  */
 class ModuleFtpUpload implements ShellInterface
 {
@@ -35,9 +35,9 @@ class ModuleFtpUpload implements ShellInterface
 	{
 		return array
 		(
-			'socketupload',
-			'socketup',
-			'socketput'
+			'ftpupload',
+			'ftpup',
+			'ftpput'
 		);
 	}
 

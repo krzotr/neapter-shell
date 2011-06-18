@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleCp - Kopiowanie pliku
  */
 class ModuleCp implements ShellInterface
 {

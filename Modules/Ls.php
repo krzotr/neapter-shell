@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleLs - Listowanie plikow / katalogow
  */
 class ModuleLs implements ShellInterface
 {

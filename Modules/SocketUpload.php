@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleSocketUpload - Wysylanie pliku za pomoca socket'a
  */
 class ModuleSocketUpload implements ShellInterface
 {

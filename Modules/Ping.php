@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModulePing - Ping
  */
 class ModulePing implements ShellInterface
 {

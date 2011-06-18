@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleEval - Wykonanie kodu PHP
  */
 class ModuleEval implements ShellInterface
 {

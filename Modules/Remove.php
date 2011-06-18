@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleRemove - Usuwanie pliku / katalogu
  */
 class ModuleRemove implements ShellInterface
 {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleFtpDownload - Pobieranie pliku z FTP
  */
 class ModuleFtpDownload implements ShellInterface
 {
@@ -37,7 +37,7 @@ class ModuleFtpDownload implements ShellInterface
 		(
 			'ftpdownload',
 			'ftpdown',
-			'ftpdown'
+			'ftpget'
 		);
 	}
 

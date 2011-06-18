@@ -6,7 +6,7 @@
 class BackConnectException extends Exception {}
 
 /**
- * class BackConnect - BackConnect
+ * class BackConnect - Polaczenie zwrotne
  */
 class BackConnect
 {

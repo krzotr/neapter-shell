@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleCat - Wyswietlanie zawartosci pliku
  */
 class ModuleCat implements ShellInterface
 {

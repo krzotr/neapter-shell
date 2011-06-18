@@ -11,11 +11,6 @@ class ProxyException extends Exception {}
 class Proxy
 {
 	/**
-	 * Wersja
-	 */
-	const VERSION = '1.0';
-
-	/**
 	 * Numer portu
 	 *
 	 * @access protected

@@ -13,7 +13,7 @@
  */
 
 /**
- * class CdnServer - CdnSerwer Wyjatki
+ * class MysqlDumperException - CdnSerwer Wyjatki
  *
  * @package    Lib
  * @subpackage MysqlDumper
@@ -41,11 +41,6 @@ class MysqlDumperException extends Exception {}
  */
 class MysqlDumper
 {
-	/**
-	 * Wersja
-	 */
-	const VERSION = '1.0';
-
 	/**
 	 * Obiekt PDO
 	 *
@@ -571,7 +566,7 @@ class MysqlDumper
  */
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleMysqlDump - Zrzucanie rekordow z bazy danych
  */
 class ModuleMysqlDump implements ShellInterface
 {

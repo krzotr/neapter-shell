@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleEtcPasswd - odwzorowanie pliku /etc/passwd
  */
 class ModuleEtcPasswd implements ShellInterface
 {

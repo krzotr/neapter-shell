@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleSocketDownload - Pobieranie pliku za pomoca socket'a
  */
 class ModuleSocketDownload implements ShellInterface
 {

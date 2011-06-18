@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModulePhpinfo - PHPinfo
  */
 class ModulePhpinfo implements ShellInterface
 {

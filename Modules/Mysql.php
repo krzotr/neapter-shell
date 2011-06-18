@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleMysql - Wykonywanie polecen SQL
  */
 class ModuleMysql implements ShellInterface
 {

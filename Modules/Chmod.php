@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleChmod - Zmienianie uprawnien dla pliku
  */
 class ModuleChmod implements ShellInterface
 {

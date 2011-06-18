@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ModuleDummy - Szkielet modulu
+ * ModuleBcat - Wyswietlanie zawartosci pliku w base64
  */
 class ModuleBcat implements ShellInterface
 {

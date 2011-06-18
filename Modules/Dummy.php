@@ -13,6 +13,7 @@ class ModuleDummy implements ShellInterface
 	/**
 	 * Obiekt Shell
 	 *
+	 * @ignore
 	 * @access private
 	 * @var    object
 	 */
