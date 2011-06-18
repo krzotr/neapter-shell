@@ -1,6 +1,15 @@
 Changelog:
 ==========
 
+
+2011-06-18 v0.21
+----------------
+*	Usunięto błąd związany z umieszczeniem parametru w cudzysłowie lub apostrofie (:down "/sciezka/   do     / katalogu     /")
+*	Usunięto XSS w lini poleceń
+*	Poprawiono pobieranie plików
+*	DoS na HTTP z użyciem CURL'a jest efektywniejszy
+
+
 2011-06-03 v0.2
 ---------------
 
