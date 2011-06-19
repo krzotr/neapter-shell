@@ -4,6 +4,11 @@
  * Wymagane PHP 5.3
  */
 
+/**
+ * Nazwa pliku ze stylami
+ */
+define( 'STYLE', 'blue' );
+
 $sData = "<?php\r\n";
 
 if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
@@ -27,13 +32,33 @@ if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 		//$aFiles[] = 'Modules/Eval';
 	}
 
+	if( ! is_file( sprintf( 'Styles/%s.css', STYLE ) ) )
+	{
+		echo "Plik ze stylami nie istnieje\r\n";
+		exit ;
+	}
+
 	$aFiles[] = 'shell';
 
 	print_r( $aFiles );
 
 	foreach( $aFiles as $sFile )
 	{
-		$sData .= file_get_contents( $sFile . '.php', NULL, NULL, 6 );
+		if( $sFile === 'shell' )
+		{
+			/**
+			 * Style
+			 */
+			$sShellData = preg_replace( '~\$this \-> sStyleSheet = file_get_contents( \'(.+?)\' );~', '', file_get_contents( $sFile . '.php', NULL, NULL, 6 ) );
+			$sShellData = preg_replace( '~private \$StyleSheet;~', '', $sShellData );
+			$sShellData = preg_replace( '~{\$this -> sStyleSheet}~', sprintf( '{%s}', file_get_contents( sprintf( 'Styles/%s.css', STYLE ) ) ), $sShellData );
+
+			$sData .= $sShellData;
+		}
+		else
+		{
+			$sData .= file_get_contents( $sFile . '.php', NULL, NULL, 6 );
+		}
 	}
 
 	$sData = preg_replace( '~^require_once.+?[\r\n]+~m', NULL, $sData ) . "?>";
