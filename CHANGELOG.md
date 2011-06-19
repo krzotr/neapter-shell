@@ -1,6 +1,10 @@
 Changelog:
 ==========
 
+2011
+*	Dodano możliwość zmiany styli
+*	Dodano panel logowania #1
+
 
 2011-06-18 v0.21
 ----------------

