@@ -190,6 +190,7 @@ class Shell
 			ini_set( 'memory_limit', '1024M' );
 			ini_set( 'default_socket_timeout', 5 );
 			ini_set( 'date.timezone', 'Europe/Warsaw' );
+			ini_set( 'html_errors', 0 );
 		}
 
 		/**
