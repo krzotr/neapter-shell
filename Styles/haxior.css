@@ -1,0 +1,19 @@
+body{background-color:#222;color:#ccc;font-size:12px;font-family:sans-serif,Verdana,Tahoma,Arial;margin:10px;padding:0}
+a{color:#74a202;text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3,h4,h5,h6{margin-top:10px;padding-bottom:5px;color:#ccc;border-bottom:2px solid #253905}
+table{background-color:#333;border:1px solid #eef;margin:auto;padding:0;border-spacing:0}
+td{margin:0;padding:0 20px 0 20px}
+th{color:#fff;font-size:14px;font-weight:700;margin:0;padding:0}
+hr{margin-top:20px;background-color:#253905;border:1px solid #253905}
+div#body{text-align:center;border:1px solid #000;min-width:940px;background-color:#333;margin:0 auto;padding:8px 20px 10px}
+div#menu{text-align:left;margin:0 auto}
+div#bottom{margin:10px auto}
+div#content{padding-top:10px;margin:0 auto}
+pre#console{text-align:left;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#222;color:#ccc;border:3px solid #def;overflow:scroll;margin:0 auto;padding:14px}
+input{color:#ccc;border:1px solid #74a202;background-color:#222;font-size:14px;padding:6px}
+input:hover{background-color:#252525}
+input#cmd{width:88%;margin-top:10px;padding-left:10px}
+input#cmd-send{margin-top:10px;margin-left:20px}
+.green{color:#5b5;font-weight:700}
+.red{color:#b55;font-weight:700}
