@@ -1,0 +1,19 @@
+body{background-color:#111;color:#c3c3c3;font-size:12px;font-family:sans-serif,Verdana,Tahoma,Arial;margin:10px;padding:0}
+a{color:#c9c9c9;text-decoration:none}
+a:hover{color:#cfcfcf;text-decoration:underline}
+h1,h2,h3,h4,h5,h6{margin-top:10px;padding-bottom:5px;color:#c0c0c0}
+table{background-color:#22262a;border:1px solid #eef;border-radius:20px;-moz-border-radius:20px;margin:auto;padding:6px}
+td{background-color:#242424;border-radius:5px;-moz-border-radius:5px;margin:0;padding:0 0 0 4px}
+th{color:#fff;font-size:14px;font-weight:700;border-radius:5px;-moz-border-radius:5px;margin:0;padding:2px}
+hr{margin-top:20px;background-color:#eff;border:1px solid #c0c0c0}
+div#body{text-align:center;border:3px solid #161616;border-radius:20px;-moz-border-radius:20px;min-width:940px;background-color:#1a1a1a;margin:0 auto;padding:8px 20px 10px}
+div#menu{text-align:left;margin:0 auto}
+div#bottom{margin:10px auto}
+div#content{padding-top:10px;margin:0 auto}
+pre#console{text-align:left;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#34383c;color:#d4d4d4;border:1px solid #b4bac0;overflow:scroll;margin:0 auto;padding:14px}
+input{border:1px solid #000;background-color:#606060;font-size:14px;padding:6px;;color:#cfcfcf}
+input:hover{color:#fff}
+input#cmd{width:88%;margin-top:10px;padding-left:10px}
+input#cmd-send{margin-top:10px;margin-left:20px;font-weight:700}
+.green{color:#7b5;font-weight:700}
+.red{color:#b55;font-weight:700}

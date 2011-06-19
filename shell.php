@@ -128,7 +128,7 @@ class Shell
 	 * @access private
 	 * @var    string
 	 */
-	private $StyleSheet;
+	private $sStyleSheet;
 
 	/**
 	 * Konstruktor
@@ -148,7 +148,7 @@ class Shell
 		/**
 		 * @ignore
 		 */
-		$this -> sStyleSheet = file_get_contents( 'Styles/blue.css' );
+		$this -> sStyleSheet = file_get_contents( 'Styles/dark.css' );
 
 		/**
 		 * @see Request::init

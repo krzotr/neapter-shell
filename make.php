@@ -4,11 +4,6 @@
  * Wymagane PHP 5.3
  */
 
-/**
- * Nazwa pliku ze stylami
- */
-define( 'STYLE', 'blue' );
-
 $sData = "<?php\r\n";
 
 if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
@@ -32,12 +27,6 @@ if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 		//$aFiles[] = 'Modules/Eval';
 	}
 
-	if( ! is_file( sprintf( 'Styles/%s.css', STYLE ) ) )
-	{
-		echo "Plik ze stylami nie istnieje\r\n";
-		exit ;
-	}
-
 	$aFiles[] = 'shell';
 
 	print_r( $aFiles );
@@ -49,9 +38,25 @@ if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 			/**
 			 * Style
 			 */
-			$sShellData = preg_replace( '~\$this \-> sStyleSheet = file_get_contents( \'(.+?)\' );~', '', file_get_contents( $sFile . '.php', NULL, NULL, 6 ) );
+			$sShellRawData = file_get_contents( $sFile . '.php', NULL, NULL, 6 );
+
+			if( ! preg_match( '~\$this -> sStyleSheet = file_get_contents\( \'(.+?)\' \);~', $sShellRawData, $aMatch ) )
+			{
+				echo "Cos nie tak ze stylami\r\n";
+				exit ;
+			}
+
+			$sShellData = preg_replace( '~\$this -> sStyleSheet = file_get_contents\( \'(.+?)\' \);~', '', file_get_contents( $sFile . '.php', NULL, NULL, 6 ) );
+
+
+			if( ! is_file( $aMatch[1] ) )
+			{
+				echo "Plik ze stylami nie istnieje\r\n";
+				exit ;
+			}
+
 			$sShellData = preg_replace( '~private \$StyleSheet;~', '', $sShellData );
-			$sShellData = preg_replace( '~{\$this -> sStyleSheet}~', sprintf( '{%s}', file_get_contents( sprintf( 'Styles/%s.css', STYLE ) ) ), $sShellData );
+			$sShellData = preg_replace( '~{\$this -> sStyleSheet}~', file_get_contents( $aMatch[1] ), $sShellData );
 
 			$sData .= $sShellData;
 		}
