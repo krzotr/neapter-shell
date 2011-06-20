@@ -130,7 +130,7 @@ DATA;
 		}
 		while( ++$i < $iLoop );
 
-		return sprintf( "<span class=\"red\">Przegrałeś</span>: <strong>%d</strong>, <span class=\"green\">Wygrałeś</span>: <strong>%d</strong>, Success rata: <strong>%.2f</strong> %%\r\n\r\n%s", $iLoses, $iWins, ( $iWins / $this -> oShell -> aArgv[1] ) * 100, $sOutput );
+		return sprintf( "<span class=\"red\">Przegrałeś</span>: <strong>%d</strong>, <span class=\"green\">Wygrałeś</span>: <strong>%d</strong>, Success rate: <strong>%.2f</strong> %%\r\n\r\n%s", $iLoses, $iWins, ( $iWins / $this -> oShell -> aArgv[1] ) * 100, $sOutput );
 	}
 
 }
