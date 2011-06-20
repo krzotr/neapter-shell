@@ -33,11 +33,7 @@ class ModuleLogout implements ShellInterface
 	 */
 	public function getCommands()
 	{
-		return array
-		(
-			'logout',
-			'exit'
-		);
+		return array( 'logout' );
 	}
 
 	/**
