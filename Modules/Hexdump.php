@@ -146,7 +146,7 @@ DATA;
 			/**
 			 * Zawartosc
 			 */
-			$sLine .= '|' . str_pad( htmlspecialchars( preg_replace( '~[^\x20-\x7f]~', '.', $sData ) ), 16, ' ', STR_PAD_RIGHT ) . '|<br />';
+			$sLine .= '|' . str_pad( htmlspecialchars( preg_replace( '~[^\x20-\x7f]~', '.', $sData ) ), 16, ' ', STR_PAD_RIGHT ) . "|\r\n";
 
 			$i += 16;
 
