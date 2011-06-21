@@ -2,12 +2,23 @@ Changelog:
 ==========
 
 2011
+----
+
 *	Dodano możliwość zmiany styli
 *	Dodano panel logowania #1
+*	Wyświetlanie pomocy dla natywnych modułów (help, system, modules)
+*	Utworzono publiczną metodę getCommandSystem() za pomocą której można wykonać polecenie systemowe
+*	Dodano komendy
+	*	irc _możliwość powiązania shell'a z kanałem irc_
+	*	hexdump
+	*	logout
+	*	exit
+	*	system
 
 
 2011-06-18 v0.21
 ----------------
+
 *	Usunięto błąd związany z umieszczeniem parametru w cudzysłowie lub apostrofie (:down "/sciezka/ do/ katalogu /")
 *	Usunięto XSS w lini poleceń
 *	Poprawiono pobieranie plików
