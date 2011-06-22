@@ -14,6 +14,7 @@ Changelog:
 	*	logout
 	*	exit
 	*	system
+	*	info
 
 
 2011-06-18 v0.21

