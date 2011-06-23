@@ -1,9 +1,17 @@
 <?php
 
 /**
- * Wymagane PHP 5.3
+ * Neapter Shell
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
+ * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
+/**
+ * Wymagane PHP 5.3
+ */
 $sData = "<?php\r\n";
 
 if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
