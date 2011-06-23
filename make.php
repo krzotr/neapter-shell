@@ -24,9 +24,9 @@ if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 
 		foreach( $oDirectory as $oFile )
 		{
-			if( is_file( $sFile = $oFile -> getPathname() ) && ( $oFile -> getFilename() !== 'Dummy.php' ) )
+			if( $oFile -> isFile() && ( $oFile -> getFilename() !== 'Dummy.php' ) )
 			{
-				$aFiles[] = 'Modules/' . basename( $sFile, '.php' );
+				$aFiles[] = 'Modules/' . basename( $oFile -> getPathname(), '.php' );
 			}
 		}
 	}

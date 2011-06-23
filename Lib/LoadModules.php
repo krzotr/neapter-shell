@@ -16,8 +16,21 @@ $oDirectory = new DirectoryIterator( 'Modules' );
  */
 foreach( $oDirectory as $oFile )
 {
-	if( is_file( $sFile = $oFile -> getPathname() ) )
+	if( $oFile -> isFile() )
 	{
-		require_once $sFile;
+		require_once $oFile -> getPathname();
+	}
+}
+
+$oDirectory = new DirectoryIterator( 'Modules/Trash' );
+
+/**
+ * Wczytywanie wszystkich modułów z katalogu Modules/Trash
+ */
+foreach( $oDirectory as $oFile )
+{
+	if( $oFile -> isFile() )
+	{
+		require_once $oFile -> getPathname();
 	}
 }
