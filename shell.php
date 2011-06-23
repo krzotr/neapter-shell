@@ -510,7 +510,7 @@ DATA;
 		/**
 		 * Formatowanie natywnego helpa
 		 */
-		$aHelp = preg_split( '~\r\n~', self::HELP );
+		$aHelp = preg_split( '~\r\n|\n|\r~', self::HELP );
 		foreach( $aHelp as $sLine )
 		{
 			$iPos = strpos( $sLine, '-' );
@@ -619,7 +619,7 @@ info - Wyświetla informacje o systemie
 DATA;
 		}
 
-		return sprintf( "- SERVER:[%s], IP:[%s], Host:[%s]\r\n.    PHP:[%s], API:[%s], Url:[%s], Path:[%s]\r\n.    SAFE_MODE:[%d], EXE:[%d], CURL:[%d], SOCKET:[%s]",
+		return sprintf( "- SERVER:[%s], IP:[%s], Host:[%s]\r\nPHP:[%s], API:[%s], Url:[%s], Path:[%s]\r\nSAFE_MODE:[%d], EXE:[%d], CURL:[%d], SOCKET:[%s]",
 			php_uname(),
 			( $sIp = Request::getServer( 'REMOTE_ADDR' ) ),
 			gethostbyaddr( $sIp ),

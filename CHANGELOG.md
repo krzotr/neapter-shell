@@ -15,6 +15,13 @@ Changelog:
 	*	exit
 	*	system
 	*	info
+*	Usunięto problem z helpem w modułach
+	*	Cat
+	*	Cp
+	*	G4m3
+	*	Mv
+	*	MysqlDumper
+	*	Remove
 
 
 2011-06-18 v0.21
