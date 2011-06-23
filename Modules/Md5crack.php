@@ -119,7 +119,7 @@ DATA;
 			}
 			else
 			{
-				$sOutput .= '<not found>';
+				$sOutput .= 'password-not-found';
 			}
 
 			$sOutput .= "\r\n";
