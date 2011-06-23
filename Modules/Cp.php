@@ -51,7 +51,7 @@ class ModuleCp implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+		return '1.01 2011-06-21 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -83,7 +83,7 @@ DATA;
 		 */
 		if( $this -> oShell -> iArgc !== 2 )
 		{
-			return $this -> oShell -> getHelp();
+			return $this -> getHelp();
 		}
 
 		$sOutput = NULL;

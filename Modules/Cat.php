@@ -47,7 +47,7 @@ class ModuleCat implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+		return '1.01 2011-06-23 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -82,7 +82,7 @@ DATA;
 		 */
 		if( $this -> oShell -> iArgc === 0 )
 		{
-			return $this -> oShell -> getHelp();
+			return $this -> getHelp();
 		}
 
 
