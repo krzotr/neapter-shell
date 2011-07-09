@@ -495,7 +495,7 @@ DATA;
 		$iMaxLen = 0;
 
 		/**
-		 * Szukanie najdluzszego ciagu (najdluzsza lista komend)
+		 * Szukanie najdluzszego ciagu (najdluzsza komenda)
 		 */
 		foreach( $this -> aHelpModules as $sModuleCmd )
 		{
@@ -510,13 +510,33 @@ DATA;
 		/**
 		 * Formatowanie natywnego helpa
 		 */
-		$aHelp = preg_split( '~\r\n|\n|\r~', self::HELP );
+
+		$aHelp = array_filter( preg_split( '~\r\n|\n|\r~', self::HELP ) );
+
+		/**
+		 * Szukanie najdluzszego ciagu (najdluzsza komenda)
+		 */
+		if( $iMaxLen === 0 )
+		{
+			foreach( $aHelp as $sLine )
+			{
+				if( ( $iLen = strpos( $sLine, '-' ) ) > $iMaxLen )
+				{
+					$iMaxLen = $iLen;
+				}
+			}
+		}
+
+		/**
+		 * Formatowanie helpow
+		 */
 		foreach( $aHelp as $sLine )
 		{
 			$iPos = strpos( $sLine, '-' );
 
 			$sOutput .= str_pad( substr( $sLine, 0, $iPos ), $iMaxLen, ' ' ) . rtrim( substr( $sLine, $iPos -  1 ) ) . "\r\n";
 		}
+
 
 		/**
 		 * Formatowanie helpow
