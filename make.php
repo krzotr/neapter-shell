@@ -54,7 +54,9 @@ if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 				exit ;
 			}
 
-			$sShellData = preg_replace( '~\$this -> sStyleSheet = file_get_contents\( \'(.+?)\' \);~', '', file_get_contents( $sFile . '.php', NULL, NULL, 6 ) );
+			$sShellData = preg_replace( '~\$this -> sStyleSheet = file_get_contents\( \'(.+?)\' \);~', NULL,
+				file_get_contents( $sFile . '.php', NULL, NULL, 6 )
+			);
 
 
 			if( ! is_file( $aMatch[1] ) )
@@ -64,7 +66,10 @@ if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 			}
 
 			$sShellData = preg_replace( '~private \$StyleSheet;~', '', $sShellData );
-			$sShellData = preg_replace( '~{\$this -> sStyleSheet}~', file_get_contents( $aMatch[1] ), $sShellData );
+			$sShellData = preg_replace( '~{\$this -> sStyleSheet}~',
+				preg_replace( '~[\r\n\t]+~', NULL, file_get_contents( $aMatch[1] ) ),
+				$sShellData
+			);
 
 			$sData .= $sShellData;
 		}
