@@ -1,13 +1,17 @@
 Changelog:
 ==========
 
-2011
-----
+2011-07-09 v0.30
+----------------
 
 *	Dodano możliwość zmiany styli
 *	Dodano panel logowania #1
-*	Wyświetlanie pomocy dla natywnych modułów (help, system, modules)
-*	Utworzono publiczną metodę getCommandSystem() za pomocą której można wykonać polecenie systemowe
+*	Dodano wykonanie polecenia systemowego za pomocą funkcji `proc_open()`
+*	Wyświetlanie pomocy dla natywnych modułów `help`, `system`, `modules`
+*	Usunięto problem z importem modułów (Permission Denied jeżeli katalog TMP jest inny niż `/tmp/`)
+*	Utworzono publiczną metodę `getCommandSystem()` za pomocą której można wykonać polecenie systemowe
+*	Poprawiono "przełączanie" między funkcjami systemowymi `system()`, `shell_exec()`, `passthru()`, `exec()`, `popen()`
+*	Poprawiono wyświetlanie outputu za pomocą funkcji exec (zwracana była tylko ostatnia linia)
 *	Dodano komendy
 	*	irc _możliwość powiązania shell'a z kanałem irc_
 	*	hexdump
@@ -27,7 +31,7 @@ Changelog:
 2011-06-18 v0.21
 ----------------
 
-*	Usunięto błąd związany z umieszczeniem parametru w cudzysłowie lub apostrofie (:down "/sciezka/ do/ katalogu /")
+*	Usunięto błąd związany z umieszczeniem parametru w cudzysłowie lub apostrofie `:down "/sciezka/ do/ katalogu /"`
 *	Usunięto XSS w lini poleceń
 *	Poprawiono pobieranie plików
 *	DoS na HTTP z użyciem CURL'a jest efektywniejszy
@@ -53,8 +57,8 @@ Changelog:
 	*	passwordrecovery
 	*	cr3d1ts
 *	możliwość wczytania danego modułu
-*	polecenie 'cr3d1ts' nie wyświetla się w help'ie
-*	'php' jest aliasem dla 'eval
+*	polecenie `cr3d1ts` nie wyświetla się w help'ie
+*	`php` jest aliasem dla `eval`
 
 
 2011-05-15 v0.1
