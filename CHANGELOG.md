@@ -1,6 +1,14 @@
 Changelog:
 ==========
 
+2011-09-07 v0.31
+----------------
+
+*	Poprawiono wyszukiwanie katalogu tymczasowego
+*	Kiedy użyjemy polecenia `cd /var/www`, `pwd` zwróci `/var/www` (dotyczy `bind` oraz `backconnect`)
+*	Poprawiono wyświetlanie output'u w `bind` i `backconnect`
+
+
 2011-07-09 v0.30
 ----------------
 
