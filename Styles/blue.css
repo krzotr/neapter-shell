@@ -10,7 +10,7 @@ div#body{text-align:center;border:3px solid #eef;border-radius:20px;-moz-border-
 div#menu{text-align:left;margin:0 auto}
 div#bottom{margin:10px auto}
 div#content{padding-top:10px;margin:0 auto}
-pre#console{text-align:left;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#f9f9f9;color:#000;border:3px solid #def;overflow:scroll;margin:0 auto;padding:14px}
+#console{text-align:left;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#f9f9f9;color:#000;border:3px solid #def;overflow:scroll;margin:0 auto;padding:14px}
 input{border-radius:10px;-moz-border-radius:10px;border:1px solid #aaa;background-color:#fff;font-size:14px;padding:6px}
 input:hover{background-color:#eee}
 input#cmd{width:87%;margin-top:10px;padding-left:10px}

