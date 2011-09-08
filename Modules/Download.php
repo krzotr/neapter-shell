@@ -61,7 +61,7 @@ class ModuleDownload implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-06-18 - <krzotr@gmail.com>';
+		return '1.02 2011-09-08 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -116,12 +116,7 @@ DATA;
 		/**
 		 * Kompresja zawartosci strony
 		 */
-		if( $bGzip )
-		{
-			ini_set( 'zlib.output_compression', 9 );
-		}
-
-		ob_start();
+		ob_start( $bGzip ? 'ob_gzhandler' : NULL );
 
 		/**
 		 * Naglowki
@@ -139,7 +134,7 @@ DATA;
 
 			while( ! feof( $rFile ) )
 			{
-				echo fread( $rFile, 131072 );
+				echo fread( $rFile, 2097152 );
 				@ ob_flush();
 				@ flush();
 			}
