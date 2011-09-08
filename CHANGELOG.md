@@ -1,13 +1,22 @@
 Changelog:
 ==========
 
+2011-09-
+---------------
 
-2011-09-07 v0.31a
+*	Poprawiono formatowanie wyniku za pomocą polecenia `hexdump`
+*	Poprawiono pobieranie pliku za pomocą kompresji gzip `:down -g`
 
+
+2011-09-08 v0.31a
+-----------------
+
+*	Zamieniono niebieski styl na ciemniejszy
 *	Usunięto błąd typu 'Fatal Error' z modułów
 	*	socketupload
 	*	socketdownload,
 *	Poprawiono wyświetlanie shella w rozdzielczości 1024
+
 
 2011-09-07 v0.31
 ----------------
