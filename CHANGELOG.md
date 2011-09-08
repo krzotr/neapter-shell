@@ -1,6 +1,14 @@
 Changelog:
 ==========
 
+
+2011-09-07 v0.31a
+
+*	Usunięto błąd typu 'Fatal Error' z modułów
+	*	socketupload
+	*	socketdownload,
+*	Poprawiono wyświetlanie shella w rozdzielczości 1024
+
 2011-09-07 v0.31
 ----------------
 

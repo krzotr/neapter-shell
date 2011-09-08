@@ -61,7 +61,7 @@ class ModuleSocketUpload implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+		return '1.01 2011-09-08 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -115,9 +115,8 @@ DATA;
 		/**
 		 * Plik zrodlowy musi istniec
 		 */
-		if( ! is_file( $this -> aArgv[1] ) )
+		if( ! is_file( $this -> oShell -> aArgv[0] ) )
 		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> oShell -> aArgv[1] );
 		}
 
 		/**
@@ -131,7 +130,7 @@ DATA;
 		/**
 		 * File
 		 */
-		if( ! ( $rFile = fopen( $this -> aArgv[1], 'r' ) ) )
+		if( ! ( $rFile = fopen( $this -> oShell -> aArgv[1], 'r' ) ) )
 		{
 			return sprintf( 'Nie można odczytać pliku "%s"', $this -> oShell -> aArgv[1] );
 		}

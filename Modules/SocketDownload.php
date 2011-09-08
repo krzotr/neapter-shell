@@ -61,7 +61,7 @@ class ModuleSocketDownload implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+		return '1.01 2011-09-08 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -105,7 +105,7 @@ DATA;
 		/**
 		 * Plik zrodlowy musi istniec
 		 */
-		$aHost = $this -> getHost( $this -> oShell -> aArgv[0] );
+		$aHost = $this -> oShell -> getHost( $this -> oShell -> aArgv[0] );
 
 		if( $aHost[1] === 0 )
 		{

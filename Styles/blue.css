@@ -13,7 +13,7 @@ div#content{padding-top:10px;margin:0 auto}
 pre#console{text-align:left;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#f9f9f9;color:#000;border:3px solid #def;overflow:scroll;margin:0 auto;padding:14px}
 input{border-radius:10px;-moz-border-radius:10px;border:1px solid #aaa;background-color:#fff;font-size:14px;padding:6px}
 input:hover{background-color:#eee}
-input#cmd{width:88%;margin-top:10px;padding-left:10px}
+input#cmd{width:87%;margin-top:10px;padding-left:10px}
 input#cmd-send{margin-top:10px;margin-left:20px}
 .green{color:#5b5;font-weight:700}
 .red{color:#b55;font-weight:700}

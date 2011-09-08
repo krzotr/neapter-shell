@@ -17,7 +17,7 @@ require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
 /**
  * class Shell - Zarzadzanie serwerem
  *
- * @version 0.31
+ * @version 0.31a
  *
  * @uses Arr
  * @uses Request
@@ -28,7 +28,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.31 b110907';
+	const VERSION = '0.31a b110908';
 
 	/**
 	 * Help, natywne polecenia
@@ -185,7 +185,7 @@ info - Wyświetla informacje o systemie';
 		/**
 		 * @ignore
 		 */
-		$this -> sStyleSheet = file_get_contents( 'Styles/blue.css' );
+		$this -> sStyleSheet = file_get_contents( 'Styles/haxior.css' );
 
 		/**
 		 * Katalog tymczasowy
@@ -393,8 +393,8 @@ info - Wyświetla informacje o systemie';
 				'Dostępne moduły: <strong>%s</strong>',
 
 				phpversion(),
-				$this -> getStatus( $this -> bSafeMode, 1 ),
-				ini_get( 'open_basedir' ),
+				$this -> getStatus( $this -> bSafeMode, TRUE ),
+				$this -> getStatus( ini_get( 'open_basedir' ), TRUE ),
 				php_sapi_name(),
 				php_uname(),
 				$this -> sTmp,
