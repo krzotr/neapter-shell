@@ -60,7 +60,7 @@ class ModuleHexdump implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.0 2011-06-19 - <krzotr@gmail.com>';
+		return '1.01 2011-09-08 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -128,7 +128,7 @@ DATA;
 			/**
 			 * Adres
 			 */
-			$sLine = str_pad( base_convert( $i, 10, 16 ), 8, '0', STR_PAD_LEFT ) . '  ';
+			$sLine = str_pad( base_convert( $i, 10, 16 ), 8, '0', STR_PAD_LEFT ) . "\x20\x20";
 
 			/**
 			 * Wartosci w HEX
