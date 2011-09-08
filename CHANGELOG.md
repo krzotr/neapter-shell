@@ -4,6 +4,7 @@ Changelog:
 2011-09-
 ---------------
 
+*	Dodano możliwość edycji oraz tworzenia nowego pliku
 *	Poprawiono formatowanie wyniku za pomocą polecenia `hexdump`
 *	Poprawiono pobieranie pliku za pomocą kompresji gzip `:down -g`
 
