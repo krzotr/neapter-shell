@@ -298,6 +298,12 @@ info - Wyświetla informacje o systemie';
 		$this -> bExec = ( ! $this -> bSafeMode && ( count( array_diff( $this -> aSystemFunctions, $this -> aDisableFunctions ) ) > 0 ) );
 
 		/**
+		 * Config
+		 */
+		error_reporting( -1 );
+		ignore_user_abort( 0 );
+
+		/**
 		 * Jesli SafeMode jest wylaczony
 		 */
 		if( ! $this -> bSafeMode )
@@ -309,13 +315,10 @@ info - Wyświetla informacje o systemie';
 			ini_set( 'date.timezone', 'Europe/Warsaw' );
 			ini_set( 'html_errors', 0 );
 		}
-
-		/**
-		 * Config
-		 */
-		error_reporting( -1 );
-		ignore_user_abort( 0 );
-		date_default_timezone_set( 'Europe/Warsaw' );
+		else
+		{
+			date_default_timezone_set( 'Europe/Warsaw' );
+		}
 
 		/**
 		 * Wczytywanie modulow
@@ -1018,7 +1021,7 @@ DATA;
 			 *
 			 * "sciezka do \"pliku\"" -> sciezka do "pliku"
 			 */
-			if( preg_match_all( '~\'(?:(?:\\\')|.*)\'|"(?:(?:\\")|(.*))"|[^ \r\n\t\'"]+~', $this -> sArgv, $aMatch ) );
+			if( preg_match_all( '~\'(?:(?:\\\')|.+?)\'|"(?:(?:\\")|.+?)"|[^ \r\n\t\'"]+~', $this -> sArgv, $aMatch ) );
 			{
 				/**
 				 * Usuwanie koncowych znakow " oraz ', zamienianie \" na " i \' na '
