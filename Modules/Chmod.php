@@ -56,7 +56,7 @@ class ModuleChmod implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.0 2011-06-04 - <krzotr@gmail.com>';
+		return '1.10 2011-09-10 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -71,7 +71,7 @@ class ModuleChmod implements ShellInterface
 Zmiana uprawnień dla pliku
 
 	Użycie:
-		chmod uprawnienie plik_lub_katalog
+		chmod uprawnienia plik_lub_katalog
 
 	Przykład:
 		chmod 777 /tmp/plik
@@ -89,7 +89,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc === 2 )
+		if( $this -> oShell -> iArgc !== 2 )
 		{
 			return $this -> getHelp();
 		}
@@ -110,7 +110,32 @@ DATA;
 			return sprintf( 'Plik "%s" nie istnieje', $this -> oShell -> aArgv[1] );
 		}
 
-		if( chmod( $this -> oShell -> aArgv[1], $this -> oShell -> aArgv[0] ) )
+		if( ! ( ( strlen( $this -> oShell -> aArgv[0] ) === 3 ) && ctype_digit( $this -> oShell -> aArgv[0] ) ) )
+		{
+			return 'Wprowadzono błędne uprawnienia!!!';
+		}
+
+		$aChmod = str_split( $this -> oShell -> aArgv[0] );
+
+		$sChmod = 0;
+
+		/**
+		 * Zamiana 777 dziesiatkowo na 777 osemkowo
+		 */
+		for( $i = 0; $i < 3; ++$i )
+		{
+			if( $aChmod[ $i ] > 8 )
+			{
+				return 'Wprowadzono błędne uprawnienia!!!';
+			}
+
+			$sChmod += $aChmod[ $i ] * pow( 8, $i );
+		}
+
+		/**
+		 * Zmiana uprawnien
+		 */
+		if( chmod( $this -> oShell -> aArgv[1], $sChmod ) )
 		{
 			return 'Uprawnienia <span class="green">zostały zmienione</span>';
 		}
