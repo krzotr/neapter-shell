@@ -4,13 +4,19 @@ Changelog:
 2011-09-
 ---------------
 
-*	Dodano moduł `autoremove`
-*	Dodano wykonanie polecenia systemowego za pomocą funkcji `pcntl_exec`
-*	Dodano możliwość wrzucenia pliku na serwer `:upload`, opcja ta jest dostępna natywnie
-*	Dodano możliwość edycji oraz tworzenia nowego pliku
-*	Poprawiono wyświetlanie pomocy dla natywnych modułów
-*	Poprawiono formatowanie wyniku za pomocą polecenia `hexdump`
-*	Poprawiono pobieranie pliku za pomocą kompresji gzip `:down -g`
+*	Dodano
+	*	Moduły
+		*	destroy - usuwanie shella
+		*	mail - wysyłanie emaili
+		*	upload - natywny moduł
+		*	edit - tworzenie oraz edycja pliku; moduł natywny
+	*	Wykonanie polecenia systemowego za pomocą funkcji `pcntl_exec`
+*	Poprawiono:
+	*	Wyświetlanie pomocy dla natywnych modułów
+	*	Formatowanie wyniku za pomocą polecenia `hexdump`
+	*	Pobieranie pliku za pomocą kompresji gzip `:down -g`
+	*	Nadawanie uprawnień poprzez moduł `chmod`
+	*	Parsowanie argumentów ujętych w `'` lub `"`
 
 
 2011-09-08 v0.31a
