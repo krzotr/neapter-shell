@@ -8,7 +8,7 @@ th{color:#fff;font-size:14px;font-weight:700;border-radius:5px;-moz-border-radiu
 hr{margin-top:20px;background-color:#eff;border:1px solid #c0c0c0}
 div#body{text-align:center;border:3px solid #161616;border-radius:20px;-moz-border-radius:20px;min-width:940px;background-color:#1a1a1a;margin:0 auto;padding:8px 20px 10px}
 div#menu{text-align:left;margin:0 auto}
-div#bottom{margin:10px auto}
+div#bottom{text-align:center;margin:10px auto}
 div#content{padding-top:10px;margin:0 auto}
 #console{text-align:left;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#34383c;color:#d4d4d4;border:1px solid #b4bac0;overflow:scroll;margin:0 auto;padding:14px}
 input{color:#cfcfcf;border:1px solid #000;background-color:#606060;font-size:14px;padding:6px}
