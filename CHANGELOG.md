@@ -4,10 +4,11 @@ Changelog:
 2011-09-
 ---------------
 
-*	Poprawiono plik pomocy dla natywnych modułów
+*	Dodano moduł `autoremove`
 *	Dodano wykonanie polecenia systemowego za pomocą funkcji `pcntl_exec`
 *	Dodano możliwość wrzucenia pliku na serwer `:upload`, opcja ta jest dostępna natywnie
 *	Dodano możliwość edycji oraz tworzenia nowego pliku
+*	Poprawiono wyświetlanie pomocy dla natywnych modułów
 *	Poprawiono formatowanie wyniku za pomocą polecenia `hexdump`
 *	Poprawiono pobieranie pliku za pomocą kompresji gzip `:down -g`
 
