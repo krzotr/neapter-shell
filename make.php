@@ -239,11 +239,7 @@ if( substr( $sData, -2 ) !== '?>' )
 	$sData .= '?>';
 }
 
-if( isset( $argv[1] ) && ( $argv[1] !== 'modules' ) )
-{
-	file_put_contents( __DIR__ . '/Tmp/prod.php', $sData );
-}
-
+file_put_contents( __DIR__ . '/Tmp/prod.php', $sData );
 
 $sData = '?>' . $sData . '<?';
 
