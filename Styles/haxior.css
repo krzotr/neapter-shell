@@ -10,6 +10,7 @@ div#body{text-align:center;border:1px solid #000;min-width:940px;background-colo
 div#menu{text-align:left;margin:0 auto}
 div#bottom{text-align:center;margin:10px auto}
 div#content{padding-top:10px;margin:0 auto}
+div#loading{text-align:center;margin:0 auto;width:150px;margin-top:150px;font-weight:700;font-size:32px;color:#74a202}
 #console{text-align:left;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#222;color:#ccc;border:3px solid #def;overflow:scroll;margin:0 auto;padding:14px}
 input{color:#ccc;border:1px solid #74a202;background-color:#222;font-size:14px;padding:6px}
 input:hover{background-color:#252525}

