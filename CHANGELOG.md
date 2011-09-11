@@ -5,6 +5,7 @@ Changelog:
 ---------------
 
 *	Dodano
+	*	Wykonywanie poleceń odbywa się bez przeładowania strony - AJAX
 	*	Moduły
 		*	destroy - usuwanie shella
 		*	mail - wysyłanie emaili
