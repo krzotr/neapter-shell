@@ -71,8 +71,14 @@ class ModuleDummy implements ShellInterface
 	{
 		/**
 		 * Wersja Data Autor
+		 *
+		 * Formaty:
+		 *     Wersja:
+		 *         \d{1}\.\d{2}
+		 *     Data
+		 *         Y-m-d
 		 */
-		return '1.0 2011-06-04 - <adres_autora>';
+		return '1.00 2011-06-04 - <adres_autora>';
 	}
 
 	/**
