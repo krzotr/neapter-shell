@@ -11,6 +11,8 @@ Changelog:
 		*	mail - wysyłanie emaili
 		*	upload - natywny moduł
 		*	edit - tworzenie oraz edycja pliku; moduł natywny
+		*	cd - przejście do katalogu
+		*	pwd - wyświetlanie katalogu, w którym aktualnie się znajdujemy
 	*	Wykonanie polecenia systemowego za pomocą funkcji `pcntl_exec`
 *	Poprawiono:
 	*	Wyświetlanie pomocy dla natywnych modułów
