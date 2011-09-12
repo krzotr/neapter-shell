@@ -1182,7 +1182,7 @@ DATA;
 		 */
 		if( strncasecmp( Request::getServer( 'HTTP_X_REQUESTED_WITH' ), 'XMLHttpRequest', 14 ) === 0 )
 		{
-			preg_match( '~<pre id="console">(.+)</pre>~s', $sData, $aMatch );
+			preg_match( '~<pre id="console">(.*)</pre>~s', $sData, $aMatch );
 			return $aMatch[1];
 		}
 
