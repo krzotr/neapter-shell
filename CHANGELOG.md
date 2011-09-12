@@ -1,18 +1,20 @@
 Changelog:
 ==========
 
-2011-09-
----------------
+2011-09-00 v0.40
+----------------
 
 *	Dodano
 	*	Wykonywanie poleceń odbywa się bez przeładowania strony - AJAX
 	*	Moduły
-		*	destroy - usuwanie shella
-		*	mail - wysyłanie emaili
-		*	upload - natywny moduł
-		*	edit - tworzenie oraz edycja pliku; moduł natywny
-		*	cd - przejście do katalogu
-		*	pwd - wyświetlanie katalogu, w którym aktualnie się znajdujemy
+		*	`destroy` - usuwanie shella
+		*	`mail` - wysyłanie emaili
+		*	`upload` - natywny moduł
+		*	`edit` - tworzenie oraz edycja pliku; moduł natywny
+		*	`cd` - przejście do katalogu
+		*	`pwd` - wyświetlanie katalogu, w którym aktualnie się znajdujemy
+		*	`revip` - Reverse Ip
+		*	`pack` / `unpack` - pakowanie / rozpakowywanie plików oraz katalogów
 	*	Wykonanie polecenia systemowego za pomocą funkcji `pcntl_exec`
 *	Poprawiono:
 	*	Wyświetlanie pomocy dla natywnych modułów
@@ -27,8 +29,8 @@ Changelog:
 
 *	Zamieniono niebieski styl na ciemniejszy
 *	Usunięto błąd typu 'Fatal Error' z modułów
-	*	socketupload
-	*	socketdownload,
+	*	`socketupload`
+	*	`socketdownload`
 *	Poprawiono wyświetlanie shella w rozdzielczości 1024
 
 
@@ -52,19 +54,19 @@ Changelog:
 *	Poprawiono "przełączanie" między funkcjami systemowymi `system()`, `shell_exec()`, `passthru()`, `exec()`, `popen()`
 *	Poprawiono wyświetlanie outputu za pomocą funkcji exec (zwracana była tylko ostatnia linia)
 *	Dodano komendy
-	*	irc _możliwość powiązania shell'a z kanałem irc_
-	*	hexdump
-	*	logout
-	*	exit
-	*	system
-	*	info
+	*	`irc` - możliwość powiązania shell'a z kanałem irc
+	*	`hexdump`
+	*	`logout`
+	*	`exit`
+	*	`system`
+	*	`info`
 *	Usunięto problem z helpem w modułach
-	*	Cat
-	*	Cp
-	*	G4m3
-	*	Mv
-	*	MysqlDumper
-	*	Remove
+	*	`cat`
+	*	`cp`
+	*	`g4m3`
+	*	`mv`
+	*	`mysqldumper`
+	*	`remove`
 
 
 2011-06-18 v0.21
@@ -81,20 +83,20 @@ Changelog:
 
 *	Wsparcie dla CLI
 *	Shella rozszerzono o następujące komendy:
-	*	ping
-	*	mkdir
-	*	cp
-	*	mv
-	*	modules
-	*	chmod
-	*	mysql
-	*	mysqldump
-	*	backconnect
-	*	bind
-	*	proxy
-	*	dos
-	*	passwordrecovery
-	*	cr3d1ts
+	*	`ping`
+	*	`mkdir`
+	*	`cp`
+	*	`mv`
+	*	`modules`
+	*	`chmod`
+	*	`mysql`
+	*	`mysqldump`
+	*	`backconnect`
+	*	`bind`
+	*	`proxy`
+	*	`dos`
+	*	`passwordrecovery`
+	*	`cr3d1ts`
 *	możliwość wczytania danego modułu
 *	polecenie `cr3d1ts` nie wyświetla się w help'ie
 *	`php` jest aliasem dla `eval`
@@ -104,17 +106,17 @@ Changelog:
 ---------------
 
 *	Pierwsza wersja skryptu, zawiera podstawowe komendy takie jak:
-	*	echo
-	*	ls
-	*	cat
-	*	eval
-	*	remove
-	*	bcat
-	*	socketdownload
-	*	ftpdownload
-	*	download
-	*	socketupload
-	*	ftpupload
-	*	etcpasswd
-	*	game
-	*	help
+	*	`echo`
+	*	`ls`
+	*	`cat`
+	*	`eval`
+	*	`remove`
+	*	`bcat`
+	*	`socketdownload`
+	*	`ftpdownload`
+	*	`download`
+	*	`socketupload`
+	*	`ftpupload`
+	*	`etcpasswd`
+	*	`game`
+	*	`help`
