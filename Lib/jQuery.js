@@ -1,5 +1,28 @@
 <script src="http://code.jquery.com/jquery-1.6.3.min.js"></script>
 <script>
+var aExclude = new Array
+(
+	'edit',
+	'upload',
+	'down',
+	'download',
+	'get',
+	'logout'
+);
+
+function isExclude( sCmd )
+{
+	for( i = 0; i < aExclude.length; ++i )
+	{
+		if( sCmd.substring( 1, aExclude[ i ].length + 1 ) == aExclude[ i ] )
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 $(function()
 	{
 		$( 'div#body' ).after( '<div id="status">&nbsp;</div>' );
@@ -9,7 +32,7 @@ $(function()
 			{
 				var sCmd = $( 'input#cmd' ).val();
 
-				if( ( $( 'input#cmd-send[value="Execute"]' ).length > 0 ) && ( sCmd.substring( 0, 5 ) != ':edit' ) && ( sCmd.substring( 0, 7 ) != ':upload' ) )
+				if( ( $( 'input#cmd-send[value="Execute"]' ).length > 0 ) && isExclude( sCmd ) )
 				{
 					$( 'div#status' ).fadeIn( 250 );
 					$.post( '', $( 'form' ).serialize(), function( sData )
