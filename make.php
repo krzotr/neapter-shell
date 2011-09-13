@@ -239,6 +239,15 @@ if( substr( $sData, -2 ) !== '?>' )
 	$sData .= '?>';
 }
 
+
+/**
+ * JavaScript
+ */
+if( in_array( 'shell', $aFiles ) )
+{
+	$sData = preg_replace( '~\$sScript\s*=\s*file_get_contents\(\s*\'Lib/jQuery.js\'\s*\);~', '$sScript=\'' . addcslashes( file_get_contents( 'LibProd/jQuery.js' ), '\'' ) . '\';', $sData );
+}
+
 file_put_contents( __DIR__ . '/Tmp/prod.php', $sData );
 
 $sData = '?>' . $sData . '<?';
