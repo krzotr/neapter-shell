@@ -10,7 +10,7 @@ div#body{text-align:center;border:3px solid #eef;border-radius:20px;-moz-border-
 div#menu{text-align:left;margin:0 auto}
 div#bottom{text-align:center;margin:10px auto}
 div#content{padding-top:10px;margin:0 auto}
-div#loading{text-align:center;margin:0 auto;width:150px;margin-top:150px;font-weight:700;font-size:32px;color:#046}
+div#status{text-align:center;position:fixed;top:15px;right:20px;width:100px;height:20px;background:#fff url(data:image/gif;base64,R0lGODlhKwALAPEAADMzM+7u7o6Oju7u7iH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAKwALAAACMoSOCMuW2diD88UKG95W88uF4DaGWFmhZid93pq+pwxnLUnXh8ou+sSz+T64oCAyTBUAACH5BAkKAAAALAAAAAArAAsAAAI9xI4IyyAPYWOxmoTHrHzzmGHe94xkmJifyqFKQ0pwLLgHa82xrekkDrIBZRQab1jyfY7KTtPimixiUsevAAAh+QQJCgAAACwAAAAAKwALAAACPYSOCMswD2FjqZpqW9xv4g8KE7d54XmMpNSgqLoOpgvC60xjNonnyc7p+VKamKw1zDCMR8rp8pksYlKorgAAIfkECQoAAAAsAAAAACsACwAAAkCEjgjLltnYmJS6Bxt+sfq5ZUyoNJ9HHlEqdCfFrqn7DrE2m7Wdj/2y45FkQ13t5itKdshFExC8YCLOEBX6AhQAADsAAAAAAAAAAAA=) center no-repeat;border:1px solid #269;font-size:14px;padding:10px;}
 #console{text-align:left;height:350px;min-height:350px;width:98%;font-size:11px;background-color:#f9f9f9;color:#000;border:3px solid #def;overflow:scroll;margin:0 auto;padding:14px}
 input{border-radius:10px;-moz-border-radius:10px;border:1px solid #aaa;background-color:#fff;font-size:14px;padding:6px}
 input:hover{background-color:#eee}
