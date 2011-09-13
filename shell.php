@@ -1210,7 +1210,6 @@ DATA;
 			return $aMatch[1];
 		}
 
-		$sCurrentUrl = Request::getCurrentUrl();
 		$sScript = file_get_contents( 'Lib/jQuery.js' );
 
 		/**

@@ -12,7 +12,7 @@ $(function()
 				if( ( $( 'input#cmd-send[value="Execute"]' ).length > 0 ) && ( sCmd.substring( 0, 5 ) != ':edit' ) && ( sCmd.substring( 0, 7 ) != ':upload' ) )
 				{
 					$( 'div#status' ).fadeIn( 250 );
-					$.post( '{$sCurrentUrl}', $( 'form' ).serialize(), function( sData )
+					$.post( '', $( 'form' ).serialize(), function( sData )
 						{
 							$( 'pre#console' ).html( sData );
 							$( 'div#status' ).fadeOut( 250 );
