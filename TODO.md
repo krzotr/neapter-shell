@@ -5,6 +5,8 @@ TODO
 
 *	RecursiveDirectoryIterator zamienić na while + opendir + readdir
 
+*	Dodać kompresję w funkcji mysqldump
+
 *	Nowe moduły
 
 	*	whoami
