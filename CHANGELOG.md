@@ -22,7 +22,8 @@ Changelog:
 	*	Pobieranie pliku za pomocą kompresji gzip `:down -g`
 	*	Nadawanie uprawnień poprzez moduł `chmod`
 	*	Parsowanie argumentów ujętych w `'` lub `"`
-*	Listę modułów przeniesiono do `modules loaded`
+	*	Moduł szyfrowania pliku z modułami
+*	Listę wszystkich modułów przeniesiono do `modules loaded`
 
 
 2011-09-08 v0.31a

