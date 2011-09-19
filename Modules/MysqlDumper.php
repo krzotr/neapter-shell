@@ -288,15 +288,7 @@ class MysqlDumper
 	 */
 	public function get()
 	{
-		/**
-		 * Wylaczanie wszystkich bufferow
-		 */
-		for( $i = 0; $i < ob_get_level(); $i++ )
-		{
-			@ ob_end_flush();
-		}
-
-		@ ob_start();
+		ob_start( 'ob_gzhandler' );
 		$fStart = microtime( 1 );
 
 		/**

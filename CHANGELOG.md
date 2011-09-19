@@ -16,6 +16,7 @@ Changelog:
 		*	`revip` - Reverse Ip
 		*	`pack` / `unpack` - pakowanie / rozpakowywanie plików oraz katalogów
 	*	Wykonanie polecenia systemowego za pomocą funkcji `pcntl_exec`
+	*	`mysqldump` - wsparcie dla gzip
 *	Poprawiono:
 	*	Wyświetlanie pomocy dla natywnych modułów
 	*	Formatowanie wyniku za pomocą polecenia `hexdump`
