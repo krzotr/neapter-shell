@@ -17,7 +17,7 @@ require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
 /**
  * class Shell - Zarzadzanie serwerem
  *
- * @version 0.31a
+ * @version 0.40-dev
  *
  * @uses Arr
  * @uses Request
@@ -28,7 +28,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.40-dev b110913';
+	const VERSION = '0.40-dev b110919';
 
 	/**
 	 * Help, natywne polecenia
