@@ -63,7 +63,7 @@ class MysqlDumper
 	 * @access protected
 	 * @var    integer
 	 */
-	protected $iLimit = 200;
+	protected $iLimit = 500;
 
 	/**
 	 * Rozszerzone dodanie
@@ -618,7 +618,7 @@ class ModuleMysqlDump implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-06-23 - <krzotr@gmail.com>';
+		return '1.02 2011-09-19 - <krzotr@gmail.com>';
 	}
 
 	/**
