@@ -543,7 +543,7 @@ info - Wyświetla informacje o systemie';
 	{
 		return sprintf( 'Wersja PHP: <strong>%s</strong><br/>' .
 				'SafeMode: %s<br/>' .
-				'OpenBaseDir: %s<br/>' .
+				'OpenBaseDir: <strong>%s</strong><br/>' .
 				'Serwer Api: <strong>%s</strong><br/>' .
 				'Serwer: <strong>%s</strong><br/>' .
 				'TMP: <strong>%s</strong><br/>' .
@@ -551,7 +551,7 @@ info - Wyświetla informacje o systemie';
 
 				phpversion(),
 				$this -> getStatus( $this -> bSafeMode, TRUE ),
-				$this -> getStatus( ini_get( 'open_basedir' ), TRUE ),
+				( ( ( $sBasedir = ini_get( 'open_basedir' ) ) === '' ) ? $this -> getStatus( 0, TRUE ) : $sBasedir ),
 				php_sapi_name(),
 				php_uname(),
 				$this -> sTmp,

@@ -23,6 +23,7 @@ Changelog:
 	*	Nadawanie uprawnień poprzez moduł `chmod`
 	*	Parsowanie argumentów ujętych w `'` lub `"`
 	*	Moduł szyfrowania pliku z modułami
+	*	Informację o `open_basedir`
 *	Listę wszystkich modułów przeniesiono do `modules loaded`
 
 
