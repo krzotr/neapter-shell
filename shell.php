@@ -224,6 +224,14 @@ info - Wyświetla informacje o systemie';
 	public $sPrefix;
 
 	/**
+	 * Jezeli TRUE to dzialamy w srodowisku deweloperskim (wlaczane wyswietlanie i raportowanie bledow)
+	 *
+	 * @access public
+	 * @var    boolean
+	 */
+	public $bDev = FALSE;
+
+	/**
 	 * Konstruktor
 	 *
 	 * @uses   Request
@@ -286,6 +294,14 @@ info - Wyświetla informacje o systemie';
 		Request::init();
 
 		/**
+		 * Tryb deweloperski
+		 */
+		if( isset( $_GET['dev'] ) )
+		{
+			$this -> bDev = TRUE;
+		}
+
+		/**
 		 * disable_functions
 		 */
 		if( ( $sDisableFunctions = ini_get( 'disable_functions' ) ) !== '' )
@@ -328,7 +344,7 @@ info - Wyświetla informacje o systemie';
 		/**
 		 * Config
 		 */
-		error_reporting( -1 );
+		error_reporting( $this -> bDev ? -1 : 0 );
 		ignore_user_abort( 0 );
 
 		/**
@@ -336,7 +352,7 @@ info - Wyświetla informacje o systemie';
 		 */
 		if( ! $this -> bSafeMode )
 		{
-			ini_set( 'display_errors', 1 );
+			ini_set( 'display_errors', (int) $this -> bDev );
 			ini_set( 'max_execution_time', 0 );
 			ini_set( 'memory_limit', '1024M' );
 			ini_set( 'default_socket_timeout', 5 );

@@ -17,6 +17,7 @@ Changelog:
 		*	`pack` / `unpack` - pakowanie / rozpakowywanie plików oraz katalogów
 	*	Wykonanie polecenia systemowego za pomocą funkcji `pcntl_exec`
 	*	`mysqldump` - wsparcie dla gzip
+	*	Możliwość przełączenia się na wersję deweloperską (włączenie wyświetlania błądów)
 *	Poprawiono:
 	*	Wyświetlanie pomocy dla natywnych modułów
 	*	Formatowanie wyniku za pomocą polecenia `hexdump`
@@ -28,7 +29,7 @@ Changelog:
 *	Listę wszystkich modułów przeniesiono do `modules loaded`
 
 
-2011-09-08 v0.31a
+2011-09-08 v0.31a23
 -----------------
 
 *	Zamieniono niebieski styl na ciemniejszy
