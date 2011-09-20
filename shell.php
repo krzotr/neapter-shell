@@ -17,7 +17,7 @@ require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
 /**
  * class Shell - Zarzadzanie serwerem
  *
- * @version 0.40-dev
+ * @version 0.40-dev2
  *
  * @uses Arr
  * @uses Request
@@ -28,7 +28,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.40-dev b110919';
+	const VERSION = '0.40-dev2 b110920';
 
 	/**
 	 * Help, natywne polecenia
@@ -249,7 +249,6 @@ info - Wyświetla informacje o systemie';
 	 */
 	public function __construct()
 	{
-		$this -> sAuth = sha1( "test\xfftest");
 		/**
 		 * Czas generowania strony
 		 */
