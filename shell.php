@@ -688,9 +688,6 @@ DATA;
 			{
 				return 'Nie można pobrać pliku z modułami';
 			}
-
-			$sFilePath = tempnam( $this -> sTmp, 'shell' );
-			file_put_contents( $sFilePath, $sData );
 		}
 		/**
 		 * Wczytywanie pliku
@@ -701,22 +698,12 @@ DATA;
 			{
 				return 'Nie można wczytać pliku z modułami';
 			}
-
-			$sFilePath = $this -> aArgv[0];
 		}
 
 		/**
 		 * Szyfrowanie zawartosci pliku
 		 */
 		file_put_contents( $this -> sTmp . '/' . $this -> sPrefix . '_modules', $this -> encode( $sData ) );
-
-		/**
-		 * Usuwanie tymczasowego pliku
-		 */
-		if( strncmp( $this -> aArgv[0], 'http://', 7 ) === 0 )
-		{
-			unlink( $sFilePath );
-		}
 
 		header( 'Refresh:1;url=' . Request::getCurrentUrl() );
 
