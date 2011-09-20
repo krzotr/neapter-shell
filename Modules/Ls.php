@@ -78,7 +78,7 @@ class ModuleLs implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-06-04 - <krzotr@gmail.com>';
+		return '1.01 2011-09-20 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -157,7 +157,7 @@ DATA;
 		/**
 		 * Domyslny katalog jezeli nie podano sciezki
 		 */
-		$sDir = ( ! empty( $this -> oShell -> aArgv ) ? $this -> oShell -> sArgv : dirname( __FILE__ ) );
+		$sDir = ( ! empty( $this -> oShell -> aArgv ) ? $this -> oShell -> sArgv : getcwd() );
 
 		$bList      = in_array( 'l', $this -> oShell -> aOptv );
 		$bRecursive = in_array( 'R', $this -> oShell -> aOptv );
@@ -180,7 +180,7 @@ DATA;
 			/**
 			 * Informacja o komendzie jaka wykonalismy
 			 */
-			$sOutput .= sprintf( "%s %s\r\n\r\n", $this -> oShell -> sCmd, $this -> oShell -> sArgv );
+			$sOutput .= sprintf( "%s\r\n\r\n", $sDir );
 
 			$sFileName = ( $bRecursive ? 'getPathname' : 'getBasename' );
 

@@ -28,6 +28,7 @@ Changelog:
 	*	Moduł szyfrowania pliku z modułami
 	*	Informację o `open_basedir`
 	*	System uwierzytelniania nie jest oparty na sesjach
+	*	Moduł `ls` wyświetla prawidłowo ścieżkę do katalogu, w którym się znajdujemy
 *	Listę wszystkich modułów przeniesiono do `modules loaded`
 
 
