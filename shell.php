@@ -1299,7 +1299,7 @@ DATA;
 					}
 					else
 					{
-						$sConsole = sprintf( 'Nie ma takiej komendy "%s"', $this -> sCmd );
+						$sConsole = sprintf( 'Nie ma takiej komendy "%s"', htmlspecialchars( $this -> sCmd ) );
 					}
 			}
 		}
