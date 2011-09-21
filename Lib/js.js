@@ -1,5 +1,4 @@
-<script>
-
+<script type="text/javascript">
 /**
  * Lista polecen, ktorych nie nalezy uzywac z AJAX
  */
@@ -104,19 +103,73 @@ var aCommands = new Array
 );
 
 /**
- * Zdarzenia
+ * body
  */
-function event( oElement, sAction, fFunction )
+var oBody = document.getElementsByTagName( 'body' )[0];
+
+/**
+ * Not for pussies
+ * a po drugie to nie chce mi sie specjalnie robic wsparcia dla IE
+ * Opera, Chrome, Firefox wystarczy
+ */
+if( navigator.appName == 'Microsoft Internet Explorer' )
 {
-	if( oElement.attachEvent )
-	{
-		oElement.attachEvent( sAction, fFunction );
-	}
-	else if( oElement.addEventListener )
-	{
-		oElement.addEventListener( sAction, fFunction );
-	}
+	oBody.innerHTML = '<h1 style="text-align: center; margin-top: 60px">Twoja przeglądarka jest do dupy, wymień ją na coś lepszego: Opera, Chrome, Firefox</h1>';
 }
+
+/**
+ * Okno ze statusem
+ */
+var oStatus = document.createElement( 'div' );
+
+oStatus.setAttribute( 'id', 'status' );
+oStatus.innerHTML = '&nbsp;';
+oStatus.style.display = 'none';
+
+oBody.appendChild( oStatus );
+
+/**
+ * Formularz
+ */
+var oForm = document.getElementsByTagName( 'form' )[0];
+
+oForm.setAttribute( 'onsubmit', 'return submitForm();' );
+
+/**
+ * input - polecenie
+ */
+var oCmd = document.getElementById( 'cmd' );
+
+/**
+ * Podpowiedzi
+ */
+var oPrompt = document.createElement( 'div' );
+
+oPrompt.setAttribute( 'id', 'prompt' );
+oPrompt.setAttribute( 'style', 'text-align: left; padding-left: 25px' );
+oPrompt.innerHTML = '<strong>Dostępne polecenia:</strong> <em>Brak</em>';
+
+oForm.appendChild( document.createElement( 'br' ) );
+oForm.appendChild( document.createElement( 'br' ) );
+oForm.appendChild( oPrompt );
+
+autoPrompt( oCmd.value.substring( 1 ) );
+
+/**
+ * Automatyczne podpowiedzi
+ */
+event( oCmd, 'keyup', function()
+	{
+		if( ( oCmd.value.length > 1 ) && ( oCmd.value.substring( 0, 1 ) == ':' ) )
+		{
+			autoPrompt( oCmd.value.substring( 1 ) );
+		}
+		else
+		{
+			oPrompt.innerHTML = '<strong>Dostępne polecenia:</strong> <em>Brak</em>';
+		}
+	}
+);
 
 /**
  * Sprawdzanie czy polecenie nie moze zostac uzyte z AJAX
@@ -134,12 +187,60 @@ function isExclude( sCmd )
 	return false;
 }
 
+function submitForm()
+{
+	var oCmd = document.getElementById( 'cmd' );
+
+	if(  ( document.getElementById( 'cmd-send' ).getAttribute( 'value' ) == 'Execute' )
+	    && ! isExclude( oCmd.value )
+	)
+	{
+		oStatus.style.display = 'block';
+
+		var oAjax = new XMLHttpRequest();
+
+		oAjax.open( 'POST', '', true );
+		oAjax.setRequestHeader( 'X-Requested-With', 'XMLHttpRequest' );
+		oAjax.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
+		oAjax.onreadystatechange = function()
+		{
+			/**
+			 * Konsola
+			 */
+			if( oAjax.readyState == 4 )
+			{
+				document.getElementById( 'console').innerHTML = oAjax.responseText;
+				oStatus.style.display = 'none';
+			}
+		}
+		oAjax.send( 'cmd=' + escape( oCmd.value ) );
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Zdarzenia
+ */
+function event( oElement, sAction, fFunction )
+{
+	if( oElement.attachEvent )
+	{
+		oElement.attachEvent( sAction, fFunction );
+	}
+	else if( oElement.addEventListener )
+	{
+		oElement.addEventListener( sAction, fFunction );
+	}
+}
+
 /**
  * Zmiana polecenia
  */
 function changeCommand( sCmd )
 {
-	document.getElementById( 'cmd' ).value = ':' + sCmd + ' ';
+	oCmd.value = ':' + sCmd + ' ';
 	autoPrompt( sCmd );
 }
 
@@ -179,126 +280,21 @@ function autoPrompt( sCommand )
 		sOutput = '<em>Brak</em>';
 	}
 
-	var oPrompt = document.getElementById( 'prompt' );
-
 	oPrompt.innerHTML = '<strong>Dostępne polecenia:</strong> ' + sOutput;
 
 	/**
-	 * Po kliknieciu
+	 * Po kliknieciu na polecenie
 	 */
 	var oSpan = oPrompt.getElementsByTagName( 'span' );
 
 	for( i = 0; i < oSpan.length; ++i )
 	{
 		sName = oSpan[ i ].getAttribute( 'onclick' );
+
 		if( sName != null )
 		{
 			oSpan[ i ].style.cursor = 'pointer';
 		}
 	}
-}
-
-window.onload = function()
-{
-	/**
-	 * body
-	 */
-	var oBody = document.getElementsByTagName( 'body' )[0];
-
-	/**
-	 * Not for pussies
-	 * a po drugie to nie chce mi sie specjalnie robic wsparcia dla IE
-	 * Opera, Chrome, Firefox wystarczy
-	 */
-	if( navigator.appName == 'Microsoft Internet Explorer' )
-	{
-		oBody.innerHTML = '<h1 style="text-align: center; margin-top: 60px">Twoja przeglądarka jest do dupy, wymień ją na coś lepszego: Opera, Chrome, Firefox</h1>';
-		return false;
-	}
-
-	/**
-	 * Okno ze statusem
-	 */
-	var oStatus = document.createElement( 'div' );
-	oStatus.setAttribute( 'id', 'status' );
-	oStatus.innerHTML = '&nbsp;';
-	oStatus.style.display = 'none';
-
-	oBody.appendChild( oStatus );
-
-	/**
-	 * Formularz
-	 */
-	var oForm = document.getElementsByTagName( 'form' )[0];
-
-	/**
-	 * input - polecenie
-	 */
-	var oCmd = document.getElementById( 'cmd' );
-
-	oForm.setAttribute( 'onsubmit', 'return false' );
-
-	event( oForm, 'submit', function()
-		{
-			if(  ( document.getElementById( 'cmd-send' ).getAttribute( 'value' ) == 'Execute' )
-			    && ! isExclude( oCmd.value )
-			)
-			{
-				oStatus.style.display = 'block';
-
-				var oAjax = new XMLHttpRequest();
-
-				oAjax.open( 'POST', '', true );
-				oAjax.setRequestHeader( 'X-Requested-With', 'XMLHttpRequest' );
-				oAjax.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
-				oAjax.onreadystatechange = function()
-					{
-						/**
-						 * Konsola
-						 */
-						if( oAjax.readyState == 4 )
-						{
-							document.getElementById( 'console').innerHTML = oAjax.responseText;
-							oStatus.style.display = 'none';
-						}
-					}
-				oAjax.send( 'cmd=' + escape( oCmd.value ) );
-
-				return false;
-			}
-		}
-	);
-
-	/**
-	 * Podpowiedzi
-	 */
-	var oPrompt = document.createElement( 'div' );
-
-	oPrompt.setAttribute( 'id', 'prompt' );
-	oPrompt.setAttribute( 'style', 'text-align: left; padding-left: 25px' );
-	oPrompt.innerHTML = '<strong>Dostępne polecenia:</strong> <em>Brak</em>';
-
-	oForm.appendChild( document.createElement( 'br' ) );
-	oForm.appendChild( document.createElement( 'br' ) );
-	oForm.appendChild( oPrompt );
-
-	autoPrompt( oCmd.value.substring( 1 ) );
-
-	/**
-	 * Automatyczne podpowiedzi
-	 */
-	event( oCmd, 'keyup', function()
-		{
-			if( ( oCmd.value.length > 1 ) && ( oCmd.value.substring( 0, 1 ) == ':' ) )
-			{
-				autoPrompt( oCmd.value.substring( 1 ) );
-			}
-			else
-			{
-				oPrompt.innerHTML = '<strong>Dostępne polecenia:</strong> <em>Brak</em>';
-			}
-			return false;
-		}
-	);
 }
 </script>
