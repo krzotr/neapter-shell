@@ -250,6 +250,16 @@ info - Wyświetla informacje o systemie';
 	public function __construct()
 	{
 		/**
+		 * Locale
+		 */
+		setLocale( LC_ALL, 'polish.UTF-8' );
+
+		/**
+		 * Naglowek UTF-8
+		 */
+		header( 'Content-type: text/html; charset=utf-8' );
+
+		/**
 		 * Czas generowania strony
 		 */
 		$this -> fGeneratedIn = microtime( 1 );
