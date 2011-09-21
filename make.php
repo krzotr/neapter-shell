@@ -245,7 +245,7 @@ if( substr( $sData, -2 ) !== '?>' )
  */
 if( isset( $aFiles ) && in_array( 'shell', $aFiles ) )
 {
-	$sData = preg_replace( '~\$sScript\s*=\s*file_get_contents\(\s*\'Lib/jQuery.js\'\s*\);~', '$sScript=\'' . addcslashes( file_get_contents( 'LibProd/jQuery.js' ), '\'' ) . '\';', $sData );
+	$sData = preg_replace( '~\$sScript\s*=\s*file_get_contents\(\s*\'Lib/js.js\'\s*\);~', '$sScript=\'' . addcslashes( file_get_contents( 'LibProd/js.js' ), '\'' ) . '\';', $sData );
 }
 
 file_put_contents( __DIR__ . '/Tmp/prod.php', $sData );

