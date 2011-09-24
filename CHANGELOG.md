@@ -19,6 +19,7 @@ Changelog:
 	*	Wykonanie polecenia systemowego za pomocą funkcji `pcntl_exec`
 	*	`mysqldump` - wsparcie dla gzip
 	*	Możliwość przełączenia się na wersję deweloperską (włączenie wyświetlania błądów)
+	*	`Logout` jest natywnym modułem
 *	Poprawiono:
 	*	parsowanie argumentów, które są objęte w `'` oraz `"` i zawierają spacje
 	*	Wyświetlanie pomocy dla natywnych modułów

