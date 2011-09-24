@@ -1190,7 +1190,7 @@ DATA;
 				$this -> sCmd = (string) substr( $sCmd, 1 );
 			}
 
-			$this -> sArgv = $this -> rmQuotes( ltrim( preg_replace( sprintf( '~^\:%s[\s+]?~', $this -> sCmd ), NULL, $sCmd ) ) );
+			$this -> sArgv = ltrim( preg_replace( sprintf( '~^\:%s[\s+]?~', $this -> sCmd ), NULL, $sCmd ) );
 
 			/**
 			 * Rozdzielanie argumentow
@@ -1215,6 +1215,8 @@ DATA;
 					$this -> sArgv = ltrim( implode( ' ', $this -> aArgv ) );
 				}
 			}
+
+			$this -> sArgv = $this -> rmQuotes( rtrim($this -> sArgv ) );
 
 			$this -> iArgc = count( $this -> aArgv );
 

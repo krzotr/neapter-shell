@@ -20,6 +20,7 @@ Changelog:
 	*	`mysqldump` - wsparcie dla gzip
 	*	Możliwość przełączenia się na wersję deweloperską (włączenie wyświetlania błądów)
 *	Poprawiono:
+	*	parsowanie argumentów, które są objęte w `'` oraz `"` i zawierają spacje
 	*	Wyświetlanie pomocy dla natywnych modułów
 	*	Formatowanie wyniku za pomocą polecenia `hexdump`
 	*	Pobieranie pliku za pomocą kompresji gzip `:down -g`
