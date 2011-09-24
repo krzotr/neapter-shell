@@ -7,5 +7,3 @@ Changelog:
 
 *	Rozmiar shella
 	*	Okrojona wersja przybiera na wadze, 9KB to zdecydowanie za dużo
-
-*	Funkcja `filectime` została wyłączona na jednym z serwerów, trzeba zastąpić ją inną

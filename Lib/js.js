@@ -1,4 +1,23 @@
 <script type="text/javascript">
+
+/**
+ * Automatyczne dopasowanie wielkosci pola konsoli
+ */
+window.onload = function()
+{
+	var oConsole = document.getElementById( 'console' );
+
+	var iHeight = innerHeight - 320;
+
+	var sHeight = ( ( iHeight < 100 ) ? 100 : iHeight ) + 'px';
+
+	/**
+	 * Zmiana wymiarow
+	 */
+	oConsole.style.minHeight = sHeight;
+	oConsole.style.height = sHeight;
+}
+
 /**
  * Lista polecen, ktorych nie nalezy uzywac z AJAX
  */
