@@ -1130,7 +1130,7 @@ DATA;
 	 * @access public
 	 * @return string
 	 */
-	private function getActionBrowser( $sCmd = NULL )
+	public function getActionBrowser( $sCmd = NULL )
 	{
 		$bRaw = ( $sCmd !== NULL );
 
