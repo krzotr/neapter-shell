@@ -1,7 +1,7 @@
 Changelog:
 ==========
 
-2011-09-00 v0.40
+2011-10-06 v0.40
 ----------------
 
 *	Dodano
@@ -31,6 +31,7 @@ Changelog:
 	*	Informację o `open_basedir`
 	*	System uwierzytelniania nie jest oparty na sesjach
 	*	Moduł `ls` wyświetla prawidłowo ścieżkę do katalogu, w którym się znajdujemy
+	*	API w `md5crack` zamieniono z hashkiller.com na tmto.org
 *	Listę wszystkich modułów przeniesiono do `modules loaded`
 
 
