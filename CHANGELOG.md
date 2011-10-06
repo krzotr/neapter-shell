@@ -35,7 +35,7 @@ Changelog:
 *	Listę wszystkich modułów przeniesiono do `modules loaded`
 
 
-2011-09-08 v0.31a23
+2011-09-08 v0.31a
 -----------------
 
 *	Zamieniono niebieski styl na ciemniejszy
