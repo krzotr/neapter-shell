@@ -11,6 +11,8 @@
 
 /**
  * ModuleMd5crack - Lamanie hasy md5
+ *
+ * hashkiller.com - version f41a5cabc515e4d8b11e4aaee2b86a183f59136a
  */
 class ModuleMd5crack implements ShellInterface
 {
@@ -56,7 +58,7 @@ class ModuleMd5crack implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-06-23 - <krzotr@gmail.com>';
+		return '1.01 2011-10-06 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -95,7 +97,7 @@ DATA;
 		}
 
 		$sOutput = NULL;
-		for( $i = 0; $i < $this -> oShell -> iArgc; $i++ )
+		for( $i = 0; $i < $this -> oShell -> iArgc; ++$i )
 		{
 			if( ! preg_match( '~^[a-zA-Z0-9]{32}\z~', $this -> oShell -> aArgv[ $i ] ) )
 			{
@@ -107,15 +109,15 @@ DATA;
 			/**
 			 * API hashkiller
 			 */
-			$sData = file_get_contents( sprintf( 'http://hashkiller.com/api/api.php?md5=%s' , $this -> oShell -> aArgv[ $i ] ) );
+			$sData = file_get_contents( sprintf( 'http://www.tmto.org/api/latest/?hash=%s&auth=true' , $this -> oShell -> aArgv[ $i ] ) );
 
 
-			if( ( ( $oXml = simplexml_load_string( $sData ) ) !== FALSE ) && ( (string) $oXml -> found === 'true' ) )
+			if( ( ( $oXml = simplexml_load_string( $sData ) ) !== FALSE ) && ( $oXml->result['text'] !== '' ))
 			{
 				/**
 				 * Odzyskany hash
 				 */
-				$sOutput .= (string) $oXml -> plain;
+				$sOutput .= (string) base64_decode( $oXml->result['text'] );
 			}
 			else
 			{
@@ -125,7 +127,7 @@ DATA;
 			$sOutput .= "\r\n";
 		}
 
-		return $sOutput;
+		return htmlspecialchars( $sOutput );
 	}
 
 }
