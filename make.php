@@ -207,6 +207,17 @@ $sData = preg_replace( '~\s+\.\s+(\'|")~', '.$1', $sData );
 $sData = preg_replace( '~[\r\n]+{[\r\n]+~', '{', $sData );
 
 /**
+ * else if -> elseif
+ */
+$sData = str_replace( 'else if', 'elseif', $sData );
+
+/**
+ * else if -> elseif
+ */
+$sData = str_replace( 'TRUE', '1', $sData );
+$sData = str_replace( 'FALSE', '0', $sData );
+
+/**
  * Usuwanie linii
  */
 $sData = preg_replace( '~(_GET|_POST|_SERVER|_FILES|null|true);[\r\n]+~i', '$1;', $sData );
@@ -228,11 +239,16 @@ if( substr( $sData, -2 ) !== '?>' )
 	$sData .= '?>';
 }
 
-if( isset( $argv[1] ) && ( $argv[1] !== 'modules' ) )
+
+/**
+ * JavaScript
+ */
+if( isset( $aFiles ) && in_array( 'shell', $aFiles ) )
 {
-	file_put_contents( __DIR__ . '/Tmp/prod.php', $sData );
+	$sData = preg_replace( '~\$sScript\s*=\s*file_get_contents\(\s*\'Lib/js.js\'\s*\);~', '$sScript=\'' . addcslashes( file_get_contents( 'LibProd/js.js' ), '\'' ) . '\';', $sData );
 }
 
+file_put_contents( __DIR__ . '/Tmp/prod.php', $sData );
 
 $sData = '?>' . $sData . '<?';
 

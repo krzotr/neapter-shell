@@ -10,9 +10,9 @@
  */
 
 /**
- * ModuleLogout - Wylogowanie
+ * ModuleCat - Wyswietlanie sciezki, w ktorej sie znajdujemy
  */
-class ModuleLogout implements ShellInterface
+class ModulePwd implements ShellInterface
 {
 	/**
 	 * Obiekt Shell
@@ -42,7 +42,7 @@ class ModuleLogout implements ShellInterface
 	 */
 	public function getCommands()
 	{
-		return array( 'logout' );
+		return array( 'pwd' );
 	}
 
 	/**
@@ -56,7 +56,7 @@ class ModuleLogout implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.0 2011-06-19 - <krzotr@gmail.com>';
+		return '1.00 2011-09-11 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -68,10 +68,10 @@ class ModuleLogout implements ShellInterface
 	public function getHelp()
 	{
 		return <<<DATA
-Wylogowanie
+Wyświetlanie ścieżki do katalogu, w którym aktualnie się znajdujemy
 
 	Użycie:
-		logout
+		pwd
 DATA;
 	}
 
@@ -84,17 +84,14 @@ DATA;
 	public function get()
 	{
 		/**
-		 * Czy jest sie zalogowanym
+		 * Help
 		 */
-		if( isset( $_SESSION['auth'] ) && ( $_SESSION['auth'] === sha1( $this -> oShell -> sAuth . Request::getServer( 'REMOTE_ADDR' ) ) ) )
+		if( $this -> oShell -> iArgc !== 0 )
 		{
-			$_SESSION['auth'] = NULL;
-			unset( $_SESSION['auth'] );
-
-			return 'Zostałes wylogowany';
+			return $this -> getHelp();
 		}
 
-		return 'Nie jesteś zalogowany, więc nie możesz się wylogować !!!';
+		return getcwd();
 	}
 
 }

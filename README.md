@@ -10,7 +10,7 @@ Shell składa się z kilkudziesięciu plików, dzięki czemu łatwiej można je 
 
 *	`make.php` - tworzy shell ze wszystkimi modułami znajdującymi się w katalogu `modules`
 
-*	`make.php lite` - wersja okrojona shella, waży ok 7KB, zawiera podstawowe funkcje takie jak:
+*	`make.php lite` - wersja okrojona shella, waży ok 9KB, zawiera podstawowe funkcje takie jak:
 
 	*	`help`
 
@@ -19,6 +19,10 @@ Shell składa się z kilkudziesięciu plików, dzięki czemu łatwiej można je 
 	*	`system` / `exec`
 
 	*	`info`
+
+	*	`upload`
+
+	*	`edit`
 
 *	`make.php modules` - tworzy plik z modułami _Tmp/modules.txt_ znajdującymi się w katalogu `modules`, aby je wczytać należy wykonać polecenie `:modules sciezka_do_pliku_z_modulami`
 
@@ -34,7 +38,17 @@ Pliki
 *	Tmp/modules.txt - plik z modułami
 
 
-__Uwaga__: Przed użyciem polecenia `make.php` upewnij się, że wartości `ini_set( 'display_errors', 1 );` oraz `error_reporting( -1 );` w pliku `shell.php` ustawione sa na __0__ !!!
+
+FAQ
+---------
+
+*	Shell działa nieprawidłowo, jak mogę zdiagnozować problem?
+
+	*	Istnieje możliwość przełączenia się na wersję deweloperską. Aby to zrobić dopisz zmienną `dev` w adresie (http://example.com/?dev)
+
+*	Czy istnieje możliwość wyłączenia obsługi shella za pomocą technologii AJAX
+
+	*	Tak, jest taka możliwość. Aby wyłączyć AJAX należy do adresu dodać zmienną nojs (http://example.com/?nojs)
 
 
 

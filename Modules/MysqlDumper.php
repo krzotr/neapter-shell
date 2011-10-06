@@ -63,7 +63,7 @@ class MysqlDumper
 	 * @access protected
 	 * @var    integer
 	 */
-	protected $iLimit = 200;
+	protected $iLimit = 500;
 
 	/**
 	 * Rozszerzone dodanie
@@ -288,15 +288,7 @@ class MysqlDumper
 	 */
 	public function get()
 	{
-		/**
-		 * Wylaczanie wszystkich bufferow
-		 */
-		for( $i = 0; $i < ob_get_level(); $i++ )
-		{
-			@ ob_end_flush();
-		}
-
-		@ ob_start();
+		ob_start( 'ob_gzhandler' );
 		$fStart = microtime( 1 );
 
 		/**
@@ -626,7 +618,7 @@ class ModuleMysqlDump implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-06-23 - <krzotr@gmail.com>';
+		return '1.02 2011-09-19 - <krzotr@gmail.com>';
 	}
 
 	/**

@@ -56,7 +56,7 @@ class ModuleRoksa implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.0 2011-06-23 - <krzotr@gmail.com>';
+		return '1.01 2011-06-23 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -139,7 +139,7 @@ DATA;
 			}
 		}
 
-		$aWhores = array_slice( $aWhores, 0, 7 );
+		$aWhores = array_slice( $aWhores, 0, 20 );
 
 		$sOutput = NULL;
 		foreach( $aWhores as $aData )

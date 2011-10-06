@@ -10,13 +10,14 @@
  */
 
 /**
- * ModuleMkdir - Tworzenie katalogu
+ * ModuleRevip - Revip
  */
-class ModuleMkdir implements ShellInterface
+class ModuleRevip implements ShellInterface
 {
 	/**
 	 * Obiekt Shell
 	 *
+	 * @ignore
 	 * @access private
 	 * @var    object
 	 */
@@ -42,7 +43,7 @@ class ModuleMkdir implements ShellInterface
 	 */
 	public function getCommands()
 	{
-		return array( 'mkdir' );
+		return array( 'revip' );
 	}
 
 	/**
@@ -56,7 +57,7 @@ class ModuleMkdir implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-06-04 - <krzotr@gmail.com>';
+		return '1.00 2011-09-12 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -68,10 +69,13 @@ class ModuleMkdir implements ShellInterface
 	public function getHelp()
 	{
 		return <<<DATA
-Wyświetla tekst
+Revip
 
 	Użycie:
-		echo tekst do wyświetlenia
+		revip host_lub_ip
+
+	Przykład:
+		revip przemo.org
 DATA;
 	}
 
@@ -83,26 +87,43 @@ DATA;
 	 */
 	public function get()
 	{
-		if( $this -> oShell -> iArgc === 0 )
+		/**
+		 * Help
+		 */
+		if( ( $this -> oShell -> iArgc !== 1 ) || ( $this -> oShell -> aArgv[0] === 'help' ) )
 		{
 			return $this -> getHelp();
 		}
 
-		$sOutput = NULL;
-
-		for( $i = 0; $i < $this -> oShell -> iArgc; $i++ )
+		/**
+		 * Pobieranie danych
+		 */
+		if( ( $sData = file_get_contents( sprintf( 'http://domaintz.com/tools/reverse-ip/%s', $this -> oShell -> aArgv[0] ) ) ) === FALSE )
 		{
-			if( ! mkdir( $this -> oShell -> aArgv[ $i ], 0777, TRUE ) )
-			{
-				$sOutput .= sprintf( "Katalog \"%s\" <span class=\"red\">nie został utworzony</span>\r\n", $this -> oShell -> aArgv[ $i ] );
-			}
-			else
-			{
-				$sOutput .= sprintf( "Katalog \"%s\" <span class=\"green\">został utworzony</span>\r\n", $this -> oShell -> aArgv[ $i ] );
-			}
+			return 'Nie można połączyć się z serwerem';
 		}
 
-		return $sOutput;
+
+		/**
+		 * Wyciaganie danych
+		 */
+		if( ! preg_match( '~<pre>(.+?)</pre>~', $sData, $aData ) )
+		{
+			return 'Wystąpił błąd podczas pobierania danych';
+		}
+
+		/**
+		 * Wyciaganie adresow
+		 */
+		if( ! preg_match_all( '~<a href="[^"]+" target="_blank" rel="nofollow">(.+?)</a>~', $aData[1], $aData ) )
+		{
+			return 'Brak danych';
+		}
+
+		/**
+		 * Wyswietlanie adresow
+		 */
+		return sprintf( "Zwrócono %d witryn:\r\n\t%s",  count( $aData[1] ), implode( "\r\n\t", $aData[1] ) );
 	}
 
 }
