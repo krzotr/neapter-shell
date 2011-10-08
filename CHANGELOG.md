@@ -1,6 +1,13 @@
 Changelog:
 ==========
 
+2011-00-00 v0.00
+----------------
+
+*	Dodano
+	*	Moduł EmailValidation - sprawdzanie czy za pomocą odpowiedniego loginu oraz hasła można zalogować się na pocztę
+
+
 2011-10-06 v0.40
 ----------------
 
