@@ -1,2 +1,0 @@
-<?php
-class Arr{public static function get($sData,array&$aArrayData){$mConfig=$aArrayData;$aData=explode('.',$sData);foreach($aData as $sParam){if(!isset($mConfig[$sParam])){return FALSE;}$mConfig=$mConfig{$sParam};}return $mConfig;}}
