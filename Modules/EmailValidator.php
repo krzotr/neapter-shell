@@ -830,6 +830,9 @@ class EmailValidator
 
 /**
  * ModuleEmailValidator - Sprawdzanie czy mozna zalogowa sie na skrzynke za pomoca uzytkownika i hasla
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleEmailValidator implements ShellInterface
 {
@@ -966,8 +969,6 @@ DATA;
 		{
 			echo $oException -> getMessage();
 		}
-
-
-
 	}
+
 }
