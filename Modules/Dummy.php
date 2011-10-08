@@ -16,6 +16,9 @@
  *
  * Jezeli uzyjemy 'eval' to stale __FILE__, __DIR__ itp nie zadzialaja !!!
  * Zamiast __FILE__ uzyj 'Request::getServer( 'SCRIPT_FILENAME' )'
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleDummy implements ShellInterface
 {

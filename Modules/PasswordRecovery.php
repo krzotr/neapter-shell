@@ -11,6 +11,9 @@
 
 /**
  * PasswordRecoveryException - Odzyskiwanie hasel wyjatki
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class PasswordRecoveryException extends Exception {}
 
@@ -18,6 +21,9 @@ class PasswordRecoveryException extends Exception {}
  * class PasswordRecovery - Odzyskiwanie hasel
  *
  * Dostepne protokoly to MySQL, SSH2, FTP oraz HTTP
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class PasswordRecovery
 {
@@ -500,6 +506,9 @@ class PasswordRecovery
 
 /**
  * ModulePasswordRecovery - Odzyskiwanie hasel
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModulePasswordRecovery implements ShellInterface
 {

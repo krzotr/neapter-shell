@@ -11,6 +11,9 @@
 
 /**
  * ModuleMv - Przenoszenie pliku / katalogu
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleMv implements ShellInterface
 {

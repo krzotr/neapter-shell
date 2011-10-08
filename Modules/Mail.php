@@ -13,6 +13,9 @@
 /**
  * class MailException - Mail wyjatki
  *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
  * @package    Lib
  * @subpackage Exception
  *
@@ -22,6 +25,9 @@ class MailException extends Exception {}
 
 /**
  * class Mail - Wysylanie emaila
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
  * @package    Lib
  * @subpackage Mail
@@ -267,6 +273,9 @@ class Mail
 
 /**
  * ModuleMail - Wysylanie wiadonosci za pomoca funkcji mail()
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleMail implements ShellInterface
 {

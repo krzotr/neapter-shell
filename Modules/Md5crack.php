@@ -13,6 +13,9 @@
  * ModuleMd5crack - Lamanie hasy md5
  *
  * hashkiller.com - version f41a5cabc515e4d8b11e4aaee2b86a183f59136a
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleMd5crack implements ShellInterface
 {

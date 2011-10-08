@@ -11,6 +11,9 @@
 
 /**
  * ModulePhpinfo - PHPinfo
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModulePhpinfo implements ShellInterface
 {

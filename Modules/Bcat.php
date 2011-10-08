@@ -11,6 +11,9 @@
 
 /**
  * ModuleBcat - Wyswietlanie zawartosci pliku w base64
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleBcat implements ShellInterface
 {

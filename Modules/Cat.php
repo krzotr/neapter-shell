@@ -11,6 +11,9 @@
 
 /**
  * ModuleCat - Wyswietlanie zawartosci pliku
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleCat implements ShellInterface
 {

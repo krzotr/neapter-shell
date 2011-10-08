@@ -11,6 +11,9 @@
 
 /**
  * ModuleSocketUpload - Wysylanie pliku za pomoca socket'a
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleSocketUpload implements ShellInterface
 {

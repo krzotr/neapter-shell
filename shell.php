@@ -17,6 +17,9 @@ require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
 /**
  * class Shell - Zarzadzanie serwerem
  *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
  * @version 0.40
  *
  * @uses Arr

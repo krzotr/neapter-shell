@@ -11,11 +11,17 @@
 
 /**
  * Bind - Bind wyjatki
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class BindException extends Exception {}
 
 /**
  * class Proxy - Bind
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class Bind
 {
@@ -168,6 +174,9 @@ class Bind
 
 /**
  * ModuleBind - Bind
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleBind implements ShellInterface
 {

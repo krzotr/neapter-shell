@@ -11,6 +11,9 @@
 
 /**
  * ModuleFtpDownload - Pobieranie pliku z FTP
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleFtpDownload implements ShellInterface
 {

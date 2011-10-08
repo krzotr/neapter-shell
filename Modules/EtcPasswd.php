@@ -11,6 +11,9 @@
 
 /**
  * ModuleEtcPasswd - odwzorowanie pliku /etc/passwd
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleEtcPasswd implements ShellInterface
 {

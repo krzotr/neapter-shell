@@ -11,6 +11,9 @@
 
 /**
  * ModuleLs - Listowanie plikow / katalogow
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleLs implements ShellInterface
 {

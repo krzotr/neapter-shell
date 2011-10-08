@@ -11,6 +11,9 @@
 
 /**
  * ModuleChmod - Zmienianie uprawnien dla pliku
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleChmod implements ShellInterface
 {

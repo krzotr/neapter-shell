@@ -11,6 +11,9 @@
 
 /**
  * ModuleHexdump - Wyswietlanie plikow w formacie szesnastkowym
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleHexdump implements ShellInterface
 {
