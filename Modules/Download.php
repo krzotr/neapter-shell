@@ -26,6 +26,14 @@ class ModuleDownload implements ShellInterface
 	private $oShell;
 
 	/**
+	 * Zdalne pobieranie
+	 *
+	 * @access private
+	 * @var    boolean
+	 */
+	private $bRemote = FALSE;
+
+	/**
 	 * Konstruktor
 	 *
 	 * @access public
@@ -64,7 +72,7 @@ class ModuleDownload implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.02 2011-09-08 - <krzotr@gmail.com>';
+		return '1.03 2011-10-17 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -79,7 +87,7 @@ class ModuleDownload implements ShellInterface
 Pobieranie pliku
 
 	Użycie:
-		download ścieżka_do_pliku
+		download ścieżka_do_pliku_http_lub_ftp
 
 	Opcje:
 		-g pobieranie przy użyciu kompresji GZIP
@@ -87,6 +95,8 @@ Pobieranie pliku
 	Przykład:
 		download /etc/passwd
 		download -g /etc/passwd
+		download http://www.google.com
+		download ftp://google.pl/x.zip
 DATA;
 	}
 
@@ -107,6 +117,31 @@ DATA;
 		}
 
 		$bGzip = in_array( 'g', $this -> oShell -> aOptv );
+
+		/**
+		 * Zdalne pobieranie
+		 */
+		if( preg_match( '~^(http|ftp)://~', $this -> oShell -> sArgv ) );
+		{
+			$sFilename = $this -> oShell -> sTmp . '/' . $this -> oShell -> sPrefix . 'download';
+
+			/**
+			 * Odczyt zdalnego pliku
+			 */
+			if( ( $sData = file_get_contents( $this -> oShell -> sArgv ) ) === FALSE )
+			{
+				return sprintf( 'Nie można połączyć się ze zdalnym hostem: "%s"', $this -> oShell -> sArgv );
+			}
+
+			/**
+			 * Zapis zawartosci do pliku
+			 */
+			file_put_contents( $sFilename, $sData );
+
+			$this -> oShell -> sArgv = $sFilename;
+
+			$this -> bRemote = TRUE;
+		}
 
 		/**
 		 * Plik zrodlowy musi istniec
@@ -144,6 +179,14 @@ DATA;
 		}
 
 		ob_end_flush();
+
+		/**
+		 * Usuwanie zdalnego pliku z dysku
+		 */
+		if( $this -> bRemote )
+		{
+			unlink( $this -> oShell -> sArgv );
+		}
 		exit ;
 	}
 
