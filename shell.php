@@ -31,7 +31,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.40 b111006';
+	const VERSION = '0.41 b111017';
 
 	/**
 	 * Help, natywne polecenia
@@ -359,7 +359,7 @@ logout - Wylogowanie';
 		/**
 		 * Prefix
 		 */
-		$this -> sPrefix = substr( base64_encode( md5( $sScriptFilename, TRUE ) . md5_file( $sScriptFilename, TRUE ) ), 0, 8 ) . '_';
+		$this -> sPrefix = substr( md5( $sScriptFilename ) . md5_file( $sScriptFilename ), 0, 10 ) . '_';
 
 		/**
 		 * Mozliwosc wywolania polecenia systemowego

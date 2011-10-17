@@ -1,8 +1,6 @@
 TODO
 ====
 
-*	`wget` - wsparcie dla protokołu http / ftp
-
 *	RecursiveDirectoryIterator zamienić na while + opendir + readdir
 
 *	Nowe moduły
