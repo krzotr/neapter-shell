@@ -886,7 +886,7 @@ class ModuleEmailValidator implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-10-17 - <krzotr@gmail.com>';
+		return '1.00 2011-10-17 - <krzotr@gmail.com>';
 	}
 
 	/**
