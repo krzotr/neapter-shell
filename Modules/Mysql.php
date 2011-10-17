@@ -11,6 +11,9 @@
 
 /**
  * ModuleMysql - Wykonywanie polecen SQL
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleMysql implements ShellInterface
 {

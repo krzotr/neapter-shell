@@ -11,11 +11,17 @@
 
 /**
  * Class IrcException - Irc wyjatki
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class IrcException extends Exception {}
 
 /**
  * Class Irc - Laczenie sie z serwerem IRC
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class Irc
 {
@@ -286,6 +292,9 @@ class Irc
 
 /**
  * ModuleIrc - Irc
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleIrc implements ShellInterface
 {

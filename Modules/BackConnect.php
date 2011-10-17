@@ -11,11 +11,17 @@
 
 /**
  * BackConnect - BackConnect wyjatki
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class BackConnectException extends Exception {}
 
 /**
  * class BackConnect - Polaczenie zwrotne
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class BackConnect
 {
@@ -164,6 +170,9 @@ class BackConnect
 
 /**
  * ModuleBackConnect - Polaczenie zwrotne
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleBackConnect implements ShellInterface
 {

@@ -11,6 +11,9 @@
 
 /**
  * ModuleCat - Wyswietlanie sciezki, w ktorej sie znajdujemy
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModulePwd implements ShellInterface
 {

@@ -11,6 +11,9 @@
 
 /**
  * ModuleCat - Zmiana aktualnego katalogu
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleCd implements ShellInterface
 {

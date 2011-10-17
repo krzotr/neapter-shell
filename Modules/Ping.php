@@ -11,6 +11,9 @@
 
 /**
  * ModulePing - Ping
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba3
  */
 class ModulePing implements ShellInterface
 {

@@ -11,6 +11,9 @@
 
 /**
  * ModuleFtpUpload - Wysylanie pliku na FTP
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleFtpUpload implements ShellInterface
 {

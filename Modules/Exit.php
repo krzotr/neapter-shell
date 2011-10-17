@@ -11,6 +11,9 @@
 
 /**
  * ModuleExit - Exit
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleExit implements ShellInterface
 {

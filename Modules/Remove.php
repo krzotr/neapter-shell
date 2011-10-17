@@ -11,6 +11,9 @@
 
 /**
  * ModuleRemove - Usuwanie pliku / katalogu
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleRemove implements ShellInterface
 {

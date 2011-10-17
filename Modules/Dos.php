@@ -11,6 +11,9 @@
 
 /**
  * DosException - Denial of Service wyjatki
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class DosException extends Exception {}
 
@@ -18,6 +21,9 @@ class DosException extends Exception {}
  * class Dos - Denial of Service
  *
  * Dostepne protokoly to tcp, udp, http
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class Dos
 {
@@ -492,6 +498,9 @@ class Dos
 
 /**
  * ModuleDos - Denial of Service
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleDos implements ShellInterface
 {

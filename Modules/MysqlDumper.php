@@ -15,6 +15,9 @@
 /**
  * class MysqlDumperException - CdnSerwer Wyjatki
  *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
  * @package    Lib
  * @subpackage MysqlDumper
  * @uses       \Exception
@@ -32,6 +35,9 @@ class MysqlDumperException extends Exception {}
  *        \Exception,
  *        \PDO;
  * ----------------------
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
  * @package    Lib
  * @subpackage MysqlDumper
@@ -568,6 +574,9 @@ class MysqlDumper
 
 /**
  * ModuleMysqlDump - Zrzucanie rekordow z bazy danych
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleMysqlDump implements ShellInterface
 {

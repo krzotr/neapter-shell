@@ -11,11 +11,17 @@
 
 /**
  * ProxyException - Proxy wyjatki
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ProxyException extends Exception {}
 
 /**
  * class Proxy - Proxy
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class Proxy
 {
@@ -353,6 +359,9 @@ class Proxy
 
 /**
  * ModuleProxy - Proxy
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleProxy implements ShellInterface
 {

@@ -11,6 +11,9 @@
 
 /**
  * ModuleCp - Kopiowanie pliku
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleCp implements ShellInterface
 {

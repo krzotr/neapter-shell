@@ -1,6 +1,14 @@
 Changelog:
 ==========
 
+2011-10-17 v0.41
+----------------
+
+*	Usunięto niedozwolony znak `/` z prefixu (aktualnie `0-9a-f{10}`)
+*	Dodano moduł `EmailValidation` - sprawdzanie czy za pomocą odpowiedniego loginu oraz hasła można zalogować się na pocztę
+*	Moduł `download` wspiera zdalne pobieranie z pliku z prokotołu http oraz ftp
+
+
 2011-10-06 v0.40
 ----------------
 

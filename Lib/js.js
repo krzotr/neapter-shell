@@ -40,7 +40,8 @@ var aExclude = new Array
 	'backconnect',
 	'bc',
 	'irc',
-	'proxy'
+	'proxy',
+	'emailvalidator'
 );
 
 /**
@@ -118,7 +119,8 @@ var aCommands = new Array
 	'proxy',
 	'phpinfo',
 	'destroy',
-	'removeshell'
+	'removeshell',
+	'emailvalidator'
 );
 
 /**

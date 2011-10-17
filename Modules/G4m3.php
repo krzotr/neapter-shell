@@ -11,6 +11,9 @@
 
 /**
  * ModuleG4m3 - Gra
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleG4m3 implements ShellInterface
 {

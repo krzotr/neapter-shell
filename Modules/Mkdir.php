@@ -11,6 +11,9 @@
 
 /**
  * ModuleMkdir - Tworzenie katalogu
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleMkdir implements ShellInterface
 {

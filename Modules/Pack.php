@@ -13,6 +13,9 @@
 /**
  * class PackerException - Pack wyjatki
  *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
  * @package    Lib
  * @subpackage Exception
  *
@@ -22,6 +25,9 @@ class PackerException extends Exception {}
 
 /**
  * class Pack - Pakowanie plikow
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
  * @package    Lib
  * @subpackage Pack
@@ -235,6 +241,9 @@ class Pack
 /**
  * class Pack - Rozpakowanie pliku
  *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
  * @package    Lib
  * @subpackage Pack
  *
@@ -432,6 +441,9 @@ class Unpack
 
 /**
  * ModulePacker - Pakowanie / rozpakowywanie plikow oraz katalogow
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModulePack implements ShellInterface
 {

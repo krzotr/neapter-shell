@@ -11,6 +11,9 @@
 
 /**
  * ModuleRoksa - Ogloszenia towarzyskie
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
  */
 class ModuleRoksa implements ShellInterface
 {
