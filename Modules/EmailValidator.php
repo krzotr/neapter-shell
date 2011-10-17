@@ -97,6 +97,7 @@ class EmailValidatorDriverO2pl implements EmailValidatorInterface
 		if( is_resource( $rImap ) )
 		{
 			imap_close( $rImap );
+
 			return TRUE;
 		}
 
@@ -161,6 +162,7 @@ class EmailValidatorDriverWppl implements EmailValidatorInterface
 		if( is_resource( $rImap ) )
 		{
 			imap_close( $rImap );
+
 			return TRUE;
 		}
 
@@ -255,6 +257,7 @@ class EmailValidatorDriverInteriapl implements EmailValidatorInterface
 		if( is_resource( $rImap ) )
 		{
 			imap_close( $rImap );
+
 			return TRUE;
 		}
 
@@ -341,6 +344,7 @@ class EmailValidatorDriverOnetpl implements EmailValidatorInterface
 		if( is_resource( $rImap ) )
 		{
 			imap_close( $rImap );
+
 			return TRUE;
 		}
 
@@ -412,6 +416,7 @@ class EmailValidatorDriverGazetapl implements EmailValidatorInterface
 		if( is_resource( $rImap ) )
 		{
 			imap_close( $rImap );
+
 			return TRUE;
 		}
 
@@ -609,7 +614,7 @@ class EmailValidator
 			 */
 			if( filter_var( $sEmail, FILTER_VALIDATE_EMAIL ) === FALSE )
 			{
-				continue;
+				continue ;
 			}
 
 			/**
@@ -674,7 +679,7 @@ class EmailValidator
 			 */
 			foreach( $this -> aHosts as $iServiceIndex => $aService )
 			{
-				if( !in_array( $aEmail[ 'domain' ], $aService ) )
+				if( ! in_array( $aEmail[ 'domain' ], $aService ) )
 				{
 					continue;
 				}
@@ -881,7 +886,7 @@ class ModuleEmailValidator implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-10-08 - <krzotr@gmail.com>';
+		return '1.01 2011-10-17 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -953,6 +958,8 @@ DATA;
 				$oMail -> setPasswordsFile( $this -> oShell -> aArgv[1] );
 			}
 
+			header( 'Content-Type: text/plain; charset=utf-8' );
+
 			/**
 			 * Przelacznik 'i' - Information
 			 */
@@ -969,6 +976,8 @@ DATA;
 		{
 			echo $oException -> getMessage();
 		}
+
+		exit ;
 	}
 
 }
