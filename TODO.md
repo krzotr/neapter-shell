@@ -1,8 +1,6 @@
 TODO
 ====
 
-*	Prosty skaner portów
-
 *	RecursiveDirectoryIterator zamienić na while + opendir + readdir
 
 *	Nowe moduły
