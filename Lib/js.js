@@ -120,7 +120,9 @@ var aCommands = new Array
 	'phpinfo',
 	'destroy',
 	'removeshell',
-	'emailvalidator'
+	'emailvalidator',
+	'portscan',
+	'portscanner'
 );
 
 /**

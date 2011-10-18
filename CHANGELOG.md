@@ -1,6 +1,12 @@
 Changelog:
 ==========
 
+2011-00-00 v0.00
+----------------
+
+*	Dodano prosty skaner portów `portscanner`
+
+
 2011-10-17 v0.41
 ----------------
 

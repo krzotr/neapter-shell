@@ -172,7 +172,7 @@ class PortScanner
 	 * Wywolanie skanowania
 	 *
 	 * @access public
-	 * @return void
+	 * @return string Informacja o wynikach
 	 */
 	public function get()
 	{
@@ -184,7 +184,7 @@ class PortScanner
 			throw new PortScannerException( 'Wprowadź adres hosta' );
 		}
 
-		printf( "Skanowanie %s:\r\n\r\n", $this -> sIp );
+		$sOutput = sprintf( "Skanowanie %s:\r\n\r\n", $this -> sIp );
 
 		/**
 		 * Skanowanie portow
@@ -194,30 +194,146 @@ class PortScanner
 			/**
 			 * Proba polaczenia
 			 */
-			if( ( $rSock = @ fsockopen( 'tcp://' . $this -> sIp, $iPort, $iErrorno = 0, $sErrorstr = NULL, 5 ) ) !== FALSE )
+			if( ( $rSock = @ fsockopen( 'tcp://' . $this -> sIp, $iPort, $iErrorno = 0, $sErrorstr = NULL, 1 ) ) !== FALSE )
 			{
 				/**
 				 * Info
 				 */
 				fwrite( $rSock, str_repeat( 'x', 1024 ) . "\r\n\r\n\r\n" );
 				$sBanner = preg_replace( '~[^[:print:]]~', ' ', fread( $rSock, 200 ) );
-				printf( "%5d - Otwarty - (%s)\r\n", $iPort, $sBanner );
+				$sOutput .= sprintf( "%5d - Otwarty - (%s)\r\n", $iPort, $sBanner );
 			}
 		}
+
+		return htmlspecialchars( $sOutput );
 	}
 
 }
 
-$oPortScanner = new PortScanner();
+/**
+ * ModulePortScanner - Prosty skaner portow
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ */
+class ModulePortScanner implements ShellInterface
+{
+	/**
+	 * Obiekt Shell
+	 *
+	 * @access private
+	 * @var    object
+	 */
+	private $oShell;
 
-try
-{
-	$oPortScanner
-		-> setHost( @ $argv[1] )
-		-> setPort( @ $argv[2] )
-		-> get();
-}
-catch( PortScannerException $oException )
-{
-	echo $oException -> getMessage();
+	/**
+	 * Konstruktor
+	 *
+	 * @access public
+	 * @param  object $oShell Obiekt Shell
+	 * @return void
+	 */
+	public function __construct( Shell $oShell )
+	{
+		$this -> oShell = $oShell;
+	}
+
+	/**
+	 * Dostepna lista komend
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function getCommands()
+	{
+		return array
+		(
+			'portscan',
+			'portscanner'
+		);
+	}
+
+	/**
+	 * Zwracanie wersji modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function getVersion()
+	{
+		/**
+		 * Wersja Data Autor
+		 */
+		return '1.00 2011-10-18 - <krzotr@gmail.com>';
+	}
+
+	/**
+	 * Zwracanie pomocy modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function getHelp()
+	{
+		return <<<DATA
+Prosty skaner portow
+
+	Użycie:
+		portscanner host [zakres_portow]
+
+	Przykład:
+		portscanner 127.0.0.1 80,90,100-200
+		portscanner localhost 1-1000,2000-3000
+DATA;
+	}
+
+	/**
+	 * Wywolanie modulu
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function get()
+	{
+		/**
+		 * Help
+		 */
+		if( $this -> oShell -> iArgc > 2 )
+		{
+			return $this -> getHelp();
+		}
+
+		/**
+		 * Chmod jest wymagany
+		 */
+		if( $this -> oShell -> iArgc > 2 )
+		{
+			return $this -> getHelp();
+		}
+
+		try
+		{
+			$oPortScanner = new PortScanner();
+
+			/**
+			 * Host
+			 */
+			$oPortScanner -> setHost( $this -> oShell -> aArgv[0] );
+
+			/**
+			 * Porty
+			 */
+			if( isset( $this -> oShell -> aArgv[1] ) )
+			{
+				$oPortScanner -> setPort( $this -> oShell -> aArgv[1] );
+			}
+
+			return $oPortScanner -> get();
+		}
+		catch( PortScannerException $oException )
+		{
+			return $oException -> getMessage();
+		}
+	}
+
 }
