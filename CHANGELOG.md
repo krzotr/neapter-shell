@@ -7,6 +7,8 @@ Changelog:
 *	Dodano
 	*	`portscanner` - prosty skaner portów
 	*	`id` - informacje o użytkowniku
+*	Poprawiono
+	*	Parsowanie znaku `+` podczas wysyłania polecenia AJAX'em
 
 
 2011-10-17 v0.41
@@ -36,7 +38,7 @@ Changelog:
 	*	`mysqldump` - wsparcie dla gzip
 	*	Możliwość przełączenia się na wersję deweloperską (włączenie wyświetlania błądów)
 	*	`Logout` jest natywnym modułem
-*	Poprawiono:
+*	Poprawiono
 	*	parsowanie argumentów, które są objęte w `'` oraz `"` i zawierają spacje
 	*	Wyświetlanie pomocy dla natywnych modułów
 	*	Formatowanie wyniku za pomocą polecenia `hexdump`

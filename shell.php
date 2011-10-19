@@ -1270,7 +1270,7 @@ DATA;
 				}
 			}
 
-			$this -> sArgv = $this -> rmQuotes( rtrim($this -> sArgv ) );
+			$this -> sArgv = $this -> rmQuotes( rtrim( $this -> sArgv ) );
 
 			$this -> iArgc = count( $this -> aArgv );
 

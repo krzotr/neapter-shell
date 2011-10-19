@@ -238,7 +238,10 @@ function submitForm()
 				oStatus.style.display = 'none';
 			}
 		}
-		oAjax.send( 'cmd=' + escape( oCmd.value ) );
+
+		var sCmd = escape( oCmd.value );
+
+		oAjax.send( 'cmd=' + sCmd.replace( new RegExp( '\\+', 'g' ), '%2B' ) );
 		return false;
 	}
 
