@@ -4,7 +4,9 @@ Changelog:
 2011-00-00 v0.00
 ----------------
 
-*	Dodano prosty skaner portów `portscanner`
+*	Dodano
+	*	`portscanner` - prosty skaner portów
+	*	`id` - informacje o użytkowniku
 
 
 2011-10-17 v0.41

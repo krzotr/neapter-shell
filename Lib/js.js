@@ -122,7 +122,9 @@ var aCommands = new Array
 	'removeshell',
 	'emailvalidator',
 	'portscan',
-	'portscanner'
+	'portscanner',
+	'id',
+	'whoami'
 );
 
 /**

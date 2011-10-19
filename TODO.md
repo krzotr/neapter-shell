@@ -5,8 +5,6 @@ TODO
 
 *	Nowe moduły
 
-	*	whoami
-
 	*	flush - usuwanie wszystkich tymczasowych plików shella
 
 *	Zmniejszyć rozmiar shella
