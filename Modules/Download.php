@@ -72,7 +72,7 @@ class ModuleDownload implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.03 2011-10-17 - <krzotr@gmail.com>';
+		return '1.03 2011-10-19 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -159,9 +159,9 @@ DATA;
 		/**
 		 * Naglowki
 		 */
-		header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0', TRUE );
-		header( sprintf( 'Content-Disposition: attachment; filename="%s"', basename( $this -> oShell -> sArgv ) ), TRUE );
-		header( 'Content-Type: application/octet-stream', TRUE );
+		header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
+		header( sprintf( 'Content-Disposition: attachment; filename="%s"', basename( $this -> oShell -> sArgv ) ) );
+		header( 'Content-Type: application/octet-stream' );
 
 		if( ( $rFile = fopen( $this -> oShell -> sArgv, 'r' ) ) !== FALSE )
 		{
