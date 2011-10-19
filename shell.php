@@ -1159,7 +1159,7 @@ info - Wyświetla informacje o systemie
 DATA;
 		}
 
-		return sprintf( "- SERVER:[%s], IP:[%s], Host:[%s]\r\nPHP:[%s], API:[%s], Url:[%s], Path:[%s]\r\nSAFE_MODE:[%d], EXE:[%d], CURL:[%d], SOCKET:[%s]",
+		return sprintf( "- SERVER:[%s], IP:[%s], Host:[%s]\r\nPHP:[%s], API:[%s], Url:[%s], Path:[%s]\r\nSAFE_MODE:[%d], EXE:[%d], CURL:[%d], SOCKET:[%d]",
 			php_uname(),
 			( $sIp = Request::getServer( 'REMOTE_ADDR' ) ),
 			gethostbyaddr( $sIp ),
@@ -1167,8 +1167,8 @@ DATA;
 			php_sapi_name(),
 			( ( PHP_SAPI === 'cli ') ? 'CLI' : Request::getCurrentUrl() ),
 			Request::getServer( 'SCRIPT_FILENAME' ),
-			(int) $this -> bSafeMode,
-			(int) $this -> bExec,
+			$this -> bSafeMode,
+			$this -> bExec,
 			function_exists( 'curl_init' ),
 			function_exists( 'socket_create' )
 
