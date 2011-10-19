@@ -9,6 +9,7 @@ Changelog:
 	*	`id` - informacje o użytkowniku
 *	Poprawiono
 	*	Parsowanie znaku `+` podczas wysyłania polecenia AJAX'em
+	*	`passwordrecovery` - błędny plik pomocy podczas wprowadzenia złej ilości parametrów
 
 
 2011-10-17 v0.41

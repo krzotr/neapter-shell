@@ -716,7 +716,7 @@ DATA;
 		}
 		/**
 		 * Wyjatek
-		 */2
+		 */
 		catch( PDOException $oException )
 		{
 			return sprintf( 'Wystąpił błąd: %s', $oException -> getMessage() );

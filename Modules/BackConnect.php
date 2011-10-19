@@ -95,7 +95,7 @@ class BackConnect
 		/**
 		 * Sprawdzanie poprawnosci portu
 		 */
-		if( ( $iValue < 0 ) || ( $iValue > 65535 ) )
+		if( ! ( ( $iValue > 0 ) && ( $iValue < 65535 ) ) )
 		{
 			throw new ProxyException( sprintf( 'Błędny port "%d"', $iValue ) );
 		}
