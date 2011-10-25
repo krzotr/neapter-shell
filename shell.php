@@ -31,7 +31,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.41 b111017';
+	const VERSION = '0.41 b111025';
 
 	/**
 	 * Help, natywne polecenia
@@ -247,6 +247,25 @@ class Shell
 	public function __construct()
 	{
 		/**
+		 * @see Request::init
+		 *
+		 * Dostep do zmiennych poprzez metody. Nie trzeba za kazdym razem uzywac konstrukcji:
+		 *   ( isset( $_GET['test'] ) && ( $_GET['test'] === 'test' ) )
+		 * tylko
+		 *   ( Request::getGet( 'test' ) === 'test' )
+		 */
+		Request::init();
+
+		/**
+		 * Blokowanie google bota; baidu, bing, yahoo moga byc
+		 */
+		if( stripos( Request::getServer( 'HTTP_USER_AGENT' ), 'Google' ) !== FALSE )
+		{
+			header( 'HTTP/1.0 404 Not Found' );
+			exit;
+		}
+
+		/**
 		 * Czas generowania strony
 		 */
 		$this -> fGeneratedIn = microtime( 1 );
@@ -297,16 +316,6 @@ class Shell
 		{
 			$this -> sTmp = $sDir;
 		}
-
-		/**
-		 * @see Request::init
-		 *
-		 * Dostep do zmiennych poprzez metody. Nie trzeba za kazdym razem uzywac konstrukcji:
-		 *   ( isset( $_GET['test'] ) && ( $_GET['test'] === 'test' ) )
-		 * tylko
-		 *   ( Request::getGet( 'test' ) === 'test' )
-		 */
-		Request::init();
 
 		/**
 		 * Tryb deweloperski

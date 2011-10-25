@@ -8,6 +8,7 @@ Changelog:
 	*	`portscanner` - prosty skaner portów
 	*	`id` - informacje o użytkowniku
 	*	`speedtest` - sprawdzanie szybkości łącza
+	*	Dostęp dla bota Google jest zablokowany
 *	Poprawiono
 	*	Parsowanie znaku `+` podczas wysyłania polecenia AJAX'em
 	*	`passwordrecovery` - błędny plik pomocy podczas wprowadzenia złej ilości parametrów
