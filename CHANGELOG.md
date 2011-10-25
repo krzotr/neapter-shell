@@ -7,6 +7,7 @@ Changelog:
 *	Dodano
 	*	`portscanner` - prosty skaner portów
 	*	`id` - informacje o użytkowniku
+	*	`speedtest` - sprawdzanie szybkości łącza
 *	Poprawiono
 	*	Parsowanie znaku `+` podczas wysyłania polecenia AJAX'em
 	*	`passwordrecovery` - błędny plik pomocy podczas wprowadzenia złej ilości parametrów
