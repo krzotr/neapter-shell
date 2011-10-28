@@ -9,6 +9,7 @@ Changelog:
 	*	`id` - informacje o użytkowniku
 	*	`speedtest` - sprawdzanie szybkości łącza
 	*	Dostęp dla bota Google jest zablokowany
+	*	`touch` - zmiana czasu modyfikacji i dostępu pliku
 *	Poprawiono
 	*	Parsowanie znaku `+` podczas wysyłania polecenia AJAX'em
 	*	`passwordrecovery` - błędny plik pomocy podczas wprowadzenia złej ilości parametrów
