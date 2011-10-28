@@ -125,7 +125,8 @@ var aCommands = new Array
 	'portscanner',
 	'id',
 	'whoami',
-	'speedtest'
+	'speedtest',
+	'touch'
 );
 
 /**
