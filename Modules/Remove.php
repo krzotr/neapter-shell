@@ -65,7 +65,7 @@ class ModuleRemove implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-06-23 - <krzotr@gmail.com>';
+		return '1.02 2011-11-02 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -121,7 +121,7 @@ DATA;
 		{
 			try
 			{
-				$oDirectory = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this -> oShell -> sArgv ), RecursiveIteratorIterator::CHILD_FIRST );
+				$oDirectory = new RecursiveIteratorIterator( new XRecursiveDirectoryIterator( $this -> oShell -> sArgv ), RecursiveIteratorIterator::CHILD_FIRST );
 
 				foreach( $oDirectory as $oFile )
 				{

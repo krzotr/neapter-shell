@@ -13,7 +13,7 @@ $sData = '<?php ';
 
 if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 {
-	$aFiles = array( 'Lib/Arr', 'Lib/Request', 'Lib/ShellInterface' );
+	$aFiles = array( 'Lib/Arr', 'Lib/Request', 'Lib/ShellInterface', 'Lib/XRecursiveDirectoryIterator' );
 
 	if( ! isset( $argv[1] ) )
 	{

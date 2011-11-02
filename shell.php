@@ -13,6 +13,7 @@ require_once dirname( __FILE__ ) . '/Lib/Arr.php';
 require_once dirname( __FILE__ ) . '/Lib/Request.php';
 require_once dirname( __FILE__ ) . '/Lib/ShellInterface.php';
 require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
+require_once dirname( __FILE__ ) . '/Lib/XRecursiveDirectoryIterator.php';
 
 /**
  * class Shell - Zarzadzanie serwerem
