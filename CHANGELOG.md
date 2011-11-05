@@ -14,6 +14,7 @@ Changelog:
 	*	Parsowanie znaku `+` podczas wysyłania polecenia AJAX'em
 	*	`passwordrecovery` - błędny plik pomocy podczas wprowadzenia złej ilości parametrów
 	*	Klasa XRecursiveDirectoryIterator (rozszerzenie RecursiveDirectoryIterator) nie zwraca wyjątku
+	*	System autoryzacji - wystarczy zdefiniować stałą NF_AUTH z wartością `sha1( "user\xffhasło" )`; autoryzacja wyłączona jest w CLI
 
 
 2011-10-17 v0.41
