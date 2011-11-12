@@ -10,7 +10,15 @@ Changelog:
 	*	`speedtest` - sprawdzanie szybkości łącza
 	*	Dostęp dla bota Google jest zablokowany
 	*	`touch` - zmiana czasu modyfikacji i dostępu pliku
+	*	`emailchecker` - nowe sterowniki:
+		*	Yahoo.com
+		*	Gmail.com
+		*	Live.com
+		*	Neostrada.pl
+		*	Orange.pl
+		*	Plusnet.pl
 *	Poprawiono
+	*	`emailchecker` - niepoprawne dane do gazeta.pl
 	*	Parsowanie znaku `+` podczas wysyłania polecenia AJAX'em
 	*	`passwordrecovery` - błędny plik pomocy podczas wprowadzenia złej ilości parametrów
 	*	Klasa XRecursiveDirectoryIterator (rozszerzenie RecursiveDirectoryIterator) nie zwraca wyjątku
