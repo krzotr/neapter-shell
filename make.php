@@ -190,6 +190,12 @@ foreach( $aTokens as $i => $aToken )
 				break;
 			}
 
+			if( trim( strtolower( $aToken[1] ) ) === 'extends' )
+			{
+				$sOutput .= ' extends ';
+				break;
+			}
+
 			if( in_array( trim( strtolower( $aToken[1] ) ), $aInclude ) )
 			{
 				$sOutput .= $aToken[1] . ' ';
