@@ -17,12 +17,17 @@ Changelog:
 		*	Neostrada.pl
 		*	Orange.pl
 		*	Plusnet.pl
+	*	`autoload` - wczytywanie rozszerzeń
 *	Poprawiono
 	*	`emailchecker` - niepoprawne dane do gazeta.pl
 	*	Parsowanie znaku `+` podczas wysyłania polecenia AJAX'em
 	*	`passwordrecovery` - błędny plik pomocy podczas wprowadzenia złej ilości parametrów
 	*	Klasa XRecursiveDirectoryIterator (rozszerzenie RecursiveDirectoryIterator) nie zwraca wyjątku
 	*	System autoryzacji - wystarczy zdefiniować stałą NF_AUTH z wartością `sha1( "user\xffhasło" )`; autoryzacja wyłączona jest w CLI
+	*	js
+		*	po wpisaniu `:` wyświetlane są wszystkie dostępne polecenia
+		*	po wpisaniu pełnego polecenia nie są wyświetlane kolejne, które zawierają daną frazę
+	*	`?p` zamieniono na `?pure`
 
 
 2011-10-17 v0.41
