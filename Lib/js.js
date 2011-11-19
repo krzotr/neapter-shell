@@ -316,7 +316,7 @@ function autoPrompt( sCommand )
 				 */
 				else
 				{
-					sOutput += '<span onclick="changeCommand(\'' + aCommands[ i ] + '\');">';
+					sOutput += "<span onclick=\"changeCommand('" + aCommands[ i ] + "');\">";
 
 					sOutput += '<span class="red">';
 					sOutput += aCommands[ i ].substring( 0, sCommand.length );
@@ -332,9 +332,7 @@ function autoPrompt( sCommand )
 	{
 		for( i in aCommands )
 		{
-			sOutput += '<span onclick="changeCommand(\'' + aCommands[ i ] + '\');">';
-
-			sOutput += '<span class="red">';
+			sOutput += "<span onclick=\"changeCommand('" + aCommands[ i ] + "');\" class=\"red\">";
 			sOutput += aCommands[ i ];
 			sOutput += '</span>,&nbsp;';
 		}
