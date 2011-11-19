@@ -32,7 +32,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.41 b111116-dev';
+	const VERSION = '0.41 b111119-dev';
 
 	/**
 	 * Help, natywne polecenia
@@ -361,7 +361,7 @@ class Shell
 		/**
 		 * Unikalny klucz
 		 */
-		$this -> sKey = md5( md5_file( $sScriptFilename ), TRUE ) . md5( $sScriptFilename, TRUE ) . sha1( $sScriptFilename = Request::getServer( 'SCRIPT_FILENAME' ), TRUE );
+		$this -> sKey = md5( md5_file( $sScriptFilename = Request::getServer( 'SCRIPT_FILENAME' ) ), TRUE ) . md5( $sScriptFilename, TRUE ) . sha1( $sScriptFilename, TRUE );
 
 		/**
 		 * Prefix
