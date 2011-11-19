@@ -18,6 +18,7 @@ Changelog:
 		*	Orange.pl
 		*	Plusnet.pl
 	*	`autoload` - wczytywanie rozszerzeń
+	*	`version` - wyświetlanie wersji shell'a
 *	Poprawiono
 	*	`emailchecker` - niepoprawne dane do gazeta.pl
 	*	Parsowanie znaku `+` podczas wysyłania polecenia AJAX'em

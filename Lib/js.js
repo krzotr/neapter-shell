@@ -127,7 +127,8 @@ var aCommands = new Array
 	'whoami',
 	'speedtest',
 	'touch',
-	'autoload'
+	'autoload',
+	'version'
 );
 
 aCommands.sort();
