@@ -1151,7 +1151,7 @@ class EmailValidator
 		/**
 		 * Sterowniki sa wymagane
 		 */
-		if( $this -> aDrivers === FALSE )
+		if( $this -> aDrivers === array() )
 		{
 			throw new EmailValidatorException( 'Nie ustawiono sterownikow' );
 		}
@@ -1159,7 +1159,7 @@ class EmailValidator
 		/**
 		 * Lista z adresami jest wymagana
 		 */
-		if( $this -> aEmails === FALSE )
+		if( $this -> aEmails === array() )
 		{
 			throw new EmailValidatorException( 'Nie wprowadzono adresow email' );
 		}
@@ -1172,6 +1172,7 @@ class EmailValidator
 		$iEmails = count( $this -> aEmails );
 
 		echo "Rozpoczęto skanowanie\r\n\r\n";
+
 		/**
 		 * Adresy email
 		 */
@@ -1453,7 +1454,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc !== 1 && $this -> oShell -> iArgc !== 2 )
+		if( ( $this -> oShell -> iArgc !== 1 ) && ( $this -> oShell -> iArgc !== 2 ) )
 		{
 			return $this -> getHelp();
 		}
