@@ -32,7 +32,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.41 b111119-dev';
+	const VERSION = '0.50 b120126';
 
 	/**
 	 * Help, natywne polecenia

@@ -61,6 +61,7 @@ var aCommands = new Array
 	'bind',
 	'pwd',
 	'remove',
+	'remote',
 	'rm',
 	'delete',
 	'del',
