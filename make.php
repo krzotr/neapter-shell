@@ -9,14 +9,11 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
-/**
- * Wymagane PHP 5.3
- */
-$sData = "<?php\r\n";
+$sData = '<?php ';
 
 if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 {
-	$aFiles = array( 'LibProd/Arr', 'LibProd/Request', 'LibProd/ShellInterface' );
+	$aFiles = array( 'Lib/Arr', 'Lib/Request', 'Lib/ShellInterface', 'Lib/XRecursiveDirectoryIterator' );
 
 	if( ! isset( $argv[1] ) )
 	{
@@ -95,144 +92,15 @@ else if( isset( $argv[1] ) && ( $argv[1] === 'modules' ) )
 	}
 }
 
+/**
+ * JavaScript
+ */
+if( isset( $aFiles ) && in_array( 'shell', $aFiles ) )
+{
+	$sData = preg_replace( '~\$sScript\s*=\s*file_get_contents\(\s*\'Lib/js.js\'\s*\);~', '$sScript=\'' . addcslashes( file_get_contents( 'LibProd/js.js' ), '\'' ) . '\';', $sData );
+}
+
 file_put_contents( __DIR__ . '/Tmp/dev.php', $sData );
-
-/**
- * Wyrazenie " ! " -> "!"
- */
-$sData = preg_replace( '~\s\!\s~', '!', $sData );
-
-/**
- * Wyrazenie " && " -> "&&"
- */
-$sData = preg_replace( '~\s\&&\s~', '&&', $sData );
-/**
- * Wyrazenie " || " -> "||"
- */
-$sData = preg_replace( '~\s\\|\|\s~', '||', $sData );
-
-/**
- * Operator trojskladnikowy
- */
-$sData = preg_replace( '~\s+\?\s~', '?', $sData );
-$sData = preg_replace( '~\s+\:\s~', ':', $sData );
-
-/**
- * Usuwanie komentarzy
- */
-$sData = preg_replace( '~/\*\*(.+?)\*/~s', NULL, $sData );
-
-/**
- * Usuwanie tabualtorow
- */
-$sData = preg_replace_callback( '~(<<<DATA(.+?)DATA;|\t)~s', function( $aVal )
-	{
-		if( $aVal[0] !== "\t" )
-		{
-			return $aVal[0];
-		}
-
-	}
-	, $sData
-);
-
-/**
- * Redukcja \r\n
- */
-$sData = preg_replace( '~[\r\n]{2,}~', "\r\n", $sData );
-
-/**
- * Redukcja spacji
- */
-$sData = preg_replace( '~ {2,}~', "\r\n", $sData );
-
-/**
- * Tablica $mConfig[ $sParam ] -> $mConfig[$sParam]
- */
-$sData = preg_replace( '~\[\s+(.+?)\s+\]~s', '[$1]', $sData );
-
-/**
- * Tablica - przypisanie  'key' => 5 -> 'key'=>5
- */
-$sData = preg_replace( '~\s+=>\s+~', '=>', $sData );
-
-/**
- * Obiekty $this -> prop   $this->prop
- */
-$sData = preg_replace( '~\s+->\s+~', '->', $sData );
-
-/**
- * break ;, exit ;, continue ; -> break;, exit;, continue
- */
-$sData = preg_replace( '~(break|continue|exit) ;~', '$1;', $sData );
-
-/**
- * private $a;
- * private $b;
- *  ->
- * private $a;private $b;
- */
-$sData = preg_replace( '~[\r\n]+(private|public|protected)\s+\$~', '$1 $', $sData );
-$sData = preg_replace( '~[\r\n]+(private|public|protected)\s+static\s+\$~', '$1 static $', $sData );
-
-/**
- * Zmienne $a = 5; -> $a=5;
- */
-$sData = preg_replace( '~(\$(this->)?[a-zA-z0-9_]+)\s+=\s+~', '$1=', $sData );
-
-/**
- * Wyrażenie (musi byc 2 razy
- * if( isset( $mConfig[$sParam] ) ) -> if(isset($mConfig[$sParam]))
- */
-$sData = preg_replace( '~\(\s+?(.+?)\s+\)~s', '($1)', $sData );
-$sData = preg_replace( '~\(\s+(.+?)\s+?\)~s', '($1)', $sData );
-$sData = preg_replace( '~\(\s+?(.+?)\s+\)~s', '($1)', $sData );
-$sData = preg_replace( '~\(\s+(.+?)\s+?\)~s', '($1)', $sData );
-$sData = preg_replace( '~\(\s+(.+?)\s+\)~s', '($1)', $sData );
-
-/**
- * Wyrażenie if( $a === 5 ) -> if( $a===5 )
- */
-$sData = preg_replace( '~\s+(!|=)=?=\s+~', '$1==', $sData );
-
-/**
- * Kontatenacja $s = 'test' . $var . "test2"; -> $s = 'test'.$var."test2";
- */
-$sData = preg_replace( '~(\'|")\s+\.\s+~', '$1.', $sData );
-$sData = preg_replace( '~\s+\.\s+(\'|")~', '.$1', $sData );
-
-/**
- * Usuwanie znakow nowej lini przed i za znakami '{' '}'
- */
-$sData = preg_replace( '~[\r\n]+{[\r\n]+~', '{', $sData );
-
-/**
- * else if -> elseif
- */
-$sData = str_replace( 'else if', 'elseif', $sData );
-
-/**
- * else if -> elseif
- */
-$sData = str_replace( 'TRUE', '1', $sData );
-$sData = str_replace( 'FALSE', '0', $sData );
-
-/**
- * Usuwanie linii
- */
-$sData = preg_replace( '~(_GET|_POST|_SERVER|_FILES|null|true);[\r\n]+~i', '$1;', $sData );
-
-$sData = preg_replace( '~\';[\r\n+]~', '\';', $sData );
-
-
-$sData = preg_replace( '~\r\n~', "\n", $sData );
-
-
-$sData = preg_replace( '~\}\n\}\n\}\n?~', '}}}', $sData );
-$sData = preg_replace( '~}\n\}\n?~', '}}', $sData );
-$sData = preg_replace( '~}\n?~', '}', $sData );
-
-$sData = preg_replace( '~(?<!\nDATA);\n(<!DATA;)~', ';', $sData );
 
 if( substr( $sData, -2 ) !== '?>' )
 {
@@ -241,12 +109,110 @@ if( substr( $sData, -2 ) !== '?>' )
 
 
 /**
- * JavaScript
+ * Usuwanie bialych znakow itp
+ * =================================================================================================
  */
-if( isset( $aFiles ) && in_array( 'shell', $aFiles ) )
+$aTokens = token_get_all( $sData ) ;
+
+$sOutput = NULL;
+
+$aExclude = array();
+
+$aInclude = array
+(
+	'return',
+	'include',
+	'include_once',
+	'require_once',
+	'require',
+	'class',
+	'private',
+	'public',
+	'protected',
+	'interface',
+	'final',
+	'abstract',
+	'const',
+	'static',
+	'function',
+	'throw',
+	'new'
+);
+
+$aReplace = array
+(
+	"\n" => '\n',
+	"\r" => '\r',
+	"\t" => '\t',
+);
+
+foreach( $aTokens as $i => $aToken )
 {
-	$sData = preg_replace( '~\$sScript\s*=\s*file_get_contents\(\s*\'Lib/js.js\'\s*\);~', '$sScript=\'' . addcslashes( file_get_contents( 'LibProd/js.js' ), '\'' ) . '\';', $sData );
+	if( in_array( $i, $aExclude ) )
+	{
+		continue;
+	}
+	if( ! is_int( $aToken[0] ) )
+	{
+		$sOutput .= $aToken[0];
+		continue ;
+	}
+
+	switch( $aToken[0] )
+	{
+		case T_DOC_COMMENT:
+			$sOutput .= '';
+			break;
+		case T_WHITESPACE:
+			$sOutput .= '';
+			break;
+		case T_START_HEREDOC:
+			$sOutput .= '"'.strtr( addcslashes( $aTokens[ $i + 1 ][1], '$"'), $aReplace ) . '"';
+			$aExclude[] = $i + 1;
+			$aExclude[] = $i + 2;
+			break;
+		default:
+			if( trim( strtolower( $aToken[1] ) ) === 'as' )
+			{
+				$sOutput .= ' as ';
+				break;
+			}
+
+			if( trim( strtolower( $aToken[1] ) ) === 'implements' )
+			{
+				$sOutput .= ' implements ';
+				break;
+			}
+
+			if( trim( strtolower( $aToken[1] ) ) === 'instanceof' )
+			{
+				$sOutput .= ' instanceof ';
+				break;
+			}
+
+			if( trim( strtolower( $aToken[1] ) ) === 'extends' )
+			{
+				$sOutput .= ' extends ';
+				break;
+			}
+
+			if( in_array( trim( strtolower( $aToken[1] ) ), $aInclude ) )
+			{
+				$sOutput .= $aToken[1] . ' ';
+			}
+			else
+			{
+				$sOutput .= $aToken[1];
+			}
+	}
 }
+
+$sData = trim( $sOutput );
+
+/**
+ * =================================================================================================
+ */
+
 
 file_put_contents( __DIR__ . '/Tmp/prod.php', $sData );
 

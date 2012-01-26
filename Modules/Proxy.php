@@ -126,7 +126,6 @@ class Proxy
 		/**
 		 * Wylaczenie blokowania
 		 */
-		//socket_set_nonblock( $rSock );
 
 		/**
 		 * Nasluchiwanie
@@ -153,7 +152,7 @@ class Proxy
 				continue ;
 			}
 
-			/*
+			/**
 			 * Naglowki uzytkownika
 			 */
 			$sHeaders = NULL;
@@ -180,7 +179,7 @@ class Proxy
 
 						socket_close( $rClient );
 
-						/*
+						/**
 						 * Rozlaczenie klienta
 						 */
 						socket_close( $rSock );

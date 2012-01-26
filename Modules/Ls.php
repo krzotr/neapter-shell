@@ -173,7 +173,7 @@ DATA;
 			 */
 			if( $bRecursive )
 			{
-				$oDirectory = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $sDir ), RecursiveIteratorIterator::SELF_FIRST );
+				$oDirectory = new RecursiveIteratorIterator( new XRecursiveDirectoryIterator( $sDir ), RecursiveIteratorIterator::SELF_FIRST );
 			}
 			else
 			{

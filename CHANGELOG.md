@@ -1,6 +1,37 @@
 Changelog:
 ==========
 
+2012-01-26 v0.50
+----------------
+
+*	Dodano
+	*	Blokada bota Google
+	*	`portscanner` - prosty skaner portów
+	*	`id` - informacje o użytkowniku
+	*	`speedtest` - sprawdzanie szybkości łącza
+	*	`touch` - zmiana czasu modyfikacji i dostępu pliku
+	*	`emailchecker` - nowe sterowniki:
+		*	Yahoo.com
+		*	Gmail.com
+		*	Live.com
+		*	Neostrada.pl
+		*	Orange.pl
+		*	Plusnet.pl
+	*	`autoload` - wczytywanie rozszerzeń
+	*	`version` - wyświetlanie wersji shell'a
+	*	`remote` - zdalnie wywołanie shella
+*	Poprawiono
+	*	Parsowanie znaku `+` podczas wysyłania polecenia AJAX'em
+	*	`emailchecker` - niepoprawne dane do gazeta.pl
+	*	`passwordrecovery` - błędny plik pomocy podczas wprowadzenia złej ilości parametrów
+	*	Klasa XRecursiveDirectoryIterator (rozszerzenie RecursiveDirectoryIterator) nie zwraca wyjątku
+	*	System autoryzacji - wystarczy zdefiniować stałą NF_AUTH z wartością `sha1( "user\xffhasło" )`; autoryzacja wyłączona jest w CLI
+	*	js
+		*	po wpisaniu `:` wyświetlane są wszystkie dostępne polecenia
+		*	po wpisaniu pełnego polecenia nie są wyświetlane kolejne, które zawierają daną frazę
+	*	`?p` zamieniono na `?pure`
+	*	`dos` - usunięto problem z DoS'owaniem na port "0"
+
 2011-10-17 v0.41
 ----------------
 
@@ -28,7 +59,7 @@ Changelog:
 	*	`mysqldump` - wsparcie dla gzip
 	*	Możliwość przełączenia się na wersję deweloperską (włączenie wyświetlania błądów)
 	*	`Logout` jest natywnym modułem
-*	Poprawiono:
+*	Poprawiono
 	*	parsowanie argumentów, które są objęte w `'` oraz `"` i zawierają spacje
 	*	Wyświetlanie pomocy dla natywnych modułów
 	*	Formatowanie wyniku za pomocą polecenia `hexdump`

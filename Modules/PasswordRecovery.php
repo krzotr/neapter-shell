@@ -558,7 +558,7 @@ class ModulePasswordRecovery implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-06-04 - <krzotr@gmail.com>';
+		return '1.01 2011-10-19 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -609,28 +609,29 @@ DATA;
 		 */
 		if( $this -> oShell -> iArgc !== 4 )
 		{
-			return $this -> getVersion();
+			return $this -> getHelp();
 		}
+
+		header( 'Content-Type: text/plain; charset=utf-8' );
 
 		try
 		{
 			ob_start();
 
-			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
-
 			$oPasswordRecovery = new PasswordRecovery();
-			$oPasswordRecovery -> setHost( $this -> oShell -> aArgv[1] )
-					   -> setType( $this -> oShell -> aArgv[0] )
-					   -> setUsers( $this -> oShell -> aArgv[2] )
-					   -> setPasswords( $this -> oShell -> aArgv[3] )
-					   -> get();
+			$oPasswordRecovery
+				-> setHost( $this -> oShell -> aArgv[1] )
+				-> setType( $this -> oShell -> aArgv[0] )
+				-> setUsers( $this -> oShell -> aArgv[2] )
+				-> setPasswords( $this -> oShell -> aArgv[3] )
+				-> get();
+
 			ob_end_flush();
 			exit ;
 
 		}
 		catch( PasswordRecoveryException $oException )
 		{
-			header( 'Content-Type: text/html; charset=utf-8', TRUE );
 			return $oException -> getMessage();
 		}
 	}

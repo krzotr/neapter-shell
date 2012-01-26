@@ -344,12 +344,12 @@ class MysqlDumper
 		 */
 		if( $this -> bDownload )
 		{
-			header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0', TRUE );
-			header( 'Content-Transfer-Encoding: binary', TRUE );
-			header( 'Content-Disposition: attachment; filename="db.sql"', TRUE);
+			header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
+			header( 'Content-Transfer-Encoding: binary' );
+			header( 'Content-Disposition: attachment; filename="db.sql"' );
 		}
 
-		header( 'Content-Type: text/plain', TRUE );
+		header( 'Content-Type: text/plain' );
 
 		/**
 		 * Iteracja tabeli
@@ -417,9 +417,7 @@ class MysqlDumper
 						/**
 						 * [nazwa_kolumny] => 'typ'
 						 */
-						array_walk( $aTypes, create_function( '& $sVal, $sKey, array $aData', '
-								$sVal = $aData[0] -> getFieldType( $aData[1], $sKey );
-							' ), array( $this, $sTablename )
+						array_walk( $aTypes, create_function( '& $sVal, $sKey, array $aData', '$sVal = $aData[0] -> getFieldType( $aData[1], $sKey );' ), array( $this, $sTablename )
 						);
 					}
 
@@ -627,7 +625,7 @@ class ModuleMysqlDump implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.02 2011-09-19 - <krzotr@gmail.com>';
+		return '1.03 2011-10-19 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -704,9 +702,10 @@ DATA;
 			$oPdo = new PDO( sprintf( 'mysql:host=%s;port=%d;dbname=%s', $aHost[0], $aHost[1], $this -> oShell -> aArgv[2] ), $sUsername, $sPassword );
 
 			$oDumper = new MysqlDumper();
-			$oDumper -> setPdo( $oPdo )
-				 -> setDownload( 1 )
-				 -> setExtendedInsert( 1 );
+			$oDumper
+				-> setPdo( $oPdo )
+				-> setDownload( 1 )
+				-> setExtendedInsert( 1 );
 
 			if( $this -> oShell -> iArgc > 3 )
 			{
@@ -714,7 +713,6 @@ DATA;
 			}
 			$oDumper -> get();
 			exit ;
-
 		}
 		/**
 		 * Wyjatek

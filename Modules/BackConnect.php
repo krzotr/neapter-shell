@@ -95,7 +95,7 @@ class BackConnect
 		/**
 		 * Sprawdzanie poprawnosci portu
 		 */
-		if( ( $iValue < 0 ) || ( $iValue > 65535 ) )
+		if( ! ( ( $iValue > 0 ) && ( $iValue < 65535 ) ) )
 		{
 			throw new ProxyException( sprintf( 'Błędny port "%d"', $iValue ) );
 		}
@@ -222,7 +222,7 @@ class ModuleBackConnect implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-06-04 - <krzotr@gmail.com>';
+		return '1.01 2011-10-19 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -279,22 +279,23 @@ DATA;
 
 		$aHost = $this -> oShell -> getHost( $this -> oShell -> aArgv[0] );
 
+		header( 'Content-Type: text/plain; charset=utf-8' );
+
 		try
 		{
 			ob_start();
 
-			header( 'Content-Type: text/plain; charset=utf-8', TRUE );
-
 			$oProxy = new BackConnect( $this -> oShell );
-			$oProxy -> setHost( $aHost[0] )
+			$oProxy
+				-> setHost( $aHost[0] )
 				-> setPort( $aHost[1] )
 				-> get();
+
 			ob_end_flush();
 			exit ;
 		}
 		catch( BackConnectException $oException )
 		{
-			header( 'Content-Type: text/html; charset=utf-8', TRUE );
 			return $oException -> getMessage();
 		}
 	}

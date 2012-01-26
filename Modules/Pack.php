@@ -32,7 +32,7 @@ class PackerException extends Exception {}
  * @package    Lib
  * @subpackage Pack
  *
- * @uses       RecursiveDirectoryIterator
+ * @uses       XRecursiveDirectoryIterator
  * @uses       RecursiveIteratorIterator
  */
 class Pack
@@ -118,7 +118,7 @@ class Pack
 			/**
 			 * Iteracyjne przeszukanie katalogu
 			 */
-			$oDirectory = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this -> sInput ) );
+			$oDirectory = new RecursiveIteratorIterator( new XRecursiveDirectoryIterator( $this -> sInput ) );
 		}
 		catch( UnexpectedValueException $oException )
 		{
@@ -247,7 +247,7 @@ class Pack
  * @package    Lib
  * @subpackage Pack
  *
- * @uses       RecursiveDirectoryIterator
+ * @uses       XRecursiveDirectoryIterator
  * @uses       RecursiveIteratorIterator
  */
 class Unpack
