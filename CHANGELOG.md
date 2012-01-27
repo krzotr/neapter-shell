@@ -1,6 +1,13 @@
 Changelog:
 ==========
 
+2012-00-00 v0.00
+----------------
+*	Poprawiono
+	*	Wyświetlanie pomocy
+	*	Zarządzanie shellem poprzez CLI
+
+
 2012-01-26 v0.50
 ----------------
 
@@ -31,6 +38,7 @@ Changelog:
 		*	po wpisaniu pełnego polecenia nie są wyświetlane kolejne, które zawierają daną frazę
 	*	`?p` zamieniono na `?pure`
 	*	`dos` - usunięto problem z DoS'owaniem na port "0"
+
 
 2011-10-17 v0.41
 ----------------

