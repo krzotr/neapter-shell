@@ -248,6 +248,11 @@ class Shell
 	public function __construct()
 	{
 		/**
+		 * Czas generowania strony a w zasadzie shella
+		 */
+		$this -> fGeneratedIn = microtime( 1 );
+
+		/**
 		 * Autoryzacja
 		 *
 		 * @see self::$sAuth
@@ -275,11 +280,6 @@ class Shell
 			header( 'HTTP/1.0 404 Not Found' );
 			exit ;
 		}
-
-		/**
-		 * Czas generowania strony
-		 */
-		$this -> fGeneratedIn = microtime( 1 );
 
 		/**
 		 * Locale

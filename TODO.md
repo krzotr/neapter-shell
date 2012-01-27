@@ -5,6 +5,10 @@ TODO
 
 	*	flush - usuwanie wszystkich tymczasowych plików shella
 
+	*	stop [modul] - przerywanie wykonywania danej czynności działającej w tle
+
+	*	stop all - przerywanie wszystkich czynności działających w tle
+
 	*	Checkery
 
 		*	Allegro
@@ -14,6 +18,8 @@ TODO
 		*	Nk
 
 		*	Paypal
+
+		*	Skype
 
 	*	Spamery
 
@@ -35,11 +41,9 @@ TODO
 
 		*	XSS
 
-	*	`remotemanager` - zdalne zarządzanie innym shell'kiem
-
 	*	Doklejanie dowolnego ciągu do pliku
 
-*	Zmniejszyć rozmiar shella
+*	Zmniejszenie rozmiaru shella
 
 *	Testy shella na php jako CGI
 
