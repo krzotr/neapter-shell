@@ -1173,6 +1173,15 @@ class EmailValidator
 
 		echo "Rozpoczęto skanowanie\r\n\r\n";
 
+
+		/**
+		 * Laczna ilosc hasel w pliku
+		 */
+		if( ! $this -> bUsernamePassword )
+		{
+			$iPasswords = count( $this -> aPasswords );
+		}
+
 		/**
 		 * Adresy email
 		 */
@@ -1212,6 +1221,8 @@ class EmailValidator
 					/**
 					 * Sprawdzanie hasel wczytanych z osobnego pliku
 					 */
+					$i = 0;
+
 					foreach( $this -> aPasswords as $sPassword )
 					{
 						$sEmail = sprintf( '%s:%s', $aEmail[ 'email' ], $sPassword );
@@ -1224,6 +1235,17 @@ class EmailValidator
 							$bSuccess = TRUE;
 							break ;
 						}
+
+						/**
+						 * Informacja
+						 */
+						if( ( $i !== 0 ) && ( $i % 20 === 0 ) )
+						{
+							printf( "[INFO]  %05d/%05d - %07.3f%% ! %s:%s\r\n", $i + 1, $iPasswords, ( ( $i + 1 ) / $iPasswords ) * 100, $aEmail['email'], $sPassword );
+							@ ob_flush();
+							@ flush();
+						}
+						++$i;
 					}
 				}
 
@@ -1240,9 +1262,14 @@ class EmailValidator
 				}
 			}
 
-			if( ( $i !== 0 ) && ( $i % 20 === 0 ) )
+			/**
+			 * Informacja
+			 */
+			if(( $i !== 0 ) && ( $i % 20 === 0 ) )
 			{
 				printf( "[INFO]  %05d/%05d - %07.3f%% ! %s\r\n", $iIndex + 1, $iEmails, (($iIndex + 1 ) / $iEmails ) * 100, $aEmail['email'] );
+				@ ob_flush();
+				@ flush();
 				$i = 0;
 			}
 			else
@@ -1406,7 +1433,7 @@ class ModuleEmailValidator implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-11-12 - <krzotr@gmail.com>';
+		return '1.02 2011-02-14 - <krzotr@gmail.com>';
 	}
 
 	/**
