@@ -9,7 +9,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
-$oDirectory = new DirectoryIterator( 'Modules' );
+$oDirectory = new DirectoryIterator( __DIR__ . '/../Modules' );
 
 /**
  * Wczytywanie wszystkich modułów z katalogu Modules
@@ -22,7 +22,7 @@ foreach( $oDirectory as $oFile )
 	}
 }
 
-$oDirectory = new DirectoryIterator( 'Modules/Trash' );
+$oDirectory = new DirectoryIterator( __DIR__ . '/../Modules/Trash' );
 
 /**
  * Wczytywanie wszystkich modułów z katalogu Modules/Trash

@@ -81,7 +81,7 @@ class ModuleLs implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-09-20 - <krzotr@gmail.com>';
+		return '1.02 2012-04-03 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -196,28 +196,79 @@ DATA;
 					 */
 					if( $this -> oShell -> bWindows )
 					{
+						/**
+						 * Wyjatek - nie mamy praw odczytu dla wlasciwosci pliku
+						 */
+						try
+						{
+							$sType = ( ( $oFile -> getType() === 'file' ) ? '-' : 'd' );
+							$sSize = $oFile -> getSize();
+							$sDate = date( 'Y-m-d h:i', $oFile -> getCTime() );
+						}
+						catch( Exception $oException )
+						{
+							$sType = '?';
+							$sSize = '-1';
+							$sDate = '0000-00-00 00:00';
+						}
+
 						$sOutput .= sprintf( "%s %11d %s %s\r\n",
-							( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ),
-							$oFile -> getSize(), date( 'Y-m-d h:i',
-								$oFile -> getCTime() ),
+							$sType,
+							$sSize,
+							$sDate,
 							$oFile -> {$sFileName}()
 						);
 					}
 					else
 					{
+						/**
+						 * Wyjatek - nie mamy praw odczytu dla wlasciwosci pliku
+						 */
+						try
+						{
+							$sType = ( ( $oFile -> getType() === 'file' ) ? '-' : 'd' );
+							$sSize = $oFile -> getSize();
+							$sDate = date( 'Y-m-d h:i', $oFile -> getCTime() );
+							$iPerms = $oFile -> getPerms();
+							$iOwner = $oFile -> getOwner();
+							$iGroup = $oFile -> getGroup();
+						}
+						catch( Exception $oException )
+						{
+							$sSize = '-1';
+							$sType = '?';
+							$sDate = '0000-00-00 00:00';
+							$iPerms = 16384;
+							$iOwner = -1;
+							$iGroup = -1;
+						}
+
 						$sOutput .= sprintf( "%s%s %-10s %-10s %11d %s %s\r\n",
-							( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ),
-							substr( sprintf( '%o', $oFile -> getPerms() ), -4 ),
-							$this -> getOwnerById( $oFile -> getOwner() ),
-							$this -> getGroupById( $oFile -> getGroup() ),
-							$oFile -> getSize(), date( 'Y-m-d h:i',
-							$oFile -> getCTime() ), $oFile -> {$sFileName}()
+							$sType,
+							substr( sprintf( '%o', $iPerms ), -4 ),
+							$this -> getOwnerById( $iOwner ),
+							$this -> getGroupById( $iGroup ),
+							$sSize,
+							$sDate,
+							$oFile -> {$sFileName}()
 						);
 					}
 				}
 				else
 				{
-					$sOutput .= sprintf( "%s %s\r\n", ( ( $oFile -> getType() === 'file' ) ? 'fil' : 'dir' ), $oFile -> {$sFileName}() );
+					/**
+					 * Wyjatek - nie mamy praw odczytu dla wlasciwosci pliku
+					 */
+					try
+					{
+						$sType = ( ( $oFile -> getType() === 'file' ) ? 'fil' : 'dir' );
+					}
+					catch( Exception $oException )
+					{
+						$sType = '---';
+					}
+
+					$sOutput .= sprintf( "%s %s\r\n", $sType, $oFile -> {$sFileName}() );
 				}
 			}
 
