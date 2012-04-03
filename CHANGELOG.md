@@ -6,6 +6,7 @@ Changelog:
 *	Poprawiono
 	*	Wyświetlanie pomocy
 	*	Zarządzanie shellem poprzez CLI
+	*	`SplFileInfo::getType(): open_basedir restriction in effect. ...` - Daniel
 
 
 2012-01-26 v0.50
