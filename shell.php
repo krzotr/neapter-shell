@@ -253,7 +253,7 @@ class Shell
 		$this -> fGeneratedIn = microtime( 1 );
 
 		/**
-		 * Autoryzacja
+		 * Uwierzytelnianie
 		 *
 		 * @see self::$sAuth
 		 */
@@ -1719,7 +1719,7 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 			{
 				for(;;)
 				{
-					printf( '>> ns@127.0.0.1:%s$', getcwd() );
+					printf( '>> ns@127.0.0.1:%s$ ', getcwd() );
 					echo $this -> getActionBrowser( rtrim( fgets( STDIN ) ) );
 				}
 				return ;

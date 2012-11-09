@@ -45,7 +45,7 @@ interface EmailValidatorInterface
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @link http://pomoc.o2.pl/poczta/programy/
+ * @link      http://pomoc.o2.pl/poczta/programy/
  */
 class EmailValidatorDriverO2pl implements EmailValidatorInterface
 {
@@ -112,8 +112,8 @@ class EmailValidatorDriverO2pl implements EmailValidatorInterface
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @link http://poczta.wp.pl/info-pomoc-ustawienia.html?action=more&id=77
- * @link http://poczta.wp.pl/info-pomoc-ustawienia.html?action=more&id=27
+ * @link      http://poczta.wp.pl/info-pomoc-ustawienia.html?action=more&id=77
+ * @link      http://poczta.wp.pl/info-pomoc-ustawienia.html?action=more&id=27
  */
 class EmailValidatorDriverWppl implements EmailValidatorInterface
 {
@@ -178,7 +178,7 @@ class EmailValidatorDriverWppl implements EmailValidatorInterface
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @link http://info.poczta.interia.pl/pomoc/artykuly,1276750,parametry-do-konfiguracji-programow-pocztowych
+ * @link      http://info.poczta.interia.pl/pomoc/artykuly,1276750,parametry-do-konfiguracji-programow-pocztowych
  */
 class EmailValidatorDriverInteriapl implements EmailValidatorInterface
 {
@@ -273,8 +273,8 @@ class EmailValidatorDriverInteriapl implements EmailValidatorInterface
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @link http://poczta.onet.pl/pomoc/13224,0,27,6,14020,37,0,0,pomoc.html
- * @link http://poczta.onet.pl/oferta/opis_opcji.html
+ * @link      http://poczta.onet.pl/pomoc/13224,0,27,6,14020,37,0,0,pomoc.html
+ * @link      http://poczta.onet.pl/oferta/opis_opcji.html
  */
 class EmailValidatorDriverOnetpl implements EmailValidatorInterface
 {
@@ -360,7 +360,7 @@ class EmailValidatorDriverOnetpl implements EmailValidatorInterface
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @link http://serwisy.gazeta.pl/Odnowa/0,87357,4782564.html#28
+ * @link      http://serwisy.gazeta.pl/Odnowa/0,87357,4782564.html#28
  */
 class EmailValidatorDriverGazetapl implements EmailValidatorInterface
 {
@@ -431,7 +431,7 @@ class EmailValidatorDriverGazetapl implements EmailValidatorInterface
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @link http://help.yahoo.com/l/pl/yahoo/mail/classic/mailplus/pop/pop-08.html
+ * @link      http://help.yahoo.com/l/pl/yahoo/mail/classic/mailplus/pop/pop-08.html
  */
 class EmailValidatorDriverYahoocom implements EmailValidatorInterface
 {
@@ -519,7 +519,7 @@ class EmailValidatorDriverYahoocom implements EmailValidatorInterface
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @link http://mail.google.com/support/bin/answer.py?answer=13287
+ * @link      http://mail.google.com/support/bin/answer.py?answer=13287
  */
 class EmailValidatorDriverGmailcom implements EmailValidatorInterface
 {
@@ -592,8 +592,8 @@ class EmailValidatorDriverGmailcom implements EmailValidatorInterface
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @link http://www.mydigitallife.info/hotmail-free-pop3-and-smtp-access-and-server-configuration-settings/
- * @link http://liveunplugged.wordpress.com/2010/03/12/hotmail-and-msn-accounts-pop3smtp-access/
+ * @link      http://www.mydigitallife.info/hotmail-free-pop3-and-smtp-access-and-server-configuration-settings/
+ * @link      http://liveunplugged.wordpress.com/2010/03/12/hotmail-and-msn-accounts-pop3smtp-access/
  */
 class EmailValidatorDriverLivecom implements EmailValidatorInterface
 {
@@ -610,6 +610,8 @@ class EmailValidatorDriverLivecom implements EmailValidatorInterface
 			'hotmail.com',
 			'hotmail.de',
 			'hotmail.fr',
+			'hotmail.it',
+			'hotmail.co.jp',
 			'hotmail.co.uk',
 			'windowslive.com',
 			'live.com',
@@ -675,7 +677,7 @@ class EmailValidatorDriverLivecom implements EmailValidatorInterface
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @link http://konfiguracja.neostrada.pl/neo/help/konf_outlook.htm
+ * @link      http://konfiguracja.neostrada.pl/neo/help/konf_outlook.htm
  */
 class EmailValidatorDriverNeostradapl implements EmailValidatorInterface
 {
@@ -738,7 +740,7 @@ class EmailValidatorDriverNeostradapl implements EmailValidatorInterface
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @link http://ustaw.orange.pl/ust.aspx
+ * @link      http://ustaw.orange.pl/ust.aspx
  */
 class EmailValidatorDriverOrangepl implements EmailValidatorInterface
 {
@@ -801,7 +803,7 @@ class EmailValidatorDriverOrangepl implements EmailValidatorInterface
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @link http://www.poczta.pl
+ * @link      http://www.poczta.pl
  */
 class EmailValidatorDriverPocztapl implements EmailValidatorInterface
 {
@@ -862,7 +864,7 @@ class EmailValidatorDriverPocztapl implements EmailValidatorInterface
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
  *
- * @link https://www.plusnet.pl/pomoc.html
+ * @link      https://www.plusnet.pl/pomoc.html
  */
 class EmailValidatorDriverPlusnetpl implements EmailValidatorInterface
 {
@@ -913,6 +915,424 @@ class EmailValidatorDriverPlusnetpl implements EmailValidatorInterface
 		/**
 		 * Zamykanie polaczenia
 		 */
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga web.de
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @link      https://registrierung.web.de/
+ * @link      https://hilfe.web.de/e-mail/pop3.html
+ */
+class EmailValidatorDriverWebde implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'web.de'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( ! ( strlen( $sPassword ) >= 8 ) && ( strlen( $sPassword ) <= 40 ) )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( '{pop3.web.de:995/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		 */
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga gmx.de
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @link      https://registrierung.web.de/
+ * @link      http://help.gmx.com/mail/overview/pop3/thunderbird3/
+ */
+class EmailValidatorDriverGmxde implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'gmx.de',
+			'gmx.at',
+			'gmx.ch',
+			'gmx.net'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( strlen( $sPassword ) < 6 )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( '{pop.gmx.com:995/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		*/
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga pino.pl
+ *
+ * @todo      untested
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @link      http://openid.pino.pl/app/konto-rejestracja
+ * @link      http://www.pino.pl/faq/informacje-ogolne-61
+ */
+class EmailValidatorDriverPinopl implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'pino.pl'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Dlugosc loginu w serwisie
+		 */
+		if( ! ( strlen( $sUsername ) >= 3 ) && ( strlen( $sUsername ) <= 32 ) )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( ! ( strlen( $sPassword ) >= 4 ) && ( strlen( $sPassword ) <= 20 ) )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( '{pop3.pino.pl:995/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		*/
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga inmail.pl
+ *
+ * @todo      untested
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @link      http://www2.inmail.pl/ClientOE.aspx
+ */
+class EmailValidatorDriverInmailpl implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'inmail.pl'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Dlugosc loginu w serwisie
+		 */
+		if( ! ( strlen( $sUsername ) >= 3 ) && ( strlen( $sUsername ) <= 30 ) )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( ! ( strlen( $sPassword ) >= 4 ) && ( strlen( $sPassword ) <= 30 ) )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( '{pop3.inmail.pl:995/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		*/
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga gg.pl
+ *
+ * @todo      untested
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @link      http://www.gg.pl/info/rejestracja-aktualizacja-danych
+ * @link      http://poczta.gg.pl/lekcja/2
+ */
+class EmailValidatorDriverGgpl implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'gg.pl'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( strlen( $sPassword ) < 6 )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( '{imap.gg.pl:993/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		*/
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga mail.ru
+ *
+ * @todo      untested
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @link      http://help.mail.ru/mail-help/mailer/popsmtp
+ */
+class EmailValidatorDriverGgpl implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'mail.ru',
+			'inbox.ru',
+			'list.ru',
+			'bk.ru'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( strlen( $sPassword ) < 6 )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( '{imap.mail.ru:993/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		*/
 		if( is_resource( $rImap ) )
 		{
 			imap_close( $rImap );
@@ -1433,7 +1853,7 @@ class ModuleEmailValidator implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.02 2011-02-14 - <krzotr@gmail.com>';
+		return '1.03 2012-11-09 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -1502,6 +1922,12 @@ DATA;
 				-> addDriver( new EmailValidatorDriverOrangepl() )
 				-> addDriver( new EmailValidatorDriverPocztapl() )
 				-> addDriver( new EmailValidatorDriverPlusnetpl() )
+				-> addDriver( new EmailValidatorDriverWebde() )
+				-> addDriver( new EmailValidatorDriverGmxde() )
+				-> addDriver( new EmailValidatorDriverInmailpl() )
+				-> addDriver( new EmailValidatorDriverPinopl() )
+				-> addDriver( new EmailValidatorDriverGgpl() )
+				-> addDriver( new EmailValidatorDriverMailru() )
 				-> setEmailsFile( $this -> oShell -> aArgv[0] );
 
 			/**

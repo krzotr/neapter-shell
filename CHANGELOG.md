@@ -7,6 +7,15 @@ Changelog:
 	*	Wyświetlanie pomocy
 	*	Zarządzanie shellem poprzez CLI
 	*	`SplFileInfo::getType(): open_basedir restriction in effect. ...` - Daniel
+*	Dodano
+	*	`emailvalidator` - nowe sterowniki:
+		*	Web.de
+		*	Gmx.de
+		*	Pino.pl
+		*	Inmail.pl
+		*	Gg.pl
+		*	Mail.ru
+		*	Hotmail.it, Hotmail.co.jp
 
 
 2012-01-26 v0.50
@@ -18,7 +27,7 @@ Changelog:
 	*	`id` - informacje o użytkowniku
 	*	`speedtest` - sprawdzanie szybkości łącza
 	*	`touch` - zmiana czasu modyfikacji i dostępu pliku
-	*	`emailchecker` - nowe sterowniki:
+	*	`emailvalidator` - nowe sterowniki:
 		*	Yahoo.com
 		*	Gmail.com
 		*	Live.com
@@ -30,7 +39,7 @@ Changelog:
 	*	`remote` - zdalnie wywołanie shella
 *	Poprawiono
 	*	Parsowanie znaku `+` podczas wysyłania polecenia AJAX'em
-	*	`emailchecker` - niepoprawne dane do gazeta.pl
+	*	`emailvalidator` - niepoprawne dane do gazeta.pl
 	*	`passwordrecovery` - błędny plik pomocy podczas wprowadzenia złej ilości parametrów
 	*	Klasa XRecursiveDirectoryIterator (rozszerzenie RecursiveDirectoryIterator) nie zwraca wyjątku
 	*	System autoryzacji - wystarczy zdefiniować stałą NF_AUTH z wartością `sha1( "user\xffhasło" )`; autoryzacja wyłączona jest w CLI
@@ -45,7 +54,7 @@ Changelog:
 ----------------
 
 *	Usunięto niedozwolony znak `/` z prefixu (aktualnie `0-9a-f{10}`)
-*	Dodano moduł `EmailValidation` - sprawdzanie czy za pomocą odpowiedniego loginu oraz hasła można zalogować się na pocztę
+*	Dodano moduł `emailvalidator` - sprawdzanie czy za pomocą odpowiedniego loginu oraz hasła można zalogować się na pocztę
 *	Moduł `download` wspiera zdalne pobieranie z pliku z prokotołu http oraz ftp
 
 
