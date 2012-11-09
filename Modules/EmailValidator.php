@@ -1286,7 +1286,7 @@ class EmailValidatorDriverGgpl implements EmailValidatorInterface
  *
  * @link      http://help.mail.ru/mail-help/mailer/popsmtp
  */
-class EmailValidatorDriverGgpl implements EmailValidatorInterface
+class EmailValidatorDriverMailru implements EmailValidatorInterface
 {
 	/**
 	 * Lista domen, ktorych dotyczy dana regula
