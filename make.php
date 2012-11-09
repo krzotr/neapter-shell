@@ -80,7 +80,6 @@ if( ! isset( $argv[1] ) || ( isset( $argv[1] ) && ( $argv[1] === 'lite' ) ) )
 }
 else if( isset( $argv[1] ) && ( $argv[1] === 'modules' ) )
 {
-
 	$oDirectory = new DirectoryIterator( 'Modules' );
 
 	foreach( $oDirectory as $oFile )
@@ -88,6 +87,7 @@ else if( isset( $argv[1] ) && ( $argv[1] === 'modules' ) )
 		if( is_file( $sFile = $oFile -> getPathname() ) && ( $oFile -> getFilename() !== 'Dummy.php' ) )
 		{
 			$sData .= file_get_contents( $sFile, NULL, NULL, 6 );
+			echo $oFile -> getBasename() . "\r\n";
 		}
 	}
 }
@@ -218,12 +218,6 @@ file_put_contents( __DIR__ . '/Tmp/prod.php', $sData );
 
 $sData = '?>' . $sData . '<?';
 
-for( $i = 0; $i < 1; $i++ )
-{
-	$sData = sprintf( "eval(gzuncompress(base64_decode('%s')));", base64_encode( gzcompress( $sData, 9 ) ) );
-}
-
-
 $sFile = __DIR__ . '/Tmp/' . ( ( isset( $argv[1] ) && ( $argv[1] === 'modules' ) ) ? 'modules.txt' : 'final.php'  );
 
-file_put_contents( $sFile, sprintf( "<?php eval(gzuncompress(base64_decode('%s')));?>", base64_encode( gzcompress( $sData, 9 ) ) ) );
+file_put_contents( $sFile, sprintf( '<?php $_=%s; eval(gzuncompress($_));?>', var_export( gzcompress( $sData, 9 ), 1 ) ) );

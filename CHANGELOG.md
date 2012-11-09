@@ -7,6 +7,7 @@ Changelog:
 	*	Wyświetlanie pomocy
 	*	Zarządzanie shellem poprzez CLI
 	*	`SplFileInfo::getType(): open_basedir restriction in effect. ...` - Daniel
+	*	Rozmiar plików wynikowych jest o ~33% mniejszy
 *	Dodano
 	*	`emailvalidator` - nowe sterowniki:
 		*	Web.de
