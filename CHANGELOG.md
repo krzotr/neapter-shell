@@ -4,7 +4,7 @@ Changelog:
 2012-00-00 v0.00
 ----------------
 *	Poprawiono
-	*	Wyświetlanie pomocy
+	*	Wyświetlanie pomocy, `:help all` wyświetla szczegółową listę
 	*	Zarządzanie shellem poprzez CLI
 	*	`SplFileInfo::getType(): open_basedir restriction in effect. ...` - Daniel
 	*	Rozmiar plików wynikowych jest o ~33% mniejszy

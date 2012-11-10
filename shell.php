@@ -878,26 +878,29 @@ DATA;
 		$sOutput .= "\r\n\r\n";
 
 		/**
-		 * Wymuszenie uzycia pliku pomocy dna natywnych polecen
+		 * Wymuszenie uzycia pliku pomocy dla natywnych polecen
 		 */
 		$this -> bHelp = TRUE;
 
 		/**
-		 * Formatowanie natywnych helpow
+		 * Szczegolowa pomoc
 		 */
-		foreach( $this -> aNativeModules as $sModule => $sMethod  )
+		if( isset( $this -> aArgv[0] ) && ( $this -> aArgv[0] === 'all' ) )
 		{
-			$sOutput .= $this -> $sMethod( TRUE )  . "\r\n\r\n\r\n";
-		}
+			/**
+			 * Formatowanie natywnych helpow
+			 */
+			foreach( $this -> aNativeModules as $sModule => $sMethod  )
+			{
+				$sOutput .= $this -> $sMethod( TRUE )  . "\r\n\r\n\r\n";
+			}
 
-		/**
-		 * Caly help
-		 */
-		foreach( $this -> aHelpModules as $sModule => $sModuleCmd )
-		{
-			$oModule = new $sModule( $this );
+			foreach( $this -> aHelpModules as $sModule => $sModuleCmd )
+			{
+				$oModule = new $sModule( $this );
 
-			$sOutput .= $sModuleCmd . ' - ' . $oModule -> getHelp() . "\r\n\r\n\r\n";
+				$sOutput .= $sModuleCmd . ' - ' . $oModule -> getHelp() . "\r\n\r\n\r\n";
+			}
 		}
 
 		/**
