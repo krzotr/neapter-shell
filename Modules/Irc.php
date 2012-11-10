@@ -438,7 +438,7 @@ DATA;
 		/**
 		 * Polecenie zaczynajace sie od ':'
 		 */
-		if( preg_match( '~^:[a-z][a-z0-9]{1,}~', $aData['message'] ) )
+		else if( preg_match( '~^:[a-z][a-z0-9]{1,}~', $aData['message'] ) )
 		{
 			$aMessageData = array();
 

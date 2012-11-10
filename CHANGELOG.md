@@ -8,7 +8,9 @@ Changelog:
 	*	Zarządzanie shellem poprzez CLI
 	*	`SplFileInfo::getType(): open_basedir restriction in effect. ...` - Daniel
 	*	Rozmiar plików wynikowych jest o ~33% mniejszy
-	*	Ustanawianie połączenia z IRC (polecenie PING) - Copi 
+	*	Irc
+		*	Ustanawianie połączenia z IRC (polecenie PING) - Copi
+		*	Po wykonaniu polecenia `:ircmsg` zwracany był komunikat `Nie ma takiej komendy "ircmsg"`
 *	Dodano
 	*	`emailvalidator` - nowe sterowniki:
 		*	Web.de
