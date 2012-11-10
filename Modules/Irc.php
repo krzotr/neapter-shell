@@ -279,15 +279,20 @@ class Irc
 	 */
 	public function sendMessage( $sType, $sMsg, $sNick = NULL )
 	{
-		$aMessageLine = preg_split( '~\r\n|\r|\n~', $sMsg );
+		if( trim( $sMsg ) === '' )
+		{
+			return ;
+		}
 
-		if( ( $iCount = count( $aMessageLine ) ) > 15 && ( $sNick !== NULL ) )
+		$aMessageLines = preg_split( '~\r\n|\r|\n~', rtrim( $sMsg, "\r\n" ) );
+
+		if( ( $iCount = count( $aMessageLines ) ) > 15 )
 		{
 			fwrite( $this -> rSock, sprintf( "PRIVMSG %s :Ocipiałeś? Wynik ma %d linii !!!\r\n", ( ( $sType === 'public' ) ? $this -> aConfig['channel'] : $sNick ), $iCount ) );
 			return ;
 		}
 
-		foreach( $aMessageLine as $sMessage )
+		foreach( $aMessageLines as $sMessage )
 		{
 			fwrite( $this -> rSock, sprintf( "PRIVMSG %s :%s\r\n",  ( ( $sType === 'public' ) ? $this -> aConfig['channel'] : $sNick ), $sMessage ) );
 
