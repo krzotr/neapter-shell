@@ -11,6 +11,7 @@ Changelog:
 	*	Irc
 		*	Ustanawianie połączenia z IRC (polecenie PING) - Copi
 		*	Po wykonaniu polecenia `:ircmsg` zwracany był komunikat `Nie ma takiej komendy "ircmsg"`
+	*	md5crack - API `www.tmto.org` zastąpiono `md5.darkbyte.ru`
 *	Dodano
 	*	`emailvalidator` - nowe sterowniki:
 		*	Web.de

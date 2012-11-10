@@ -61,7 +61,7 @@ class ModuleMd5crack implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-10-06 - <krzotr@gmail.com>';
+		return '1.02 2012-11-10 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -107,27 +107,12 @@ DATA;
 				continue ;
 			}
 
-			$sOutput .= sprintf( '%s:', $this -> oShell -> aArgv[ $i ] );
-
 			/**
-			 * API hashkiller
+			 * API md5.darkbyte.ru
 			 */
-			$sData = file_get_contents( sprintf( 'http://www.tmto.org/api/latest/?hash=%s&auth=true' , $this -> oShell -> aArgv[ $i ] ) );
+			$sData = file_get_contents( 'http://md5.darkbyte.ru/api.php?q=' . $this -> oShell -> aArgv[ $i ] );
 
-
-			if( ( ( $oXml = simplexml_load_string( $sData ) ) !== FALSE ) && ( $oXml->result['text'] !== '' ))
-			{
-				/**
-				 * Odzyskany hash
-				 */
-				$sOutput .= (string) base64_decode( $oXml->result['text'] );
-			}
-			else
-			{
-				$sOutput .= 'password-not-found';
-			}
-
-			$sOutput .= "\r\n";
+			$sOutput .= sprintf( "%s:%s\r\n", $this -> oShell -> aArgv[ $i ], ( $sData ?: 'password-not-found' ) );
 		}
 
 		return htmlspecialchars( $sOutput );
