@@ -8,6 +8,7 @@ Changelog:
 	*	Zarządzanie shellem poprzez CLI
 	*	`SplFileInfo::getType(): open_basedir restriction in effect. ...` - Daniel
 	*	Rozmiar plików wynikowych jest o ~33% mniejszy
+	*	Ustanawianie połączenia z IRC (polecenie PING) - Copi 
 *	Dodano
 	*	`emailvalidator` - nowe sterowniki:
 		*	Web.de
