@@ -184,7 +184,7 @@ class PortScanner
 			throw new PortScannerException( 'Wprowadź adres hosta' );
 		}
 
-		$sOutput = sprintf( "Skanowanie %s:\r\n\r\n", $this -> sIp );
+		$sOutput = sprintf( "Skanowanie %s, porty: %s\r\n", ( $this -> sIp ?: '127.0.0.1' ), implode( ',', $this -> aPorts ) );
 
 		/**
 		 * Skanowanie portow
@@ -204,6 +204,8 @@ class PortScanner
 				$sOutput .= sprintf( "%5d - Otwarty - (%s)\r\n", $iPort, $sBanner );
 			}
 		}
+
+		$sOutput .= "\r\nSkanowanie zakończone";
 
 		return htmlspecialchars( $sOutput );
 	}
@@ -264,7 +266,7 @@ class ModulePortScanner implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-10-18 - <krzotr@gmail.com>';
+		return '1.01 2011-10-11 - <krzotr@gmail.com>';
 	}
 
 	/**

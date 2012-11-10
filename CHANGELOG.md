@@ -12,6 +12,7 @@ Changelog:
 		*	Ustanawianie połączenia z IRC (polecenie PING) - Copi
 		*	Po wykonaniu polecenia `:ircmsg` zwracany był komunikat `Nie ma takiej komendy "ircmsg"`
 	*	md5crack - API `www.tmto.org` zastąpiono `md5.darkbyte.ru`
+	*	portscanner - wyświetlanie komunikatów	
 *	Dodano
 	*	`emailvalidator` - nowe sterowniki:
 		*	Web.de
@@ -20,7 +21,7 @@ Changelog:
 		*	Inmail.pl
 		*	Gg.pl
 		*	Mail.ru
-		*	Hotmail.it, Hotmail.co.jp
+		*	Hotmail.it, Hotmail.co.jp		
 
 
 2012-01-26 v0.50
