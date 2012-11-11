@@ -12,7 +12,8 @@ Changelog:
 		*	Ustanawianie połączenia z IRC (polecenie PING) - Copi
 		*	Po wykonaniu polecenia `:ircmsg` zwracany był komunikat `Nie ma takiej komendy "ircmsg"`
 	*	md5crack - API `www.tmto.org` zastąpiono `md5.darkbyte.ru`
-	*	portscanner - wyświetlanie komunikatów	
+	*	portscanner - wyświetlanie komunikatów
+	*	polecenia eval i php dostępne są jako standardowe (nie jako dodatkowy moduł)
 *	Dodano
 	*	`emailvalidator` - nowe sterowniki:
 		*	Web.de

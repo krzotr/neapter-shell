@@ -43,8 +43,6 @@ TODO
 
 	*	Doklejanie dowolnego ciągu do pliku
 
-*	Zmniejszenie rozmiaru shella
-
 *	Testy shella na php jako CGI
 
 *	Moduł Mysql musi zawierać rozszerzenia: mysql, mysqli
@@ -53,6 +51,4 @@ TODO
 
 *	Jednolity interface dla zdalnych połączeń (curl, fsockopen, fopen)
 
-*	Aplikacja w PHP-GTK do zarządzania wieloma shell'kami na raz
-
-*	Obfuskator dla kodu (eval + gzcompress jest strasznie niewygodne)
+*	Aplikacja w PHP-GTK do zarządzania wieloma shell'kami jednocześnie

