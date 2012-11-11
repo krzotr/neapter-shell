@@ -196,6 +196,19 @@ foreach( $aTokens as $i => $aToken )
 				break;
 			}
 
+			if( trim( strtolower( $aToken[1] ) ) === '(boolean)' )
+			{
+				$sOutput .= '(bool)';
+				break;
+			}
+
+			if( $aToken[1] === 'echo' )
+			{
+				$sOutput .= 'echo ';
+				break;
+			}
+
+
 			if( in_array( trim( strtolower( $aToken[1] ) ), $aInclude ) )
 			{
 				$sOutput .= $aToken[1] . ' ';

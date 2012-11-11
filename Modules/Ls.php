@@ -81,7 +81,7 @@ class ModuleLs implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.02 2012-04-03 - <krzotr@gmail.com>';
+		return '1.03 2012-11-11 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -173,7 +173,7 @@ DATA;
 			 */
 			if( $bRecursive )
 			{
-				$oDirectory = new RecursiveIteratorIterator( new XRecursiveDirectoryIterator( $sDir ), RecursiveIteratorIterator::SELF_FIRST );
+				$oDirectory = new RecursiveIteratorIterator( new XRecursiveDirectoryIterator( $sDir ), RecursiveIteratorIterator::SELF_FIRST | FilesystemIterator::FOLLOW_SYMLINKS );
 			}
 			else
 			{

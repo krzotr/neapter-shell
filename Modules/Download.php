@@ -72,7 +72,7 @@ class ModuleDownload implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.03 2011-10-19 - <krzotr@gmail.com>';
+		return '1.04 2012-11-11 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -121,7 +121,7 @@ DATA;
 		/**
 		 * Zdalne pobieranie
 		 */
-		if( preg_match( '~^(http|ftp)://~', $this -> oShell -> sArgv ) );
+		if( preg_match( '~^(http|ftp)://~', $this -> oShell -> sArgv ) )
 		{
 			$sFilename = $this -> oShell -> sTmp . '/' . $this -> oShell -> sPrefix . 'download';
 
@@ -151,10 +151,10 @@ DATA;
 			return sprintf( 'Plik "%s" nie istnieje', $this -> oShell -> sArgv );
 		}
 
-		/**
-		 * Kompresja zawartosci strony
-		 */
-		ob_start( $bGzip ? 'ob_gzhandler' : NULL );
+		if( ( $rFile = @ fopen( $this -> oShell -> sArgv, 'r' ) ) === FALSE )
+		{
+			echo "Błąd odczytu pliku";
+		}
 
 		/**
 		 * Naglowki
@@ -163,19 +163,21 @@ DATA;
 		header( sprintf( 'Content-Disposition: attachment; filename="%s"', basename( $this -> oShell -> sArgv ) ) );
 		header( 'Content-Type: application/octet-stream' );
 
-		if( ( $rFile = fopen( $this -> oShell -> sArgv, 'r' ) ) !== FALSE )
-		{
-			if( ! $bGzip )
-			{
-				header( sprintf( 'Content-Length: %s', filesize( $this -> oShell -> sArgv ) ), TRUE );
-			}
+		/**
+		 * Kompresja zawartosci strony
+		 */
+		ob_start( $bGzip ? 'ob_gzhandler' : NULL );
 
-			while( ! feof( $rFile ) )
-			{
-				echo fread( $rFile, 2097152 );
-				@ ob_flush();
-				@ flush();
-			}
+		if( ! $bGzip )
+		{
+			header( sprintf( 'Content-Length: %s', filesize( $this -> oShell -> sArgv ) ), TRUE );
+		}
+
+		while( ! feof( $rFile ) )
+		{
+			echo fread( $rFile, 32768 );
+			@ ob_flush();
+			@ flush();
 		}
 
 		ob_end_flush();

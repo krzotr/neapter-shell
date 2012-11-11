@@ -11,9 +11,14 @@ Changelog:
 	*	Irc
 		*	Ustanawianie połączenia z IRC (polecenie PING) - Copi
 		*	Po wykonaniu polecenia `:ircmsg` zwracany był komunikat `Nie ma takiej komendy "ircmsg"`
-	*	md5crack - API `www.tmto.org` zastąpiono `md5.darkbyte.ru`
-	*	portscanner - wyświetlanie komunikatów
-	*	polecenia eval i php dostępne są jako standardowe (nie jako dodatkowy moduł)
+	*	`md5crack` - API `www.tmto.org` zastąpiono `md5.darkbyte.ru`
+	*	`portscanner` - wyświetlanie komunikatów
+	*	Polecenia eval i php dostępne są jako standardowe (nie jako dodatkowy moduł)
+	*	`info` - pełna ścieżka skryptu w CLI
+	*	Wczytywanie rozszerzenia PHP .dll dla Windows
+	*	`ls` - podążanie za dowiązaniami symbolicznymi
+	*	`download` - błąd podczas pobierania pliku
+	*	Obfuskacja kodu - problem z `echo`
 *	Dodano
 	*	`emailvalidator` - nowe sterowniki:
 		*	Web.de
