@@ -8,9 +8,11 @@ Tworzenie shella
 
 Shell składa się z kilkudziesięciu plików, dzięki czemu łatwiej można je edytować. Do utworzenia jednego pliku shella służy polecenie `make.php`
 
+*	`make.php --help` / `make.php -h` - pomoc
+
 *	`make.php` - tworzy shell ze wszystkimi modułami znajdującymi się w katalogu `modules`
 
-*	`make.php lite` - wersja okrojona shella, waży ok 13KB, zawiera podstawowe funkcje takie jak:
+*	`make.php type=lite` - wersja okrojona shella, waży ok 10KB, zawiera podstawowe funkcje takie jak:
 
 	*	`autoload`
 
@@ -22,7 +24,7 @@ Shell składa się z kilkudziesięciu plików, dzięki czemu łatwiej można je 
 
 	*	`info`
 
-	*	`logout`
+	*	`exit / logout`
 
 	*	`modules`
 
@@ -30,38 +32,68 @@ Shell składa się z kilkudziesięciu plików, dzięki czemu łatwiej można je 
 
 	*	`upload`
 
-*	`make.php modules` - tworzy plik z modułami _Tmp/modules.txt_ znajdującymi się w katalogu `modules`, aby je wczytać należy wykonać polecenie `:modules sciezka_do_pliku_z_modulami`
+	*	`eval / php`
+
+	*	`version`
+
+*	`make.php type=modules` - tworzy plik z modułami _Tmp/modules.txt_ znajdującymi się w katalogu `modules`, aby je wczytać należy wykonać polecenie `:modules sciezka_do_pliku_z_modulami`
+
+*	`make.php --no-js` - pliki js nie zostaną dołączone
+
+*	`make.php --no-css` - arkusze stylów nie zostaną dołączone
+
+*	`make.php --no-extended-version` - dodatkowe informacje takie jak data utworzenia shalla nie zostaną dołączone do numeru wersji
+
+Powyższe opcje można łączyć
+
+	*	`make.php --no-js --no-extended-version`
+
+	*	`make.php --no-js --no-css --no-extended-version` - zalecane dla uruchomienia w CLI
 
 Pliki
 
-*	Tmp/final.php - finalna wersja shella z użyciem `base64_encode` oraz `gzcompress`
+*	`Tmp/final.php` - finalna wersja shella z użyciem `gzcompress`
 
-*	Tmp/prod.php - finalna wersja shella
+*	`Tmp/prod.php` - finalna wersja shella
 
-*	Tmp/dev.php - wersja deweloperska - zawiera _złączone_ wszystkie pliki, komentarze, formatowanie itp.
+*	`Tmp/dev.php` - wersja deweloperska - zawiera _złączone_ wszystkie pliki, komentarze, formatowanie itp.
 
-*	Tmp/modules.txt - plik z modułami
+*	`Tmp/modules.txt` - plik z modułami
 
 
 
 Obsługa shella
 --------------
 
-*	Wszystkie polecenia z modułów shellowych należy poprzedzić znakiem `:` przykład: `:ls`, `:pwd`. W przypadku wykonania polecenia bez znaku `:` zostanie wywołane polecenie systemowe przy użyciu funkcji `exec`, `shell_exec`, `passthru`, `system`, `popen`, `proc_open` lub `pcntl_exec` 
+*	Wszystkie polecenia z modułów shellowych należy poprzedzić znakiem `:` przykład: `:ls`, `:pwd`. W przypadku wykonania polecenia bez znaku `:` zostanie wywołane polecenie systemowe przy użyciu funkcji `exec`, `shell_exec`, `passthru`, `system`, `popen`, `proc_open` lub `pcntl_exec`
+
 *	Dostępna jest pomoc podstawowa `:help` oraz szczegółowa `:help all`. Możliwe jest wyświetlenie pomocy dla konkretnego modułu, wystarczy wywołać `:nazwa_modulu help` np `:md5crack help`
+
 *	Podstawowymi poleceniami są:
-	*	help         - Wyświetlanie pomocy
-	*	modules      - Informacje o modułach
-	*	edit         - Edycja oraz tworzenie nowego pliku
-	*	upload       - Wrzucanie pliku na serwer
-	*	system, exec - Uruchomienie polecenia systemowego
-	*	info         - Wyświetla informacje o systemie
-	*	autoload     - Automatyczne wczytywanie rozszerzeń PHP
-	*	cd           - Zmiana aktualnego katalogu
-	*	eval, php    - Wykonanie kodu PHP
-	*	version      - Wyświetlanie numeru wersji shella
-	*	logout       - Wylogowanie z shella (jeśli ustawiono dostęp na hasło)
-	*	cr3d1ts      - Informacje o autorze
+
+	*	help          - Wyświetlanie pomocy
+
+	*	modules       - Informacje o modułach
+
+	*	edit          - Edycja oraz tworzenie nowego pliku
+
+	*	upload        - Wrzucanie pliku na serwer
+
+	*	system, exec  - Uruchomienie polecenia systemowego
+
+	*	info          - Wyświetla informacje o systemie
+
+	*	autoload      - Automatyczne wczytywanie rozszerzeń PHP
+
+	*	cd            - Zmiana aktualnego katalogu
+
+	*	eval, php     - Wykonanie kodu PHP
+
+	*	version       - Wyświetlanie numeru wersji shella
+
+	*	exit / logout - Wylogowanie z shella
+
+	*	cr3d1ts       - Informacje o autorze
 *	Istnieje możliwość przełączenia się na wersję deweloperską. Aby to zrobić należy dopisać zmienną `dev` w adresie (http://example.com/?dev)
 *	W celu uruchomienia shella z domyślną konfigurację. Aby to zrobić należy w adresie dopisać zmienną `pure` (http://example.com/?pure). Shell w ten sposób pominie wczytywanie dodatkowych modułów (polecenie `modules`) oraz rozszerzeń (polecenie `autoload`)
 *	Aby wyłączyć AJAX należy do adresu dodać zmienną nojs (http://example.com/?nojs)

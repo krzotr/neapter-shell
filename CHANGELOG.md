@@ -27,7 +27,11 @@ Changelog:
 		*	Inmail.pl
 		*	Gg.pl
 		*	Mail.ru
-		*	Hotmail.it, Hotmail.co.jp		
+		*	Hotmail.it, Hotmail.co.jp
+	*	help dla pliki `make.php`
+	*	możliwość całkowitego wyłączenia js/css podczas tworzenia shella
+	*	wersja zawiera datę utworzenia shella oraz dodatkowe informacje
+	*	`exit` to alias dla `logout`
 
 
 2012-01-26 v0.50
