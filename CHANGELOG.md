@@ -18,7 +18,7 @@ Changelog:
 		*	`info` - pełna ścieżka skryptu w CLI
 		*	`ls` - podążanie za dowiązaniami symbolicznymi
 		*	`download` - błąd podczas pobierania pliku
-		*	`exit` to alias dla `logout`, `eval` i `php`, wszystkie dostępne jako polecenia podstawowe
+		*	`exit` i `quit` to aliasy dla `logout`, `eval` i `php`, wszystkie dostępne jako polecenia podstawowe
 		*	Wyświetlanie pomocy `help` zawiera podstawowe informacje, `:help all` wyświetla szczegółową listę
 	*	Obfuskacja kodu - problem z `echo`
 	*	Rozmiar plików wynikowych jest o ~33% mniejszy

