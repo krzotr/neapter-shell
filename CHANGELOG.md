@@ -4,21 +4,25 @@ Changelog:
 2012-00-00 v0.00
 ----------------
 *	Poprawiono
-	*	Wyświetlanie pomocy, `:help all` wyświetla szczegółową listę
-	*	Zarządzanie shellem poprzez CLI
-	*	`SplFileInfo::getType(): open_basedir restriction in effect. ...` - Daniel
-	*	Rozmiar plików wynikowych jest o ~33% mniejszy
-	*	Irc
-		*	Ustanawianie połączenia z IRC (polecenie PING) - Copi
-		*	Po wykonaniu polecenia `:ircmsg` zwracany był komunikat `Nie ma takiej komendy "ircmsg"`
-	*	`md5crack` - API `www.tmto.org` zastąpiono `md5.darkbyte.ru`
-	*	`portscanner` - wyświetlanie komunikatów
-	*	Polecenia eval i php dostępne są jako standardowe (nie jako dodatkowy moduł)
-	*	`info` - pełna ścieżka skryptu w CLI
-	*	Wczytywanie rozszerzenia PHP .dll dla Windows
-	*	`ls` - podążanie za dowiązaniami symbolicznymi
-	*	`download` - błąd podczas pobierania pliku
+	*	Moduły
+		*	`ls` - `SplFileInfo::getType(): open_basedir restriction in effect. ...` - Daniel
+		*	`emailvalidator`
+			*	cachowanie hostów
+			*	pop3 bez ssl zamieniono na pop3/imap z ssl
+			*	fatalne działanie live.com, neostrada.pl
+		*	Irc - Copi
+			*	Ustanawianie połączenia z IRC (polecenie PING)
+			*	Po wykonaniu polecenia `:ircmsg` zwracany był komunikat `Nie ma takiej komendy "ircmsg"`
+		*	`md5crack` - API `www.tmto.org` zastąpiono `md5.darkbyte.ru`
+		*	`portscanner` - wyświetlanie komunikatów
+		*	`info` - pełna ścieżka skryptu w CLI
+		*	`ls` - podążanie za dowiązaniami symbolicznymi
+		*	`download` - błąd podczas pobierania pliku
+		*	`exit` to alias dla `logout`, `eval` i `php`, wszystkie dostępne jako polecenia podstawowe
+		*	Wyświetlanie pomocy `help` zawiera podstawowe informacje, `:help all` wyświetla szczegółową listę
 	*	Obfuskacja kodu - problem z `echo`
+	*	Rozmiar plików wynikowych jest o ~33% mniejszy
+	*	Zarządzanie shellem poprzez CLI
 *	Dodano
 	*	`emailvalidator` - nowe sterowniki:
 		*	Web.de
@@ -28,10 +32,10 @@ Changelog:
 		*	Gg.pl
 		*	Mail.ru
 		*	Hotmail.it, Hotmail.co.jp
-	*	help dla pliki `make.php`
-	*	możliwość całkowitego wyłączenia js/css podczas tworzenia shella
-	*	wersja zawiera datę utworzenia shella oraz dodatkowe informacje
-	*	`exit` to alias dla `logout`
+	*	Tworzenie shella
+		*	help dla pliku `make.php`
+		*	możliwość całkowitego wyłączenia js/css podczas tworzenia shella
+		*	wersja zawiera datę utworzenia shella oraz dodatkowe informacje ustawione podczas tworzenia shella
 
 
 2012-01-26 v0.50

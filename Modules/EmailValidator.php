@@ -89,7 +89,7 @@ class EmailValidatorDriverO2pl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{poczta.o2.pl:110/pop3}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'poczta.o2.pl' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -155,7 +155,7 @@ class EmailValidatorDriverWppl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop3.wp.pl:110/pop3}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'imap.wp.pl' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -232,7 +232,7 @@ class EmailValidatorDriverInteriapl implements EmailValidatorInterface
 		{
 			case 'interia.pl':
 			case 'interia.eu':
-				$sDomain = 'poczta.interia.pl';
+				$sHost = EmailValidator::getHost( 'poczta.interia.pl' );
 
 				if( $sDomain === 'interia.eu' )
 				{
@@ -241,16 +241,16 @@ class EmailValidatorDriverInteriapl implements EmailValidatorInterface
 
 				break ;
 			case 'poczta.fm':
-				$sDomain = 'www.poczta.fm';
+				$sHost = EmailValidator::getHost( 'www.poczta.fm' );
 				break ;
 			default:
-				$sDomain = 'poczta.vip.interia.pl';
+				$sHost = EmailValidator::getHost( 'poczta.vip.interia.pl' );
 				$sUsername = $sEmail;
 		}
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( sprintf( '{%s:110/pop3}', $sDomain ), $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', $sHost ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -337,7 +337,7 @@ class EmailValidatorDriverOnetpl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop3.poczta.onet.pl:110/pop3}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'imap.poczta.onet.pl' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -406,7 +406,7 @@ class EmailValidatorDriverGazetapl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop.gmail.com:995/pop3/ssl/novalidate-cert}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop.gmail.com' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -494,7 +494,7 @@ class EmailValidatorDriverYahoocom implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop.mail.yahoo.com:110/pop3}', $sUsername, $sPassword, null, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'imap.mail.yahoo.com' ) ), $sUsername, $sPassword, null, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -569,7 +569,7 @@ class EmailValidatorDriverGmailcom implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop.gmail.com:995/pop3/ssl/novalidate-cert}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop.gmail.com' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -652,7 +652,7 @@ class EmailValidatorDriverLivecom implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{smtp.live.com:995/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop3.live.com' ) ), $sEmail, $sPassword, OP_SILENT, 5 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -715,7 +715,7 @@ class EmailValidatorDriverNeostradapl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{smtp.live.com:110/pop3}', $sEmail, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'poczta.neostrada.pl' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -778,7 +778,7 @@ class EmailValidatorDriverOrangepl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap =  imap_open( '{mail.orange.pl:110/pop3}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap =  imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'mail.orange.pl' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -841,7 +841,7 @@ class EmailValidatorDriverPocztapl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{mail.poczta.pl:110/pop3}', $sEmail, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'mail.poczta.pl' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -910,7 +910,7 @@ class EmailValidatorDriverPlusnetpl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{mail.plusnet.pl:110/pop3}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'mail.plusnet.pl' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -975,7 +975,7 @@ class EmailValidatorDriverWebde implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop3.web.de:995/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop3.web.de' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -1043,7 +1043,7 @@ class EmailValidatorDriverGmxde implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop.gmx.com:995/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop.gmx.com' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -1118,7 +1118,7 @@ class EmailValidatorDriverPinopl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop3.pino.pl:995/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop3.pino.pl' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -1192,7 +1192,7 @@ class EmailValidatorDriverInmailpl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop3.inmail.pl:995/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop3.inmail.pl' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -1259,7 +1259,7 @@ class EmailValidatorDriverGgpl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{imap.gg.pl:993/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'imap.gg.pl' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -1328,7 +1328,7 @@ class EmailValidatorDriverMailru implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{imap.mail.ru:993/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'imap.mail.ru' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -1402,6 +1402,15 @@ class EmailValidator
 	protected $bUsernamePassword = FALSE;
 
 	/**
+	 * Cache dla hostow, aby nie odpytywac ciagle serwerow DNS
+	 *
+	 * @static
+	 * @access protected
+	 * @var    protected
+	 */
+	protected static $aHostIp = array();
+
+	/**
 	 * Konstruktor
 	 *
 	 * @access public
@@ -1454,7 +1463,7 @@ class EmailValidator
 			throw new EmailValidatorException( 'Plik z hasłami nie istnieje' );
 		}
 
-		$this -> aPasswords = file( $sValue, FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES );
+		$this -> aPasswords = array_unique( file( $sValue, FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES ) );
 
 		if( $this -> aPasswords === array( ) )
 		{
@@ -1561,6 +1570,16 @@ class EmailValidator
 		}
 
 		return $this;
+	}
+
+	public static function getHost( $sName )
+	{
+		if( ! isset( self::$aHostIp[ $sName ] ) )
+		{
+			self::$aHostIp[ $sName ] = gethostbyname( $sName );
+		}
+
+		return self::$aHostIp[ $sName ];
 	}
 
 	/**

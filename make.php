@@ -9,9 +9,9 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
-require_once( __DIR__ . '/Lib/Request.php' );
-require_once( __DIR__ . '/Lib/Args.php' );
-require_once( __DIR__ . '/Lib/ArgsException.php' );
+require_once __DIR__ . '/Lib/Request.php';
+require_once __DIR__ . '/Lib/Args.php';
+require_once __DIR__ . '/Lib/ArgsException.php';
 
 
 
