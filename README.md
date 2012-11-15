@@ -24,7 +24,7 @@ Shell składa się z kilkudziesięciu plików, dzięki czemu łatwiej można je 
 
 	*	`info`
 
-	*	`exit / logout`
+	*	`exit` / `quit` / `logout`
 
 	*	`modules`
 
@@ -46,9 +46,9 @@ Shell składa się z kilkudziesięciu plików, dzięki czemu łatwiej można je 
 
 Powyższe opcje można łączyć
 
-	*	`make.php --no-js --no-extended-version`
+*	`make.php --no-js --no-extended-version`
 
-	*	`make.php --no-js --no-css --no-extended-version` - zalecane dla uruchomienia w CLI
+*	`make.php --no-js --no-css --no-extended-version` - zalecane dla uruchomienia w CLI
 
 Pliki
 
