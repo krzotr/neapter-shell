@@ -11,26 +11,26 @@
  */
 
 /**
- * class MailException - Mail wyjatki
+ * Mail - Wyjatki
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @package    Lib
- * @subpackage Exception
+ * @package    Neapter
+ * @subpackage Lib\Exception
  *
  * @uses       Exception
  */
 class MailException extends Exception {}
 
 /**
- * class Mail - Wysylanie emaila
+ * Wysylanie emaila
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @package    Lib
- * @subpackage Mail
+ * @package    Neapter
+ * @subpackage Lib
  *
  * @uses       Neapter\Lib\Exception\MailException
  */
@@ -266,16 +266,16 @@ class Mail
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModuleMail - Wysylanie wiadonosci za pomoca funkcji mail()
+ * Wysylanie wiadonosci za pomoca funkcji mail()
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @package    NeapterShell
  * @subpackage Modules

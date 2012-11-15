@@ -11,29 +11,32 @@
  */
 
 /**
- * class PackerException - Pack wyjatki
+ * Pack - Wyjatki
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @package    Lib
- * @subpackage Exception
+ * @package    Neapter
+ * @subpackage Lib\Exception
  *
  * @uses       Exception
  */
 class PackerException extends Exception {}
 
 /**
- * class Pack - Pakowanie plikow
+ * Pakowanie plikow
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @package    Lib
- * @subpackage Pack
+ * @package    Neapter
+ * @subpackage Lib
  *
  * @uses       XRecursiveDirectoryIterator
  * @uses       RecursiveIteratorIterator
+ *
+ * @package    Neapter
+ * @subpackage Lib
  */
 class Pack
 {
@@ -239,13 +242,13 @@ class Pack
 }
 
 /**
- * class Pack - Rozpakowanie pliku
+ * Rozpakowanie pliku
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @package    Lib
- * @subpackage Pack
+ * @package    Neapter
+ * @subpackage Lib
  *
  * @uses       XRecursiveDirectoryIterator
  * @uses       RecursiveIteratorIterator
@@ -434,16 +437,16 @@ class Unpack
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModulePacker - Pakowanie / rozpakowywanie plikow oraz katalogow
+ * Pakowanie / rozpakowywanie plikow
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @package    NeapterShell
  * @subpackage Modules
