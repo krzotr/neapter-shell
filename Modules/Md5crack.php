@@ -4,41 +4,22 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModuleMd5crack - Lamanie hasy md5
- *
- * hashkiller.com - version f41a5cabc515e4d8b11e4aaee2b86a183f59136a
+ * Lamanie hasy md5
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleMd5crack implements ShellInterface
+class ModuleMd5crack extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *

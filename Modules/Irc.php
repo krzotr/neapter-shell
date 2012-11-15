@@ -10,18 +10,24 @@
  */
 
 /**
- * Class IrcException - Irc wyjatki
+ * Irc - Wyjatki
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\Exception
  */
 class IrcException extends Exception {}
 
 /**
- * Class Irc - Laczenie sie z serwerem IRC
+ * Podlaczenie sie do kanalu Irc
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools
  */
 class Irc
 {
@@ -323,21 +329,16 @@ class Irc
  */
 
 /**
- * ModuleIrc - Irc
+ * Podlaczenie sie do kanalu Irc
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleIrc implements ShellInterface
+class ModuleIrc extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
 	/**
 	 * Obiekt Shell
 	 *
@@ -356,7 +357,7 @@ class ModuleIrc implements ShellInterface
 	 */
 	public function __construct( Shell $oShell )
 	{
-		$this -> oShell = $oShell;
+		parent::__construct( $oShell );
 
 		self::$oShelll = $oShell;
 	}

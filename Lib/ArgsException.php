@@ -13,8 +13,8 @@
 /**
  * class ArgsException - Args wyjatki
  *
- * @package    Lib
- * @subpackage Exception
+ * @package    Neapter
+ * @subpackage Core\Exception
  *
  * @uses       Exception
  */

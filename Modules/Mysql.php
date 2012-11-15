@@ -4,39 +4,22 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModuleMysql - Wykonywanie polecen SQL
+ * Wykonywanie polecen SQL
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleMysql implements ShellInterface
+class ModuleMysql extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *

@@ -4,7 +4,7 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
@@ -13,7 +13,10 @@
  * Interface dla EmailValidator'a
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator
  */
 interface EmailValidatorInterface
 {
@@ -43,9 +46,12 @@ interface EmailValidatorInterface
  * Obsluga o2.pl
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      http://pomoc.o2.pl/poczta/programy/
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverO2pl implements EmailValidatorInterface
 {
@@ -110,10 +116,13 @@ class EmailValidatorDriverO2pl implements EmailValidatorInterface
  * Obsluga wp.pl
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      http://poczta.wp.pl/info-pomoc-ustawienia.html?action=more&id=77
  * @link      http://poczta.wp.pl/info-pomoc-ustawienia.html?action=more&id=27
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverWppl implements EmailValidatorInterface
 {
@@ -176,9 +185,12 @@ class EmailValidatorDriverWppl implements EmailValidatorInterface
  * Obsluga interia.pl
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      http://info.poczta.interia.pl/pomoc/artykuly,1276750,parametry-do-konfiguracji-programow-pocztowych
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverInteriapl implements EmailValidatorInterface
 {
@@ -271,10 +283,13 @@ class EmailValidatorDriverInteriapl implements EmailValidatorInterface
  * Obsluga onet.pl
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      http://poczta.onet.pl/pomoc/13224,0,27,6,14020,37,0,0,pomoc.html
  * @link      http://poczta.onet.pl/oferta/opis_opcji.html
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverOnetpl implements EmailValidatorInterface
 {
@@ -358,9 +373,12 @@ class EmailValidatorDriverOnetpl implements EmailValidatorInterface
  * Obsluga onet.pl
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      http://serwisy.gazeta.pl/Odnowa/0,87357,4782564.html#28
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverGazetapl implements EmailValidatorInterface
 {
@@ -429,9 +447,12 @@ class EmailValidatorDriverGazetapl implements EmailValidatorInterface
  * IMAP i POP3 nie sa dostepne w wersji FREE
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      http://help.yahoo.com/l/pl/yahoo/mail/classic/mailplus/pop/pop-08.html
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverYahoocom implements EmailValidatorInterface
 {
@@ -517,9 +538,12 @@ class EmailValidatorDriverYahoocom implements EmailValidatorInterface
  * Trzeba wlaczyc obsluge POP3 w panelu
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      http://mail.google.com/support/bin/answer.py?answer=13287
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverGmailcom implements EmailValidatorInterface
 {
@@ -590,10 +614,13 @@ class EmailValidatorDriverGmailcom implements EmailValidatorInterface
  * Obsluga Live.com
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      http://www.mydigitallife.info/hotmail-free-pop3-and-smtp-access-and-server-configuration-settings/
  * @link      http://liveunplugged.wordpress.com/2010/03/12/hotmail-and-msn-accounts-pop3smtp-access/
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverLivecom implements EmailValidatorInterface
 {
@@ -675,9 +702,12 @@ class EmailValidatorDriverLivecom implements EmailValidatorInterface
  * Brak informacji na temat dlugosci hasla
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      http://konfiguracja.neostrada.pl/neo/help/konf_outlook.htm
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverNeostradapl implements EmailValidatorInterface
 {
@@ -738,9 +768,12 @@ class EmailValidatorDriverNeostradapl implements EmailValidatorInterface
  * Brak informacji na temat dlugosci hasla
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      http://ustaw.orange.pl/ust.aspx
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverOrangepl implements EmailValidatorInterface
 {
@@ -801,9 +834,12 @@ class EmailValidatorDriverOrangepl implements EmailValidatorInterface
  * Brak informacji na temat dlugosci hasla
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      http://www.poczta.pl
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverPocztapl implements EmailValidatorInterface
 {
@@ -862,9 +898,12 @@ class EmailValidatorDriverPocztapl implements EmailValidatorInterface
  * Obsluga plusnet.pl
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      https://www.plusnet.pl/pomoc.html
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverPlusnetpl implements EmailValidatorInterface
 {
@@ -935,6 +974,9 @@ class EmailValidatorDriverPlusnetpl implements EmailValidatorInterface
  *
  * @link      https://registrierung.web.de/
  * @link      https://hilfe.web.de/e-mail/pop3.html
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverWebde implements EmailValidatorInterface
 {
@@ -1000,6 +1042,9 @@ class EmailValidatorDriverWebde implements EmailValidatorInterface
  *
  * @link      https://registrierung.web.de/
  * @link      http://help.gmx.com/mail/overview/pop3/thunderbird3/
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverGmxde implements EmailValidatorInterface
 {
@@ -1070,6 +1115,9 @@ class EmailValidatorDriverGmxde implements EmailValidatorInterface
  *
  * @link      http://openid.pino.pl/app/konto-rejestracja
  * @link      http://www.pino.pl/faq/informacje-ogolne-61
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverPinopl implements EmailValidatorInterface
 {
@@ -1144,6 +1192,9 @@ class EmailValidatorDriverPinopl implements EmailValidatorInterface
  * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      http://www2.inmail.pl/ClientOE.aspx
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverInmailpl implements EmailValidatorInterface
 {
@@ -1219,6 +1270,9 @@ class EmailValidatorDriverInmailpl implements EmailValidatorInterface
  *
  * @link      http://www.gg.pl/info/rejestracja-aktualizacja-danych
  * @link      http://poczta.gg.pl/lekcja/2
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverGgpl implements EmailValidatorInterface
 {
@@ -1285,6 +1339,9 @@ class EmailValidatorDriverGgpl implements EmailValidatorInterface
  * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @link      http://help.mail.ru/mail-help/mailer/popsmtp
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverMailru implements EmailValidatorInterface
 {
@@ -1346,10 +1403,13 @@ class EmailValidatorDriverMailru implements EmailValidatorInterface
 }
 
 /**
- * Wyjatki dla EmailValidator
+ * EmailValidator - Wyjatki
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\Exception
  */
 class EmailValidatorException extends Exception{}
 
@@ -1357,7 +1417,10 @@ class EmailValidatorException extends Exception{}
  * Sprawdzanie czy przy uzyciu adresu email oraz hasla da sie zalogowac na skrzynke
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools
  */
 class EmailValidator
 {
@@ -1820,33 +1883,16 @@ class EmailValidator
  */
 
 /**
- * ModuleEmailValidator - Sprawdzanie czy mozna zalogowa sie na skrzynke za pomoca uzytkownika i hasla
+ * Sprawdzanie czy mozna zalogowa sie na skrzynke za pomoca uzytkownika i hasla
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleEmailValidator implements ShellInterface
+class ModuleEmailValidator extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *

@@ -4,24 +4,30 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * PortScanner - PortScanner wyjatki
+ * PortScanner - Wyjatki
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\Exception
  */
 class PortScannerException extends Exception {}
 
 /**
- * class PortScanner - Prosty skaner portow
+ * Prosty skaner portow TCP z zakresem
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools
  */
 class PortScanner
 {
@@ -213,33 +219,16 @@ class PortScanner
 }
 
 /**
- * ModulePortScanner - Prosty skaner portow
+ * Prosty skaner portow TCP z zakresem
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModulePortScanner implements ShellInterface
+class ModulePortScanner extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *

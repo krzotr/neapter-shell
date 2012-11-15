@@ -4,7 +4,7 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
@@ -14,7 +14,13 @@ require_once __DIR__ . '/Lib/Args.php';
 require_once __DIR__ . '/Lib/ArgsException.php';
 
 
-
+/**
+ * Wyswietlanie pomocy
+ *
+ * @ignore
+ *
+ * @return string
+ */
 function getHelp()
 {
 	return <<<HELP
@@ -62,7 +68,7 @@ switch( $sType )
 	case 'lite':
 	case 'normal':
 
-		$aFiles = array( 'Lib/Arr', 'Lib/Request', 'Lib/ShellInterface', 'Lib/XRecursiveDirectoryIterator' );
+		$aFiles = array( 'Lib/Arr', 'Lib/Request', 'Lib/ModuleAbstract', 'Lib/XRecursiveDirectoryIterator' );
 
 		if( $sType !== 'lite' )
 		{
