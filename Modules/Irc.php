@@ -14,6 +14,9 @@
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
 class IrcException extends Exception {}
 
@@ -328,16 +331,8 @@ class Irc
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
  */
-class ModuleIrc implements ShellInterface
+class ModuleIrc extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
 	/**
 	 * Obiekt Shell
 	 *
@@ -356,7 +351,7 @@ class ModuleIrc implements ShellInterface
 	 */
 	public function __construct( Shell $oShell )
 	{
-		$this -> oShell = $oShell;
+		parent::__construct( $oShell );
 
 		self::$oShelll = $oShell;
 	}

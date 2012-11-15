@@ -15,8 +15,8 @@
 /**
  * class Request - Informacje o zadaniu
  *
- * @package    Core
- * @subpackage Request
+ * @package    Neapter
+ * @subpackage Core
  *
  * @uses       Neapter\Core\Arr
  * @uses       Neapter\Core\Url

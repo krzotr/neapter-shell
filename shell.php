@@ -11,7 +11,7 @@
 
 require_once dirname( __FILE__ ) . '/Lib/Arr.php';
 require_once dirname( __FILE__ ) . '/Lib/Request.php';
-require_once dirname( __FILE__ ) . '/Lib/ShellInterface.php';
+require_once dirname( __FILE__ ) . '/Lib/ModuleAbstract.php';
 require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
 require_once dirname( __FILE__ ) . '/Lib/XRecursiveDirectoryIterator.php';
 
@@ -21,7 +21,9 @@ require_once dirname( __FILE__ ) . '/Lib/XRecursiveDirectoryIterator.php';
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @version 0.41
+ * @version 0.50
+ *
+ * @package NeapterShell
  *
  * @uses Arr
  * @uses Request
@@ -438,7 +440,7 @@ class Shell
 		/**
 		 * Lista dostepnych modulow natywnych
 		 */
-		$oReflection = new ReFlectionClass( 'shell' );
+		$oReflection = new ReflectionClass( 'shell' );
 		$aHelpModules = $oReflection -> getMethods();
 
 		foreach( $aHelpModules as $oMethod )
@@ -462,14 +464,14 @@ class Shell
 			/**
 			 * Wyszukiwanie klas z prefixem Module
 			 */
-			if( ( strncmp( $sClass, 'Module', 6 ) === 0 ) && ( $sClass !== 'ModuleDummy' ) )
+			if( ( strncmp( $sClass, 'Module', 6 ) === 0 ) && ( $sClass !== 'ModuleDummy' ) && ( $sClass !== 'ModuleAbstract' ) )
 			{
 				$oModule = new $sClass( $this );
 
 				/**
-				 * Klasa musi implementowac ShellInterface
+				 * Klasa musi implementowac ModuleAbstract
 				 */
-				if( $oModule instanceof ShellInterface )
+				if( $oModule instanceof ModuleAbstract )
 				{
 					$aCommands = $oModule -> getCommands();
 

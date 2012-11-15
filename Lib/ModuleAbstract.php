@@ -11,9 +11,19 @@
 
 /**
  * interface - ShellInterface interface dla shella
+ *
+ * @package    NeapterShell
  */
-interface ShellInterface
+abstract class ModuleAbstract
 {
+	/**
+	 * Obiekt Shell
+	 *
+	 * @access protected
+	 * @var    object
+	 */
+	protected $oShell;
+
 	/**
 	 * Konstruktor
 	 *
@@ -21,38 +31,49 @@ interface ShellInterface
 	 * @param  object $oShell Obiekt Shell
 	 * @return void
 	 */
-	public function __construct( Shell $oShell );
+	public function __construct( Shell $oShell )
+	{
+		$this -> oShell = $oShell;
+	}
 
 	/**
 	 * Zwracania aliasow dla komendy
 	 *
+	 * @abstract
+	 *
 	 * @access public
 	 * @return array
 	 */
-	public function getCommands();
+	abstract public function getCommands();
 
 	/**
 	 * Zwracanie wersji modulu
 	 *
+	 * @abstract
+	 *
 	 * @access public
 	 * @return string
 	 */
-	public function getVersion();
+	abstract public function getVersion();
 
 	/**
 	 * Zwracanie pomocy modulu
 	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getHelp();
-
-	/**
-	 * Wywolanie modulu
+	 * @abstract
 	 *
 	 * @access public
 	 * @return string
 	 */
-	public function get();
+	abstract public function getHelp();
+
+	/**
+	 * Wywolanie modulu
+	 *
+	 * @abstract
+	 *
+	 * @access public
+	 * @return string
+	 */
+	abstract public function get();
 
 }

@@ -14,17 +14,12 @@
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2011, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleDownload implements ShellInterface
+class ModuleDownload extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
 	/**
 	 * Zdalne pobieranie
 	 *
@@ -32,18 +27,6 @@ class ModuleDownload implements ShellInterface
 	 * @var    boolean
 	 */
 	private $bRemote = FALSE;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
 
 	/**
 	 * Dostepna lista komend

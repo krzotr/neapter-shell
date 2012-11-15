@@ -62,7 +62,7 @@ switch( $sType )
 	case 'lite':
 	case 'normal':
 
-		$aFiles = array( 'Lib/Arr', 'Lib/Request', 'Lib/ShellInterface', 'Lib/XRecursiveDirectoryIterator' );
+		$aFiles = array( 'Lib/Arr', 'Lib/Request', 'Lib/ModuleAbstract', 'Lib/XRecursiveDirectoryIterator' );
 
 		if( $sType !== 'lite' )
 		{

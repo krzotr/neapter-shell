@@ -16,8 +16,8 @@
  * @uses       Neapter\Core\Request
  * @uses       Neapter\Core\Exception\ArgsException
  *
- * @package    Core
- * @subpackage Args
+ * @package    Neapter
+ * @subpackage Core
  */
 class Args
 {
