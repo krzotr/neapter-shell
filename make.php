@@ -68,7 +68,13 @@ switch( $sType )
 	case 'lite':
 	case 'normal':
 
-		$aFiles = array( 'Lib/Arr', 'Lib/Request', 'Lib/ModuleAbstract', 'Lib/XRecursiveDirectoryIterator' );
+		$aFiles = array
+		(
+			'Lib/Arr',
+			'Lib/Request',
+			'Lib/ModuleAbstract',
+			'Lib/XRecursiveDirectoryIterator'
+		);
 
 		if( $sType !== 'lite' )
 		{
@@ -92,20 +98,35 @@ switch( $sType )
 			if( $sFile === 'shell' )
 			{
 				/**
-				 * Style
+				 * /shell.php
 				 */
-				$sShellRawData = file_get_contents( $sFile . '.php', NULL, NULL, 6 );
+				$sShellFile = file( $sFile . '.php' );
 
-				if( ! preg_match( '~\$this -> sStyleSheet = file_get_contents\( \'(.+?)\' \);~', $sShellRawData, $aMatch ) )
+				$sShellFile[0] = NULL;
+
+				/**
+				 * /Lib/Shell.php
+				 */
+				foreach( $sShellFile as & $sLine )
+				{
+					if( strncmp( $sLine, 'require_once', 12 ) === 0 )
+					{
+						$sLine = file_get_contents( dirname( __FILE__ ) . '/Lib/Shell.php', NULL, NULL, 6 );
+						break ;
+					}
+				}
+				$sShellFile[] = "\n\nexit;\n";
+
+				$sShellData = implode( '', $sShellFile );
+
+				/**
+				 * Wyciaganie Style
+				 */
+				if( ! preg_match( '~\$this -> sStyleSheet = file_get_contents\( \'(.+?)\' \);~', $sShellData, $aMatch ) )
 				{
 					echo "Cos nie tak ze stylami\r\n";
 					exit ;
 				}
-
-				$sShellData = preg_replace( '~\$this -> sStyleSheet = file_get_contents\( \'(.+?)\' \);~', NULL,
-					file_get_contents( $sFile . '.php', NULL, NULL, 6 )
-				);
-
 
 				if( ! is_file( $aMatch[1] ) )
 				{
@@ -113,6 +134,10 @@ switch( $sType )
 					exit ;
 				}
 
+				/**
+				 * Podmienianie styli
+				 */
+				$sShellData = preg_replace( '~\$this -> sStyleSheet = file_get_contents\( \'(.+?)\' \);~', NULL, $sShellData );
 				$sShellData = preg_replace( '~private \$StyleSheet;~', '', $sShellData );
 				$sShellData = preg_replace( '~{\$this -> sStyleSheet}~',
 					preg_replace( '~[\r\n\t]+~', NULL, ( $oArgs -> getOption( 'no-css' ) ? '' : file_get_contents( $aMatch[1] ) ) ),

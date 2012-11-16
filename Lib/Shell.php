@@ -9,11 +9,11 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
-require_once dirname( __FILE__ ) . '/Lib/Arr.php';
-require_once dirname( __FILE__ ) . '/Lib/Request.php';
-require_once dirname( __FILE__ ) . '/Lib/ModuleAbstract.php';
-require_once dirname( __FILE__ ) . '/Lib/LoadModules.php';
-require_once dirname( __FILE__ ) . '/Lib/XRecursiveDirectoryIterator.php';
+require_once dirname( __FILE__ ) . '/Arr.php';
+require_once dirname( __FILE__ ) . '/Request.php';
+require_once dirname( __FILE__ ) . '/ModuleAbstract.php';
+require_once dirname( __FILE__ ) . '/LoadModules.php';
+require_once dirname( __FILE__ ) . '/XRecursiveDirectoryIterator.php';
 
 /**
  * class Shell - Zarzadzanie serwerem
@@ -1815,16 +1815,3 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 	}
 
 }
-
-/**
- * Wylaczanie wszystkich bufferow
- */
-for( $i = 0; $i < ob_get_level(); ++$i )
-{
-	ob_end_clean();
-}
-
-$oShell = new Shell();
-$oShell -> get();
-
-exit ;
