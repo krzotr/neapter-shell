@@ -11,7 +11,7 @@
  */
 
 /**
- * class Args - Parsowanie argumentow
+ * Parsowanie argumentow
  *
  * @uses       Neapter\Core\Request
  * @uses       Neapter\Core\Exception\ArgsException

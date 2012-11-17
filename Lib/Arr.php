@@ -13,7 +13,7 @@
  */
 
 /**
- * class Arr - Przydatne metody do obslugi tablic
+ * Arr - Przydatne metody do obslugi tablic
  *
  * @package    Neapter
  * @subpackage Core

@@ -80,7 +80,6 @@ DATA;
 			return $this -> getHelp();
 		}
 
-
 		/**
 		 * Plik zrodlowy musi istniec
 		 */

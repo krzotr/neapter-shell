@@ -11,7 +11,7 @@
  */
 
 /**
- * class ArgsException - Args wyjatki
+ * ArgsException - Wyjatki
  *
  * @package    Neapter
  * @subpackage Core\Exception

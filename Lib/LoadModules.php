@@ -9,28 +9,43 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
-$oDirectory = new DirectoryIterator( __DIR__ . '/../Modules' );
-
 /**
- * Wczytywanie wszystkich modułów z katalogu Modules
+ * Wczytywanie modulow, poprawka dla UnitTestow
+ *
+ * @package    Neapter
+ * @subpackage Core
  */
-foreach( $oDirectory as $oFile )
+class LoadModules
 {
-	if( $oFile -> isFile() )
+	public function __construct()
 	{
-		require_once $oFile -> getPathname();
+		$oDirectory = new DirectoryIterator( __DIR__ . '/../Modules' );
+
+		/**
+		 * Wczytywanie wszystkich modułów z katalogu Modules
+		 */
+		foreach( $oDirectory as $oFile )
+		{
+			if( $oFile -> isFile() )
+			{
+				require_once $oFile -> getPathname();
+			}
+		}
+
+		$oDirectory = new DirectoryIterator( __DIR__ . '/../Modules/Trash' );
+
+		/**
+		 * Wczytywanie wszystkich modułów z katalogu Modules/Trash
+		 */
+		foreach( $oDirectory as $oFile )
+		{
+			if( $oFile -> isFile() )
+			{
+				require_once $oFile -> getPathname();
+			}
+		}
 	}
+
 }
 
-$oDirectory = new DirectoryIterator( __DIR__ . '/../Modules/Trash' );
-
-/**
- * Wczytywanie wszystkich modułów z katalogu Modules/Trash
- */
-foreach( $oDirectory as $oFile )
-{
-	if( $oFile -> isFile() )
-	{
-		require_once $oFile -> getPathname();
-	}
-}
+new LoadModules();

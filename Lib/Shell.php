@@ -291,12 +291,15 @@ class Shell
 		/**
 		 * Naglowek UTF-8
 		 */
-		header( 'Content-type: text/html; charset=utf-8' );
+		if( PHP_SAPI !== 'cli' )
+		{
+			header( 'Content-type: text/html; charset=utf-8' );
+		}
 
 		/**
 		 * @ignore
 		 */
-		$this -> sStyleSheet = file_get_contents( 'Styles/haxior.css' );
+		$this -> sStyleSheet = file_get_contents( dirname( __FILE__ ) . '/../Styles/dark.css' );
 
 		/**
 		 *  Sprawdzanie do ktorego katalogu mamy zapis
