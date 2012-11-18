@@ -10,7 +10,7 @@
  */
 
 /**
- * Testy modulu Ping
+ * Testy modulu Pwd
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba

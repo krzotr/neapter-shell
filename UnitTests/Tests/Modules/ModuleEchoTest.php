@@ -10,7 +10,7 @@
  */
 
 /**
- * Testy modulu Ping
+ * Testy modulu Echo
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
@@ -18,7 +18,7 @@
  * @package    NeapterShell
  * @subpackage UnitTests
  */
-class ModulePingTest extends PHPUnit_Framework_TestCase
+class ModuleEchoTest extends PHPUnit_Framework_TestCase
 {
 	public function setUp() {}
 
@@ -27,8 +27,8 @@ class ModulePingTest extends PHPUnit_Framework_TestCase
 		$oShell = new Shell();
 		$oModule = new ModulePing( $oShell );
 
-		$oShell -> parseCommand( ':ping' );
-		$this -> assertSame( 'pong', $oModule -> get() );
+		$oShell -> parseCommand( ':echo TeST' );
+		$this -> assertSame( 'TeST', $oModule -> get() );
 	}
 
 }

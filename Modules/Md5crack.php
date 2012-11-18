@@ -93,7 +93,7 @@ DATA;
 			 */
 			$sData = file_get_contents( 'http://md5.darkbyte.ru/api.php?q=' . $this -> oShell -> aArgv[ $i ] );
 
-			$sOutput .= sprintf( "%s:%s\r\n", $this -> oShell -> aArgv[ $i ], ( $sData ?: 'password-not-found' ) );
+			$sOutput .= sprintf( "%s:%s\r\n", $this -> oShell -> aArgv[ $i ], ( trim( $sData ) ?: 'password-not-found' ) );
 		}
 
 		return htmlspecialchars( $sOutput );
