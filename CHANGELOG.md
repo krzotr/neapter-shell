@@ -1,7 +1,7 @@
 Changelog:
 ==========
 
-2012-00-00 v0.00
+2012-00-00 v0.60
 ----------------
 *	Poprawiono
 	*	Moduły
@@ -9,12 +9,12 @@ Changelog:
 		*	`emailvalidator`
 			*	cachowanie hostów
 			*	pop3 bez ssl zamieniono na pop3/imap z ssl
-			*	fatalne działanie live.com, neostrada.pl
+			*	fatalne działanie live.com oraz neostrada.pl
 		*	Irc - Copi
 			*	Ustanawianie połączenia z IRC (polecenie PING)
 			*	Po wykonaniu polecenia `:ircmsg` zwracany był komunikat `Nie ma takiej komendy "ircmsg"`
 		*	`md5crack` - API `www.tmto.org` zastąpiono `md5.darkbyte.ru`
-		*	`portscanner` - wyświetlanie komunikatów
+		*	`portscanner` - wyświetlanie szczegółowych komunikatów
 		*	`info` - pełna ścieżka skryptu w CLI
 		*	`ls` - podążanie za dowiązaniami symbolicznymi
 		*	`download` - błąd podczas pobierania pliku
@@ -23,8 +23,6 @@ Changelog:
 	*	Obfuskacja kodu - problem z `echo`
 	*	Rozmiar plików wynikowych jest o ~33% mniejszy
 	*	Zarządzanie shellem poprzez CLI
-	*	dokumentacja klas, nagłówków
-	*	interface do tworzenia modułu został zastąpiony klasa abstrakcyjną
 *	Dodano
 	*	`emailvalidator` - nowe sterowniki:
 		*	Web.de
@@ -38,6 +36,10 @@ Changelog:
 		*	help dla pliku `make.php`
 		*	możliwość całkowitego wyłączenia js/css podczas tworzenia shella
 		*	wersja zawiera datę utworzenia shella oraz dodatkowe informacje ustawione podczas tworzenia shella
+*	Ponadto
+	*	Dokumentacja klas, metod, właściwości
+	*	Testy jednostkowe
+	*	Interfejs do tworzenia modułu został zastąpiony klasa abstrakcyjną
 
 
 2012-01-26 v0.50
