@@ -10,7 +10,7 @@
  */
 
 /**
- * Testy modulu Ping
+ * Testy modulu Id
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
@@ -18,7 +18,7 @@
  * @package    NeapterShell
  * @subpackage UnitTests
  */
-class ModulePingTest extends PHPUnit_Framework_TestCase
+class ModuleIdTest extends PHPUnit_Framework_TestCase
 {
 	protected $oShell;
 	protected $oModule;
@@ -26,13 +26,16 @@ class ModulePingTest extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		$this -> oShell = new Shell();
-		$this -> oModule = new ModulePing( $this -> oShell );
+		$this -> oModule = new ModuleId( $this -> oShell );
 	}
 
 	public function testModule()
 	{
-		$this -> oShell -> parseCommand( ':ping' );
-		$this -> assertSame( 'pong', $this -> oModule -> get() );
+		$this -> oShell -> parseCommand( ':id ' . __FILE__ );
+		$this -> assertSame( sprintf( 'user=%s uid=%d gid=%d', get_current_user(), getmyuid(), getmygid() ), $this -> oModule -> get() );
+
+		$this -> oShell -> parseCommand( ':whoami ' . __FILE__ );
+		$this -> assertSame( sprintf( 'user=%s uid=%d gid=%d', get_current_user(), getmyuid(), getmygid() ), $this -> oModule -> get() );
 	}
 
 }

@@ -20,15 +20,19 @@
  */
 class ModuleEchoTest extends PHPUnit_Framework_TestCase
 {
-	public function setUp() {}
+	protected $oShell;
+	protected $oModule;
+
+	public function setUp()
+	{
+		$this -> oShell = new Shell();
+		$this -> oModule = new ModuleEcho( $this -> oShell );
+	}
 
 	public function testModule()
 	{
-		$oShell = new Shell();
-		$oModule = new ModulePing( $oShell );
-
-		$oShell -> parseCommand( ':echo TeST' );
-		$this -> assertSame( 'TeST', $oModule -> get() );
+		$this -> oShell -> parseCommand( ':echo TeST' );
+		$this -> assertSame( 'TeST', $this -> oModule -> get() );
 	}
 
 }

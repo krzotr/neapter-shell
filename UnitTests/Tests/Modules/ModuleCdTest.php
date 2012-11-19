@@ -10,7 +10,7 @@
  */
 
 /**
- * Testy modulu Ping
+ * Testy modulu Cd
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
@@ -18,7 +18,7 @@
  * @package    NeapterShell
  * @subpackage UnitTests
  */
-class ModulePingTest extends PHPUnit_Framework_TestCase
+class ModuleCdTest extends PHPUnit_Framework_TestCase
 {
 	protected $oShell;
 	protected $oModule;
@@ -26,13 +26,20 @@ class ModulePingTest extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		$this -> oShell = new Shell();
-		$this -> oModule = new ModulePing( $this -> oShell );
+		$this -> oModule = new ModuleCd( $this -> oShell );
 	}
 
 	public function testModule()
 	{
-		$this -> oShell -> parseCommand( ':ping' );
-		$this -> assertSame( 'pong', $this -> oModule -> get() );
+		$this -> oShell -> parseCommand( ':cd ..' );
+		$this -> assertSame( getcwd(), realpath( dirname( __DIR__ ) . DIRECTORY_SEPARATOR . '..' ) );
+	}
+
+
+	public function testFailModule()
+	{
+		$this -> oShell -> parseCommand( ':cd directory_not_ExiSt5' );
+		$this -> assertSame( getcwd(), realpath( dirname( __DIR__ ) . DIRECTORY_SEPARATOR . '..' ) );
 	}
 
 }

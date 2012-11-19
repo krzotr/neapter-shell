@@ -96,6 +96,14 @@ DATA;
 			$sOutput .= sprintf( "%s:%s\r\n", $this -> oShell -> aArgv[ $i ], ( trim( $sData ) ?: 'password-not-found' ) );
 		}
 
+		/**
+		 * Poprawny hash jest wymagany
+		 */
+		if( $sOutput === NULL )
+		{
+			return $this -> getHelp();
+		}
+
 		return htmlspecialchars( $sOutput );
 	}
 
