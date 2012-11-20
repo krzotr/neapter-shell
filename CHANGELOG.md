@@ -23,6 +23,7 @@ Changelog:
 	*	Obfuskacja kodu - problem z `echo`
 	*	Rozmiar plików wynikowych jest o ~33% mniejszy
 	*	Zarządzanie shellem poprzez CLI
+	*	`phpinfo` w CLI
 	*	dokumentacja klas, nagłówków
 	*	interface do tworzenia modułu został zastąpiony klasa abstrakcyjną
 *	Dodano
