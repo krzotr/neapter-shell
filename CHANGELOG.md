@@ -34,6 +34,7 @@ Changelog:
 			*	Mail.ru
 			*	Hotmail.it, Hotmail.co.jp
 		*	Ręczne sprawdzenie przy użyciu`:emailvalidator test@wp.pl:test test2@wp.pl:test2 test3@wp.pl:test3`
+		*	Tryb gadatliwy - `-v`
 	*	Tworzenie shella
 		*	help dla pliku `make.php`
 		*	możliwość całkowitego wyłączenia js/css podczas tworzenia shella

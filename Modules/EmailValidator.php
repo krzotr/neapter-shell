@@ -1521,7 +1521,21 @@ class EmailValidator
 	}
 
 	/**
-	 * Reczne sprawdzenie email:pass
+	 * Reczne dodanie email:pass, czyszczenie tablicy z adresami
+	 *
+	 * @acess  public
+	 * @param  string        $sValue Email:pass
+	 * @return EmailValidator        Obiekt EmailValidator
+	 */
+	public function setEmailPassword( $sValue )
+	{
+		$this -> aEmails = array();
+
+		return $this -> addEmailPassword( $sValue );
+	}
+
+	/**
+	 * Reczne dodanie email:pass
 	 *
 	 * @acess  public
 	 * @param  string        $sValue Email:pass
@@ -1688,6 +1702,13 @@ class EmailValidator
 		return $this;
 	}
 
+	/**
+	 * Cachowanie adresow IP
+	 *
+	 * @access public
+	 * @param  string $sName Nazwa hosta
+	 * @return string        Adres IP
+	 */
 	public static function getHost( $sName )
 	{
 		if( ! isset( self::$aHostIp[ $sName ] ) )
@@ -1696,6 +1717,20 @@ class EmailValidator
 		}
 
 		return self::$aHostIp[ $sName ];
+	}
+
+	/**
+	 * Tryb gadatliwy
+	 *
+	 * @acess  public
+	 * @param  boolean         $bValue Wartosc
+	 * @return EmailValidator          Obiekt EmailValidator
+	 */
+	public function setVerbose( $bValue )
+	{
+		$this -> bVerbose = (boolean) $bValue;
+
+		return $this;
 	}
 
 	/**
@@ -2001,6 +2036,7 @@ Sprawdzanie loginu i hasla dla poczty
 
 	Opcje:
 		-i - wyświetlanie informacji o emailach w szczególności o wspieranych hostach
+		-v - tryb gadatliwy
 
 	Przykład:
 		emailvalidator test@wp.pl:test
@@ -2071,6 +2107,14 @@ DATA;
 			if( ! $bUsernamePassword && isset( $this -> oShell -> aArgv[1] ) )
 			{
 				$oMail -> setPasswordsFile( $this -> oShell -> aArgv[1] );
+			}
+
+			/**
+			 * Tryb gadatliwy
+			 */
+			if( in_array( 'v', $this -> oShell -> aOptv ) )
+			{
+				$oMail -> setVerbose( TRUE );
 			}
 
 			header( 'Content-Type: text/plain; charset=utf-8' );
