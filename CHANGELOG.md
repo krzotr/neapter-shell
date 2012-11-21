@@ -24,14 +24,16 @@ Changelog:
 	*	Rozmiar plików wynikowych jest o ~33% mniejszy
 	*	Zarządzanie shellem poprzez CLI
 *	Dodano
-	*	`emailvalidator` - nowe sterowniki:
-		*	Web.de
-		*	Gmx.de
-		*	Pino.pl
-		*	Inmail.pl
-		*	Gg.pl
-		*	Mail.ru
-		*	Hotmail.it, Hotmail.co.jp
+	*	`emailvalidator`
+		*	nowe sterowniki:
+			*	Web.de
+			*	Gmx.de
+			*	Pino.pl
+			*	Inmail.pl
+			*	Gg.pl
+			*	Mail.ru
+			*	Hotmail.it, Hotmail.co.jp
+		*	Ręczne sprawdzenie przy użyciu`:emailvalidator test@wp.pl:test test2@wp.pl:test2 test3@wp.pl:test3`
 	*	Tworzenie shella
 		*	help dla pliku `make.php`
 		*	możliwość całkowitego wyłączenia js/css podczas tworzenia shella

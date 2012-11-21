@@ -1474,6 +1474,14 @@ class EmailValidator
 	protected static $aHostIp = array();
 
 	/**
+	 * Tryb gadatliwy
+	 *
+	 * @access protected
+	 * @var    boolean
+	 */
+	protected $bVerbose = FALSE;
+
+	/**
 	 * Konstruktor
 	 *
 	 * @access public
@@ -1513,11 +1521,56 @@ class EmailValidator
 	}
 
 	/**
+	 * Reczne sprawdzenie email:pass
+	 *
+	 * @acess  public
+	 * @param  string        $sValue Email:pass
+	 * @return EmailValidator        Obiekt EmailValidator
+	 */
+	public function addEmailPassword( $sValue )
+	{
+		/**
+		 * username:password
+		 */
+		if( strpos( $sValue, ':') === FALSE )
+		{
+			return $this;
+		}
+
+		$sEmail = strstr( strtolower( $sValue ), ':', TRUE );
+
+		/**
+		 * Adres email musi byc poprawny
+		 */
+		if( filter_var( $sEmail, FILTER_VALIDATE_EMAIL ) === FALSE )
+		{
+			return $this;
+		}
+
+		/**
+		 * Wstawianie adresu do tablicy
+		 */
+		$this -> aEmails[] = array
+		(
+			'email'    => $sEmail,
+			'username' => strstr( $sEmail, '@', TRUE ),
+			'domain'   => substr( $sEmail, strpos( $sEmail, '@' ) + 1 ),
+			'password' => substr( $sValue, strpos( $sValue, ':' ) + 1 ),
+			'line'     => $sValue
+		);
+
+		$this -> bVerbose = TRUE;
+		$this -> bUsernamePassword = TRUE;
+
+		return $this;
+	}
+
+	/**
 	 * Ustawienia pliku z haslami
 	 *
 	 * @acess  public
 	 * @param  string        $sValue Plik z haslami
-	 * @return EmailValidator         Obiekt EmailValidator
+	 * @return EmailValidator        Obiekt EmailValidator
 	 */
 	public function setPasswordsFile( $sValue )
 	{
@@ -1741,7 +1794,7 @@ class EmailValidator
 						/**
 						 * Informacja
 						 */
-						if( ( $i !== 0 ) && ( $i % 20 === 0 ) )
+						if( $this -> bVerbose || ( ( $i !== 0 ) && ( $i % 20 === 0 ) ) )
 						{
 							printf( "[INFO]  %05d/%05d - %07.3f%% ! %s:%s\r\n", $i + 1, $iPasswords, ( ( $i + 1 ) / $iPasswords ) * 100, $aEmail['email'], $sPassword );
 							@ ob_flush();
@@ -1767,7 +1820,7 @@ class EmailValidator
 			/**
 			 * Informacja
 			 */
-			if(( $i !== 0 ) && ( $i % 20 === 0 ) )
+			if( ! $bSuccess && ( $this -> bVerbose || ( ( $i !== 0 ) && ( $i % 20 === 0 ) ) ) )
 			{
 				printf( "[INFO]  %05d/%05d - %07.3f%% ! %s\r\n", $iIndex + 1, $iEmails, (($iIndex + 1 ) / $iEmails ) * 100, $aEmail['email'] );
 				@ ob_flush();
@@ -1935,10 +1988,12 @@ Sprawdzanie loginu i hasla dla poczty
 	Sprawdzanie czy za pomoca loginu i hasla mozna zalogowac sie na poczte
 
 	Użycie:
-		emailvalidator plik_z_emailami [plik_z_hasłami]
+		emailvalidator dane [plik_z_hasłami]
 
-		plik_z_emailami - plik z emailami w formacie:
+		dane - plik z emailami w formacie:
 			email:hasło lub	email (jeżeli został użyty plik_z_hasłami)
+
+		dane - email:password [email2:password2]
 
 		plik_z_hasłami - plik, w którym znajdują się hasła; kiedy ta opcja jest użyta
 				 plik plik_z_emailami musi zawierać wyłącznie adres email (bez hasła)
@@ -1948,6 +2003,8 @@ Sprawdzanie loginu i hasla dla poczty
 		-i - wyświetlanie informacji o emailach w szczególności o wspieranych hostach
 
 	Przykład:
+		emailvalidator test@wp.pl:test
+		emailvalidator test@wp.pl:test test2@wp.pl:test2 test3@wp.pl:test3
 		emailvalidator emails.txt
 		emailvalidator emails.txt passwords.txt
 
@@ -1966,7 +2023,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( ( $this -> oShell -> iArgc !== 1 ) && ( $this -> oShell -> iArgc !== 2 ) )
+		if( $this -> oShell -> iArgc === 0 )
 		{
 			return $this -> getHelp();
 		}
@@ -1992,13 +2049,26 @@ DATA;
 				-> addDriver( new EmailValidatorDriverInmailpl() )
 				-> addDriver( new EmailValidatorDriverPinopl() )
 				-> addDriver( new EmailValidatorDriverGgpl() )
-				-> addDriver( new EmailValidatorDriverMailru() )
-				-> setEmailsFile( $this -> oShell -> aArgv[0] );
+				-> addDriver( new EmailValidatorDriverMailru() );
+
+			$bUsernamePassword = FALSE;
+			if( preg_match( '~^.+?@.+?:.+?\z~', $this -> oShell -> aArgv[0] ) )
+			{
+				$bUsernamePassword = TRUE;
+				foreach( $this -> oShell -> aArgv as $sEmailPass )
+				{
+					$oMail -> addEmailPassword( $sEmailPass );
+				}
+			}
+			else
+			{
+				$oMail -> setEmailsFile( $this -> oShell -> aArgv[0] );
+			}
 
 			/**
 			 * Plik z haslami
 			 */
-			if( isset( $this -> oShell -> aArgv[1] ) )
+			if( ! $bUsernamePassword && isset( $this -> oShell -> aArgv[1] ) )
 			{
 				$oMail -> setPasswordsFile( $this -> oShell -> aArgv[1] );
 			}
