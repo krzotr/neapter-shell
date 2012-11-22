@@ -81,34 +81,62 @@ DATA;
 		}
 
 		/**
+		 * Naglowki
+		 */
+		$aStream = array
+		(
+			'http' => array
+			(
+				'method' => 'GET',
+				'header' => "User-Agent: Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11\r\n" .
+					    "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
+			)
+		);
+
+		/**
 		 * Pobieranie danych
 		 */
-		if( ( $sData = file_get_contents( sprintf( 'http://domaintz.com/tools/reverse-ip/%s', $this -> oShell -> aArgv[0] ) ) ) === FALSE )
+		if( ( $sData = file_get_contents( 'http://www.ip-adress.com/reverse_ip/' . $this -> oShell -> aArgv[0], FALSE, stream_context_create( $aStream ) ) ) === FALSE )
 		{
 			return 'Nie można połączyć się z serwerem';
 		}
 
+		/**
+		 * Zly host
+		 */
+		if( strpos( $sData, 'could not be resolved. Make sure that you enter an valid IP address, host or domainname' ) )
+		{
+			return 'Nie można przetłumacz hosta';
+		}
+
+		/**
+		 * Zly host
+		 */
+		if( strpos( $sData, '<div id="hostcount">0 Hosts on this IP</div>' ) )
+		{
+			return 'Brak adresów IP';
+		}
 
 		/**
 		 * Wyciaganie danych
 		 */
-		if( ! preg_match( '~<pre>(.+?)</pre>~', $sData, $aData ) )
+		if( ! preg_match( '~<table class="list">(.+?)</table>~s', $sData, $aData ) )
 		{
-			return 'Wystąpił błąd podczas pobierania danych';
+			return 'Wystąpił błąd podczas wyciągania danych';
 		}
 
 		/**
-		 * Wyciaganie adresow
+		 * Wyciaganie danych
 		 */
-		if( ! preg_match_all( '~<a href="[^"]+" target="_blank" rel="nofollow">(.+?)</a>~', $aData[1], $aData ) )
+		if( ! preg_match_all( '~<td>\r\n(.+?)</td>~', $aData[1], $aData ) )
 		{
-			return 'Brak danych';
+			return 'Wystąpił błąd podczas wyciągania hostów';
 		}
 
 		/**
 		 * Wyswietlanie adresow
 		 */
-		return sprintf( "Zwrócono %d witryn:\r\n\t%s",  count( $aData[1] ), implode( "\r\n\t", $aData[1] ) );
+		return sprintf( "Zwrócono %d witryn:\r\n\r\n\t%s",  count( $aData[1] ), implode( "\r\n\t", $aData[1] ) );
 	}
 
 }

@@ -14,6 +14,7 @@ Changelog:
 			*	Ustanawianie połączenia z IRC (polecenie PING)
 			*	Po wykonaniu polecenia `:ircmsg` zwracany był komunikat `Nie ma takiej komendy "ircmsg"`
 		*	`md5crack` - API `www.tmto.org` zastąpiono `md5.darkbyte.ru`
+		*	`revip` - Zmieniono adres strony na ip-adress.com
 		*	`portscanner` - wyświetlanie komunikatów
 		*	`info` - pełna ścieżka skryptu w CLI
 		*	`ls` - podążanie za dowiązaniami symbolicznymi
