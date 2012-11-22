@@ -42,6 +42,8 @@ Shell składa się z kilkudziesięciu plików, dzięki czemu łatwiej można je 
 
 *	`make.php --no-css` - arkusze stylów nie zostaną dołączone
 
+*	`make.php -css=blue` - dołączenie własnego arkusza styli
+
 *	`make.php --no-extended-version` - dodatkowe informacje takie jak data utworzenia shalla nie zostaną dołączone do numeru wersji
 
 Powyższe opcje można łączyć
@@ -108,14 +110,6 @@ FAQ
 *	Czy shell jest indeksowany przez Googlebot?
 
 	*	Nie. Ze względu na bezpieczeństwo Googlebot otrzyma stronę z błędem 404 co uniemożliwia zaindeksowanie shella.
-
-*	Jak mogę zmienić wygląd shella?
-
-	*	W pliku `shell.php` zmodyfikuj linię
-
-		`$this -> sStyleSheet = file_get_contents( 'Styles/dark.css' );`
-
-	W miejsce `Styles/dark.css` należy wstawić ścieżkę do pliku ze stylami oraz uruchom `make.php`
 
 
 

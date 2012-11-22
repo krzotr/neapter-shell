@@ -38,6 +38,13 @@ function getHelp()
   --no-css
     kaskadowy arkusz stylów nie zostanie dołaczony do shella
 
+
+  --css=nazwa
+    zmiana wyglądu shella, style znajdują się w katalogu Styles
+
+      przykład:
+      --css=blue
+
   --no-extended-version
     data utworzenia shella oraz informacje o dodatkowych opcjach nie są doklejane do numeru wersji
 
@@ -91,8 +98,6 @@ switch( $sType )
 
 		$aFiles[] = 'shell';
 
-		echo "\r\n\t" . implode( "\r\n\t", $aFiles ) . "\n";
-
 		foreach( $aFiles as $sFile )
 		{
 			if( $sFile === 'shell' )
@@ -135,12 +140,25 @@ switch( $sType )
 				}
 
 				/**
+				 * Style uzytkownika
+				 */
+				if( ( ( $sStyleFilePath = $oArgs -> getOption( 'css' ) ) !== FALSE ) && ! $oArgs -> getOption( 'no-css' ) )
+				{
+					$sStyleFilePath = dirname( __FILE__ ) . '/Styles/' . basename( $sStyleFilePath ) . '.css';
+					if( ! is_file( $sStyleFilePath ) )
+					{
+						printf( "Plik ze stylami '%s' nie istnieje\r\n", $sStyleFilePath );
+						exit;
+					}
+				}
+
+				/**
 				 * Podmienianie styli
 				 */
 				$sShellData = preg_replace( '~\$this -> sStyleSheet = file_get_contents\( \'(.+?)\' \);~', NULL, $sShellData );
 				$sShellData = preg_replace( '~private \$StyleSheet;~', '', $sShellData );
 				$sShellData = preg_replace( '~{\$this -> sStyleSheet}~',
-					preg_replace( '~[\r\n\t]+~', NULL, ( $oArgs -> getOption( 'no-css' ) ? '' : file_get_contents( $aMatch[1] ) ) ),
+					preg_replace( '~[\r\n\t]+~', NULL, ( $oArgs -> getOption( 'no-css' ) ? '' : file_get_contents( $sStyleFilePath ?: $aMatch[1] ) ) ),
 					$sShellData
 				);
 

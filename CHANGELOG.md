@@ -38,6 +38,7 @@ Changelog:
 	*	Tworzenie shella
 		*	help dla pliku `make.php`
 		*	możliwość całkowitego wyłączenia js/css podczas tworzenia shella
+		*	`--css=blue` - podmiana styli
 		*	wersja zawiera datę utworzenia shella oraz dodatkowe informacje ustawione podczas tworzenia shella
 *	Ponadto
 	*	Dokumentacja klas, metod, właściwości
