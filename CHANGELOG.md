@@ -44,6 +44,7 @@ Changelog:
 	*	Dokumentacja klas, metod, właściwości
 	*	Testy jednostkowe
 	*	Interfejs do tworzenia modułu został zastąpiony klasa abstrakcyjną
+	*	Aktualizacna biblioteki `Pack`
 
 
 2012-01-26 v0.50
