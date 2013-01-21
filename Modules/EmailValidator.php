@@ -1482,6 +1482,14 @@ class EmailValidator
 	protected $bVerbose = FALSE;
 
 	/**
+	 * Sciezka do pliku wynikowego
+	 *
+	 * @access protected
+	 * @var    string
+	 */
+	protected $sOutputFile;
+
+	/**
 	 * Konstruktor
 	 *
 	 * @access public
@@ -1734,6 +1742,38 @@ class EmailValidator
 	}
 
 	/**
+	 * Sciezka do pliku wynikowego
+	 *
+	 * @acess  public
+	 * @param  string        $sValue Sciezka do pliku wynikowego
+	 * @return EmailValidator        Obiekt EmailValidator
+	 */
+	public function setOutputFile( $sValue )
+	{
+		$this -> sOutputFile = (string) $sValue;
+		/**
+		 * Tworzenie pliku
+		 */
+		if( ! is_file( $this -> sOutputFile ) )
+		{
+			if( ! file_put_contents(  $this -> sOutputFile, '', LOCK_EX ) )
+			{
+				throw new EmailValidatorException( 'Nie można utworzyć pliku' );
+			}
+		}
+
+		/**
+		 * Czy plik jest do zapisu
+		 */
+		if( ! is_writable( $this -> sOutputFile ) )
+		{
+			throw new EmailValidatorException( 'Nie można zapisać do pliku' );
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Proces walidacji adresow
 	 */
 	public function get()
@@ -1771,6 +1811,8 @@ class EmailValidator
 		{
 			$iPasswords = count( $this -> aPasswords );
 		}
+
+		$bSuccess = FALSE;
 
 		/**
 		 * Adresy email
@@ -1844,7 +1886,15 @@ class EmailValidator
 				 */
 				if( $bSuccess )
 				{
-					printf( "[FOUND] %05d/%05d - %07.3f%% # %s\r\n", $iIndex + 1, $iEmails, (($iIndex + 1 ) / $iEmails ) * 100, $sEmail );
+					$sOutput = sprintf( "[FOUND] %05d/%05d - %07.3f%% # %s\r\n", $iIndex + 1, $iEmails, (($iIndex + 1 ) / $iEmails ) * 100, $sEmail );
+
+					echo $sOutput;
+
+					if( $this -> sOutputFile !== NULL )
+					{
+						@ file_put_contents( $this -> sOutputFile, $sOutput, FILE_APPEND | LOCK_EX );
+					}
+
 					@ ob_flush();
 					@ flush();
 					$i = 0;

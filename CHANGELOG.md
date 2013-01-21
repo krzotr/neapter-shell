@@ -10,6 +10,7 @@ Changelog:
 			*	cachowanie hostów
 			*	pop3 bez ssl zamieniono na pop3/imap z ssl
 			*	fatalne działanie live.com oraz neostrada.pl
+			*	metoda setOutputFile
 		*	Irc - Copi
 			*	Ustanawianie połączenia z IRC (polecenie PING)
 			*	Po wykonaniu polecenia `:ircmsg` zwracany był komunikat `Nie ma takiej komendy "ircmsg"`
