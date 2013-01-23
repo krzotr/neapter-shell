@@ -97,7 +97,9 @@ Obsługa shella
 
 	*	cr3d1ts       - Informacje o autorze
 *	Istnieje możliwość przełączenia się na wersję deweloperską. Aby to zrobić należy dopisać zmienną `dev` w adresie (http://example.com/?dev)
+
 *	W celu uruchomienia shella z domyślną konfigurację. Aby to zrobić należy w adresie dopisać zmienną `pure` (http://example.com/?pure). Shell w ten sposób pominie wczytywanie dodatkowych modułów (polecenie `modules`) oraz rozszerzeń (polecenie `autoload`)
+
 *	Aby wyłączyć AJAX należy do adresu dodać zmienną nojs (http://example.com/?nojs)
 
 FAQ
@@ -110,6 +112,13 @@ FAQ
 *	Czy shell jest indeksowany przez Googlebot?
 
 	*	Nie. Ze względu na bezpieczeństwo Googlebot otrzyma stronę z błędem 404 co uniemożliwia zaindeksowanie shella.
+
+
+
+Jak mogę stworzyć własny moduł do shella?
+-----------------------------------------
+
+Cały mechanizm tworzenia modułu został opisany w pliku MODULE.md
 
 
 
