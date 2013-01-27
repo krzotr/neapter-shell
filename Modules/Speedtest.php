@@ -78,15 +78,16 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc !== 1 )
+		if( $this -> oArgs -> getNumberOfParams() !== 1 )
 		{
 			return $this -> getHelp();
 		}
 
+		$sParam = $this -> oArgs -> getParam( 0 );
 		/**
 		 * Wspierany jest tylko protokul HTTP
 		 */
-		if( strncmp( $this -> oShell -> aArgv[0], 'http://', 7 ) !== 0 )
+		if( strncmp( $sParam, 'http://', 7 ) !== 0 )
 		{
 			return 'Wspierany jest tylko protokół http!';
 		}
@@ -107,7 +108,7 @@ DATA;
 		/**
 		 * Otwieranie polaczenia
 		 */
-		if( ( $rFp = fopen( $this -> oShell -> aArgv[0], 'r', FALSE, stream_context_create( $aStream ) ) ) === FALSE )
+		if( ( $rFp = fopen( $sParam, 'r', FALSE, stream_context_create( $aStream ) ) ) === FALSE )
 		{
 			return 'Nie można pobrać pliku';
 		}

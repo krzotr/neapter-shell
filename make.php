@@ -11,7 +11,6 @@
 
 require_once __DIR__ . '/Lib/Request.php';
 require_once __DIR__ . '/Lib/Args.php';
-require_once __DIR__ . '/Lib/ArgsException.php';
 
 
 /**
@@ -80,7 +79,8 @@ switch( $sType )
 			'Lib/Arr',
 			'Lib/Request',
 			'Lib/ModuleAbstract',
-			'Lib/XRecursiveDirectoryIterator'
+			'Lib/XRecursiveDirectoryIterator',
+			'Lib/Args'
 		);
 
 		if( $sType !== 'lite' )

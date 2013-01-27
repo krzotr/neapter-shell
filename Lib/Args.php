@@ -11,52 +11,50 @@
  */
 
 /**
- * class Args - Parsowanie argumentow
- *
- * @uses       Neapter\Core\Request
- * @uses       Neapter\Core\Exception\ArgsException
+ * Parsowanie argumentow
  *
  * @package    Neapter
  * @subpackage Core
+ *
+ * @uses       Neapter\Core\Request
  */
 class Args
 {
 	/**
 	 * Surowa lista argumentow
 	 *
-	 * @access private
+	 * @access protected
 	 * @var    array
 	 */
-	private $aArgv = array();
+	protected $aArgv = array();
 
 	/**
 	 * Przefiltrowana lista argumentow
 	 *
-	 * @access private
+	 * @access protected
 	 * @var    array
 	 */
-	private $aArgs = array();
+	protected $aArgs = array();
 
 	/**
 	 * Lista opcji
 	 *
-	 * @access private
+	 * @access protected
 	 * @var    array
 	 */
-	private $aOptions = array();
+	protected $aOptions = array();
 
 	/**
 	 * Lista przelacznikow
 	 *
-	 * @access private
+	 * @access protected
 	 * @var    array
 	 */
-	private $aSwitches = array();
+	protected $aSwitches = array();
 
 	/**
 	 * Konstruktor
 	 *
-	 * @uses   Neapter\Core\Exception\ArgsException
 	 * @uses   Neapter\Core\Request
 	 *
 	 * @access public
@@ -65,6 +63,11 @@ class Args
 	 */
 	public function __construct( $mArgv = array() )
 	{
+		if( $mArgv === '' )
+		{
+			return ;
+		}
+
 		if( is_array( $mArgv ) )
 		{
 			/**
@@ -74,20 +77,12 @@ class Args
 		}
 		else
 		{
-			if( ! preg_match_all( '~\'(?:(?:\\\')|.+?)\'|"(?:(?:\\")|.+?)"|[^ \r\n\t\'"]+~', $mArgv, $aMatch ) )
+			if( ! preg_match_all( '~([^ ]*(\'(?:(?:\\\')|.+?)\'|"(?:(?:\\")|.+?)"))|([^ \r\n"\']+)~', $mArgv, $aMatch ) )
 			{
-				throw new ArgsException( 'Błąd podczas przetwarzania parametrów' );
+				return ;
 			}
 
 			$this -> aArgv = array_map( array( $this, 'parseArgv' ), $aMatch[0] );
-		}
-
-		/**
-		 * Ilosc argumentow
-		 */
-		if( ( $iArgc = count( $this -> aArgv ) ) === 0 )
-		{
-			throw new ArgsException( 'Brak argumentów' );
 		}
 
 		/**
@@ -98,7 +93,9 @@ class Args
 		/**
 		 * Rozdzielanie parametrow
 		 */
-		for( $i = 1; $i < $iArgc; ++$i )
+		$iArgc = count( $this -> aArgv );
+
+		for( $i = 0; $i < $iArgc; ++$i )
 		{
 			/**
 			 * Opcje
@@ -126,8 +123,7 @@ class Args
 			 */
 			else if( ( strncmp( $aArgs[ $i ], '-', 1 ) === 0 ) && ( strncmp( $aArgs[ $i ], '--', 2 ) !== 0 ) )
 			{
-				$aData = str_split( substr( $aArgs[ $i ], 1 ) );
-				foreach( $aData as $sSwitcher )
+				foreach( str_split( substr( $aArgs[ $i ], 1 ) ) as $sSwitcher )
 				{
 					/**
 					 * --vva -c
@@ -181,6 +177,17 @@ class Args
 	}
 
 	/**
+	 * Ilosc opcji
+	 *
+	 * @access public
+	 * @return integer Ilosc parametrow
+	 */
+	public function getNumberOfOptions()
+	{
+		return count( $this -> aOptions );
+	}
+
+	/**
 	 * Pobieranie przelacznika
 	 *
 	 * @access public
@@ -206,6 +213,17 @@ class Args
 	public function getSwitches()
 	{
 		return $this -> aSwitches;
+	}
+
+	/**
+	 * Ilosc przelacznikow
+	 *
+	 * @access public
+	 * @return integer Ilosc parametrow
+	 */
+	public function getNumberOfSwitches()
+	{
+		return count( $this -> aSwitches );
 	}
 
 	/**
@@ -244,13 +262,24 @@ class Args
 	}
 
 	/**
+	 * Ilosc parametrow
+	 *
+	 * @access public
+	 * @return integer Ilosc parametrow
+	 */
+	public function getNumberOfParams()
+	{
+		return count( $this -> aArgs );
+	}
+
+	/**
 	 * Oczyszczanie argumentow ze zbednych znakow
 	 *
-	 * @access private
+	 * @access protected
 	 * @param  string & $sVar Argument
 	 * @return void
 	 */
-	private function parseArgv( $sVar )
+	protected function parseArgv( $sVar )
 	{
 		$sVar = strtr( $sVar, array
 			(

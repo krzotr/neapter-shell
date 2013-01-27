@@ -72,7 +72,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc !== 0 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() !== 0 )
 		{
 			return $this -> getHelp();
 		}

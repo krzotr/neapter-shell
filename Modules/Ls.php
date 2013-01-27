@@ -155,10 +155,12 @@ DATA;
 		/**
 		 * Domyslny katalog jezeli nie podano sciezki
 		 */
-		$sDir = ( ! empty( $this -> oShell -> aArgv ) ? $this -> oShell -> sArgv : getcwd() );
+		$sDir = ( $this -> oShell -> getArgs() -> getParam( 0  ) ?: getcwd() );
 
-		$bList      = in_array( 'l', $this -> oShell -> aOptv );
-		$bRecursive = in_array( 'R', $this -> oShell -> aOptv );
+		$aOptv = $this -> oShell -> getArgs() -> getOptions();
+
+		$bList      = array_key_exists( 'l', $aOptv );
+		$bRecursive = array_key_exists( 'R', $aOptv );
 
 		try
 		{
@@ -189,7 +191,7 @@ DATA;
 					/**
 					 * Windows ?
 					 */
-					if( $this -> oShell -> bWindows )
+					if( $this -> oShell -> isWindows() )
 					{
 						/**
 						 * Wyjatek - nie mamy praw odczytu dla wlasciwosci pliku

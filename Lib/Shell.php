@@ -14,6 +14,7 @@ require_once dirname( __FILE__ ) . '/Request.php';
 require_once dirname( __FILE__ ) . '/ModuleAbstract.php';
 require_once dirname( __FILE__ ) . '/LoadModules.php';
 require_once dirname( __FILE__ ) . '/XRecursiveDirectoryIterator.php';
+require_once dirname( __FILE__ ) . '/Args.php';
 
 /**
  * class Shell - Zarzadzanie serwerem
@@ -60,12 +61,28 @@ class Shell
 	private $fGeneratedIn;
 
 	/**
-	 * SafeMode ON / OFF
+	 * Czy jest wlaczone SafeMode?
 	 *
-	 * @access public
+	 * @access protected
 	 * @var    boolean
 	 */
-	public $bSafeMode;
+	protected $bSafeMode;
+
+	/**
+	 * Czy dzialamy w srodowisku Windows?
+	 *
+	 * @access protected
+	 * @var    boolean
+	 */
+	protected $bWindows = FALSE;
+
+	/**
+	 * Mozliwe jest wykonanie polecenia systemowego?
+	 *
+	 * @access private
+	 * @var    boolean
+	 */
+	private $bExec = FALSE;
 
 	/**
 	 * Tablica wylaczaonych funkcji
@@ -76,52 +93,13 @@ class Shell
 	private $aDisableFunctions = array();
 
 	/**
-	 * Mozliwe jest wykonanie polecenia systemowego ?
-	 *
-	 * @access private
-	 * @var    boolean
-	 */
-	private $bExec = FALSE;
-
-	/**
-	 * Dzialamy w srodowisku Windows ?
-	 *
-	 * @access public
-	 * @var    boolean
-	 */
-	public $bWindows = FALSE;
-
-	/**
-	 * Komenda
+	 * Nazwa polecenie
+	 * ':test' => 'test'
 	 *
 	 * @access public
 	 * @var    string
 	 */
 	public $sCmd;
-
-	/**
-	 * Lista parametrow
-	 *
-	 * @access public
-	 * @var    array
-	 */
-	public $aArgv = array();
-
-	/**
-	 * Ilosc parametrow
-	 *
-	 * @access public
-	 * @var    integer
-	 */
-	public $iArgc = 0;
-
-	/**
-	 * Lista opcji
-	 *
-	 * @access public
-	 * @var    array
-	 */
-	public $aOptv = array();
 
 	/**
 	 * Ciag jako jeden wielki parametr
@@ -130,6 +108,14 @@ class Shell
 	 * @var    string
 	 */
 	public $sArgv;
+
+	/**
+	 * Parsowanie argumentow
+	 *
+	 * @access protected
+	 * @var    object
+	 */
+	protected $oArgs;
 
 	/**
 	 * Lista modulow i komend
@@ -229,7 +215,7 @@ class Shell
 	 * @access public
 	 * @var    boolean
 	 */
-	public $bDev = FALSE;
+	public $bDev = TRUE;
 
 	/**
 	 * Jezeli FALSE to skrypty JavaScript sa wlaczone
@@ -688,10 +674,13 @@ class Shell
 	 */
 	private function getCommandModules()
 	{
+		$iArgc = $this -> oArgs -> getNumberOfParams();
+		$sParam = $this -> oArgs -> getParam( 0 );
+
 		/**
 		 * Help
 		 */
-		if( $this -> bHelp || ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		if( $this -> bHelp || ( $iArgc !== 1 ) || ( $sParam === 'help' ) )
 		{
 			return <<<DATA
 modules - Informacje o modułach
@@ -713,7 +702,7 @@ DATA;
 		/**
 		 * Lista dostepnych modulow
 		 */
-		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'loaded' ) )
+		if( ( $iArgc === 1 ) && ( $sParam === 'loaded' ) )
 		{
 			$aModules = array_merge( array_keys( $this -> aNativeModules ),
 				array_map(
@@ -729,7 +718,7 @@ DATA;
 		/**
 		 * Wyswietlanie wersji bibliotek
 		 */
-		if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'version' ) )
+		if( ( $iArgc === 1 ) && ( $sParam === 'version' ) )
 		{
 			/**
 			 * Szukanie najdluzszej nazwy modulu
@@ -760,9 +749,9 @@ DATA;
 		/**
 		 * Pobieranie pliku z http
 		 */
-		if( strncmp( $this -> aArgv[0], 'http://', 7 ) === 0 )
+		if( strncmp( $sParam, 'http://', 7 ) === 0 )
 		{
-			if( ( $sData = file_get_contents( $this -> aArgv[0] ) ) === FALSE )
+			if( ( $sData = file_get_contents( $sParam ) ) === FALSE )
 			{
 				return 'Nie można pobrać pliku z modułami';
 			}
@@ -772,7 +761,7 @@ DATA;
 		 */
 		else
 		{
-			if( ! ( is_file( $this -> aArgv[0] ) && ( ( $sData = file_get_contents( $this -> aArgv[0] ) ) !== FALSE ) ) )
+			if( ! ( is_file( $sParam ) && ( ( $sData = file_get_contents( $sParam ) ) !== FALSE ) ) )
 			{
 				return 'Nie można wczytać pliku z modułami';
 			}
@@ -878,10 +867,12 @@ DATA;
 		 */
 		$this -> bHelp = TRUE;
 
+		$sParam = $this -> oArgs -> getParam( 0 );
+
 		/**
 		 * Szczegolowa pomoc
 		 */
-		if( isset( $this -> aArgv[0] ) && ( $this -> aArgv[0] === 'all' ) )
+		if( $sParam === 'all' )
 		{
 			/**
 			 * Formatowanie natywnych helpow
@@ -915,7 +906,9 @@ DATA;
 	 */
 	private function getCommandAutoload()
 	{
-		if( $this -> bHelp  || ( ( $this -> iArgc === 0 ) && ( $this -> aOptv === array() ) ) )
+		$aSwitches = $this -> oArgs -> getSwitches();
+
+		if( $this -> bHelp  || ( ( $this -> oArgs -> getNumberOfParams() === 0 ) && ( $aSwitches === array() ) ) )
 		{
 			return <<<DATA
 Wczytywanie rozszerzeń PHP
@@ -947,7 +940,7 @@ DATA;
 		/**
 		 * List
 		 */
-		if( in_array( 'l', $this -> aOptv ) )
+		if( array_key_exists( 'l', $aSwitches ) )
 		{
 			if( $aAutoload === array() )
 			{
@@ -970,7 +963,7 @@ DATA;
 		/**
 		 * Flush
 		 */
-		if( in_array( 'f', $this -> aOptv ) )
+		if( array_key_exists( 'f', $aSwitches ) )
 		{
 			return sprintf( 'Plik z rozszerzeniami %szostał usunięty', ! unlink( $this -> sTmp . '/' . $this -> sPrefix . '_autoload' ) ? 'nie ' : NULL );
 		}
@@ -980,7 +973,7 @@ DATA;
 		 */
 		$sOutput = NULL;
 
-		foreach( $this -> aArgv as $sExtension )
+		foreach( $this -> oArgs -> getParams() as $sExtension )
 		{
 			/**
 			 * Czy rozszerzenie zostalo juz poprzednio wczytane
@@ -1018,7 +1011,7 @@ DATA;
 	 */
 	private function getCommandEval()
 	{
-		if( $this -> bHelp  || ( $this -> iArgc === 0 ) )
+		if( $this -> bHelp  || ( $this -> oArgs -> getNumberOfParams() === 0 ) )
 		{
 			return <<<DATA
 Wykonanie kodu PHP
@@ -1048,7 +1041,7 @@ DATA;
 	 */
 	private function getCommandCd()
 	{
-		if( $this -> bHelp  || ( $this -> iArgc !== 1 ) )
+		if( $this -> bHelp  || ( $this -> oArgs -> getNumberOfParams() < 1 ) )
 		{
 			return <<<DATA
 Zmiana aktualnego katalogu
@@ -1222,7 +1215,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> bHelp || ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		if( $this -> bHelp || ( $this -> oArgs -> getNumberOfParams() !== 1 ) || ( $this -> oArgs -> getParam( 0 ) === 'help' ) )
 		{
 			return <<<DATA
 edit - Edycja oraz tworzenie nowego pliku
@@ -1341,7 +1334,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> bHelp || ( $this -> iArgc !== 1 ) || ( $this -> aArgv[0] === 'help' ) )
+		if( $this -> bHelp || ( $this -> oArgs -> getNumberOfParams() !== 1 ) || ( $this -> oArgs -> getParam( 0 ) === 'help' ) )
 		{
 			return <<<DATA
 upload - Wrzucanie pliku na serwer
@@ -1382,7 +1375,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> bHelp || ( $this -> iArgc !== 0 ) )
+		if( $this -> bHelp )
 		{
 			return <<<DATA
 info - Wyświetla informacje o systemie
@@ -1404,7 +1397,6 @@ DATA;
 			$this -> bExec,
 			function_exists( 'curl_init' ),
 			function_exists( 'socket_create' )
-
 		);
 	}
 
@@ -1462,7 +1454,6 @@ DATA;
 				$sCmd = (string) Request::getPost( 'cmd' );
 			}
 		}
-
 		/**
 		 * Komendy shella rozpoczynaja sie od znaku ':'
 		 */
@@ -1477,35 +1468,7 @@ DATA;
 				$this -> sCmd = (string) substr( $sCmd, 1 );
 			}
 
-			$this -> sArgv = ltrim( preg_replace( sprintf( '~^\:%s[\s+]?~', $this -> sCmd ), NULL, $sCmd ) );
-
-			/**
-			 * Rozdzielanie argumentow
-			 *
-			 * "sciezka do \"pliku\"" -> sciezka do "pliku"
-			 */
-			if( preg_match_all( '~\'(?:(?:\\\')|.+?)\'|"(?:(?:\\")|.+?)"|[^ \r\n\t\'"]+~', $this -> sArgv, $aMatch ) );
-			{
-				/**
-				 * Usuwanie koncowych znakow " oraz ', zamienianie \" na " i \' na '
-				 *
-				 * Dalbym tutaj lambde, ale php 5.2 tego nie obsluguje ...
-				 */
-				array_walk( $aMatch[0], array( $this, 'parseArgv' ) );
-
-				$this -> aArgv = $aMatch[0];
-
-				if( isset( $this -> aArgv[0] ) && substr( $this -> aArgv[0], 0, 1 ) === '-' )
-				{
-					$this -> aOptv = str_split( substr( $this -> aArgv[0], 1 ) );
-					array_shift( $this -> aArgv );
-					$this -> sArgv = ltrim( implode( ' ', $this -> aArgv ) );
-				}
-			}
-
-			$this -> sArgv = $this -> rmQuotes( rtrim( $this -> sArgv ) );
-
-			$this -> iArgc = count( $this -> aArgv );
+			$this -> oArgs = new Args( ltrim( preg_replace( sprintf( '~^\:%s[\s+]?~', $this -> sCmd ), NULL, $sCmd ) ) );
 
 			/**
 			 *  Lista komend i aliasy
@@ -1602,7 +1565,7 @@ DATA;
 						$sModule = $this -> aModules[ $this -> sCmd ];
 						$oModule = new $sModule( $this );
 
-						if( ( $this -> iArgc === 1 ) && ( $this -> aArgv[0] === 'help' ) )
+						if( ( $this -> oArgs -> getNumberOfParams() === 1 ) && ( $this -> oArgs -> getParam( 0 ) === 'help' ) )
 						{
 							$sConsole = $this -> aHelpModules[ $sModule ] . ' - ' . $oModule -> getHelp();
 						}
@@ -1771,47 +1734,24 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 		echo $this -> getActionBrowser();
 	}
 
-	/**
-	 * Oczyszczanie argumentow ze zbednych znakow
-	 *
-	 * @access private
-	 * @param  string & $sVar Argument
-	 * @return void
-	 */
-	private function parseArgv( & $sVar )
+	public function getArgs()
 	{
-		$sVar = strtr( $sVar, array
-			(
-				'\\\'' => '\'',
-				'\\"'  => '"'
-			)
-		);
-
-		if(    ( ( substr( $sVar, 0, 1 ) === '"' ) && ( substr( $sVar, -1 ) === '"' ) )
-		    || ( ( substr( $sVar, 0, 1 ) === '\'' ) && ( substr( $sVar, -1 ) === '\'' ) )
-		)
-		{
-			$sVar = substr( $sVar, 1, -1 );
-		}
+		return $this -> oArgs;
 	}
 
-	/**
-	 * Usuwanie poczakowego oraz koncowego znaku " / '
-	 *
-	 * @access private
-	 * @param  string $sVal Ciag znakow
-	 * @return string
-	 */
-	private function rmQuotes( $sVal )
+	public function isSafeMode()
 	{
-		if(    ( ( substr( $sVal, 0, 1 ) === '"' ) && ( substr( $sVal, -1 ) === '"' ) )
-		    || ( ( substr( $sVal, 0, 1 ) === '\'' ) && ( substr( $sVal, -1 ) === '\'' ) )
-		)
-		{
-			return substr( $sVal, 1, -1 );
-		}
+		return $this -> bSafeMode;
+	}
 
-		return $sVal;
+	public function isWindows()
+	{
+		return $this -> bWindows;
+	}
+
+	public function isExecutable()
+	{
+		return $this -> bExec;
 	}
 
 }
