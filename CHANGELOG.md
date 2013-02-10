@@ -46,6 +46,7 @@ Changelog:
 		*	`--css=blue` - podmiana styli
 		*	wersja zawiera datę utworzenia shella oraz dodatkowe informacje ustawione podczas tworzenia shella
 *	Ponadto
+	*	`cd` jest natywnym modułem
 	*	Dokumentacja klas, metod, właściwości
 	*	Testy jednostkowe
 	*	Interfejs do tworzenia modułu został zastąpiony klasa abstrakcyjną

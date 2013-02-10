@@ -483,7 +483,7 @@ class Shell
 		   && ( ( $sData = file_get_contents( $sFile ) ) !== FALSE )
 		)
 		{
-			chdir( $this -> decode( $sData ) );
+			@ chdir( $this -> decode( $sData ) );
 		}
 	}
 
@@ -1059,9 +1059,11 @@ Zmiana aktualnego katalogu
 DATA;
 		}
 
-		if( chdir( $this -> sArgv ) )
+		$sDir = $this -> oArgs -> getParam( 0 );
+
+		if( @ chdir( $sDir ) )
 		{
-			file_put_contents( $this -> sTmp . '/' . $this -> sPrefix . 'chdir', $this -> encode( $this -> sArgv ) );
+			file_put_contents( $this -> sTmp . '/' . $this -> sPrefix . 'chdir', $this -> encode( $sDir ) );
 
 			return sprintf( "Katalog zmieniono na:\r\n\t%s", getcwd() );
 		}
