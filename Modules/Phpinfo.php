@@ -42,7 +42,7 @@ class ModulePhpinfo extends ModuleAbstract
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-06-04 - <krzotr@gmail.com>';
+		return '1.01 2011-11-20 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -79,17 +79,20 @@ DATA;
 		 * Wywalanie zbednych tresci, klasy itp
 		 * Licencje kazdy zna
 		 */
-		$sData = str_replace( array
-			(
-				' class="e"',
-				' class="v"'
-			),
-			'',
-			substr( $sData,
-				strpos( $sData, '<div class="center">' ) + 20,
-				-( strlen( $sData ) - strrpos( $sData, '<h2>PHP License</h2>' ) )
-			)
-		);
+		if( PHP_SAPI !== 'cli' )
+		{
+			$sData = str_replace( array
+				(
+					' class="e"',
+					' class="v"'
+				),
+				'',
+				substr( $sData,
+					strpos( $sData, '<div class="center">' ) + 20,
+					-( strlen( $sData ) - strrpos( $sData, '<h2>PHP License</h2>' ) )
+				)
+			);
+		}
 
 		/**
 		 * logo kazdy widzial, creditsy tez

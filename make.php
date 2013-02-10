@@ -127,11 +127,13 @@ switch( $sType )
 				/**
 				 * Wyciaganie Style
 				 */
-				if( ! preg_match( '~\$this -> sStyleSheet = file_get_contents\( \'(.+?)\' \);~', $sShellData, $aMatch ) )
+				if( ! preg_match( '~\$this -> sStyleSheet = file_get_contents\( dirname\( __FILE__ \) \. \'(.+?)\' \);~', $sShellData, $aMatch ) )
 				{
 					echo "Cos nie tak ze stylami\r\n";
 					exit ;
 				}
+
+				$aMatch[1] = substr( $aMatch[1], 4 );
 
 				if( ! is_file( $aMatch[1] ) )
 				{
@@ -155,7 +157,7 @@ switch( $sType )
 				/**
 				 * Podmienianie styli
 				 */
-				$sShellData = preg_replace( '~\$this -> sStyleSheet = file_get_contents\( \'(.+?)\' \);~', NULL, $sShellData );
+				$sShellData = preg_replace( '~\$this -> sStyleSheet = file_get_contents\((.+?)\);~', NULL, $sShellData );
 				$sShellData = preg_replace( '~private \$StyleSheet;~', '', $sShellData );
 				$sShellData = preg_replace( '~{\$this -> sStyleSheet}~',
 					preg_replace( '~[\r\n\t]+~', NULL, ( $oArgs -> getOption( 'no-css' ) ? '' : file_get_contents( $sStyleFilePath ?: $aMatch[1] ) ) ),

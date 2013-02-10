@@ -15,7 +15,8 @@ Changelog:
 			*	Ustanawianie połączenia z IRC (polecenie PING)
 			*	Po wykonaniu polecenia `:ircmsg` zwracany był komunikat `Nie ma takiej komendy "ircmsg"`
 		*	`md5crack` - API `www.tmto.org` zastąpiono `md5.darkbyte.ru`
-		*	`portscanner` - wyświetlanie szczegółowych komunikatów
+		*	`revip` - Zmieniono adres strony na ip-adress.com
+		*	`portscanner` - wyświetlanie komunikatów
 		*	`info` - pełna ścieżka skryptu w CLI
 		*	`ls` - podążanie za dowiązaniami symbolicznymi
 		*	`download` - błąd podczas pobierania pliku
@@ -24,6 +25,9 @@ Changelog:
 	*	Obfuskacja kodu - problem z `echo`
 	*	Rozmiar plików wynikowych jest o ~33% mniejszy
 	*	Zarządzanie shellem poprzez CLI
+	*	`phpinfo` w CLI
+	*	dokumentacja klas, nagłówków
+	*	interface do tworzenia modułu został zastąpiony klasa abstrakcyjną
 *	Dodano
 	*	`emailvalidator`
 		*	nowe sterowniki:

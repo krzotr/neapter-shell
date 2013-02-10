@@ -13,7 +13,7 @@
  */
 
 /**
- * class Request - Informacje o zadaniu
+ * Request - Informacje o zadaniu
  *
  * @package    Neapter
  * @subpackage Core

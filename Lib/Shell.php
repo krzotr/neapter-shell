@@ -215,7 +215,6 @@ class Shell
 	 * @access public
 	 * @var    boolean
 	 */
-	public $bDev = TRUE;
 
 	/**
 	 * Jezeli FALSE to skrypty JavaScript sa wlaczone
@@ -277,7 +276,10 @@ class Shell
 		/**
 		 * Naglowek UTF-8
 		 */
-		header( 'Content-type: text/html; charset=utf-8' );
+		if( PHP_SAPI !== 'cli' )
+		{
+			header( 'Content-type: text/html; charset=utf-8' );
+		}
 
 		/**
 		 * @ignore
