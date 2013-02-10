@@ -79,7 +79,7 @@ class Pack
 	 */
 	public function setOutput( $sValue )
 	{
-		$this -> sOutput = (string) $sValue;
+		$this -> sOutput = realpath( (string) $sValue );
 
 		return $this;
 	}
@@ -171,9 +171,17 @@ class Pack
 			}
 
 			/**
-			 * Relatywna Sciezka
+			 * Absolutna Sciezka
 			 */
 			$sPathName = $oDir -> getPathName();
+
+			/**
+			 * Plik wynikowy nie jest umieszczaony
+			 */
+			if( $sPathName === $this -> sOutput )
+			{
+				continue ;
+			}
 
 			$sPath = substr( $sPathName, $iPathLen );
 
@@ -479,7 +487,7 @@ class ModulePack extends ModuleAbstract
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-09-12 - <krzotr@gmail.com>';
+		return '1.01 2013-01-21 - <krzotr@gmail.com>';
 	}
 
 	/**

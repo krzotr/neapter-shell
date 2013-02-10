@@ -42,6 +42,8 @@ Shell składa się z kilkudziesięciu plików, dzięki czemu łatwiej można je 
 
 *	`make.php --no-css` - arkusze stylów nie zostaną dołączone
 
+*	`make.php -css=blue` - dołączenie własnego arkusza styli
+
 *	`make.php --no-extended-version` - dodatkowe informacje takie jak data utworzenia shalla nie zostaną dołączone do numeru wersji
 
 Powyższe opcje można łączyć
@@ -95,7 +97,9 @@ Obsługa shella
 
 	*	cr3d1ts       - Informacje o autorze
 *	Istnieje możliwość przełączenia się na wersję deweloperską. Aby to zrobić należy dopisać zmienną `dev` w adresie (http://example.com/?dev)
+
 *	W celu uruchomienia shella z domyślną konfigurację. Aby to zrobić należy w adresie dopisać zmienną `pure` (http://example.com/?pure). Shell w ten sposób pominie wczytywanie dodatkowych modułów (polecenie `modules`) oraz rozszerzeń (polecenie `autoload`)
+
 *	Aby wyłączyć AJAX należy do adresu dodać zmienną nojs (http://example.com/?nojs)
 
 FAQ
@@ -109,13 +113,12 @@ FAQ
 
 	*	Nie. Ze względu na bezpieczeństwo Googlebot otrzyma stronę z błędem 404 co uniemożliwia zaindeksowanie shella.
 
-*	Jak mogę zmienić wygląd shella?
 
-	*	W pliku `shell.php` zmodyfikuj linię
 
-		`$this -> sStyleSheet = file_get_contents( 'Styles/dark.css' );`
+Jak mogę stworzyć własny moduł do shella?
+-----------------------------------------
 
-	W miejsce `Styles/dark.css` należy wstawić ścieżkę do pliku ze stylami oraz uruchom `make.php`
+Cały mechanizm tworzenia modułu został opisany w pliku MODULE.md
 
 
 

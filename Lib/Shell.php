@@ -21,7 +21,7 @@ require_once dirname( __FILE__ ) . '/XRecursiveDirectoryIterator.php';
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @version 0.50
+ * @version 0.60
  *
  * @package NeapterShell
  *
@@ -34,7 +34,7 @@ class Shell
 	/**
 	 * Wersja
 	 */
-	const VERSION = '0.50 b121109-dev';
+	const VERSION = '0.60-dev';
 
 	/**
 	 * Help, natywne polecenia

@@ -1,7 +1,7 @@
 Changelog:
 ==========
 
-2012-00-00 v0.00
+2012-00-00 v0.60
 ----------------
 *	Poprawiono
 	*	Moduły
@@ -9,7 +9,8 @@ Changelog:
 		*	`emailvalidator`
 			*	cachowanie hostów
 			*	pop3 bez ssl zamieniono na pop3/imap z ssl
-			*	fatalne działanie live.com, neostrada.pl
+			*	fatalne działanie live.com oraz neostrada.pl
+			*	metoda setOutputFile
 		*	Irc - Copi
 			*	Ustanawianie połączenia z IRC (polecenie PING)
 			*	Po wykonaniu polecenia `:ircmsg` zwracany był komunikat `Nie ma takiej komendy "ircmsg"`
@@ -28,18 +29,27 @@ Changelog:
 	*	dokumentacja klas, nagłówków
 	*	interface do tworzenia modułu został zastąpiony klasa abstrakcyjną
 *	Dodano
-	*	`emailvalidator` - nowe sterowniki:
-		*	Web.de
-		*	Gmx.de
-		*	Pino.pl
-		*	Inmail.pl
-		*	Gg.pl
-		*	Mail.ru
-		*	Hotmail.it, Hotmail.co.jp
+	*	`emailvalidator`
+		*	nowe sterowniki:
+			*	Web.de
+			*	Gmx.de
+			*	Pino.pl
+			*	Inmail.pl
+			*	Gg.pl
+			*	Mail.ru
+			*	Hotmail.it, Hotmail.co.jp
+		*	Ręczne sprawdzenie przy użyciu`:emailvalidator test@wp.pl:test test2@wp.pl:test2 test3@wp.pl:test3`
+		*	Tryb gadatliwy - `-v`
 	*	Tworzenie shella
 		*	help dla pliku `make.php`
 		*	możliwość całkowitego wyłączenia js/css podczas tworzenia shella
+		*	`--css=blue` - podmiana styli
 		*	wersja zawiera datę utworzenia shella oraz dodatkowe informacje ustawione podczas tworzenia shella
+*	Ponadto
+	*	Dokumentacja klas, metod, właściwości
+	*	Testy jednostkowe
+	*	Interfejs do tworzenia modułu został zastąpiony klasa abstrakcyjną
+	*	Aktualizacna biblioteki `Pack`
 
 
 2012-01-26 v0.50

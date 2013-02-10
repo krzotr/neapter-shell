@@ -1474,6 +1474,22 @@ class EmailValidator
 	protected static $aHostIp = array();
 
 	/**
+	 * Tryb gadatliwy
+	 *
+	 * @access protected
+	 * @var    boolean
+	 */
+	protected $bVerbose = FALSE;
+
+	/**
+	 * Sciezka do pliku wynikowego
+	 *
+	 * @access protected
+	 * @var    string
+	 */
+	protected $sOutputFile;
+
+	/**
 	 * Konstruktor
 	 *
 	 * @access public
@@ -1513,11 +1529,70 @@ class EmailValidator
 	}
 
 	/**
+	 * Reczne dodanie email:pass, czyszczenie tablicy z adresami
+	 *
+	 * @acess  public
+	 * @param  string        $sValue Email:pass
+	 * @return EmailValidator        Obiekt EmailValidator
+	 */
+	public function setEmailPassword( $sValue )
+	{
+		$this -> aEmails = array();
+
+		return $this -> addEmailPassword( $sValue );
+	}
+
+	/**
+	 * Reczne dodanie email:pass
+	 *
+	 * @acess  public
+	 * @param  string        $sValue Email:pass
+	 * @return EmailValidator        Obiekt EmailValidator
+	 */
+	public function addEmailPassword( $sValue )
+	{
+		/**
+		 * username:password
+		 */
+		if( strpos( $sValue, ':') === FALSE )
+		{
+			return $this;
+		}
+
+		$sEmail = strstr( strtolower( $sValue ), ':', TRUE );
+
+		/**
+		 * Adres email musi byc poprawny
+		 */
+		if( filter_var( $sEmail, FILTER_VALIDATE_EMAIL ) === FALSE )
+		{
+			return $this;
+		}
+
+		/**
+		 * Wstawianie adresu do tablicy
+		 */
+		$this -> aEmails[] = array
+		(
+			'email'    => $sEmail,
+			'username' => strstr( $sEmail, '@', TRUE ),
+			'domain'   => substr( $sEmail, strpos( $sEmail, '@' ) + 1 ),
+			'password' => substr( $sValue, strpos( $sValue, ':' ) + 1 ),
+			'line'     => $sValue
+		);
+
+		$this -> bVerbose = TRUE;
+		$this -> bUsernamePassword = TRUE;
+
+		return $this;
+	}
+
+	/**
 	 * Ustawienia pliku z haslami
 	 *
 	 * @acess  public
 	 * @param  string        $sValue Plik z haslami
-	 * @return EmailValidator         Obiekt EmailValidator
+	 * @return EmailValidator        Obiekt EmailValidator
 	 */
 	public function setPasswordsFile( $sValue )
 	{
@@ -1635,6 +1710,13 @@ class EmailValidator
 		return $this;
 	}
 
+	/**
+	 * Cachowanie adresow IP
+	 *
+	 * @access public
+	 * @param  string $sName Nazwa hosta
+	 * @return string        Adres IP
+	 */
 	public static function getHost( $sName )
 	{
 		if( ! isset( self::$aHostIp[ $sName ] ) )
@@ -1643,6 +1725,52 @@ class EmailValidator
 		}
 
 		return self::$aHostIp[ $sName ];
+	}
+
+	/**
+	 * Tryb gadatliwy
+	 *
+	 * @acess  public
+	 * @param  boolean         $bValue Wartosc
+	 * @return EmailValidator          Obiekt EmailValidator
+	 */
+	public function setVerbose( $bValue )
+	{
+		$this -> bVerbose = (boolean) $bValue;
+
+		return $this;
+	}
+
+	/**
+	 * Sciezka do pliku wynikowego
+	 *
+	 * @acess  public
+	 * @param  string        $sValue Sciezka do pliku wynikowego
+	 * @return EmailValidator        Obiekt EmailValidator
+	 */
+	public function setOutputFile( $sValue )
+	{
+		$this -> sOutputFile = (string) $sValue;
+		/**
+		 * Tworzenie pliku
+		 */
+		if( ! is_file( $this -> sOutputFile ) )
+		{
+			if( ! file_put_contents(  $this -> sOutputFile, '', LOCK_EX ) )
+			{
+				throw new EmailValidatorException( 'Nie można utworzyć pliku' );
+			}
+		}
+
+		/**
+		 * Czy plik jest do zapisu
+		 */
+		if( ! is_writable( $this -> sOutputFile ) )
+		{
+			throw new EmailValidatorException( 'Nie można zapisać do pliku' );
+		}
+
+		return $this;
 	}
 
 	/**
@@ -1683,6 +1811,8 @@ class EmailValidator
 		{
 			$iPasswords = count( $this -> aPasswords );
 		}
+
+		$bSuccess = FALSE;
 
 		/**
 		 * Adresy email
@@ -1741,7 +1871,7 @@ class EmailValidator
 						/**
 						 * Informacja
 						 */
-						if( ( $i !== 0 ) && ( $i % 20 === 0 ) )
+						if( $this -> bVerbose || ( ( $i !== 0 ) && ( $i % 20 === 0 ) ) )
 						{
 							printf( "[INFO]  %05d/%05d - %07.3f%% ! %s:%s\r\n", $i + 1, $iPasswords, ( ( $i + 1 ) / $iPasswords ) * 100, $aEmail['email'], $sPassword );
 							@ ob_flush();
@@ -1756,7 +1886,15 @@ class EmailValidator
 				 */
 				if( $bSuccess )
 				{
-					printf( "[FOUND] %05d/%05d - %07.3f%% # %s\r\n", $iIndex + 1, $iEmails, (($iIndex + 1 ) / $iEmails ) * 100, $sEmail );
+					$sOutput = sprintf( "[FOUND] %05d/%05d - %07.3f%% # %s\r\n", $iIndex + 1, $iEmails, (($iIndex + 1 ) / $iEmails ) * 100, $sEmail );
+
+					echo $sOutput;
+
+					if( $this -> sOutputFile !== NULL )
+					{
+						@ file_put_contents( $this -> sOutputFile, $sOutput, FILE_APPEND | LOCK_EX );
+					}
+
 					@ ob_flush();
 					@ flush();
 					$i = 0;
@@ -1767,7 +1905,7 @@ class EmailValidator
 			/**
 			 * Informacja
 			 */
-			if(( $i !== 0 ) && ( $i % 20 === 0 ) )
+			if( ! $bSuccess && ( $this -> bVerbose || ( ( $i !== 0 ) && ( $i % 20 === 0 ) ) ) )
 			{
 				printf( "[INFO]  %05d/%05d - %07.3f%% ! %s\r\n", $iIndex + 1, $iEmails, (($iIndex + 1 ) / $iEmails ) * 100, $aEmail['email'] );
 				@ ob_flush();
@@ -1935,10 +2073,12 @@ Sprawdzanie loginu i hasla dla poczty
 	Sprawdzanie czy za pomoca loginu i hasla mozna zalogowac sie na poczte
 
 	Użycie:
-		emailvalidator plik_z_emailami [plik_z_hasłami]
+		emailvalidator dane [plik_z_hasłami]
 
-		plik_z_emailami - plik z emailami w formacie:
+		dane - plik z emailami w formacie:
 			email:hasło lub	email (jeżeli został użyty plik_z_hasłami)
+
+		dane - email:password [email2:password2]
 
 		plik_z_hasłami - plik, w którym znajdują się hasła; kiedy ta opcja jest użyta
 				 plik plik_z_emailami musi zawierać wyłącznie adres email (bez hasła)
@@ -1946,8 +2086,11 @@ Sprawdzanie loginu i hasla dla poczty
 
 	Opcje:
 		-i - wyświetlanie informacji o emailach w szczególności o wspieranych hostach
+		-v - tryb gadatliwy
 
 	Przykład:
+		emailvalidator test@wp.pl:test
+		emailvalidator test@wp.pl:test test2@wp.pl:test2 test3@wp.pl:test3
 		emailvalidator emails.txt
 		emailvalidator emails.txt passwords.txt
 
@@ -1966,7 +2109,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( ( $this -> oShell -> iArgc !== 1 ) && ( $this -> oShell -> iArgc !== 2 ) )
+		if( $this -> oShell -> iArgc === 0 )
 		{
 			return $this -> getHelp();
 		}
@@ -1992,15 +2135,36 @@ DATA;
 				-> addDriver( new EmailValidatorDriverInmailpl() )
 				-> addDriver( new EmailValidatorDriverPinopl() )
 				-> addDriver( new EmailValidatorDriverGgpl() )
-				-> addDriver( new EmailValidatorDriverMailru() )
-				-> setEmailsFile( $this -> oShell -> aArgv[0] );
+				-> addDriver( new EmailValidatorDriverMailru() );
+
+			$bUsernamePassword = FALSE;
+			if( preg_match( '~^.+?@.+?:.+?\z~', $this -> oShell -> aArgv[0] ) )
+			{
+				$bUsernamePassword = TRUE;
+				foreach( $this -> oShell -> aArgv as $sEmailPass )
+				{
+					$oMail -> addEmailPassword( $sEmailPass );
+				}
+			}
+			else
+			{
+				$oMail -> setEmailsFile( $this -> oShell -> aArgv[0] );
+			}
 
 			/**
 			 * Plik z haslami
 			 */
-			if( isset( $this -> oShell -> aArgv[1] ) )
+			if( ! $bUsernamePassword && isset( $this -> oShell -> aArgv[1] ) )
 			{
 				$oMail -> setPasswordsFile( $this -> oShell -> aArgv[1] );
+			}
+
+			/**
+			 * Tryb gadatliwy
+			 */
+			if( in_array( 'v', $this -> oShell -> aOptv ) )
+			{
+				$oMail -> setVerbose( TRUE );
 			}
 
 			header( 'Content-Type: text/plain; charset=utf-8' );
