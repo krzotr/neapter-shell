@@ -75,12 +75,12 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc === 0 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() !== 1 )
 		{
 			return $this -> getHelp();
 		}
 
-		if( chdir( $this -> oShell -> sArgv ) )
+		if( chdir( $this -> oShell -> getArgs() -> getParam( 0 ) ) )
 		{
 			return sprintf( "Katalog zmieniono na:\r\n\t%s", getcwd() );
 		}

@@ -78,12 +78,13 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oArgs -> getNumberOfParams() !== 1 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() !== 1 )
 		{
 			return $this -> getHelp();
 		}
 
-		$sParam = $this -> oArgs -> getParam( 0 );
+		$sParam = $this -> oShell -> getArgs() -> getParam( 0 );
+
 		/**
 		 * Wspierany jest tylko protokul HTTP
 		 */
@@ -108,7 +109,7 @@ DATA;
 		/**
 		 * Otwieranie polaczenia
 		 */
-		if( ( $rFp = fopen( $sParam, 'r', FALSE, stream_context_create( $aStream ) ) ) === FALSE )
+		if( ( $rFp = @ fopen( $sParam, 'r', FALSE, stream_context_create( $aStream ) ) ) === FALSE )
 		{
 			return 'Nie można pobrać pliku';
 		}

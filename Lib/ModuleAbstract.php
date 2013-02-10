@@ -25,14 +25,6 @@ abstract class ModuleAbstract
 	protected $oShell;
 
 	/**
-	 * Obiekt Args, skrocony zapis $oShell -> getArgs()
-	 *
-	 * @access protected
-	 * @var    object
-	 */
-	protected $oArgs;
-
-	/**
 	 * Konstruktor
 	 *
 	 * @access public
@@ -42,7 +34,6 @@ abstract class ModuleAbstract
 	public function __construct( Shell $oShell )
 	{
 		$this -> oShell = $oShell;
-		$this -> oArgs = $this -> oShell -> getArgs();
 	}
 
 	/**

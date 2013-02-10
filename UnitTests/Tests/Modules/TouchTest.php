@@ -41,7 +41,8 @@ class ModuleTouchTest extends PHPUnit_Framework_TestCase
 
 	public function testModule()
 	{
-		$this -> oShell -> parseCommand( ':touch 2010-10-10 ' . $this -> sFilePath );
+		$this -> oShell -> setArgs( ':touch 2010-10-10 ' . $this -> sFilePath );
+		
 		$this -> assertSame( 'Data modyfikacji i dostępu została zmieniona', $this -> oModule -> get() );
 
 		clearstatcache();

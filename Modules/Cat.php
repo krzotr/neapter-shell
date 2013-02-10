@@ -75,20 +75,22 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc === 0 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() !== 1 )
 		{
 			return $this -> getHelp();
 		}
 
+		$sFilePath = $this -> oShell -> getArgs() -> getParam( 0 );
+
 		/**
 		 * Plik zrodlowy musi istniec
 		 */
-		if( ! is_file( $this -> oShell -> sArgv ) )
+		if( ! is_file( $sFilePath ) )
 		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> oShell -> sArgv );
+			return sprintf( 'Plik "%s" nie istnieje', $sFilePath );
 		}
 
-		return htmlspecialchars( file_get_contents( $this -> oShell -> sArgv ) );
+		return htmlspecialchars( file_get_contents( $sFilePath ) );
 	}
 
 }

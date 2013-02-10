@@ -76,7 +76,9 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( ( $this -> oShell -> iArgc !== 1 ) && ( $this -> oShell -> iArgc !== 2 ) )
+		$iParams = $this -> oShell -> getArgs() -> getNumberOfParams();
+
+		if( ( $iParams !== 1 ) && ( $iParams !== 2 ) )
 		{
 			return $this -> getHelp();
 		}
@@ -84,27 +86,30 @@ DATA;
 		/**
 		 * Sprawdzanie czy plik istnieje
 		 */
-		if( isset( $this -> oShell -> aArgv[1] ) && ! is_file( $this -> oShell -> aArgv[1] ) )
+		$sFilePath = $this -> oShell -> getArgs() -> getParam( 1 );
+
+		if( ( $sFilePath !== FALSE ) && ! is_file( $sFilePath ) )
 		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> oShell -> aArgv[1] );
+			return sprintf( 'Plik "%s" nie istnieje', $sFilePath );
 		}
+
 		/**
 		 * Sciezka do "tego" pliku
 		 */
-		else if( ! isset( $this -> oShell -> aArgv[1] ) )
+		if( $sFilePath === FALSE )
 		{
-			$this -> oShell -> aArgv[1] = Request::getServer( 'SCRIPT_FILENAME' );
+			$sFilePath = Request::getServer( 'SCRIPT_FILENAME' );
 		}
 
 		/**
 		 * Czas modyfikacji / dostepu
 		 */
-		$iTime = strtotime( $this -> oShell -> aArgv[0] );
+		$iTime = strtotime( $this -> oShell -> getArgs() -> getParam( 0 ) );
 
 		/**
 		 * Zmiana czasu dostepu i modyfikacji
 		 */
-		if( touch( $this -> oShell -> aArgv[1], $iTime, $iTime ) )
+		if( touch( $sFilePath, $iTime, $iTime ) )
 		{
 			return 'Data modyfikacji i dostępu została zmieniona';
 		}

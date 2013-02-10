@@ -31,14 +31,14 @@ class ModuleCdTest extends PHPUnit_Framework_TestCase
 
 	public function testModule()
 	{
-		$this -> oShell -> parseCommand( ':cd ..' );
+		$this -> oShell -> setArgs( ':cd ..' );
 		$this -> assertSame( getcwd(), realpath( dirname( __DIR__ ) . DIRECTORY_SEPARATOR . '..' ) );
 	}
 
 
 	public function testFailModule()
 	{
-		$this -> oShell -> parseCommand( ':cd directory_not_ExiSt5' );
+		$this -> oShell -> setArgs( ':cd directory_not_ExiSt5' );
 		$this -> assertSame( getcwd(), realpath( dirname( __DIR__ ) . DIRECTORY_SEPARATOR . '..' ) );
 	}
 

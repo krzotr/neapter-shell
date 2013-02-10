@@ -284,7 +284,10 @@ class Shell
 		/**
 		 * @ignore
 		 */
-		$this -> sStyleSheet = file_get_contents( 'Styles/haxior.css' );
+		if( PHP_SAPI !== 'cli' )
+		{
+			$this -> sStyleSheet = file_get_contents( dirname( Request::getServer( 'SCRIPT_FILENAME' ) ) . '/Styles/haxior.css' );
+		}
 
 		/**
 		 *  Sprawdzanie do ktorego katalogu mamy zapis
@@ -312,7 +315,7 @@ class Shell
 		/**
 		 * Tryb deweloperski
 		 */
-		$this -> bDev = isset( $_GET['dev'] );
+		$this -> bDev = 1;//isset( $_GET['dev'] );
 
 		/**
 		 * Wylaczenie JavaScript
@@ -1754,6 +1757,11 @@ return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8
 	public function isExecutable()
 	{
 		return $this -> bExec;
+	}
+
+	public function setArgs( $sArgs )
+	{
+		$this -> oArgs = new Args( preg_replace( '~^:[^ ]+\s+~', NULL, $sArgs  ) );
 	}
 
 }

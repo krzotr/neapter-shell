@@ -31,17 +31,17 @@ class ModuleCatTest extends PHPUnit_Framework_TestCase
 
 	public function testModule()
 	{
-		$this -> oShell -> parseCommand( ':cat ' . __FILE__ );
+		$this -> oShell -> setArgs( ':cat ' . __FILE__ );
 		$this -> assertSame( htmlspecialchars( file_get_contents( __FILE__ ) ), $this -> oModule -> get() );
 
-		$this -> oShell -> parseCommand( ':cat x' . __FILE__ );
+		$this -> oShell -> setArgs( ':cat x' . __FILE__ );
 		$this -> assertSame( sprintf( 'Plik "x%s" nie istnieje', __FILE__ ), $this -> oModule -> get() );
 	}
 
 
 	public function testFailModule()
 	{
-		$this -> oShell -> parseCommand( ':cat x' . __FILE__ );
+		$this -> oShell -> setArgs( ':cat x' . __FILE__ );
 		$this -> assertSame( sprintf( 'Plik "x%s" nie istnieje', __FILE__ ), $this -> oModule -> get() );
 	}
 

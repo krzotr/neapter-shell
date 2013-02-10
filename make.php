@@ -127,13 +127,13 @@ switch( $sType )
 				/**
 				 * Wyciaganie Style
 				 */
-				if( ! preg_match( '~\$this -> sStyleSheet = file_get_contents\( dirname\( __FILE__ \) \. \'(.+?)\' \);~', $sShellData, $aMatch ) )
+				if( ! preg_match( '~\$this -> sStyleSheet = file_get_contents\(\s?(.+?)\s?\);~', $sShellData, $aMatch ) )
 				{
 					echo "Cos nie tak ze stylami\r\n";
 					exit ;
 				}
 
-				$aMatch[1] = substr( $aMatch[1], 4 );
+				$aMatch[1] = eval( sprintf( 'return %s;', $aMatch[1] ) );
 
 				if( ! is_file( $aMatch[1] ) )
 				{

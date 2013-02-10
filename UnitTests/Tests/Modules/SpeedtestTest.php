@@ -41,14 +41,14 @@ class ModuleSpeedtestTest extends PHPUnit_Framework_TestCase
 
 	public function testModule()
 	{
-		$this -> oShell -> parseCommand( ':speedtest http://test.online.kz/download/1.test' );
+		$this -> oShell -> setArgs( ':speedtest http://test.online.kz/download/1.test' );
 
 		$this -> assertRegExp( '~^Pobrano: \d+ bajtów w \d+\.\d+ sekundy\r\nŚrednia prędkość to: \d+\.\d+ KB/s\z~', $this -> oModule -> get() );
 	}
 
 	public function testFailModule()
 	{
-		$this -> oShell -> parseCommand( ':speedtest http://file.not.found' );
+		$this -> oShell -> setArgs( ':speedtest http://file.not.found' );
 
 		$this -> assertSame( 'Nie można pobrać pliku', $this -> oModule -> get() );
 	}
