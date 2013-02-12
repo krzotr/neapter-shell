@@ -31,8 +31,11 @@ class ModuleEchoTest extends PHPUnit_Framework_TestCase
 
 	public function testModule()
 	{
-		$this -> oShell -> parseCommand( ':echo TeST' );
+		$this -> oShell -> setArgs( ':echo TeST' );
 		$this -> assertSame( 'TeST', $this -> oModule -> get() );
+
+		$this -> oShell -> setArgs( ':echo TeST test2 TeST' );
+		$this -> assertSame( 'TeST test2 TeST', $this -> oModule -> get() );
 	}
 
 }

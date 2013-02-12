@@ -31,7 +31,7 @@ class ModulePingTest extends PHPUnit_Framework_TestCase
 
 	public function testModule()
 	{
-		$this -> oShell -> parseCommand( ':ping' );
+		$this -> oShell -> setArgs( ':ping' );
 		$this -> assertSame( 'pong', $this -> oModule -> get() );
 	}
 

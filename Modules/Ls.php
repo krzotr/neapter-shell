@@ -155,7 +155,7 @@ DATA;
 		/**
 		 * Domyslny katalog jezeli nie podano sciezki
 		 */
-		$sDir = ( $this -> oShell -> getArgs() -> getParam( 0  ) ?: getcwd() );
+		$sDir = ( $this -> oShell -> getArgs() -> getParam( 0 ) ?: getcwd() );
 
 		$aOptv = $this -> oShell -> getArgs() -> getOptions();
 

@@ -80,7 +80,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc === 0 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() === 0 )
 		{
 			return $this -> getHelp();
 		}
@@ -88,14 +88,17 @@ DATA;
 		/**
 		 * Plik zrodlowy musi istniec
 		 */
-		if( ! is_file( $this -> oShell -> sArgv ) )
+
+		$sFileName = $this -> oShell -> getArgs() -> getParam( 0 );
+
+		if( ! is_file( $sFileName ) )
 		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> oShell -> sArgv );
+			return sprintf( 'Plik "%s" nie istnieje', $sFileName );
 		}
 
-		if( ! ( $rFile = fopen( $this -> oShell -> sArgv, 'r' ) ) )
+		if( ! ( $rFile = fopen( $sFileName, 'r' ) ) )
 		{
-			return sprintf( 'Nie można otworzyć pliku "%s"', $this -> oShell -> sArgv );
+			return sprintf( 'Nie można otworzyć pliku "%s"', $sFileName );
 		}
 
 		$i = 0;

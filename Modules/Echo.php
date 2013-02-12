@@ -69,7 +69,7 @@ DATA;
 	 */
 	public function get()
 	{
-		return htmlspecialchars( $this -> oShell -> sArgv );
+		return htmlspecialchars( implode( ' ', $this -> oShell -> getArgs() -> getParams() ) );
 	}
 
 }

@@ -31,10 +31,10 @@ class ModuleIdTest extends PHPUnit_Framework_TestCase
 
 	public function testModule()
 	{
-		$this -> oShell -> parseCommand( ':id ' . __FILE__ );
+		$this -> oShell -> setArgs( ':id ' . __FILE__ );
 		$this -> assertSame( sprintf( 'user=%s uid=%d gid=%d', get_current_user(), getmyuid(), getmygid() ), $this -> oModule -> get() );
 
-		$this -> oShell -> parseCommand( ':whoami ' . __FILE__ );
+		$this -> oShell -> setArgs( ':whoami ' . __FILE__ );
 		$this -> assertSame( sprintf( 'user=%s uid=%d gid=%d', get_current_user(), getmyuid(), getmygid() ), $this -> oModule -> get() );
 	}
 

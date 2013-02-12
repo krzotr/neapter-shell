@@ -31,7 +31,7 @@ class ModuleBcatTest extends PHPUnit_Framework_TestCase
 
 	public function testModule()
 	{
-		$this -> oShell -> parseCommand( ':bcat ' . __FILE__ );
+		$this -> oShell -> setArgs( ':bcat ' . __FILE__ );
 
 		$sMime = sprintf( "MIME-Version: 1.0\r\nContent-Type: application/octet-stream; name=\"%s\"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"%s\"\r\n\r\n",
 			basename( __FILE__ ), basename( __FILE__ )
@@ -43,7 +43,7 @@ class ModuleBcatTest extends PHPUnit_Framework_TestCase
 
 	public function testFailModule()
 	{
-		$this -> oShell -> parseCommand( ':cat x' . __FILE__ );
+		$this -> oShell -> setArgs( ':cat x' . __FILE__ );
 		$this -> assertSame( sprintf( 'Plik "x%s" nie istnieje', __FILE__ ), $this -> oModule -> get() );
 	}
 

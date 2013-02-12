@@ -79,7 +79,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc === 0 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() === 0 )
 		{
 			return $this -> getHelp();
 		}
@@ -87,19 +87,22 @@ DATA;
 		/**
 		 * Plik zrodlowy musi istniec
 		 */
-		if( ! is_file( $this -> oShell -> sArgv ) )
+
+		$sFilePath = $this -> oShell -> getArgs() -> getParam( 0 );
+
+		if( ! is_file( $sFilePath ) )
 		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> oShell -> sArgv );
+			return sprintf( 'Plik "%s" nie istnieje', $sFilePath );
 		}
 
 		/**
 		 * Naglowek Mime i zrodlo pliku w base64
 		 */
 		$sMime = sprintf( "MIME-Version: 1.0\r\nContent-Type: application/octet-stream; name=\"%s\"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"%s\"\r\n\r\n",
-			basename( $this -> oShell -> sArgv ), basename( $this -> oShell -> sArgv )
+			basename( $sFilePath ), basename( $sFilePath )
 		);
 
-		return htmlspecialchars( $sMime . chunk_split( base64_encode( file_get_contents( $this -> oShell -> sArgv ) ), 130 ) );
+		return htmlspecialchars( $sMime . chunk_split( base64_encode( file_get_contents( $sFilePath ) ), 130 ) );
 	}
 
 }

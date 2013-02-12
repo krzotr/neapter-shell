@@ -259,12 +259,15 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc !== 1 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() !== 1 )
 		{
 			return $this -> getHelp();
 		}
 
-		header( 'Content-Type: text/plain; charset=utf-8' );
+		if( PHP_SAPI !== 'cli' )
+		{
+			header( 'Content-Type: text/plain; charset=utf-8' );
+		}
 
 		try
 		{
@@ -272,7 +275,7 @@ DATA;
 
 			$oProxy = new Bind( $this -> oShell );
 			$oProxy
-				-> setPort( $this -> oShell -> aArgv[0] )
+				-> setPort( $this -> oShell -> getArgs() -> getParam( 0 ) )
 				-> get();
 
 			ob_end_flush();

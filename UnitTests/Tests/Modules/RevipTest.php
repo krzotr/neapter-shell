@@ -31,16 +31,16 @@ class ModuleRevipTest extends PHPUnit_Framework_TestCase
 
 	public function testModule()
 	{
-		$this -> oShell -> parseCommand( ':revip nk.pl' );
+		$this -> oShell -> setArgs( ':revip nk.pl' );
 		$this -> assertSame( "Zwrócono 1 witryn:\r\n\r\n\tnk.pl", $this -> oModule -> get() );
 
-		$this -> oShell -> parseCommand( ':revip onet.pl' );
+		$this -> oShell -> setArgs( ':revip onet.pl' );
 		$this -> assertSame( 'Brak adresów IP', $this -> oModule -> get() );
 	}
 
 	public function testFailModule()
 	{
-		$this -> oShell -> parseCommand( ':revip ThisnotExists.host' );
+		$this -> oShell -> setArgs( ':revip ThisnotExists.host' );
 		$this -> assertSame( 'Nie można przetłumacz hosta', $this -> oModule -> get() );
 	}
 

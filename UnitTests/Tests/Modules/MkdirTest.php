@@ -35,7 +35,7 @@ class ModuleMkdirTest extends PHPUnit_Framework_TestCase
 	{
 		$sTmpPath = $this -> sTmoPath . md5( microtime() );
 
-		$this -> oShell -> parseCommand( ':mkdir ' . $sTmpPath );
+		$this -> oShell -> setArgs( ':mkdir ' . $sTmpPath );
 		$this -> assertSame( $this -> oModule -> get(), sprintf( "Katalog \"%s\" <span class=\"green\">został utworzony</span>\r\n", $sTmpPath ) );
 		clearstatcache();
 		$this -> assertTrue( is_dir( $sTmpPath ) );
@@ -46,7 +46,7 @@ class ModuleMkdirTest extends PHPUnit_Framework_TestCase
 		$sTmpPath3 = $this -> sTmoPath . md5( microtime() ) . '/' . md5( microtime() );
 
 		clearstatcache();
-		$this -> oShell -> parseCommand( ':mkdir ' . $sTmpPath1 . ' ' . $sTmpPath2 . ' ' . $sTmpPath3);
+		$this -> oShell -> setArgs( ':mkdir ' . $sTmpPath1 . ' ' . $sTmpPath2 . ' ' . $sTmpPath3);
 		$this -> assertSame( $this -> oModule -> get(), "Katalog \"{$sTmpPath1}\" <span class=\"green\">został utworzony</span>\r\nKatalog \"{$sTmpPath2}\" <span class=\"green\">został utworzony</span>\r\nKatalog \"{$sTmpPath3}\" <span class=\"green\">został utworzony</span>\r\n" );
 		clearstatcache();
 		$this -> assertTrue( is_dir( $sTmpPath1 ) );
@@ -59,7 +59,7 @@ class ModuleMkdirTest extends PHPUnit_Framework_TestCase
 	{
 		$sTmpPath = $this -> sTmoPath . str_repeat( 'x', 1000 );
 
-		$this -> oShell -> parseCommand( ':mkdir ' . $sTmpPath );
+		$this -> oShell -> setArgs( ':mkdir ' . $sTmpPath );
 
 		$this -> assertSame( $this -> oModule -> get(), sprintf( "Katalog \"%s\" <span class=\"red\">nie został utworzony</span>\r\n", $sTmpPath ) );
 		clearstatcache();

@@ -74,15 +74,18 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc === 0 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() === 0 )
 		{
 			return $this -> getHelp();
 		}
 
+		$sParam = $this -> oShell -> getArgs() -> getParam( 0 );
+		$iLoop = (int) $this -> oShell -> getArgs() -> getParam( 1 );
+
 		/**
 		 * Jesli 'liczba' jest rowna 'x' to komputer sam losuje liczby
 		 */
-		if( ( $this -> oShell -> aArgv[0] !== 'x' ) && ( ! ctype_digit( $this -> oShell -> aArgv[0] ) || strlen( $this -> oShell -> aArgv[0] ) !== 1 ) )
+		if( ( $sParam !== 'x' ) && ( ! ctype_digit( $sParam ) || strlen( $sParam ) !== 1 ) )
 		{
 			return 'Komputera nie oszukasz, zapoznaj się z zasadami gry';
 		}
@@ -90,24 +93,24 @@ DATA;
 		/**
 		 * Maksymalnie 1000 losowan
 		 */
-		if( isset( $this -> oShell -> aArgv[1] ) && ( ! ctype_digit( $this -> oShell -> aArgv[1] ) || ( $this -> oShell -> aArgv[1] > 1000 ) ) )
+		if( ( $iLoop !== 0 ) && ( ( $iLoop > 1000 ) || ( $iLoop < 0 ) ) )
 		{
 			return 'Komputera nie oszukasz, zapoznaj się z zasadami gry';
 		}
 
-		$iLoop = ( isset( $this -> oShell -> aArgv[1] ) ? (int) $this -> oShell -> aArgv[1] : 10 );
+		$iLoop = $iLoop ?: 10;
 
 		$sOutput = NULL;
 
 		$iWins  = 0;
 		$iLoses = 0;
 
-		$iDigit = (int) $this -> oShell -> aArgv[0];
+		$iDigit = (int) $sParam;
 
 		$i = 0;
 		do
 		{
-			if( $this -> oShell -> aArgv[0] === 'x' )
+			if( $sParam === 'x' )
 			{
 				$iDigit = mt_rand( 0, 9 );
 			}
@@ -125,7 +128,7 @@ DATA;
 		}
 		while( ++$i < $iLoop );
 
-		return sprintf( "<span class=\"red\">Przegrałeś</span>: <strong>%d</strong>, <span class=\"green\">Wygrałeś</span>: <strong>%d</strong>, Success rate: <strong>%.2f</strong> %%\r\n\r\n%s", $iLoses, $iWins, ( $iWins / $this -> oShell -> aArgv[1] ) * 100, $sOutput );
+		return sprintf( "<span class=\"red\">Przegrałeś</span>: <strong>%d</strong>, <span class=\"green\">Wygrałeś</span>: <strong>%d</strong>, Success rate: <strong>%.2f</strong> %%\r\n\r\n%s", $iLoses, $iWins, ( $iWins / $iLoop ) * 100, $sOutput );
 	}
 
 }

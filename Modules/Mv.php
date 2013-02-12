@@ -76,19 +76,24 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc !== 2 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() !== 2 )
 		{
 			return $this -> getHelp();
 		}
 
-		$sOutput = NULL;
+		$sSource = $this -> oShell -> getArgs() -> getParam( 0 );
+		$sDestination = $this -> oShell -> getArgs() -> getParam( 1 );
 
-		if( ! rename( $this -> oShell -> aArgv[0], $this -> oShell -> aArgv[1] ) )
+		if( ! @ rename( $sSource, $sDestination ) )
 		{
-			return sprintf( 'Plik "%s" <span class="red">nie został przeniesiony</span> do "%s"', $this -> oShell -> aArgv[0], $this -> oShell -> aArgv[1] );
+			$sMsg = 'Plik "%s" <span class="red">nie został przeniesiony</span> do "%s"';
+		}
+		else
+		{
+			$sMsg = 'Plik "%s" <span class="green">został przeniesiony</span> do "%s"';
 		}
 
-		return sprintf( 'Plik "%s" <span class="green">został przeniesiony</span> do "%s"', $this -> oShell -> aArgv[0], $this -> oShell -> aArgv[1] );
+		return sprintf( $sMsg, $sSource, $sDestination );
 	}
 
 }

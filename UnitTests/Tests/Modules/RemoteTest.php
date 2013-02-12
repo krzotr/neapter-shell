@@ -33,7 +33,7 @@ class ModulePhpinfoTest extends PHPUnit_Framework_TestCase
 	{
 		$sCmd = md5( microtime( 1 ) );
 
-		$this -> oShell -> parseCommand( ':remote http://hosting.iptcom.net/phpinfo.php ' . $sCmd );
+		$this -> oShell -> setArgs( ':remote http://hosting.iptcom.net/phpinfo.php ' . $sCmd );
 		$this -> assertTrue( strpos( $this -> oModule -> get(), '&lt;tr&gt;&lt;td class=&quot;e&quot;&gt;_REQUEST[&quot;cmd&quot;]&lt;/td&gt;&lt;td class=&quot;v&quot;&gt;' . $sCmd . '&lt;/td&gt;&lt;/tr&gt;' ) !== FALSE  );
 	}
 

@@ -31,7 +31,7 @@ class ModuleHexdumpTest extends PHPUnit_Framework_TestCase
 
 		$this -> sFilePath = sys_get_temp_dir() . '/' . md5( time() );
 
-		if( ! file_put_contents( $this -> sFilePath, "Plik Testowy 1234567890 abcdefghijk\r\n\r\n\r\nTest2" ) )
+		if( ! @ file_put_contents( $this -> sFilePath, "Plik Testowy 1234567890 abcdefghijk\r\n\r\n\r\nTest2" ) )
 		{
 			$this -> fail( 'Nie można utworzyć przykładowego pliku' );
 		}
@@ -43,10 +43,10 @@ class ModuleHexdumpTest extends PHPUnit_Framework_TestCase
 		$sData .= "00000010  34 35 36 37 38 39 30 20  61 62 63 64 65 66 67 68  |4567890 abcdefgh|\r\n";
 		$sData .= "00000020  69 6a 6b 0d 0a 0d 0a 0d  0a 54 65 73 74 32        |ijk......Test2  |\r\n";
 
-		$this -> oShell -> parseCommand( ':hd ' . $this -> sFilePath );
+		$this -> oShell -> setArgs( ':hd ' . $this -> sFilePath );
 		$this -> assertSame( $sData, $this -> oModule -> get() );
 
-		$this -> oShell -> parseCommand( ':hexdump ' . $this -> sFilePath );
+		$this -> oShell -> setArgs( ':hexdump ' . $this -> sFilePath );
 		$this -> assertSame( $sData, $this -> oModule -> get() );
 	}
 

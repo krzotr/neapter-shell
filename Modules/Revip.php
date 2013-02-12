@@ -75,7 +75,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( ( $this -> oShell -> iArgc !== 1 ) || ( $this -> oShell -> aArgv[0] === 'help' ) )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() !== 1 )
 		{
 			return $this -> getHelp();
 		}
@@ -96,7 +96,7 @@ DATA;
 		/**
 		 * Pobieranie danych
 		 */
-		if( ( $sData = file_get_contents( 'http://www.ip-adress.com/reverse_ip/' . $this -> oShell -> aArgv[0], FALSE, stream_context_create( $aStream ) ) ) === FALSE )
+		if( ( $sData = file_get_contents( 'http://www.ip-adress.com/reverse_ip/' . $this -> oShell -> getArgs() -> getParam( 0 ), FALSE, stream_context_create( $aStream ) ) ) === FALSE )
 		{
 			return 'Nie można połączyć się z serwerem';
 		}

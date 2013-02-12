@@ -31,7 +31,7 @@ class ModuleG4m3Test extends PHPUnit_Framework_TestCase
 
 	public function testModule()
 	{
-		$this -> oShell -> parseCommand( ':G4m3 5' );
+		$this -> oShell -> setArgs( ':G4m3 5' );
 		$this -> assertTrue( (boolean) $this -> oModule -> get() );
 	}
 

@@ -75,15 +75,18 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc === 0 )
+		$iParams = $this -> oShell -> getArgs() -> getNumberOfParams();
+
+		if( $iParams === 0 )
 		{
 			return $this -> getHelp();
 		}
 
 		$sOutput = NULL;
-		for( $i = 0; $i < $this -> oShell -> iArgc; ++$i )
+		for( $i = 0; $i < $iParams; ++$i )
 		{
-			if( ! preg_match( '~^[a-zA-Z0-9]{32}\z~', $this -> oShell -> aArgv[ $i ] ) )
+			$sHash = $this -> oShell -> getArgs() -> getParam( $i );
+			if( ! preg_match( '~^[a-zA-Z0-9]{32}\z~', $sHash ) )
 			{
 				continue ;
 			}
@@ -91,9 +94,9 @@ DATA;
 			/**
 			 * API md5.darkbyte.ru
 			 */
-			$sData = file_get_contents( 'http://md5.darkbyte.ru/api.php?q=' . $this -> oShell -> aArgv[ $i ] );
+			$sData = @ file_get_contents( 'http://md5.darkbyte.ru/api.php?q=' . $sHash );
 
-			$sOutput .= sprintf( "%s:%s\r\n", $this -> oShell -> aArgv[ $i ], ( trim( $sData ) ?: 'password-not-found' ) );
+			$sOutput .= sprintf( "%s:%s\r\n", $sHash, ( trim( $sData ) ?: 'password-not-found' ) );
 		}
 
 		/**

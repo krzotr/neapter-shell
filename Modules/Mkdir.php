@@ -69,23 +69,28 @@ DATA;
 	 */
 	public function get()
 	{
-		if( $this -> oShell -> iArgc === 0 )
+		$iParams = $this -> oShell -> getArgs() -> getNumberOfParams();
+
+		if( $iParams === 0 )
 		{
 			return $this -> getHelp();
 		}
 
 		$sOutput = NULL;
 
-		for( $i = 0; $i < $this -> oShell -> iArgc; $i++ )
+		for( $i = 0; $i < $iParams; ++$i )
 		{
-			if( ! mkdir( $this -> oShell -> aArgv[ $i ], 0777, TRUE ) )
+			$sPathName = $this -> oShell -> getArgs() -> getParam( $i );
+			if( ! @ mkdir( $sPathName, 0777, TRUE ) )
 			{
-				$sOutput .= sprintf( "Katalog \"%s\" <span class=\"red\">nie został utworzony</span>\r\n", $this -> oShell -> aArgv[ $i ] );
+				$sMsg =  "Katalog \"%s\" <span class=\"red\">nie został utworzony</span>\r\n";
 			}
 			else
 			{
-				$sOutput .= sprintf( "Katalog \"%s\" <span class=\"green\">został utworzony</span>\r\n", $this -> oShell -> aArgv[ $i ] );
+				$sMsg = "Katalog \"%s\" <span class=\"green\">został utworzony</span>\r\n";
 			}
+
+			$sOutput .= sprintf( $sMsg, $sPathName );
 		}
 
 		return $sOutput;

@@ -31,7 +31,7 @@ class ModulePhpinfoTest extends PHPUnit_Framework_TestCase
 
 	public function testModule()
 	{
-		$this -> oShell -> parseCommand( ':phpinfo' );
+		$this -> oShell -> setArgs( ':phpinfo' );
 		$this -> assertRegExp( '~_SERVER\["DOCUMENT_ROOT"\]~', $this -> oModule -> get() );
 	}
 

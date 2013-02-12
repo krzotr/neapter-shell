@@ -261,14 +261,17 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc !== 1 )
+		if( $this -> oShell -> getargs() -> getNumberOfParams() !== 1 )
 		{
 			return $this -> getHelp();
 		}
 
-		$aHost = $this -> oShell -> getHost( $this -> oShell -> aArgv[0] );
+		$aHost = $this -> oShell -> getHost( $this -> oShell -> getargs() -> getParam( 0 ) );
 
-		header( 'Content-Type: text/plain; charset=utf-8' );
+		if( PHP_SAPI !== 'cli' )
+		{
+			header( 'Content-Type: text/plain; charset=utf-8' );
+		}
 
 		try
 		{
