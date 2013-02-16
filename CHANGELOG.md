@@ -23,6 +23,7 @@ Changelog:
 		*	`exit` i `quit` to aliasy dla `logout`, `eval` i `php`, wszystkie dostępne jako polecenia podstawowe
 		*	Wyświetlanie pomocy `help` zawiera podstawowe informacje, `:help all` wyświetla szczegółową listę
 	*	Obfuskacja kodu - problem z `echo`
+	*	Technologia AJAX
 	*	Rozmiar plików wynikowych jest o ~33% mniejszy
 	*	Zarządzanie shellem poprzez CLI
 	*	`phpinfo` w CLI

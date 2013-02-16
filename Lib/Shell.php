@@ -1649,7 +1649,7 @@ DATA;
 			return $aMatch[1];
 		}
 
-		$sScript = file_get_contents( 'Lib/js.js' );
+		$sScript = file_get_contents( dirname( Request::getServer( 'SCRIPT_FILENAME' ) ) . '/Lib/js.js' );
 
 		/**
 		 * Wylaczenie JavaScript

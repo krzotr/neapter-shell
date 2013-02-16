@@ -196,8 +196,8 @@ if( $sType !== 'modules' )
 	 */
 	if( isset( $aFiles ) && in_array( 'shell', $aFiles ) )
 	{
-		$sJs = $oArgs -> getOption( 'no-js' ) ? '' :  addcslashes( file_get_contents( 'LibProd/js.js' ), '\'' );
-		$sData = preg_replace( '~\$sScript\s*=\s*file_get_contents\(\s*\'Lib/js.js\'\s*\);~', '$sScript=\'' . $sJs . '\';', $sData );
+		$sJs = $oArgs -> getOption( 'no-js' ) ? '' :  file_get_contents( 'LibProd/js.js' );
+		$sData = preg_replace( '~\$sScript\s*=\s*file_get_contents\(.+?\'/Lib/js.js\'\s*\);~', '$sScript=' . var_export($sJs, TRUE) . ';', $sData );
 	}
 
 	/**
