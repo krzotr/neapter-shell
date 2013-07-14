@@ -4,39 +4,22 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModulePhpinfo - PHPinfo
+ * Wyswietlanie PHPinfo
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModulePhpinfo implements ShellInterface
+class ModulePhpinfo extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *
@@ -59,7 +42,7 @@ class ModulePhpinfo implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-06-04 - <krzotr@gmail.com>';
+		return '1.01 2011-11-20 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -96,17 +79,20 @@ DATA;
 		 * Wywalanie zbednych tresci, klasy itp
 		 * Licencje kazdy zna
 		 */
-		$sData = str_replace( array
-			(
-				' class="e"',
-				' class="v"'
-			),
-			'',
-			substr( $sData,
-				strpos( $sData, '<div class="center">' ) + 20,
-				-( strlen( $sData ) - strrpos( $sData, '<h2>PHP License</h2>' ) )
-			)
-		);
+		if( PHP_SAPI !== 'cli' )
+		{
+			$sData = str_replace( array
+				(
+					' class="e"',
+					' class="v"'
+				),
+				'',
+				substr( $sData,
+					strpos( $sData, '<div class="center">' ) + 20,
+					-( strlen( $sData ) - strrpos( $sData, '<h2>PHP License</h2>' ) )
+				)
+			);
+		}
 
 		/**
 		 * logo kazdy widzial, creditsy tez

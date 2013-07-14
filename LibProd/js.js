@@ -20,7 +20,7 @@ function submitForm()
 {oStatus.style.display='block';var oAjax=new XMLHttpRequest();oAjax.open('POST','',true);oAjax.setRequestHeader('X-Requested-With','XMLHttpRequest');oAjax.setRequestHeader('Content-Type','application/x-www-form-urlencoded');oAjax.onreadystatechange=function()
 {if(oAjax.readyState==4)
 {document.getElementById('console').innerHTML=oAjax.responseText;oStatus.style.display='none';}}
-var sCmd=escape(oCmd.value);oAjax.send('cmd='+sCmd.replace(new RegExp('\\+','g'),'%2B'));return false;}
+var sCmd=escape(oCmd.value);oAjax.send('cmd='+sCmd.replace(new RegExp('~~+','g'),'%2B'));return false;}
 return true;}
 function event(oElement,sAction,fFunction)
 {if(oElement.attachEvent)

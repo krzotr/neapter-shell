@@ -4,39 +4,22 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModuleCat - Wyswietlanie zawartosci pliku
+ * Wyswietlanie zawartosci pliku
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleCat implements ShellInterface
+class ModuleCat extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *
@@ -92,21 +75,22 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc === 0 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() !== 1 )
 		{
 			return $this -> getHelp();
 		}
 
+		$sFilePath = $this -> oShell -> getArgs() -> getParam( 0 );
 
 		/**
 		 * Plik zrodlowy musi istniec
 		 */
-		if( ! is_file( $this -> oShell -> sArgv ) )
+		if( ! is_file( $sFilePath ) )
 		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> oShell -> sArgv );
+			return sprintf( 'Plik "%s" nie istnieje', $sFilePath );
 		}
 
-		return htmlspecialchars( file_get_contents( $this -> oShell -> sArgv ) );
+		return htmlspecialchars( file_get_contents( $sFilePath ) );
 	}
 
 }

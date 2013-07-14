@@ -4,7 +4,7 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
@@ -13,30 +13,13 @@
  * ModuleRoksa - Ogloszenia towarzyskie
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    Neapter
+ * @subpackage Modules
  */
-class ModuleRoksa implements ShellInterface
+class ModuleRoksa extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *
@@ -59,7 +42,7 @@ class ModuleRoksa implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-06-23 - <krzotr@gmail.com>';
+		return '1.02 2011-11-20 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -71,15 +54,18 @@ class ModuleRoksa implements ShellInterface
 	public function getHelp()
 	{
 		return <<<DATA
-Ogłoszenia towarzyskie
+Ogłoszenia towarzyskie Roksa.pl - Kraków
 
 	Typ:
 		wiek - sortowanie według wieku rosnąco
 		cena - sortowanie według ceny rosnąco
 		nowe - nowe dziewczęta
 
+	Limit:
+		ilość pozycji na stronie 1 - 100
+
 	Użycie:
-		roska [typ]
+		roska [typ] [limit]
 
 	Przykład:
 		roksa nowe
@@ -100,6 +86,13 @@ DATA;
 		if( $this -> oShell -> iArgc > 2 )
 		{
 			return $this -> getHelp();
+		}
+
+		$iLimit = 20;
+
+		if( isset( $this -> oShell -> aArgv[1] ) && in_array( $this -> oShell -> aArgv[1], range( 1, 100 ) ) )
+		{
+			$iLimit = (int) $this -> oShell -> aArgv[1];
 		}
 
 		$sData = file_get_contents( 'http://www.roksa.pl/lpl/anonse.php?r=panie&miasto=Krak%C3%B3w' );
@@ -142,7 +135,7 @@ DATA;
 			}
 		}
 
-		$aWhores = array_slice( $aWhores, 0, 20 );
+		$aWhores = array_slice( $aWhores, 0, $iLimit );
 
 		$sOutput = NULL;
 		foreach( $aWhores as $aData )

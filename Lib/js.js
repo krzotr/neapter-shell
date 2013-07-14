@@ -254,7 +254,7 @@ function submitForm()
 
 		var sCmd = escape( oCmd.value );
 
-		oAjax.send( 'cmd=' + sCmd.replace( new RegExp( '\\+', 'g' ), '%2B' ) );
+		oAjax.send( 'cmd=' + sCmd.replace( new RegExp( '~~+', 'g' ), '%2B' ) );
 		return false;
 	}
 

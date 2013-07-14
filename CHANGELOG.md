@@ -1,6 +1,59 @@
 Changelog:
 ==========
 
+2012-00-00 v0.60
+----------------
+*	Poprawiono
+	*	Moduły
+		*	`ls` - `SplFileInfo::getType(): open_basedir restriction in effect. ...` - Daniel
+		*	`emailvalidator`
+			*	cachowanie hostów
+			*	pop3 bez ssl zamieniono na pop3/imap z ssl
+			*	fatalne działanie live.com oraz neostrada.pl
+			*	metoda setOutputFile
+		*	Irc - Copi
+			*	Ustanawianie połączenia z IRC (polecenie PING)
+			*	Po wykonaniu polecenia `:ircmsg` zwracany był komunikat `Nie ma takiej komendy "ircmsg"`
+		*	`md5crack` - API `www.tmto.org` zastąpiono `md5.darkbyte.ru`
+		*	`revip` - Zmieniono adres strony na ip-adress.com
+		*	`portscanner` - wyświetlanie komunikatów
+		*	`info` - pełna ścieżka skryptu w CLI
+		*	`ls` - podążanie za dowiązaniami symbolicznymi
+		*	`download` - błąd podczas pobierania pliku
+		*	`exit` i `quit` to aliasy dla `logout`, `eval` i `php`, wszystkie dostępne jako polecenia podstawowe
+		*	Wyświetlanie pomocy `help` zawiera podstawowe informacje, `:help all` wyświetla szczegółową listę
+	*	Obfuskacja kodu - problem z `echo`
+	*	Technologia AJAX
+	*	Rozmiar plików wynikowych jest o ~33% mniejszy
+	*	Zarządzanie shellem poprzez CLI
+	*	`phpinfo` w CLI
+	*	dokumentacja klas, nagłówków
+	*	interface do tworzenia modułu został zastąpiony klasa abstrakcyjną
+*	Dodano
+	*	`emailvalidator`
+		*	nowe sterowniki:
+			*	Web.de
+			*	Gmx.de
+			*	Pino.pl
+			*	Inmail.pl
+			*	Gg.pl
+			*	Mail.ru
+			*	Hotmail.it, Hotmail.co.jp
+		*	Ręczne sprawdzenie przy użyciu`:emailvalidator test@wp.pl:test test2@wp.pl:test2 test3@wp.pl:test3`
+		*	Tryb gadatliwy - `-v`
+	*	Tworzenie shella
+		*	help dla pliku `make.php`
+		*	możliwość całkowitego wyłączenia js/css podczas tworzenia shella
+		*	`--css=blue` - podmiana styli
+		*	wersja zawiera datę utworzenia shella oraz dodatkowe informacje ustawione podczas tworzenia shella
+*	Ponadto
+	*	`cd` jest natywnym modułem
+	*	Dokumentacja klas, metod, właściwości
+	*	Testy jednostkowe
+	*	Interfejs do tworzenia modułu został zastąpiony klasa abstrakcyjną
+	*	Aktualizacna biblioteki `Pack`
+
+
 2012-01-26 v0.50
 ----------------
 
@@ -10,7 +63,7 @@ Changelog:
 	*	`id` - informacje o użytkowniku
 	*	`speedtest` - sprawdzanie szybkości łącza
 	*	`touch` - zmiana czasu modyfikacji i dostępu pliku
-	*	`emailchecker` - nowe sterowniki:
+	*	`emailvalidator` - nowe sterowniki:
 		*	Yahoo.com
 		*	Gmail.com
 		*	Live.com
@@ -22,7 +75,7 @@ Changelog:
 	*	`remote` - zdalnie wywołanie shella
 *	Poprawiono
 	*	Parsowanie znaku `+` podczas wysyłania polecenia AJAX'em
-	*	`emailchecker` - niepoprawne dane do gazeta.pl
+	*	`emailvalidator` - niepoprawne dane do gazeta.pl
 	*	`passwordrecovery` - błędny plik pomocy podczas wprowadzenia złej ilości parametrów
 	*	Klasa XRecursiveDirectoryIterator (rozszerzenie RecursiveDirectoryIterator) nie zwraca wyjątku
 	*	System autoryzacji - wystarczy zdefiniować stałą NF_AUTH z wartością `sha1( "user\xffhasło" )`; autoryzacja wyłączona jest w CLI
@@ -32,11 +85,12 @@ Changelog:
 	*	`?p` zamieniono na `?pure`
 	*	`dos` - usunięto problem z DoS'owaniem na port "0"
 
+
 2011-10-17 v0.41
 ----------------
 
 *	Usunięto niedozwolony znak `/` z prefixu (aktualnie `0-9a-f{10}`)
-*	Dodano moduł `EmailValidation` - sprawdzanie czy za pomocą odpowiedniego loginu oraz hasła można zalogować się na pocztę
+*	Dodano moduł `emailvalidator` - sprawdzanie czy za pomocą odpowiedniego loginu oraz hasła można zalogować się na pocztę
 *	Moduł `download` wspiera zdalne pobieranie z pliku z prokotołu http oraz ftp
 
 

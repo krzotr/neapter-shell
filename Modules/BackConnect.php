@@ -4,24 +4,30 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * BackConnect - BackConnect wyjatki
+ * BackConnect - Wyjatki
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\Exception
  */
 class BackConnectException extends Exception {}
 
 /**
- * class BackConnect - Polaczenie zwrotne
+ * Polaczenie zwrotne
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools
  */
 class BackConnect
 {
@@ -169,33 +175,16 @@ class BackConnect
  */
 
 /**
- * ModuleBackConnect - Polaczenie zwrotne
+ * Polaczenie zwrotne
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    Neapter
+ * @subpackage Modules
  */
-class ModuleBackConnect implements ShellInterface
+class ModuleBackConnect extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *
@@ -272,14 +261,17 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc !== 1 )
+		if( $this -> oShell -> getargs() -> getNumberOfParams() !== 1 )
 		{
 			return $this -> getHelp();
 		}
 
-		$aHost = $this -> oShell -> getHost( $this -> oShell -> aArgv[0] );
+		$aHost = $this -> oShell -> getHost( $this -> oShell -> getargs() -> getParam( 0 ) );
 
-		header( 'Content-Type: text/plain; charset=utf-8' );
+		if( PHP_SAPI !== 'cli' )
+		{
+			header( 'Content-Type: text/plain; charset=utf-8' );
+		}
 
 		try
 		{

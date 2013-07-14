@@ -4,39 +4,22 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModuleTouch - Zmiana daty dostepu i modyfikacji pliku
+ * Zmiana daty dostepu i modyfikacji pliku
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba3
+ * @copyright Copyright (c) 2012, Krzysztof Otręba3
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleTouch implements ShellInterface
+class ModuleTouch extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *
@@ -93,7 +76,9 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( ( $this -> oShell -> iArgc !== 1 ) && ( $this -> oShell -> iArgc !== 2 ) )
+		$iParams = $this -> oShell -> getArgs() -> getNumberOfParams();
+
+		if( ( $iParams !== 1 ) && ( $iParams !== 2 ) )
 		{
 			return $this -> getHelp();
 		}
@@ -101,27 +86,30 @@ DATA;
 		/**
 		 * Sprawdzanie czy plik istnieje
 		 */
-		if( isset( $this -> oShell -> aArgv[1] ) && ! is_file( $this -> oShell -> aArgv[1] ) )
+		$sFilePath = $this -> oShell -> getArgs() -> getParam( 1 );
+
+		if( ( $sFilePath !== FALSE ) && ! is_file( $sFilePath ) )
 		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> oShell -> aArgv[1] );
+			return sprintf( 'Plik "%s" nie istnieje', $sFilePath );
 		}
+
 		/**
 		 * Sciezka do "tego" pliku
 		 */
-		else if( ! isset( $this -> oShell -> aArgv[1] ) )
+		if( $sFilePath === FALSE )
 		{
-			$this -> oShell -> aArgv[1] = Request::getServer( 'SCRIPT_FILENAME' );
+			$sFilePath = Request::getServer( 'SCRIPT_FILENAME' );
 		}
 
 		/**
 		 * Czas modyfikacji / dostepu
 		 */
-		$iTime = strtotime( $this -> oShell -> aArgv[0] );
+		$iTime = strtotime( $this -> oShell -> getArgs() -> getParam( 0 ) );
 
 		/**
 		 * Zmiana czasu dostepu i modyfikacji
 		 */
-		if( touch( $this -> oShell -> aArgv[1], $iTime, $iTime ) )
+		if( touch( $sFilePath, $iTime, $iTime ) )
 		{
 			return 'Data modyfikacji i dostępu została zmieniona';
 		}

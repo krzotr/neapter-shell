@@ -4,24 +4,30 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * Bind - Bind wyjatki
+ * Bind - Wyjatki
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\Exception
  */
 class BindException extends Exception {}
 
 /**
- * class Proxy - Bind
+ * Nasluchiwanie na danym porcie
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools
  */
 class Bind
 {
@@ -58,7 +64,7 @@ class Bind
 			throw new ProxyException( 'Brak rozszerzenia "sockets"' );
 		}
 
-		$this -> oShell = $oShell;
+		$this -> oShell =  $oShell;
 	}
 
 	/**
@@ -173,33 +179,16 @@ class Bind
  */
 
 /**
- * ModuleBind - Bind
+ * Nasluchiwanie na danym porcie
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    Neapter
+ * @subpackage Modules
  */
-class ModuleBind implements ShellInterface
+class ModuleBind extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *
@@ -270,12 +259,15 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc !== 1 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() !== 1 )
 		{
 			return $this -> getHelp();
 		}
 
-		header( 'Content-Type: text/plain; charset=utf-8' );
+		if( PHP_SAPI !== 'cli' )
+		{
+			header( 'Content-Type: text/plain; charset=utf-8' );
+		}
 
 		try
 		{
@@ -283,7 +275,7 @@ DATA;
 
 			$oProxy = new Bind( $this -> oShell );
 			$oProxy
-				-> setPort( $this -> oShell -> aArgv[0] )
+				-> setPort( $this -> oShell -> getArgs() -> getParam( 0 ) )
 				-> get();
 
 			ob_end_flush();

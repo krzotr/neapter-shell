@@ -4,26 +4,25 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModuleExit - Exit
+ * interface - ShellInterface interface dla shella
  *
- * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @package    NeapterShell
  */
-class ModuleExit implements ShellInterface
+abstract class ModuleAbstract
 {
 	/**
 	 * Obiekt Shell
 	 *
-	 * @access private
+	 * @access protected
 	 * @var    object
 	 */
-	private $oShell;
+	protected $oShell;
 
 	/**
 	 * Konstruktor
@@ -38,55 +37,43 @@ class ModuleExit implements ShellInterface
 	}
 
 	/**
-	 * Dostepna lista komend
+	 * Zwracania aliasow dla komendy
+	 *
+	 * @abstract
 	 *
 	 * @access public
 	 * @return array
 	 */
-	public function getCommands()
-	{
-		return array( 'exit' );
-	}
+	abstract public function getCommands();
 
 	/**
 	 * Zwracanie wersji modulu
 	 *
+	 * @abstract
+	 *
 	 * @access public
 	 * @return string
 	 */
-	public function getVersion()
-	{
-		/**
-		 * Wersja Data Autor
-		 */
-		return '1.00 2011-06-20 - <krzotr@gmail.com>';
-	}
+	abstract public function getVersion();
 
 	/**
 	 * Zwracanie pomocy modulu
 	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getHelp()
-	{
-		return <<<DATA
-Wykonuje funkcje PHP 'exit'
-
-	Użycie:
-		exit
-DATA;
-	}
-
-	/**
-	 * Wywolanie modulu
+	 * @abstract
 	 *
 	 * @access public
 	 * @return string
 	 */
-	public function get()
-	{
-		exit ;
-	}
+	abstract public function getHelp();
+
+	/**
+	 * Wywolanie modulu
+	 *
+	 * @abstract
+	 *
+	 * @access public
+	 * @return string
+	 */
+	abstract public function get();
 
 }

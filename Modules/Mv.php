@@ -4,39 +4,22 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModuleMv - Przenoszenie pliku / katalogu
+ * Przenoszenie pliku / katalogu
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleMv implements ShellInterface
+class ModuleMv extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *
@@ -93,19 +76,24 @@ DATA;
 		/**
 		 * Help
 		 */
-		if( $this -> oShell -> iArgc !== 2 )
+		if( $this -> oShell -> getArgs() -> getNumberOfParams() !== 2 )
 		{
 			return $this -> getHelp();
 		}
 
-		$sOutput = NULL;
+		$sSource = $this -> oShell -> getArgs() -> getParam( 0 );
+		$sDestination = $this -> oShell -> getArgs() -> getParam( 1 );
 
-		if( ! rename( $this -> oShell -> aArgv[0], $this -> oShell -> aArgv[1] ) )
+		if( ! @ rename( $sSource, $sDestination ) )
 		{
-			return sprintf( 'Plik "%s" <span class="red">nie został przeniesiony</span> do "%s"', $this -> oShell -> aArgv[0], $this -> oShell -> aArgv[1] );
+			$sMsg = 'Plik "%s" <span class="red">nie został przeniesiony</span> do "%s"';
+		}
+		else
+		{
+			$sMsg = 'Plik "%s" <span class="green">został przeniesiony</span> do "%s"';
 		}
 
-		return sprintf( 'Plik "%s" <span class="green">został przeniesiony</span> do "%s"', $this -> oShell -> aArgv[0], $this -> oShell -> aArgv[1] );
+		return sprintf( $sMsg, $sSource, $sDestination );
 	}
 
 }

@@ -4,24 +4,30 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * PortScanner - PortScanner wyjatki
+ * PortScanner - Wyjatki
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools\Exception
  */
 class PortScannerException extends Exception {}
 
 /**
- * class PortScanner - Prosty skaner portow
+ * Prosty skaner portow TCP z zakresem
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Tools
  */
 class PortScanner
 {
@@ -184,7 +190,7 @@ class PortScanner
 			throw new PortScannerException( 'Wprowadź adres hosta' );
 		}
 
-		$sOutput = sprintf( "Skanowanie %s:\r\n\r\n", $this -> sIp );
+		$sOutput = sprintf( "Skanowanie %s, porty: %s\r\n", ( $this -> sIp ?: '127.0.0.1' ), implode( ',', $this -> aPorts ) );
 
 		/**
 		 * Skanowanie portow
@@ -205,39 +211,24 @@ class PortScanner
 			}
 		}
 
+		$sOutput .= "\r\nSkanowanie zakończone";
+
 		return htmlspecialchars( $sOutput );
 	}
 
 }
 
 /**
- * ModulePortScanner - Prosty skaner portow
+ * Prosty skaner portow TCP z zakresem
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModulePortScanner implements ShellInterface
+class ModulePortScanner extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *
@@ -264,7 +255,7 @@ class ModulePortScanner implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-10-18 - <krzotr@gmail.com>';
+		return '1.01 2011-10-11 - <krzotr@gmail.com>';
 	}
 
 	/**

@@ -11,29 +11,32 @@
  */
 
 /**
- * class PackerException - Pack wyjatki
+ * Pack - Wyjatki
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @package    Lib
- * @subpackage Exception
+ * @package    Neapter
+ * @subpackage Lib\Exception
  *
  * @uses       Exception
  */
 class PackerException extends Exception {}
 
 /**
- * class Pack - Pakowanie plikow
+ * Pakowanie plikow
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @package    Lib
- * @subpackage Pack
+ * @package    Neapter
+ * @subpackage Lib
  *
  * @uses       XRecursiveDirectoryIterator
  * @uses       RecursiveIteratorIterator
+ *
+ * @package    Neapter
+ * @subpackage Lib
  */
 class Pack
 {
@@ -76,7 +79,7 @@ class Pack
 	 */
 	public function setOutput( $sValue )
 	{
-		$this -> sOutput = (string) $sValue;
+		$this -> sOutput = realpath( (string) $sValue );
 
 		return $this;
 	}
@@ -168,9 +171,17 @@ class Pack
 			}
 
 			/**
-			 * Relatywna Sciezka
+			 * Absolutna Sciezka
 			 */
 			$sPathName = $oDir -> getPathName();
+
+			/**
+			 * Plik wynikowy nie jest umieszczaony
+			 */
+			if( $sPathName === $this -> sOutput )
+			{
+				continue ;
+			}
 
 			$sPath = substr( $sPathName, $iPathLen );
 
@@ -239,13 +250,13 @@ class Pack
 }
 
 /**
- * class Pack - Rozpakowanie pliku
+ * Rozpakowanie pliku
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
- * @package    Lib
- * @subpackage Pack
+ * @package    Neapter
+ * @subpackage Lib
  *
  * @uses       XRecursiveDirectoryIterator
  * @uses       RecursiveIteratorIterator
@@ -434,40 +445,22 @@ class Unpack
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModulePacker - Pakowanie / rozpakowywanie plikow oraz katalogow
+ * Pakowanie / rozpakowywanie plikow
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModulePack implements ShellInterface
+class ModulePack extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @ignore
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
-
 	/**
 	 * Dostepna lista komend
 	 *
@@ -494,7 +487,7 @@ class ModulePack implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.00 2011-09-12 - <krzotr@gmail.com>';
+		return '1.01 2013-01-21 - <krzotr@gmail.com>';
 	}
 
 	/**

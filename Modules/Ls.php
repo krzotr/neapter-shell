@@ -4,27 +4,22 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * ModuleLs - Listowanie plikow / katalogow
+ * Listowanie plikow / katalogow
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012, Krzysztof Otręba
+ *
+ * @package    NeapterShell
+ * @subpackage Modules
  */
-class ModuleLs implements ShellInterface
+class ModuleLs extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access private
-	 * @var    object
-	 */
-	private $oShell;
-
 	/**
 	 * Czy funkcja posix_getpwuid istnieje
 	 *
@@ -50,7 +45,7 @@ class ModuleLs implements ShellInterface
 	 */
 	public function __construct( Shell $oShell )
 	{
-		$this -> oShell = $oShell;
+		parent::__construct( $oShell );
 
 		/**
 		 * Czy funkcje sa dostepne
@@ -81,7 +76,7 @@ class ModuleLs implements ShellInterface
 		/**
 		 * Wersja Data Autor
 		 */
-		return '1.01 2011-09-20 - <krzotr@gmail.com>';
+		return '1.03 2012-11-11 - <krzotr@gmail.com>';
 	}
 
 	/**
@@ -160,10 +155,12 @@ DATA;
 		/**
 		 * Domyslny katalog jezeli nie podano sciezki
 		 */
-		$sDir = ( ! empty( $this -> oShell -> aArgv ) ? $this -> oShell -> sArgv : getcwd() );
+		$sDir = ( $this -> oShell -> getArgs() -> getParam( 0 ) ?: getcwd() );
 
-		$bList      = in_array( 'l', $this -> oShell -> aOptv );
-		$bRecursive = in_array( 'R', $this -> oShell -> aOptv );
+		$aOptv = $this -> oShell -> getArgs() -> getOptions();
+
+		$bList      = array_key_exists( 'l', $aOptv );
+		$bRecursive = array_key_exists( 'R', $aOptv );
 
 		try
 		{
@@ -173,7 +170,7 @@ DATA;
 			 */
 			if( $bRecursive )
 			{
-				$oDirectory = new RecursiveIteratorIterator( new XRecursiveDirectoryIterator( $sDir ), RecursiveIteratorIterator::SELF_FIRST );
+				$oDirectory = new RecursiveIteratorIterator( new XRecursiveDirectoryIterator( $sDir ), RecursiveIteratorIterator::SELF_FIRST | FilesystemIterator::FOLLOW_SYMLINKS );
 			}
 			else
 			{
@@ -194,30 +191,81 @@ DATA;
 					/**
 					 * Windows ?
 					 */
-					if( $this -> oShell -> bWindows )
+					if( $this -> oShell -> isWindows() )
 					{
+						/**
+						 * Wyjatek - nie mamy praw odczytu dla wlasciwosci pliku
+						 */
+						try
+						{
+							$sType = ( ( $oFile -> getType() === 'file' ) ? '-' : 'd' );
+							$sSize = $oFile -> getSize();
+							$sDate = date( 'Y-m-d h:i', $oFile -> getCTime() );
+						}
+						catch( Exception $oException )
+						{
+							$sType = '?';
+							$sSize = '-1';
+							$sDate = '0000-00-00 00:00';
+						}
+
 						$sOutput .= sprintf( "%s %11d %s %s\r\n",
-							( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ),
-							$oFile -> getSize(), date( 'Y-m-d h:i',
-								$oFile -> getCTime() ),
+							$sType,
+							$sSize,
+							$sDate,
 							$oFile -> {$sFileName}()
 						);
 					}
 					else
 					{
+						/**
+						 * Wyjatek - nie mamy praw odczytu dla wlasciwosci pliku
+						 */
+						try
+						{
+							$sType = ( ( $oFile -> getType() === 'file' ) ? '-' : 'd' );
+							$sSize = $oFile -> getSize();
+							$sDate = date( 'Y-m-d h:i', $oFile -> getCTime() );
+							$iPerms = $oFile -> getPerms();
+							$iOwner = $oFile -> getOwner();
+							$iGroup = $oFile -> getGroup();
+						}
+						catch( Exception $oException )
+						{
+							$sSize = '-1';
+							$sType = '?';
+							$sDate = '0000-00-00 00:00';
+							$iPerms = 16384;
+							$iOwner = -1;
+							$iGroup = -1;
+						}
+
 						$sOutput .= sprintf( "%s%s %-10s %-10s %11d %s %s\r\n",
-							( ( $oFile -> getType() === 'file' ) ? '-' : 'd' ),
-							substr( sprintf( '%o', $oFile -> getPerms() ), -4 ),
-							$this -> getOwnerById( $oFile -> getOwner() ),
-							$this -> getGroupById( $oFile -> getGroup() ),
-							$oFile -> getSize(), date( 'Y-m-d h:i',
-							$oFile -> getCTime() ), $oFile -> {$sFileName}()
+							$sType,
+							substr( sprintf( '%o', $iPerms ), -4 ),
+							$this -> getOwnerById( $iOwner ),
+							$this -> getGroupById( $iGroup ),
+							$sSize,
+							$sDate,
+							$oFile -> {$sFileName}()
 						);
 					}
 				}
 				else
 				{
-					$sOutput .= sprintf( "%s %s\r\n", ( ( $oFile -> getType() === 'file' ) ? 'fil' : 'dir' ), $oFile -> {$sFileName}() );
+					/**
+					 * Wyjatek - nie mamy praw odczytu dla wlasciwosci pliku
+					 */
+					try
+					{
+						$sType = ( ( $oFile -> getType() === 'file' ) ? 'fil' : 'dir' );
+					}
+					catch( Exception $oException )
+					{
+						$sType = '---';
+					}
+
+					$sOutput .= sprintf( "%s %s\r\n", $sType, $oFile -> {$sFileName}() );
 				}
 			}
 
