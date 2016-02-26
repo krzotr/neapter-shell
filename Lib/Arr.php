@@ -20,37 +20,35 @@
  */
 class Arr
 {
-	/**
-	 * Pobieranie danych z tablicy za pomoca przyjaznego indeksu
-	 *
-	 * @example index1.index2.index3
-	 *
-	 * @static
-	 * @access public
-	 * @param  string $sData Indeks
-	 * @param  array         Tablica
-	 * @return mixed         Wartosci tablicy
-	 */
-	public static function get( $sData, array & $aArrayData )
-	{
-		$mConfig = $aArrayData;
+    /**
+     * Pobieranie danych z tablicy za pomoca przyjaznego indeksu
+     *
+     * @example index1.index2.index3
+     *
+     * @static
+     * @access public
+     * @param  string $sData Indeks
+     * @param  array         Tablica
+     * @return mixed         Wartosci tablicy
+     */
+    public static function get($sData, array & $aArrayData)
+    {
+        $mConfig = $aArrayData;
 
-		/**
-		 * Rozdzielanie parametrow
-		 */
-		$aData = explode( '.', $sData );
+        /**
+         * Rozdzielanie parametrow
+         */
+        $aData = explode('.', $sData);
 
-		foreach( $aData as $sParam )
-		{
-			if( ! isset( $mConfig[ $sParam ] ) )
-			{
-				return FALSE;
-			}
+        foreach ($aData as $sParam) {
+            if (!isset($mConfig[$sParam])) {
+                return FALSE;
+            }
 
-			$mConfig = $mConfig{$sParam};
-		}
+            $mConfig = $mConfig{$sParam};
+        }
 
-		return $mConfig;
-	}
+        return $mConfig;
+    }
 
 }

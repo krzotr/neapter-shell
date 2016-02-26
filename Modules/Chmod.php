@@ -20,40 +20,40 @@
  */
 class ModuleChmod extends ModuleAbstract
 {
-	/**
-	 * Dostepna lista komend
-	 *
-	 * @access public
-	 * @return array
-	 */
-	public function getCommands()
-	{
-		return array( 'chmod' );
-	}
+    /**
+     * Dostepna lista komend
+     *
+     * @access public
+     * @return array
+     */
+    public function getCommands()
+    {
+        return array('chmod');
+    }
 
-	/**
-	 * Zwracanie wersji modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getVersion()
-	{
-		/**
-		 * Wersja Data Autor
-		 */
-		return '1.10 2011-09-10 - <krzotr@gmail.com>';
-	}
+    /**
+     * Zwracanie wersji modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getVersion()
+    {
+        /**
+         * Wersja Data Autor
+         */
+        return '1.10 2011-09-10 - <krzotr@gmail.com>';
+    }
 
-	/**
-	 * Zwracanie pomocy modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getHelp()
-	{
-		return <<<DATA
+    /**
+     * Zwracanie pomocy modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getHelp()
+    {
+        return <<<DATA
 Zmiana uprawnień dla pliku
 
 	Użycie:
@@ -62,71 +62,64 @@ Zmiana uprawnień dla pliku
 	Przykład:
 		chmod 777 /tmp/plik
 DATA;
-	}
+    }
 
-	/**
-	 * Wywolanie modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function get()
-	{
-		/**
-		 * Help
-		 */
-		if( $this -> oShell -> iArgc !== 2 )
-		{
-			return $this -> getHelp();
-		}
+    /**
+     * Wywolanie modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function get()
+    {
+        /**
+         * Help
+         */
+        if ($this->oShell->iArgc !== 2) {
+            return $this->getHelp();
+        }
 
-		/**
-		 * Chmod jest wymagany
-		 */
-		if( ! ctype_digit( $this -> oShell -> aArgv[0] ) || strlen( $this -> oShell -> aArgv[0] ) !== 3 )
-		{
-			return sprintf( 'Błędny chmod "%d"', $this -> oShell -> aArgv[0] );
-		}
+        /**
+         * Chmod jest wymagany
+         */
+        if (!ctype_digit($this->oShell->aArgv[0]) || strlen($this->oShell->aArgv[0]) !== 3) {
+            return sprintf('Błędny chmod "%d"', $this->oShell->aArgv[0]);
+        }
 
-		/**
-		 * Plik musi istniec
-		 */
-		if( ! is_file( $this -> oShell -> aArgv[1] ) )
-		{
-			return sprintf( 'Plik "%s" nie istnieje', $this -> oShell -> aArgv[1] );
-		}
+        /**
+         * Plik musi istniec
+         */
+        if (!is_file($this->oShell->aArgv[1])) {
+            return sprintf('Plik "%s" nie istnieje', $this->oShell->aArgv[1]);
+        }
 
-		if( ! ( ( strlen( $this -> oShell -> aArgv[0] ) === 3 ) && ctype_digit( $this -> oShell -> aArgv[0] ) ) )
-		{
-			return 'Wprowadzono błędne uprawnienia!!!';
-		}
+        if (!((strlen($this->oShell->aArgv[0]) === 3) && ctype_digit($this->oShell->aArgv[0]))) {
+            return 'Wprowadzono błędne uprawnienia!!!';
+        }
 
-		$aChmod = str_split( $this -> oShell -> aArgv[0] );
+        $aChmod = str_split($this->oShell->aArgv[0]);
 
-		$sChmod = 0;
+        $sChmod = 0;
 
-		/**
-		 * Zamiana 777 dziesiatkowo na 777 osemkowo
-		 */
-		for( $i = 0; $i < 3; ++$i )
-		{
-			if( $aChmod[ $i ] > 8 )
-			{
-				return 'Wprowadzono błędne uprawnienia!!!';
-			}
+        /**
+         * Zamiana 777 dziesiatkowo na 777 osemkowo
+         */
+        for ($i = 0; $i < 3; ++$i) {
+            if ($aChmod[$i] > 8) {
+                return 'Wprowadzono błędne uprawnienia!!!';
+            }
 
-			$sChmod += $aChmod[ $i ] * pow( 8, $i );
-		}
+            $sChmod += $aChmod[$i] * pow(8, $i);
+        }
 
-		/**
-		 * Zmiana uprawnien
-		 */
-		if( chmod( $this -> oShell -> aArgv[1], $sChmod ) )
-		{
-			return 'Uprawnienia <span class="green">zostały zmienione</span>';
-		}
+        /**
+         * Zmiana uprawnien
+         */
+        if (chmod($this->oShell->aArgv[1], $sChmod)) {
+            return 'Uprawnienia <span class="green">zostały zmienione</span>';
+        }
 
-		return 'Uprawnienia <span class="red">nie zostały zmienione</span>';
-	}
+        return 'Uprawnienia <span class="red">nie zostały zmienione</span>';
+    }
 
 }

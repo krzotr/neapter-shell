@@ -20,40 +20,40 @@
  */
 class ModuleSpeedtest extends ModuleAbstract
 {
-	/**
-	 * Dostepna lista komend
-	 *
-	 * @access public
-	 * @return array
-	 */
-	public function getCommands()
-	{
-		return array( 'speedtest' );
-	}
+    /**
+     * Dostepna lista komend
+     *
+     * @access public
+     * @return array
+     */
+    public function getCommands()
+    {
+        return array('speedtest');
+    }
 
-	/**
-	 * Zwracanie wersji modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getVersion()
-	{
-		/**
-		 * Wersja Data Autor
-		 */
-		return '1.00 2011-10-25 - <krzotr@gmail.com>';
-	}
+    /**
+     * Zwracanie wersji modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getVersion()
+    {
+        /**
+         * Wersja Data Autor
+         */
+        return '1.00 2011-10-25 - <krzotr@gmail.com>';
+    }
 
-	/**
-	 * Zwracanie pomocy modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getHelp()
-	{
-		return <<<DATA
+    /**
+     * Zwracanie pomocy modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getHelp()
+    {
+        return <<<DATA
 Test prędkości łącza
 
 	Użycie:
@@ -65,88 +65,83 @@ Test prędkości łącza
 		speedtest http://test.online.kz/download/5mb.test
 
 DATA;
-	}
+    }
 
-	/**
-	 * Wywolanie modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function get()
-	{
-		/**
-		 * Help
-		 */
-		if( $this -> oShell -> getArgs() -> getNumberOfParams() !== 1 )
-		{
-			return $this -> getHelp();
-		}
+    /**
+     * Wywolanie modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function get()
+    {
+        /**
+         * Help
+         */
+        if ($this->oShell->getArgs()->getNumberOfParams() !== 1) {
+            return $this->getHelp();
+        }
 
-		$sParam = $this -> oShell -> getArgs() -> getParam( 0 );
+        $sParam = $this->oShell->getArgs()->getParam(0);
 
-		/**
-		 * Wspierany jest tylko protokul HTTP
-		 */
-		if( strncmp( $sParam, 'http://', 7 ) !== 0 )
-		{
-			return 'Wspierany jest tylko protokół http!';
-		}
+        /**
+         * Wspierany jest tylko protokul HTTP
+         */
+        if (strncmp($sParam, 'http://', 7) !== 0) {
+            return 'Wspierany jest tylko protokół http!';
+        }
 
-		/**
-		 * Naglowki
-		 */
-		$aStream = array
-		(
-			'http' => array
-			(
-				'method' => 'GET',
-				'header' => "Connection: Close\r\n"
-			)
-		);
+        /**
+         * Naglowki
+         */
+        $aStream = array
+        (
+            'http' => array
+            (
+                'method' => 'GET',
+                'header' => "Connection: Close\r\n"
+            )
+        );
 
 
-		/**
-		 * Otwieranie polaczenia
-		 */
-		if( ( $rFp = @ fopen( $sParam, 'r', FALSE, stream_context_create( $aStream ) ) ) === FALSE )
-		{
-			return 'Nie można pobrać pliku';
-		}
+        /**
+         * Otwieranie polaczenia
+         */
+        if (($rFp = @ fopen($sParam, 'r', FALSE, stream_context_create($aStream))) === FALSE) {
+            return 'Nie można pobrać pliku';
+        }
 
-		stream_set_timeout( $rFp, 15 );
+        stream_set_timeout($rFp, 15);
 
-		/**
-		 * Pobieranie pliku
-		 */
-		$fTime = microtime( 1 );
-		$iTotal = 0;
-		$iCount = 0;
+        /**
+         * Pobieranie pliku
+         */
+        $fTime = microtime(1);
+        $iTotal = 0;
+        $iCount = 0;
 
-		while( ! feof( $rFp ) )
-		{
-			/**
-			 * Test powinien trwac maksymalnie 5 sekund
-			 */
-			if(    ( ( $iTotal += strlen( fread( $rFp, 2048 ) ) ) < 2048 )
-			    || ( ( $iCount > 50 ) && ( microtime( 1 ) - $fTime ) > 5 )
-			)
-			{
-				break ;
-			}
+        while (!feof($rFp)) {
+            /**
+             * Test powinien trwac maksymalnie 5 sekund
+             */
+            if ((($iTotal += strlen(fread($rFp, 2048))) < 2048)
+                || (($iCount > 50) && (microtime(1) - $fTime) > 5)
+            ) {
+                break;
+            }
 
-			++$iCount;
-		}
+            ++$iCount;
+        }
 
-		/**
-		 * Zamykanie polaczenia
-		 */
-		fclose( $rFp );
+        /**
+         * Zamykanie polaczenia
+         */
+        fclose($rFp);
 
-		/**
-		 * Statystyki
-		 */
-		return sprintf( "Pobrano: %d bajtów w %.4f sekundy\r\nŚrednia prędkość to: %.2f KB/s", $iTotal, $fTime = microtime( 1 ) - $fTime, ( $iTotal / $fTime ) / 1024 );
-	}
+        /**
+         * Statystyki
+         */
+        return sprintf("Pobrano: %d bajtów w %.4f sekundy\r\nŚrednia prędkość to: %.2f KB/s", $iTotal, $fTime = microtime(1) - $fTime, ($iTotal / $fTime) / 1024);
+    }
 
 }

@@ -17,34 +17,30 @@
  */
 class LoadModules
 {
-	public function __construct()
-	{
-		$oDirectory = new DirectoryIterator( __DIR__ . '/../Modules' );
+    public function __construct()
+    {
+        $oDirectory = new DirectoryIterator(__DIR__ . '/../Modules');
 
-		/**
-		 * Wczytywanie wszystkich modułów z katalogu Modules
-		 */
-		foreach( $oDirectory as $oFile )
-		{
-			if( $oFile -> isFile() )
-			{
-				require_once $oFile -> getPathname();
-			}
-		}
+        /**
+         * Wczytywanie wszystkich modułów z katalogu Modules
+         */
+        foreach ($oDirectory as $oFile) {
+            if ($oFile->isFile()) {
+                require_once $oFile->getPathname();
+            }
+        }
 
-		$oDirectory = new DirectoryIterator( __DIR__ . '/../Modules/Trash' );
+        $oDirectory = new DirectoryIterator(__DIR__ . '/../Modules/Trash');
 
-		/**
-		 * Wczytywanie wszystkich modułów z katalogu Modules/Trash
-		 */
-		foreach( $oDirectory as $oFile )
-		{
-			if( $oFile -> isFile() )
-			{
-				require_once $oFile -> getPathname();
-			}
-		}
-	}
+        /**
+         * Wczytywanie wszystkich modułów z katalogu Modules/Trash
+         */
+        foreach ($oDirectory as $oFile) {
+            if ($oFile->isFile()) {
+                require_once $oFile->getPathname();
+            }
+        }
+    }
 
 }
 

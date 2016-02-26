@@ -9,15 +9,14 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
-require_once dirname( __FILE__ ) . '/Lib/Shell.php';
+require_once dirname(__FILE__) . '/Lib/Shell.php';
 
 /**
  * Wylaczanie wszystkich bufferow
  */
-for( $i = 0; $i < ob_get_level(); ++$i )
-{
-	ob_end_clean();
+for ($i = 0; $i < ob_get_level(); ++$i) {
+    ob_end_clean();
 }
 
 $oShell = new Shell();
-$oShell -> get();
+$oShell->get();

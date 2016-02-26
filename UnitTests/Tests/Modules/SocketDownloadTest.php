@@ -20,25 +20,25 @@
  */
 class ModuleSocketDownloadTest extends PHPUnit_Framework_TestCase
 {
-	protected $oShell;
-	protected $oModule;
+    protected $oShell;
+    protected $oModule;
 
-	public function setUp()
-	{
-		$this -> oShell = new Shell();
-		$this -> oModule = new ModuleSocketDownload( $this -> oShell );
-	}
+    public function setUp()
+    {
+        $this->oShell = new Shell();
+        $this->oModule = new ModuleSocketDownload($this->oShell);
+    }
 
-	public function testModule()
-	{
-		$this -> oShell -> parseCommand( 'socketdownload' );
-		$this -> assertSame( $this -> oModule -> getHelp(), $this -> oModule -> get() );
+    public function testModule()
+    {
+        $this->oShell->parseCommand('socketdownload');
+        $this->assertSame($this->oModule->getHelp(), $this->oModule->get());
 
-		$this -> oShell -> parseCommand( 'socketdown' );
-		$this -> assertSame( $this -> oModule -> getHelp(), $this -> oModule -> get() );
+        $this->oShell->parseCommand('socketdown');
+        $this->assertSame($this->oModule->getHelp(), $this->oModule->get());
 
-		$this -> oShell -> parseCommand( 'socketget' );
-		$this -> assertSame( $this -> oModule -> getHelp(), $this -> oModule -> get() );
-	}
+        $this->oShell->parseCommand('socketget');
+        $this->assertSame($this->oModule->getHelp(), $this->oModule->get());
+    }
 
 }

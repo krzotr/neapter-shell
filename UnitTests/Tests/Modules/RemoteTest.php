@@ -20,21 +20,21 @@
  */
 class ModulePhpinfoTest extends PHPUnit_Framework_TestCase
 {
-	protected $oShell;
-	protected $oModule;
+    protected $oShell;
+    protected $oModule;
 
-	public function setUp()
-	{
-		$this -> oShell = new Shell();
-		$this -> oModule = new ModuleRemote( $this -> oShell );
-	}
+    public function setUp()
+    {
+        $this->oShell = new Shell();
+        $this->oModule = new ModuleRemote($this->oShell);
+    }
 
-	public function testModule()
-	{
-		$sCmd = md5( microtime( 1 ) );
+    public function testModule()
+    {
+        $sCmd = md5(microtime(1));
 
-		$this -> oShell -> setArgs( ':remote http://hosting.iptcom.net/phpinfo.php ' . $sCmd );
-		$this -> assertTrue( strpos( $this -> oModule -> get(), '&lt;tr&gt;&lt;td class=&quot;e&quot;&gt;_REQUEST[&quot;cmd&quot;]&lt;/td&gt;&lt;td class=&quot;v&quot;&gt;' . $sCmd . '&lt;/td&gt;&lt;/tr&gt;' ) !== FALSE  );
-	}
+        $this->oShell->setArgs(':remote http://hosting.iptcom.net/phpinfo.php ' . $sCmd);
+        $this->assertTrue(strpos($this->oModule->get(), '&lt;tr&gt;&lt;td class=&quot;e&quot;&gt;_REQUEST[&quot;cmd&quot;]&lt;/td&gt;&lt;td class=&quot;v&quot;&gt;' . $sCmd . '&lt;/td&gt;&lt;/tr&gt;') !== FALSE);
+    }
 
 }

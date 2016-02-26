@@ -20,56 +20,56 @@
  */
 class ModuleEcho extends ModuleAbstract
 {
-	/**
-	 * Dostepna lista komend
-	 *
-	 * @access public
-	 * @return array
-	 */
-	public function getCommands()
-	{
-		return array( 'echo' );
-	}
+    /**
+     * Dostepna lista komend
+     *
+     * @access public
+     * @return array
+     */
+    public function getCommands()
+    {
+        return array('echo');
+    }
 
-	/**
-	 * Zwracanie wersji modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getVersion()
-	{
-		/**
-		 * Wersja Data Autor
-		 */
-		return '1.00 2011-06-04 - <krzotr@gmail.com>';
-	}
+    /**
+     * Zwracanie wersji modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getVersion()
+    {
+        /**
+         * Wersja Data Autor
+         */
+        return '1.00 2011-06-04 - <krzotr@gmail.com>';
+    }
 
-	/**
-	 * Zwracanie pomocy modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getHelp()
-	{
-		return <<<DATA
+    /**
+     * Zwracanie pomocy modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getHelp()
+    {
+        return <<<DATA
 Wyświetla tekst
 
 	Użycie:
 		echo tekst do wyświetlenia
 DATA;
-	}
+    }
 
-	/**
-	 * Wywolanie modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function get()
-	{
-		return htmlspecialchars( implode( ' ', $this -> oShell -> getArgs() -> getParams() ) );
-	}
+    /**
+     * Wywolanie modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function get()
+    {
+        return htmlspecialchars(implode(' ', $this->oShell->getArgs()->getParams()));
+    }
 
 }

@@ -22,7 +22,7 @@ require_once __DIR__ . '/Lib/Args.php';
  */
 function getHelp()
 {
-	return <<<HELP
+    return <<<HELP
   --help, -h
     plik pomocy
 
@@ -55,291 +55,253 @@ Request::init();
 
 $oArgs = new Args();
 
-if( $oArgs -> getOption( 'help' ) || $oArgs -> getSwitch( 'h' ) )
-{
-	die( getHelp() );
+if ($oArgs->getOption('help') || $oArgs->getSwitch('h')) {
+    die(getHelp());
 }
 
-$sType = $oArgs -> getOption( 'type' );
+$sType = $oArgs->getOption('type');
 
-if( $sType === FALSE )
-{
-	$sType = 'normal';
+if ($sType === FALSE) {
+    $sType = 'normal';
 }
-
 
 $sData = '<?php ';
-switch( $sType )
-{
-	case 'lite':
-	case 'normal':
 
-		$aFiles = array
-		(
-			'Lib/Arr',
-			'Lib/Request',
-			'Lib/ModuleAbstract',
-			'Lib/XRecursiveDirectoryIterator',
-			'Lib/Args'
-		);
+switch ($sType) {
+    case 'lite':
+    case 'normal':
 
-		if( $sType !== 'lite' )
-		{
-			$oDirectory = new DirectoryIterator( __DIR__ . '/Modules' );
+        $aFiles = array(
+            'Lib/Arr',
+            'Lib/Request',
+            'Lib/ModuleAbstract',
+            'Lib/XRecursiveDirectoryIterator',
+            'Lib/Args'
+        );
 
-			foreach( $oDirectory as $oFile )
-			{
-				if( $oFile -> isFile() && ( $oFile -> getFilename() !== 'Dummy.php' ) )
-				{
-					$aFiles[] = 'Modules/' . basename( $oFile -> getPathname(), '.php' );
-				}
-			}
-		}
+        if ($sType !== 'lite') {
+            $oDirectory = new DirectoryIterator(__DIR__ . '/Modules');
 
-		$aFiles[] = 'shell';
+            foreach ($oDirectory as $oFile) {
+                if ($oFile->isFile() && ($oFile->getFilename() !== 'Dummy.php')) {
+                    $aFiles[] = 'Modules/' . basename($oFile->getPathname(), '.php');
+                }
+            }
+        }
 
-		foreach( $aFiles as $sFile )
-		{
-			if( $sFile === 'shell' )
-			{
-				/**
-				 * /shell.php
-				 */
-				$sShellFile = file( $sFile . '.php' );
+        $aFiles[] = 'shell';
 
-				$sShellFile[0] = NULL;
+        foreach ($aFiles as $sFile) {
+            if ($sFile === 'shell') {
+                /**
+                 * /shell.php
+                 */
+                $sShellFile = file($sFile . '.php');
 
-				/**
-				 * /Lib/Shell.php
-				 */
-				foreach( $sShellFile as & $sLine )
-				{
-					if( strncmp( $sLine, 'require_once', 12 ) === 0 )
-					{
-						$sLine = file_get_contents( dirname( __FILE__ ) . '/Lib/Shell.php', NULL, NULL, 6 );
-						break ;
-					}
-				}
-				$sShellFile[] = "\n\nexit;\n";
+                $sShellFile[0] = NULL;
 
-				$sShellData = implode( '', $sShellFile );
+                /**
+                 * /Lib/Shell.php
+                 */
+                foreach ($sShellFile as & $sLine) {
+                    if (strncmp($sLine, 'require_once', 12) === 0) {
+                        $sLine = file_get_contents(dirname(__FILE__) . '/Lib/Shell.php', NULL, NULL, 6);
+                        break;
+                    }
+                }
+                $sShellFile[] = "\n\nexit;\n";
 
-				/**
-				 * Wyciaganie Style
-				 */
-				if( ! preg_match( '~\$this -> sStyleSheet = file_get_contents\(\s?(.+?)\s?\);~', $sShellData, $aMatch ) )
-				{
-					echo "Cos nie tak ze stylami\r\n";
-					exit ;
-				}
+                $sShellData = implode('', $sShellFile);
 
-				$aMatch[1] = eval( sprintf( 'return %s;', $aMatch[1] ) );
+                /**
+                 * Wyciaganie Style
+                 */
+                if (!preg_match('~\$this -> sStyleSheet = file_get_contents\(\s?(.+?)\s?\);~', $sShellData, $aMatch)) {
+                    echo "Cos nie tak ze stylami\r\n";
+                    exit;
+                }
 
-				if( ! is_file( $aMatch[1] ) )
-				{
-					echo "Plik ze stylami nie istnieje\r\n";
-					exit ;
-				}
+                $aMatch[1] = eval(sprintf('return %s;', $aMatch[1]));
 
-				/**
-				 * Style uzytkownika
-				 */
-				if( ( ( $sStyleFilePath = $oArgs -> getOption( 'css' ) ) !== FALSE ) && ! $oArgs -> getOption( 'no-css' ) )
-				{
-					$sStyleFilePath = dirname( __FILE__ ) . '/Styles/' . basename( $sStyleFilePath ) . '.css';
-					if( ! is_file( $sStyleFilePath ) )
-					{
-						printf( "Plik ze stylami '%s' nie istnieje\r\n", $sStyleFilePath );
-						exit;
-					}
-				}
+                if (!is_file($aMatch[1])) {
+                    echo "Plik ze stylami nie istnieje\r\n";
+                    exit;
+                }
 
-				/**
-				 * Podmienianie styli
-				 */
-				$sShellData = preg_replace( '~\$this -> sStyleSheet = file_get_contents\((.+?)\);~', NULL, $sShellData );
-				$sShellData = preg_replace( '~private \$StyleSheet;~', '', $sShellData );
-				$sShellData = preg_replace( '~{\$this -> sStyleSheet}~',
-					preg_replace( '~[\r\n\t]+~', NULL, ( $oArgs -> getOption( 'no-css' ) ? '' : file_get_contents( $sStyleFilePath ?: $aMatch[1] ) ) ),
-					$sShellData
-				);
+                /**
+                 * Style uzytkownika
+                 */
+                if ((($sStyleFilePath = $oArgs->getOption('css')) !== FALSE) && !$oArgs->getOption('no-css')) {
+                    $sStyleFilePath = dirname(__FILE__) . '/Styles/' . basename($sStyleFilePath) . '.css';
+                    if (!is_file($sStyleFilePath)) {
+                        printf("Plik ze stylami '%s' nie istnieje\r\n", $sStyleFilePath);
+                        exit;
+                    }
+                }
 
-				$sData .= $sShellData;
-			}
-			else
-			{
-				$sData .= file_get_contents( $sFile . '.php', NULL, NULL, 6 );
-			}
-		}
-		$sData = preg_replace( '~^require_once.+?[\r\n]+~m', NULL, $sData ) . "?>";
-		break ;
-	case 'modules':
-		$oDirectory = new DirectoryIterator( 'Modules' );
+                /**
+                 * Podmienianie styli
+                 */
+                $sShellData = preg_replace('~\$this -> sStyleSheet = file_get_contents\((.+?)\);~', NULL, $sShellData);
+                $sShellData = preg_replace('~private \$StyleSheet;~', '', $sShellData);
+                $sShellData = preg_replace('~{\$this -> sStyleSheet}~',
+                    preg_replace('~[\r\n\t]+~', NULL, ($oArgs->getOption('no-css') ? '' : file_get_contents($sStyleFilePath ?: $aMatch[1]))),
+                    $sShellData
+                );
 
-		foreach( $oDirectory as $oFile )
-		{
-			if( is_file( $sFile = $oFile -> getPathname() ) && ( $oFile -> getFilename() !== 'Dummy.php' ) )
-			{
-				$sData .= file_get_contents( $sFile, NULL, NULL, 6 );
-				echo $oFile -> getBasename() . "\r\n";
-			}
-		}
-		break ;
-	default:
-		die( getHelp() );
+                $sData .= $sShellData;
+            } else {
+                $sData .= file_get_contents($sFile . '.php', NULL, NULL, 6);
+            }
+        }
+        $sData = preg_replace('~^require_once.+?[\r\n]+~m', NULL, $sData) . "?>";
+        break;
+    case 'modules':
+        $oDirectory = new DirectoryIterator('Modules');
+
+        foreach ($oDirectory as $oFile) {
+            if (is_file($sFile = $oFile->getPathname()) && ($oFile->getFilename() !== 'Dummy.php')) {
+                $sData .= file_get_contents($sFile, NULL, NULL, 6);
+                echo $oFile->getBasename() . "\r\n";
+            }
+        }
+        break;
+    default:
+        die(getHelp());
 }
 
-if( $sType !== 'modules' )
-{
-	/**
-	 * JavaScript
-	 */
-	if( isset( $aFiles ) && in_array( 'shell', $aFiles ) )
-	{
-		$sJs = $oArgs -> getOption( 'no-js' ) ? '' :  file_get_contents( 'LibProd/js.js' );
-		$sData = preg_replace( '~\$sScript\s*=\s*file_get_contents\(.+?\'/Lib/js.js\'\s*\);~', '$sScript=' . var_export($sJs, TRUE) . ';', $sData );
-	}
+if ($sType !== 'modules') {
+    /**
+     * JavaScript
+     */
+    if (isset($aFiles) && in_array('shell', $aFiles)) {
+        $sJs = $oArgs->getOption('no-js') ? '' : file_get_contents('LibProd/js.js');
+        $sData = preg_replace('~\$sScript\s*=\s*file_get_contents\(.+?\'/Lib/js.js\'\s*\);~', '$sScript=' . var_export($sJs, TRUE) . ';', $sData);
+    }
 
-	/**
-	 * Doklejanie informacji o wersji
-	 */
-	if( ! $oArgs -> getOption( 'no-extended-version' ) )
-	{
-		$sInfo = date('\mYmd') . ( $oArgs -> getOption( 'no-js' ) ? ',no-js' : '' ) . ( $oArgs -> getOption( 'no-css' ) ? ',no-css' : '' );
-		$sData = preg_replace( "~const\s+VERSION\s+=\s+'(.+?)';~", "const VERSION = '$1 (" . $sInfo . ")';", $sData );
-	}
+    /**
+     * Doklejanie informacji o wersji
+     */
+    if (!$oArgs->getOption('no-extended-version')) {
+        $sInfo = date('\mYmd') . ($oArgs->getOption('no-js') ? ',no-js' : '') . ($oArgs->getOption('no-css') ? ',no-css' : '');
+        $sData = preg_replace("~const\s+VERSION\s+=\s+'(.+?)';~", "const VERSION = '$1 (" . $sInfo . ")';", $sData);
+    }
 }
 
-file_put_contents( __DIR__ . '/Tmp/dev.php', $sData );
+file_put_contents(__DIR__ . '/Tmp/dev.php', $sData);
 
-if( substr( $sData, -2 ) !== '?>' )
-{
-	$sData .= '?>';
+if (substr($sData, -2) !== '?>') {
+    $sData .= '?>';
 }
 
 /**
  * Usuwanie bialych znakow itp
  * =================================================================================================
  */
-$aTokens = token_get_all( $sData ) ;
+$aTokens = token_get_all($sData);
 
 $sOutput = NULL;
 
 $aExclude = array();
 
-$aInclude = array
-(
-	'return',
-	'include',
-	'include_once',
-	'require_once',
-	'require',
-	'class',
-	'private',
-	'public',
-	'protected',
-	'interface',
-	'final',
-	'abstract',
-	'const',
-	'static',
-	'function',
-	'throw',
-	'new'
+$aInclude = array(
+    'return',
+    'include',
+    'include_once',
+    'require_once',
+    'require',
+    'class',
+    'private',
+    'public',
+    'protected',
+    'interface',
+    'final',
+    'abstract',
+    'const',
+    'static',
+    'function',
+    'throw',
+    'new'
 );
 
 $aReplace = array
 (
-	"\n" => '\n',
-	"\r" => '\r',
-	"\t" => '\t',
+    "\n" => '\n',
+    "\r" => '\r',
+    "\t" => '\t',
 );
 
-foreach( $aTokens as $i => $aToken )
-{
-	if( in_array( $i, $aExclude ) )
-	{
-		continue;
-	}
-	if( ! is_int( $aToken[0] ) )
-	{
-		$sOutput .= $aToken[0];
-		continue ;
-	}
+foreach ($aTokens as $i => $aToken) {
+    if (in_array($i, $aExclude)) {
+        continue;
+    }
+    if (!is_int($aToken[0])) {
+        $sOutput .= $aToken[0];
+        continue;
+    }
 
-	switch( $aToken[0] )
-	{
-		case T_DOC_COMMENT:
-			$sOutput .= '';
-			break;
-		case T_WHITESPACE:
-			$sOutput .= '';
-			break;
-		case T_START_HEREDOC:
-			$sOutput .= '"'.strtr( addcslashes( $aTokens[ $i + 1 ][1], '$"'), $aReplace ) . '"';
-			$aExclude[] = $i + 1;
-			$aExclude[] = $i + 2;
-			break;
-		default:
-			if( trim( strtolower( $aToken[1] ) ) === 'as' )
-			{
-				$sOutput .= ' as ';
-				break;
-			}
+    switch ($aToken[0]) {
+        case T_DOC_COMMENT:
+            $sOutput .= '';
+            break;
+        case T_WHITESPACE:
+            $sOutput .= '';
+            break;
+        case T_START_HEREDOC:
+            $sOutput .= '"' . strtr(addcslashes($aTokens[$i + 1][1], '$"'), $aReplace) . '"';
+            $aExclude[] = $i + 1;
+            $aExclude[] = $i + 2;
+            break;
+        default:
+            if (trim(strtolower($aToken[1])) === 'as') {
+                $sOutput .= ' as ';
+                break;
+            }
 
-			if( trim( strtolower( $aToken[1] ) ) === 'implements' )
-			{
-				$sOutput .= ' implements ';
-				break;
-			}
+            if (trim(strtolower($aToken[1])) === 'implements') {
+                $sOutput .= ' implements ';
+                break;
+            }
 
-			if( trim( strtolower( $aToken[1] ) ) === 'instanceof' )
-			{
-				$sOutput .= ' instanceof ';
-				break;
-			}
+            if (trim(strtolower($aToken[1])) === 'instanceof') {
+                $sOutput .= ' instanceof ';
+                break;
+            }
 
-			if( trim( strtolower( $aToken[1] ) ) === 'extends' )
-			{
-				$sOutput .= ' extends ';
-				break;
-			}
+            if (trim(strtolower($aToken[1])) === 'extends') {
+                $sOutput .= ' extends ';
+                break;
+            }
 
-			if( trim( strtolower( $aToken[1] ) ) === '(boolean)' )
-			{
-				$sOutput .= '(bool)';
-				break;
-			}
+            if (trim(strtolower($aToken[1])) === '(boolean)') {
+                $sOutput .= '(bool)';
+                break;
+            }
 
-			if( $aToken[1] === 'echo' )
-			{
-				$sOutput .= 'echo ';
-				break;
-			}
+            if ($aToken[1] === 'echo') {
+                $sOutput .= 'echo ';
+                break;
+            }
 
 
-			if( in_array( trim( strtolower( $aToken[1] ) ), $aInclude ) )
-			{
-				$sOutput .= $aToken[1] . ' ';
-			}
-			else
-			{
-				$sOutput .= $aToken[1];
-			}
-	}
+            if (in_array(trim(strtolower($aToken[1])), $aInclude)) {
+                $sOutput .= $aToken[1] . ' ';
+            } else {
+                $sOutput .= $aToken[1];
+            }
+    }
 }
 
-$sData = trim( $sOutput );
+$sData = trim($sOutput);
 
 /**
  * =================================================================================================
  */
 
-
-file_put_contents( __DIR__ . '/Tmp/prod.php', $sData );
+file_put_contents(__DIR__ . '/Tmp/prod.php', $sData);
 
 $sData = '?>' . $sData . '<?';
 
-$sFile = __DIR__ . '/Tmp/' . ( ( isset( $argv[1] ) && ( $argv[1] === 'modules' ) ) ? 'modules.txt' : 'final.php'  );
+$sFile = __DIR__ . '/Tmp/' . ((isset($argv[1]) && ($argv[1] === 'modules')) ? 'modules.txt' : 'final.php');
 
-file_put_contents( $sFile, sprintf( '<?php $_=%s; eval(gzuncompress($_));?>', var_export( gzcompress( $sData, 9 ), 1 ) ) );
+file_put_contents($sFile, sprintf('<?php $_=%s; eval(gzuncompress($_));?>', var_export(gzcompress($sData, 9), 1)));

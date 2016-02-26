@@ -20,40 +20,40 @@
  */
 class ModuleMd5crack extends ModuleAbstract
 {
-	/**
-	 * Dostepna lista komend
-	 *
-	 * @access public
-	 * @return array
-	 */
-	public function getCommands()
-	{
-		return array( 'md5crack' );
-	}
+    /**
+     * Dostepna lista komend
+     *
+     * @access public
+     * @return array
+     */
+    public function getCommands()
+    {
+        return array('md5crack');
+    }
 
-	/**
-	 * Zwracanie wersji modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getVersion()
-	{
-		/**
-		 * Wersja Data Autor
-		 */
-		return '1.02 2012-11-10 - <krzotr@gmail.com>';
-	}
+    /**
+     * Zwracanie wersji modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getVersion()
+    {
+        /**
+         * Wersja Data Autor
+         */
+        return '1.02 2012-11-10 - <krzotr@gmail.com>';
+    }
 
-	/**
-	 * Zwracanie pomocy modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getHelp()
-	{
-		return <<<DATA
+    /**
+     * Zwracanie pomocy modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getHelp()
+    {
+        return <<<DATA
 Łamanie haszy md5
 
 	Użycie:
@@ -62,52 +62,48 @@ class ModuleMd5crack extends ModuleAbstract
 	Przykład:
 		md5crack 098f6bcd4621d373cade4e832627b4f6 b36d331451a61eb2d76860e00c347396
 DATA;
-	}
+    }
 
-	/**
-	 * Wywolanie modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function get()
-	{
-		/**
-		 * Help
-		 */
-		$iParams = $this -> oShell -> getArgs() -> getNumberOfParams();
+    /**
+     * Wywolanie modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function get()
+    {
+        /**
+         * Help
+         */
+        $iParams = $this->oShell->getArgs()->getNumberOfParams();
 
-		if( $iParams === 0 )
-		{
-			return $this -> getHelp();
-		}
+        if ($iParams === 0) {
+            return $this->getHelp();
+        }
 
-		$sOutput = NULL;
-		for( $i = 0; $i < $iParams; ++$i )
-		{
-			$sHash = $this -> oShell -> getArgs() -> getParam( $i );
-			if( ! preg_match( '~^[a-zA-Z0-9]{32}\z~', $sHash ) )
-			{
-				continue ;
-			}
+        $sOutput = NULL;
+        for ($i = 0; $i < $iParams; ++$i) {
+            $sHash = $this->oShell->getArgs()->getParam($i);
+            if (!preg_match('~^[a-zA-Z0-9]{32}\z~', $sHash)) {
+                continue;
+            }
 
-			/**
-			 * API md5.darkbyte.ru
-			 */
-			$sData = @ file_get_contents( 'http://md5.darkbyte.ru/api.php?q=' . $sHash );
+            /**
+             * API md5.darkbyte.ru
+             */
+            $sData = @ file_get_contents('http://md5.darkbyte.ru/api.php?q=' . $sHash);
 
-			$sOutput .= sprintf( "%s:%s\r\n", $sHash, ( trim( $sData ) ?: 'password-not-found' ) );
-		}
+            $sOutput .= sprintf("%s:%s\r\n", $sHash, (trim($sData) ?: 'password-not-found'));
+        }
 
-		/**
-		 * Poprawny hash jest wymagany
-		 */
-		if( $sOutput === NULL )
-		{
-			return $this -> getHelp();
-		}
+        /**
+         * Poprawny hash jest wymagany
+         */
+        if ($sOutput === NULL) {
+            return $this->getHelp();
+        }
 
-		return htmlspecialchars( $sOutput );
-	}
+        return htmlspecialchars($sOutput);
+    }
 
 }

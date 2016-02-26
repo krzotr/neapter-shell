@@ -20,19 +20,19 @@
  */
 class ModulePingTest extends PHPUnit_Framework_TestCase
 {
-	protected $oShell;
-	protected $oModule;
+    protected $oShell;
+    protected $oModule;
 
-	public function setUp()
-	{
-		$this -> oShell = new Shell();
-		$this -> oModule = new ModulePing( $this -> oShell );
-	}
+    public function setUp()
+    {
+        $this->oShell = new Shell();
+        $this->oModule = new ModulePing($this->oShell);
+    }
 
-	public function testModule()
-	{
-		$this -> oShell -> setArgs( ':ping' );
-		$this -> assertSame( 'pong', $this -> oModule -> get() );
-	}
+    public function testModule()
+    {
+        $this->oShell->setArgs(':ping');
+        $this->assertSame('pong', $this->oModule->get());
+    }
 
 }

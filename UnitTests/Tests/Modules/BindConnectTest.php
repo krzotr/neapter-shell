@@ -20,19 +20,19 @@
  */
 class ModuleBindTest extends PHPUnit_Framework_TestCase
 {
-	protected $oShell;
-	protected $oModule;
+    protected $oShell;
+    protected $oModule;
 
-	public function setUp()
-	{
-		$this -> oShell = new Shell();
-		$this -> oModule = new ModuleBind( $this -> oShell );
-	}
+    public function setUp()
+    {
+        $this->oShell = new Shell();
+        $this->oModule = new ModuleBind($this->oShell);
+    }
 
-	public function testModule()
-	{
-		$this -> oShell -> parseCommand( 'bind' );
-		$this -> assertSame( $this -> oModule -> getHelp(), $this -> oModule -> get() );
-	}
+    public function testModule()
+    {
+        $this->oShell->parseCommand('bind');
+        $this->assertSame($this->oModule->getHelp(), $this->oModule->get());
+    }
 
 }

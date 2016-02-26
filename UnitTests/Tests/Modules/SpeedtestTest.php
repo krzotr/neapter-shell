@@ -20,37 +20,36 @@
  */
 class ModuleSpeedtestTest extends PHPUnit_Framework_TestCase
 {
-	protected $oShell;
-	protected $oModule;
-	protected $sFilePath;
+    protected $oShell;
+    protected $oModule;
+    protected $sFilePath;
 
-	public function setUp()
-	{
-		$this -> oShell = new Shell();
-		$this -> oModule = new ModuleSpeedtest( $this -> oShell );
+    public function setUp()
+    {
+        $this->oShell = new Shell();
+        $this->oModule = new ModuleSpeedtest($this->oShell);
 
-		$this -> sFilePath = sys_get_temp_dir() . '/' . md5( time() );
+        $this->sFilePath = sys_get_temp_dir() . '/' . md5(time());
 
-		touch( $this -> sFilePath );
+        touch($this->sFilePath);
 
-		if( ! is_file( $this -> sFilePath ) )
-		{
-			$this -> fail( 'Nie można utworzyć przykładowego pliku' );
-		}
-	}
+        if (!is_file($this->sFilePath)) {
+            $this->fail('Nie można utworzyć przykładowego pliku');
+        }
+    }
 
-	public function testModule()
-	{
-		$this -> oShell -> setArgs( ':speedtest http://test.online.kz/download/1.test' );
+    public function testModule()
+    {
+        $this->oShell->setArgs(':speedtest http://test.online.kz/download/1.test');
 
-		$this -> assertRegExp( '~^Pobrano: \d+ bajtów w \d+\.\d+ sekundy\r\nŚrednia prędkość to: \d+\.\d+ KB/s\z~', $this -> oModule -> get() );
-	}
+        $this->assertRegExp('~^Pobrano: \d+ bajtów w \d+\.\d+ sekundy\r\nŚrednia prędkość to: \d+\.\d+ KB/s\z~', $this->oModule->get());
+    }
 
-	public function testFailModule()
-	{
-		$this -> oShell -> setArgs( ':speedtest http://file.not.found' );
+    public function testFailModule()
+    {
+        $this->oShell->setArgs(':speedtest http://file.not.found');
 
-		$this -> assertSame( 'Nie można pobrać pliku', $this -> oModule -> get() );
-	}
+        $this->assertSame('Nie można pobrać pliku', $this->oModule->get());
+    }
 
 }

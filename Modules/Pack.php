@@ -21,7 +21,9 @@
  *
  * @uses       Exception
  */
-class PackerException extends Exception {}
+class PackerException extends Exception
+{
+}
 
 /**
  * Pakowanie plikow
@@ -40,212 +42,199 @@ class PackerException extends Exception {}
  */
 class Pack
 {
-	/**
-	 * Sciezka zawierajaca pliki do spakowania
-	 *
-	 * @access protected
-	 * @var    string
-	 */
-	protected $sInput;
+    /**
+     * Sciezka zawierajaca pliki do spakowania
+     *
+     * @access protected
+     * @var    string
+     */
+    protected $sInput;
 
-	/**
-	 * Plik wynikowy
-	 *
-	 * @access protected
-	 * @var    string
-	 */
-	protected $sOutput;
+    /**
+     * Plik wynikowy
+     *
+     * @access protected
+     * @var    string
+     */
+    protected $sOutput;
 
-	/**
-	 * Ustawienia sciezki
-	 *
-	 * @access public
-	 * @param  string $sValue Sciezka
-	 * @return Pack   Obiekt  Pack
-	 */
-	public function setInput( $sValue )
-	{
-		$this -> sInput = realpath( (string) $sValue );
+    /**
+     * Ustawienia sciezki
+     *
+     * @access public
+     * @param  string $sValue Sciezka
+     * @return Pack   Obiekt  Pack
+     */
+    public function setInput($sValue)
+    {
+        $this->sInput = realpath((string)$sValue);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Ustawienia sciezki do pliku wynikowego
-	 *
-	 * @access public
-	 * @param  string $sValue Sciezka
-	 * @return Pack   Obiekt  Pack
-	 */
-	public function setOutput( $sValue )
-	{
-		$this -> sOutput = realpath( (string) $sValue );
+    /**
+     * Ustawienia sciezki do pliku wynikowego
+     *
+     * @access public
+     * @param  string $sValue Sciezka
+     * @return Pack   Obiekt  Pack
+     */
+    public function setOutput($sValue)
+    {
+        $this->sOutput = realpath((string)$sValue);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Wykonanie procesu pakowania pliku
-	 *
-	 * @access public
-	 * @return void
-	 */
-	public function get()
-	{
-		/**
-		 * Sciezka jest wymagana
-		 */
-		if( $this -> sInput === NULL )
-		{
-			throw new PackerException( 'Nie wybrano katalogu źródłowego' );
-		}
+    /**
+     * Wykonanie procesu pakowania pliku
+     *
+     * @access public
+     * @return void
+     */
+    public function get()
+    {
+        /**
+         * Sciezka jest wymagana
+         */
+        if ($this->sInput === NULL) {
+            throw new PackerException('Nie wybrano katalogu źródłowego');
+        }
 
-		/**
-		 * Folder zrodlowy musi istniec
-		 */
-		if( ! is_dir( $this -> sInput ) )
-		{
-			throw new PackerException( 'Katalog źródłowy nie istnieje' );
-		}
+        /**
+         * Folder zrodlowy musi istniec
+         */
+        if (!is_dir($this->sInput)) {
+            throw new PackerException('Katalog źródłowy nie istnieje');
+        }
 
-		/**
-		 * Sciezka do pliku docelowego jest wymagana
-		 */
-		if( $this -> sOutput === NULL )
-		{
-			throw new PackerException( 'Nie wybrano pliku docelowego' );
-		}
+        /**
+         * Sciezka do pliku docelowego jest wymagana
+         */
+        if ($this->sOutput === NULL) {
+            throw new PackerException('Nie wybrano pliku docelowego');
+        }
 
-		try
-		{
-			/**
-			 * Iteracyjne przeszukanie katalogu
-			 */
-			$oDirectory = new RecursiveIteratorIterator( new XRecursiveDirectoryIterator( $this -> sInput ) );
-		}
-		catch( UnexpectedValueException $oException )
-		{
-			throw new PackerException( sprintf( 'Wystąpił nieoczekiwany błąd: %s', $oException -> getMessage() ) );
-		}
+        try {
+            /**
+             * Iteracyjne przeszukanie katalogu
+             */
+            $oDirectory = new RecursiveIteratorIterator(new XRecursiveDirectoryIterator($this->sInput));
+        } catch (UnexpectedValueException $oException) {
+            throw new PackerException(sprintf('Wystąpił nieoczekiwany błąd: %s', $oException->getMessage()));
+        }
 
-		/**
-		 * Otwieranie pliku do zapisu
-		 */
-		if( ! ( $rFile = @ fopen( $this -> sOutput, 'w' ) ) )
-		{
-			throw new PackerException( 'Nie można utworzyć pliku wynikowego' );
-		}
+        /**
+         * Otwieranie pliku do zapisu
+         */
+        if (!($rFile = @ fopen($this->sOutput, 'w'))) {
+            throw new PackerException('Nie można utworzyć pliku wynikowego');
+        }
 
-		/**
-		 * Blokowanie pliku
-		 */
-		flock( $rFile, LOCK_EX );
+        /**
+         * Blokowanie pliku
+         */
+        flock($rFile, LOCK_EX);
 
-		/**
-		 * Naglowek - 16 bajtow
-		 * NFPACK - 8 bajtow
-		 * nastepne 8 bajtow sa zarezerwowane
-		 */
-		fwrite( $rFile, "NFPACKER\0\0\0\0\0\0\0\0" );
+        /**
+         * Naglowek - 16 bajtow
+         * NFPACK - 8 bajtow
+         * nastepne 8 bajtow sa zarezerwowane
+         */
+        fwrite($rFile, "NFPACKER\0\0\0\0\0\0\0\0");
 
-		/**
-		 * Dlugosc sciezki
-		 */
-		$iPathLen = strlen( $this -> sInput );
+        /**
+         * Dlugosc sciezki
+         */
+        $iPathLen = strlen($this->sInput);
 
-		/**
-		 *  2 bajty na dlugosc sciezki do pliku
-		 * X bajtow na sciezke
-		 *  4 bajty na rozmiar pliku
-		 * X bajtow na zawartosc pliku
-		 *  4 bajty na hash pliku
-		 */
-		foreach( $oDirectory as $oDir )
-		{
-			/**
-			 * Element musi byc plikiem
-			 */
-			if( ! $oDir -> isFile() )
-			{
-				continue ;
-			}
+        /**
+         *  2 bajty na dlugosc sciezki do pliku
+         * X bajtow na sciezke
+         *  4 bajty na rozmiar pliku
+         * X bajtow na zawartosc pliku
+         *  4 bajty na hash pliku
+         */
+        foreach ($oDirectory as $oDir) {
+            /**
+             * Element musi byc plikiem
+             */
+            if (!$oDir->isFile()) {
+                continue;
+            }
 
-			/**
-			 * Absolutna Sciezka
-			 */
-			$sPathName = $oDir -> getPathName();
+            /**
+             * Absolutna Sciezka
+             */
+            $sPathName = $oDir->getPathName();
 
-			/**
-			 * Plik wynikowy nie jest umieszczaony
-			 */
-			if( $sPathName === $this -> sOutput )
-			{
-				continue ;
-			}
+            /**
+             * Plik wynikowy nie jest umieszczaony
+             */
+            if ($sPathName === $this->sOutput) {
+                continue;
+            }
 
-			$sPath = substr( $sPathName, $iPathLen );
+            $sPath = substr($sPathName, $iPathLen);
 
-			if( ( strncmp( $sPath, '/', 1 ) === 0 ) || ( strncmp( $sPath, '\\', 1 ) === 0 ) )
-			{
-				$sPath = substr( $sPath, 1 );
-			}
+            if ((strncmp($sPath, '/', 1) === 0) || (strncmp($sPath, '\\', 1) === 0)) {
+                $sPath = substr($sPath, 1);
+            }
 
-			/**
-			 * Pierwsze 2 bajty to dlugosc sciezki do pliku
-			 */
-			fwrite( $rFile, pack( 'n', strlen( $sPath ) ) );
+            /**
+             * Pierwsze 2 bajty to dlugosc sciezki do pliku
+             */
+            fwrite($rFile, pack('n', strlen($sPath)));
 
-			/**
-			 * Kolejno umieszczona jest sciezka do pliku
-			 */
-			fwrite( $rFile, str_replace( '\\', '/', $sPath ) );
+            /**
+             * Kolejno umieszczona jest sciezka do pliku
+             */
+            fwrite($rFile, str_replace('\\', '/', $sPath));
 
-			/**
-			 * Nastepne 4 bajty to rozmiar pliku
-			 */
-			fwrite( $rFile, pack( 'N', $oDir -> getSize() ) );
+            /**
+             * Nastepne 4 bajty to rozmiar pliku
+             */
+            fwrite($rFile, pack('N', $oDir->getSize()));
 
-			/**
-			 * Otwieranie pliku
-			 */
-			if( ! ( $rFileContent = fopen( $sPathName, 'r' ) ) )
-			{
-				flock( $rFile, LOCK_UN );
+            /**
+             * Otwieranie pliku
+             */
+            if (!($rFileContent = fopen($sPathName, 'r'))) {
+                flock($rFile, LOCK_UN);
 
-				fclose( $rFileContent );
+                fclose($rFileContent);
 
-				throw new PackerException( sprintf( 'Nie można otworzyć pliku "%s"', $sPathName ) );
-			}
+                throw new PackerException(sprintf('Nie można otworzyć pliku "%s"', $sPathName));
+            }
 
-			/**
-			 * Odczyt i zapisanie pliku
-			 */
-			while( ! feof( $rFileContent ) )
-			{
-				fwrite( $rFile, fread( $rFileContent, 65536 ) );
-			}
+            /**
+             * Odczyt i zapisanie pliku
+             */
+            while (!feof($rFileContent)) {
+                fwrite($rFile, fread($rFileContent, 65536));
+            }
 
-			/**
-			 * 4 bajty to suma kontrolna
-			 */
-			fwrite( $rFile, substr( md5_file( $sPathName, TRUE ), 0, 4 ) );
+            /**
+             * 4 bajty to suma kontrolna
+             */
+            fwrite($rFile, substr(md5_file($sPathName, TRUE), 0, 4));
 
-			/**
-			 * Zamkniecie pliku
-			 */
-			fclose( $rFileContent );
-		}
+            /**
+             * Zamkniecie pliku
+             */
+            fclose($rFileContent);
+        }
 
-		/**
-		 * Zdjecie blokady z pliku
-		 */
-		flock( $rFile, LOCK_UN );
+        /**
+         * Zdjecie blokady z pliku
+         */
+        flock($rFile, LOCK_UN);
 
-		/**
-		 * Zamkniecie pliku
-		 */
-		fclose( $rFile );
-	}
+        /**
+         * Zamkniecie pliku
+         */
+        fclose($rFile);
+    }
 
 }
 
@@ -263,177 +252,167 @@ class Pack
  */
 class Unpack
 {
-	/**
-	 * Plik zrodlowy
-	 *
-	 * @access protected
-	 * @var    string
-	 */
-	protected $sInput;
+    /**
+     * Plik zrodlowy
+     *
+     * @access protected
+     * @var    string
+     */
+    protected $sInput;
 
-	/**
-	 * Plik wynikowy
-	 *
-	 * @access protected
-	 * @var    string
-	 */
-	protected $sOutput;
+    /**
+     * Plik wynikowy
+     *
+     * @access protected
+     * @var    string
+     */
+    protected $sOutput;
 
-	/**
-	 * Ustawienia sciezki
-	 *
-	 * @access public
-	 * @param  string $sValue Sciezka
-	 * @return Pack   Obiekt  Pack
-	 */
-	public function setInput( $sValue )
-	{
-		$this -> sInput = realpath( (string) $sValue );
+    /**
+     * Ustawienia sciezki
+     *
+     * @access public
+     * @param  string $sValue Sciezka
+     * @return Pack   Obiekt  Pack
+     */
+    public function setInput($sValue)
+    {
+        $this->sInput = realpath((string)$sValue);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Ustawienia sciezki do pliku wynikowego
-	 *
-	 * @access public
-	 * @param  string $sValue Sciezka
-	 * @return Pack   Obiekt  Pack
-	 */
-	public function setOutput( $sValue )
-	{
-		$this -> sOutput = realpath( (string) $sValue ) . '/';
+    /**
+     * Ustawienia sciezki do pliku wynikowego
+     *
+     * @access public
+     * @param  string $sValue Sciezka
+     * @return Pack   Obiekt  Pack
+     */
+    public function setOutput($sValue)
+    {
+        $this->sOutput = realpath((string)$sValue) . '/';
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Wykonanie procesu pakowania pliku
-	 *
-	 * @access public
-	 * @return string Output
-	 */
-	public function get()
-	{
-		$sOutput = NULL;
+    /**
+     * Wykonanie procesu pakowania pliku
+     *
+     * @access public
+     * @return string Output
+     */
+    public function get()
+    {
+        $sOutput = NULL;
 
-		/**
-		 * Plik zrodlowy jest wymagany
-		 */
-		if( $this -> sInput === NULL )
-		{
-			throw new PackerException( 'Nie wybrano pliku źródłowego' );
-		}
+        /**
+         * Plik zrodlowy jest wymagany
+         */
+        if ($this->sInput === NULL) {
+            throw new PackerException('Nie wybrano pliku źródłowego');
+        }
 
-		/**
-		 * Plik zrodlowy musi istniec
-		 */
-		if( ! is_file( $this -> sInput ) )
-		{
-			throw new PackerException( 'Plik źródłowy nie istnieje' );
-		}
+        /**
+         * Plik zrodlowy musi istniec
+         */
+        if (!is_file($this->sInput)) {
+            throw new PackerException('Plik źródłowy nie istnieje');
+        }
 
-		/**
-		 * Sciezka do pliku docelowego jest wymagana
-		 */
-		if( $this -> sOutput === NULL )
-		{
-			throw new PackerException( 'Nie wybrano pliku docelowego' );
-		}
+        /**
+         * Sciezka do pliku docelowego jest wymagana
+         */
+        if ($this->sOutput === NULL) {
+            throw new PackerException('Nie wybrano pliku docelowego');
+        }
 
-		/**
-		 * Otwieranie pliku zrodlowego do odczytu
-		 */
-		if( ! ( $rFile = @ fopen( $this -> sInput, 'r' ) ) )
-		{
-			throw new PackerException( sprintf( 'Nie można otworzyć pliku: %s', $this -> sInput ) );
-		}
+        /**
+         * Otwieranie pliku zrodlowego do odczytu
+         */
+        if (!($rFile = @ fopen($this->sInput, 'r'))) {
+            throw new PackerException(sprintf('Nie można otworzyć pliku: %s', $this->sInput));
+        }
 
-		/**
-		 * Blokowanie pliku
-		 */
-		flock( $rFile, LOCK_EX );
+        /**
+         * Blokowanie pliku
+         */
+        flock($rFile, LOCK_EX);
 
-		/**
-		 * Sprawdzanie czy naglowek jest poprawny
-		 */
-		if( fread( $rFile, 8 ) !== 'NFPACKER' )
-		{
-			throw new PackerException( 'Plik źródłowy ma niewłaściwy format' );
-		}
+        /**
+         * Sprawdzanie czy naglowek jest poprawny
+         */
+        if (fread($rFile, 8) !== 'NFPACKER') {
+            throw new PackerException('Plik źródłowy ma niewłaściwy format');
+        }
 
-		/**
-		 * Pominiecie naglowka
-		 */
-		fseek( $rFile, 16 );
+        /**
+         * Pominiecie naglowka
+         */
+        fseek($rFile, 16);
 
-		while( ! feof( $rFile ) )
-		{
-			/**
-			 * Rozmiar sciezki
-			 */
-			if( ( $sData = fread( $rFile, 2 ) ) === '' )
-			{
-				break ;
-			}
+        while (!feof($rFile)) {
+            /**
+             * Rozmiar sciezki
+             */
+            if (($sData = fread($rFile, 2)) === '') {
+                break;
+            }
 
-			list( , $iSize ) = unpack( 'n', $sData );
+            list(, $iSize) = unpack('n', $sData);
 
-			/**
-			 * Sciezka
-			 */
-			$sFileName = fread( $rFile, $iSize );
+            /**
+             * Sciezka
+             */
+            $sFileName = fread($rFile, $iSize);
 
-			/**
-			 * Rozmiar pliku
-			 */
-			list( , $iSize ) = unpack( 'N', fread( $rFile, 4 ) );
+            /**
+             * Rozmiar pliku
+             */
+            list(, $iSize) = unpack('N', fread($rFile, 4));
 
-			/**
-			 * Tworzenie katalogu
-			 */
-			if( ! is_dir( ( $sPathName = dirname( $this -> sOutput . $sFileName ) ) ) )
-			{
-				mkdir( $sPathName, 0777, TRUE );
-			}
+            /**
+             * Tworzenie katalogu
+             */
+            if (!is_dir(($sPathName = dirname($this->sOutput . $sFileName)))) {
+                mkdir($sPathName, 0777, TRUE);
+            }
 
-			$sFileName = $this -> sOutput . $sFileName;
+            $sFileName = $this->sOutput . $sFileName;
 
-			/**
-			 * Zapis do pliku
-			 */
-			if( ! file_put_contents( $sFileName, ( $iSize === 0 ? NULL : fread( $rFile, $iSize ) ) ) )
-			{
-				throw new PackerException( sprintf( 'Nie można zapisać pliku %s', $sFileName ) );
-			}
+            /**
+             * Zapis do pliku
+             */
+            if (!file_put_contents($sFileName, ($iSize === 0 ? NULL : fread($rFile, $iSize)))) {
+                throw new PackerException(sprintf('Nie można zapisać pliku %s', $sFileName));
+            }
 
-			/**
-			 * Sprawdzanie sumu kontrolnej
-			 */
-			if( ! strncmp( md5_file( $sFileName, TRUE ), fread( $rFile, 4 ), 4 ) === 0 )
-			{
-				flock( $rFile, LOCK_UN );
+            /**
+             * Sprawdzanie sumu kontrolnej
+             */
+            if (!strncmp(md5_file($sFileName, TRUE), fread($rFile, 4), 4) === 0) {
+                flock($rFile, LOCK_UN);
 
-				fclose( $rFile );
+                fclose($rFile);
 
-				throw new PackerException( sprintf( 'Błędna suma kontrolna pliku: %s', $sPathName ) );
-			}
+                throw new PackerException(sprintf('Błędna suma kontrolna pliku: %s', $sPathName));
+            }
 
-			$sOutput .= $sFileName . "\r\n";
-		}
+            $sOutput .= $sFileName . "\r\n";
+        }
 
-		/**
-		 * Zdjecie blokady z pliku
-		 */
-		flock( $rFile, LOCK_UN );
+        /**
+         * Zdjecie blokady z pliku
+         */
+        flock($rFile, LOCK_UN);
 
-		/**
-		 * Zamkniecie pliku
-		 */
-		fclose( $rFile );
+        /**
+         * Zamkniecie pliku
+         */
+        fclose($rFile);
 
-		return $sOutput;
-	}
+        return $sOutput;
+    }
 
 }
 
@@ -461,44 +440,44 @@ class Unpack
  */
 class ModulePack extends ModuleAbstract
 {
-	/**
-	 * Dostepna lista komend
-	 *
-	 * @access public
-	 * @return array
-	 */
-	public function getCommands()
-	{
-		return array
-		(
-			'pack',
-			'unpack'
-		);
-	}
+    /**
+     * Dostepna lista komend
+     *
+     * @access public
+     * @return array
+     */
+    public function getCommands()
+    {
+        return array
+        (
+            'pack',
+            'unpack'
+        );
+    }
 
-	/**
-	 * Zwracanie wersji modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getVersion()
-	{
-		/**
-		 * Wersja Data Autor
-		 */
-		return '1.01 2013-01-21 - <krzotr@gmail.com>';
-	}
+    /**
+     * Zwracanie wersji modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getVersion()
+    {
+        /**
+         * Wersja Data Autor
+         */
+        return '1.01 2013-01-21 - <krzotr@gmail.com>';
+    }
 
-	/**
-	 * Zwracanie pomocy modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getHelp()
-	{
-		return <<<DATA
+    /**
+     * Zwracanie pomocy modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getHelp()
+    {
+        return <<<DATA
 Pakowanie / rozpakowywanie plików oraz katalogów
 
 	Użycie:
@@ -511,60 +490,52 @@ Pakowanie / rozpakowywanie plików oraz katalogów
 		pack -d /tmp/output.nfp /tmp/
 		unpack /tmp/output.nfp /tmp/
 DATA;
-	}
+    }
 
-	/**
-	 * Wywolanie modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function get()
-	{
-		/**
-		 * Help
-		 */
-		if( $this -> oShell -> iArgc !== 2 )
-		{
-			return $this -> getHelp();
-		}
+    /**
+     * Wywolanie modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function get()
+    {
+        /**
+         * Help
+         */
+        if ($this->oShell->iArgc !== 2) {
+            return $this->getHelp();
+        }
 
-		/**
-		 * Unpack
-		 */
-		if( ( $this -> oShell -> sCmd === 'unpack' ) || in_array( 'd', $this -> oShell -> aOptv ) )
-		{
-			try
-			{
-				$oUnpack = new Unpack();
-				$oUnpack
-					-> setInput( $this -> oShell -> aArgv[0] )
-					-> setOutput( $this -> oShell -> aArgv[1] )
-					-> get();
-				return 'Plik został wypakowany';
-			}
-			catch( PackerException $oException )
-			{
-				return $oException -> getMessage();
-			}
-		}
+        /**
+         * Unpack
+         */
+        if (($this->oShell->sCmd === 'unpack') || in_array('d', $this->oShell->aOptv)) {
+            try {
+                $oUnpack = new Unpack();
+                $oUnpack
+                    ->setInput($this->oShell->aArgv[0])
+                    ->setOutput($this->oShell->aArgv[1])
+                    ->get();
+                return 'Plik został wypakowany';
+            } catch (PackerException $oException) {
+                return $oException->getMessage();
+            }
+        }
 
-		/**
-		 * Pack
-		 */
-		try
-		{
-			$oUnpack = new Pack();
-			$oUnpack
-				-> setInput( $this -> oShell -> aArgv[0] )
-				-> setOutput( $this -> oShell -> aArgv[1] )
-				-> get();
-			return 'Katalog został spakowany';
-		}
-		catch( PackerException $oException )
-		{
-			return $oException -> getMessage();
-		}
-	}
+        /**
+         * Pack
+         */
+        try {
+            $oUnpack = new Pack();
+            $oUnpack
+                ->setInput($this->oShell->aArgv[0])
+                ->setOutput($this->oShell->aArgv[1])
+                ->get();
+            return 'Katalog został spakowany';
+        } catch (PackerException $oException) {
+            return $oException->getMessage();
+        }
+    }
 
 }

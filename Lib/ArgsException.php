@@ -18,4 +18,6 @@
  *
  * @uses       Exception
  */
-class ArgsException extends Exception {}
+class ArgsException extends Exception
+{
+}

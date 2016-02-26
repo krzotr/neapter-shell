@@ -16,14 +16,12 @@ window.onload = function()
 	 */
 	oConsole.style.minHeight = sHeight;
 	oConsole.style.height = sHeight;
-}
+};
 
 /**
  * Lista polecen, ktorych nie nalezy uzywac z AJAX
  */
-var aExclude = new Array
-(
-	'edit',
+var aExclude = ['edit',
 	'upload',
 	'down',
 	'download',
@@ -41,15 +39,12 @@ var aExclude = new Array
 	'bc',
 	'irc',
 	'proxy',
-	'emailvalidator'
-);
+	'emailvalidator'];
 
 /**
  * Podpowiedi - lista wszystkich dostepnych polecen
  */
-var aCommands = new Array
-(
-	'help',
+var aCommands = ['help',
 	'modules',
 	'edit',
 	'upload',
@@ -129,8 +124,7 @@ var aCommands = new Array
 	'speedtest',
 	'touch',
 	'autoload',
-	'version'
-);
+	'version'];
 
 aCommands.sort();
 
@@ -250,7 +244,7 @@ function submitForm()
 				document.getElementById( 'console').innerHTML = oAjax.responseText;
 				oStatus.style.display = 'none';
 			}
-		}
+		};
 
 		var sCmd = escape( oCmd.value );
 

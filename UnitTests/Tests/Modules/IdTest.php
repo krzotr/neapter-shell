@@ -20,22 +20,22 @@
  */
 class ModuleIdTest extends PHPUnit_Framework_TestCase
 {
-	protected $oShell;
-	protected $oModule;
+    protected $oShell;
+    protected $oModule;
 
-	public function setUp()
-	{
-		$this -> oShell = new Shell();
-		$this -> oModule = new ModuleId( $this -> oShell );
-	}
+    public function setUp()
+    {
+        $this->oShell = new Shell();
+        $this->oModule = new ModuleId($this->oShell);
+    }
 
-	public function testModule()
-	{
-		$this -> oShell -> setArgs( ':id ' . __FILE__ );
-		$this -> assertSame( sprintf( 'user=%s uid=%d gid=%d', get_current_user(), getmyuid(), getmygid() ), $this -> oModule -> get() );
+    public function testModule()
+    {
+        $this->oShell->setArgs(':id ' . __FILE__);
+        $this->assertSame(sprintf('user=%s uid=%d gid=%d', get_current_user(), getmyuid(), getmygid()), $this->oModule->get());
 
-		$this -> oShell -> setArgs( ':whoami ' . __FILE__ );
-		$this -> assertSame( sprintf( 'user=%s uid=%d gid=%d', get_current_user(), getmyuid(), getmygid() ), $this -> oModule -> get() );
-	}
+        $this->oShell->setArgs(':whoami ' . __FILE__);
+        $this->assertSame(sprintf('user=%s uid=%d gid=%d', get_current_user(), getmyuid(), getmygid()), $this->oModule->get());
+    }
 
 }

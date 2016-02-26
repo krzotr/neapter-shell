@@ -18,7 +18,9 @@
  * @package    NeapterShell
  * @subpackage Tools\Exception
  */
-class IrcException extends Exception {}
+class IrcException extends Exception
+{
+}
 
 /**
  * Podlaczenie sie do kanalu Irc
@@ -31,296 +33,277 @@ class IrcException extends Exception {}
  */
 class Irc
 {
-	/**
-	 * Konfiguracja
-	 *
-	 * @access protected
-	 * @var    array
-	 */
-	protected $aConfig = array
-	(
-		'host'     => NULL,
-		'port'     => 6667,
-		'nick'     => NULL,
-		'channel'  => NULL,
-		'password' => NULL
-	);
+    /**
+     * Konfiguracja
+     *
+     * @access protected
+     * @var    array
+     */
+    protected $aConfig = array
+    (
+        'host' => NULL,
+        'port' => 6667,
+        'nick' => NULL,
+        'channel' => NULL,
+        'password' => NULL
+    );
 
-	/**
-	 * Nazwa funkcji zwrotnej
-	 *
-	 * @access protected
-	 * @var    string
-	 */
-	protected $sCallback;
+    /**
+     * Nazwa funkcji zwrotnej
+     *
+     * @access protected
+     * @var    string
+     */
+    protected $sCallback;
 
-	/**
-	 * Polaczenie
-	 *
-	 * @access protected
-	 * @var    string
-	 */
-	protected $rSock;
+    /**
+     * Polaczenie
+     *
+     * @access protected
+     * @var    string
+     */
+    protected $rSock;
 
-	/**
-	 * Ustawianie hosta
-	 *
-	 * @access public
-	 * @param  string $sValue Host:Port
-	 * @return object         Obiekt Irc
-	 */
-	public function setHost( $sValue )
-	{
-		@ list( $sHost, $iPort ) = explode( ':', $sValue );
+    /**
+     * Ustawianie hosta
+     *
+     * @access public
+     * @param  string $sValue Host:Port
+     * @return object         Obiekt Irc
+     */
+    public function setHost($sValue)
+    {
+        @ list($sHost, $iPort) = explode(':', $sValue);
 
-		if( ctype_digit( $iPort ) )
-		{
-			$this -> aConfig['port'] = (int) $iPort;
-		}
+        if (ctype_digit($iPort)) {
+            $this->aConfig['port'] = (int)$iPort;
+        }
 
-		$this -> aConfig['host'] = (string) $sValue;
+        $this->aConfig['host'] = (string)$sValue;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Ustawianie nazwy kanalu
-	 *
-	 * @access public
-	 * @param  string $sValue Kanal
-	 * @return object         Obiekt Irc
-	 */
-	public function setChannel( $sValue )
-	{
-		if( strncmp( $sValue, '#', 1 ) !== 0 )
-		{
-			$sValue = '#' . $sValue;
-		}
+    /**
+     * Ustawianie nazwy kanalu
+     *
+     * @access public
+     * @param  string $sValue Kanal
+     * @return object         Obiekt Irc
+     */
+    public function setChannel($sValue)
+    {
+        if (strncmp($sValue, '#', 1) !== 0) {
+            $sValue = '#' . $sValue;
+        }
 
-		$this -> aConfig['channel'] = (string) $sValue;
+        $this->aConfig['channel'] = (string)$sValue;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Ustawianie hasla do kanalu
-	 *
-	 * @access public
-	 * @param  string $sValue Haslo
-	 * @return object         Obiekt Irc
-	 */
-	public function setPassword( $sValue )
-	{
-		$this -> aConfig['password'] = (string) $sValue;
+    /**
+     * Ustawianie hasla do kanalu
+     *
+     * @access public
+     * @param  string $sValue Haslo
+     * @return object         Obiekt Irc
+     */
+    public function setPassword($sValue)
+    {
+        $this->aConfig['password'] = (string)$sValue;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Ustawianie nazwy uzytkownika
-	 *
-	 * @access public
-	 * @param  string $sValue Host:Port
-	 * @return object         Obiekt Irc
-	 */
-	public function setNick( $sValue )
-	{
-		$this -> aConfig['nick'] = (string) $sValue;
+    /**
+     * Ustawianie nazwy uzytkownika
+     *
+     * @access public
+     * @param  string $sValue Host:Port
+     * @return object         Obiekt Irc
+     */
+    public function setNick($sValue)
+    {
+        $this->aConfig['nick'] = (string)$sValue;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Ustawianie funkcji zwrotnej
-	 *
-	 * Funkcja zwrotna przyjmuje nastepujace parametry
-	 *     object $oIrc   - Obiekt Irc
-	 *     array $aConfig - Konfiguracja polaczenia z Irc
-	 *     array $aData   - Dane pochodzace z Irc, klucze:
-	 *         'type'     - public/private - Typ wiadomosci ktora otrzymal klient irc
-	 *         'nick'     - Nazwa uzytkownika, ktory wyslal wiadomosc
-	 *         'message'  - Wiadomosc od uzytkownika
-	 *
-	 * @access public
-	 * @param  string $sValue Host:Port
-	 * @return object         Obiekt Irc
-	 */
-	public function setCallback( $sValue )
-	{
-		$this -> sCallback = $sValue;
+    /**
+     * Ustawianie funkcji zwrotnej
+     *
+     * Funkcja zwrotna przyjmuje nastepujace parametry
+     *     object $oIrc   - Obiekt Irc
+     *     array $aConfig - Konfiguracja polaczenia z Irc
+     *     array $aData   - Dane pochodzace z Irc, klucze:
+     *         'type'     - public/private - Typ wiadomosci ktora otrzymal klient irc
+     *         'nick'     - Nazwa uzytkownika, ktory wyslal wiadomosc
+     *         'message'  - Wiadomosc od uzytkownika
+     *
+     * @access public
+     * @param  string $sValue Host:Port
+     * @return object         Obiekt Irc
+     */
+    public function setCallback($sValue)
+    {
+        $this->sCallback = $sValue;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Wykonanie
-	 *
-	 * @access public
-	 * @return void
-	 */
-	public function get()
-	{
-		/**
-		 * Host jest wymagany
-		 */
-		if( $this -> aConfig['host'] === NULL )
-		{
-			throw new IrcException( 'Host jest wymagany' );
-		}
+    /**
+     * Wykonanie
+     *
+     * @access public
+     * @return void
+     */
+    public function get()
+    {
+        /**
+         * Host jest wymagany
+         */
+        if ($this->aConfig['host'] === NULL) {
+            throw new IrcException('Host jest wymagany');
+        }
 
-		/**
-		 * Kanal jest wymagany
-		 */
-		if( $this -> aConfig['channel'] === NULL )
-		{
-			throw new IrcException( 'Kanał jest wymagany' );
-		}
+        /**
+         * Kanal jest wymagany
+         */
+        if ($this->aConfig['channel'] === NULL) {
+            throw new IrcException('Kanał jest wymagany');
+        }
 
-		/**
-		 * Nick jest wymagany
-		 */
-		if( $this -> aConfig['nick'] === NULL )
-		{
-			throw new IrcException( 'Nick jest wymagany' );
-		}
+        /**
+         * Nick jest wymagany
+         */
+        if ($this->aConfig['nick'] === NULL) {
+            throw new IrcException('Nick jest wymagany');
+        }
 
-		$this -> rSock = fsockopen( $this -> aConfig['host'], $this -> aConfig['port'] );
+        $this->rSock = fsockopen($this->aConfig['host'], $this->aConfig['port']);
 
-		fwrite( $this -> rSock, sprintf( "NICK %s\r\nUSER %s %s %s :%s\r\n", $this -> aConfig['nick'], $this -> aConfig['nick'], $this -> aConfig['nick'], $this -> aConfig['host'], $this -> aConfig['nick'] ) );
+        fwrite($this->rSock, sprintf("NICK %s\r\nUSER %s %s %s :%s\r\n", $this->aConfig['nick'], $this->aConfig['nick'], $this->aConfig['nick'], $this->aConfig['host'], $this->aConfig['nick']));
 
-		while( ( strpos( $sData = fgets( $this -> rSock ), sprintf( ':%s MODE %s :+i', $this -> aConfig['nick'], $this -> aConfig['nick'] ) ) === FALSE ) && ! empty( $sData ) )
-		{
-			/**
-			 * PING - PONG
-			 */
-			if( strncmp( $sData, 'PING', 4 ) === 0 )
-			{
-				$sPinger = rtrim( substr( $sData, 5 ) );
-				fwrite( $this -> rSock, sprintf( "PONG %s\r\n", $sPinger ) );
-				continue ;
-			}
+        while ((strpos($sData = fgets($this->rSock), sprintf(':%s MODE %s :+i', $this->aConfig['nick'], $this->aConfig['nick'])) === FALSE) && !empty($sData)) {
+            /**
+             * PING - PONG
+             */
+            if (strncmp($sData, 'PING', 4) === 0) {
+                $sPinger = rtrim(substr($sData, 5));
+                fwrite($this->rSock, sprintf("PONG %s\r\n", $sPinger));
+                continue;
+            }
 
-			usleep( 10000 );
-		}
+            usleep(10000);
+        }
 
-		/**
-		 * Podlaczenie do kanalu
-		 */
-		fwrite( $this -> rSock, sprintf( "JOIN %s%s\r\n", $this -> aConfig['channel'], ( ( $this -> aConfig['password'] === NULL ) ? NULL : ' ' . $this -> aConfig['password'] ) ) );
-		fgets( $this -> rSock );
-		fwrite( $this -> rSock, sprintf( "MODE %s\r\n", $this -> aConfig['channel'] ) );
-		fgets( $this -> rSock );
-		fwrite( $this -> rSock, sprintf( "WHO %s\r\n", $this -> aConfig['channel'] ) );
-		fgets( $this -> rSock );
+        /**
+         * Podlaczenie do kanalu
+         */
+        fwrite($this->rSock, sprintf("JOIN %s%s\r\n", $this->aConfig['channel'], (($this->aConfig['password'] === NULL) ? NULL : ' ' . $this->aConfig['password'])));
+        fgets($this->rSock);
+        fwrite($this->rSock, sprintf("MODE %s\r\n", $this->aConfig['channel']));
+        fgets($this->rSock);
+        fwrite($this->rSock, sprintf("WHO %s\r\n", $this->aConfig['channel']));
+        fgets($this->rSock);
 
-		fwrite( $this -> rSock, sprintf( "PRIVMSG %s :Here I am\n", $this -> aConfig['channel'] ) );
+        fwrite($this->rSock, sprintf("PRIVMSG %s :Here I am\n", $this->aConfig['channel']));
 
-		for( ;; )
-		{
-			$sData = fgets( $this -> rSock );
-			usleep( 10000 );
+        for (; ;) {
+            $sData = fgets($this->rSock);
+            usleep(10000);
 
-			/**
-			 * PING - PONG
-			 */
-			if( strncmp( $sData, 'PING', 4 ) === 0 )
-			{
-				$sPinger = rtrim( substr( $sData, 5 ) );
-				fwrite( $this -> rSock, sprintf( ":%s PONG %s :%s\r\n", $sPinger, $sPinger, $sPinger ) );
-				continue ;
-			}
+            /**
+             * PING - PONG
+             */
+            if (strncmp($sData, 'PING', 4) === 0) {
+                $sPinger = rtrim(substr($sData, 5));
+                fwrite($this->rSock, sprintf(":%s PONG %s :%s\r\n", $sPinger, $sPinger, $sPinger));
+                continue;
+            }
 
-			if( ! preg_match( '~:(.+?)!([^ ]+) ([^ ]+) (.+?)\s?:([^\r\n]+)~', $sData, $aData ) )
-			{
-				continue ;
-			}
+            if (!preg_match('~:(.+?)!([^ ]+) ([^ ]+) (.+?)\s?:([^\r\n]+)~', $sData, $aData)) {
+                continue;
+            }
 
-			list( $NULL, $sFrom, $sIp, $sOption, $sTo, $sMessage ) = $aData;
+            list($NULL, $sFrom, $sIp, $sOption, $sTo, $sMessage) = $aData;
 
-			$sMessage = rtrim( $sMessage );
+            $sMessage = rtrim($sMessage);
 
-			/**
-			 * Wyrzucony z serwera
-			 */
-			if( $sOption === 'KICK' )
-			{
-				throw new IrcException( 'Klient został wyrzucony z serwera' );
-			}
+            /**
+             * Wyrzucony z serwera
+             */
+            if ($sOption === 'KICK') {
+                throw new IrcException('Klient został wyrzucony z serwera');
+            }
 
-			/**
-			 * Publiczna wiadomosc
-			 */
-			$sType = NULL;
-			if( $sTo === $this -> aConfig['channel'] )
-			{
-				$sType = 'public';
-			}
-			else if( $sTo === $this -> aConfig['nick'] )
-			{
-				$sType = 'private';
-			}
+            /**
+             * Publiczna wiadomosc
+             */
+            $sType = NULL;
+            if ($sTo === $this->aConfig['channel']) {
+                $sType = 'public';
+            } else if ($sTo === $this->aConfig['nick']) {
+                $sType = 'private';
+            }
 
-			if( $sType !== NULL )
-			{
-				$aData = array
-				(
-					'type'    => $sType,
-					'nick'    => $sFrom,
-					'message' => $sMessage,
-				);
+            if ($sType !== NULL) {
+                $aData = array
+                (
+                    'type' => $sType,
+                    'nick' => $sFrom,
+                    'message' => $sMessage,
+                );
 
-				call_user_func( $this -> sCallback, $this, $this -> aConfig, $aData );
-			}
-		}
-	}
+                call_user_func($this->sCallback, $this, $this->aConfig, $aData);
+            }
+        }
+    }
 
-	/**
-	 * Wysylanie wiadomosci
-	 *
-	 * @access public
-	 * @param  string $sType Typ wiadomosci: 'public', 'private'
-	 * @param  string $sMsg  Tresc wiadomosci
-	 * @param  string $sNick [Optional]<br>Nadawca (w przypadku $sType === 'private')
-	 * @return void
-	 */
-	public function sendMessage( $sType, $sMsg, $sNick = NULL )
-	{
-		if( trim( $sMsg ) === '' )
-		{
-			return ;
-		}
+    /**
+     * Wysylanie wiadomosci
+     *
+     * @access public
+     * @param  string $sType Typ wiadomosci: 'public', 'private'
+     * @param  string $sMsg Tresc wiadomosci
+     * @param  string $sNick [Optional]<br>Nadawca (w przypadku $sType === 'private')
+     * @return void
+     */
+    public function sendMessage($sType, $sMsg, $sNick = NULL)
+    {
+        if (trim($sMsg) === '') {
+            return;
+        }
 
-		$aMessageLines = preg_split( '~\r\n|\r|\n~', rtrim( $sMsg, "\r\n" ) );
+        $aMessageLines = preg_split('~\r\n|\r|\n~', rtrim($sMsg, "\r\n"));
 
-		if( ( $iCount = count( $aMessageLines ) ) > 15 )
-		{
-			fwrite( $this -> rSock, sprintf( "PRIVMSG %s :Ocipiałeś? Wynik ma %d linii !!!\r\n", ( ( $sType === 'public' ) ? $this -> aConfig['channel'] : $sNick ), $iCount ) );
-			return ;
-		}
+        if (($iCount = count($aMessageLines)) > 15) {
+            fwrite($this->rSock, sprintf("PRIVMSG %s :Ocipiałeś? Wynik ma %d linii !!!\r\n", (($sType === 'public') ? $this->aConfig['channel'] : $sNick), $iCount));
+            return;
+        }
 
-		foreach( $aMessageLines as $sMessage )
-		{
-			fwrite( $this -> rSock, sprintf( "PRIVMSG %s :%s\r\n",  ( ( $sType === 'public' ) ? $this -> aConfig['channel'] : $sNick ), $sMessage ) );
+        foreach ($aMessageLines as $sMessage) {
+            fwrite($this->rSock, sprintf("PRIVMSG %s :%s\r\n", (($sType === 'public') ? $this->aConfig['channel'] : $sNick), $sMessage));
 
-			if( $iCount > 5 )
-			{
-				usleep( mt_rand( 200000, 1000000 ) );
-			}
-		}
-	}
+            if ($iCount > 5) {
+                usleep(mt_rand(200000, 1000000));
+            }
+        }
+    }
 
-	/**
-	 * Wysylanie surowej wiadomosci
-	 *
-	 * @access public
-	 * @param  string $sData Dane
-	 * @return void
-	 */
-	public function sendRawMessage( $sData )
-	{
-		fwrite( $this -> rSock, $sData . "\r\n" );
-		usleep( mt_rand( 10000, 20000 ) );
-	}
+    /**
+     * Wysylanie surowej wiadomosci
+     *
+     * @access public
+     * @param  string $sData Dane
+     * @return void
+     */
+    public function sendRawMessage($sData)
+    {
+        fwrite($this->rSock, $sData . "\r\n");
+        usleep(mt_rand(10000, 20000));
+    }
 
 }
 
@@ -339,63 +322,63 @@ class Irc
  */
 class ModuleIrc extends ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @static
-	 * @access private
-	 * @var    object
-	 */
-	private static $oShelll;
+    /**
+     * Obiekt Shell
+     *
+     * @static
+     * @access private
+     * @var    object
+     */
+    private static $oShelll;
 
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		parent::__construct( $oShell );
+    /**
+     * Konstruktor
+     *
+     * @access public
+     * @param  object $oShell Obiekt Shell
+     * @return void
+     */
+    public function __construct(Shell $oShell)
+    {
+        parent::__construct($oShell);
 
-		self::$oShelll = $oShell;
-	}
+        self::$oShelll = $oShell;
+    }
 
-	/**
-	 * Dostepna lista komend
-	 *
-	 * @access public
-	 * @return array
-	 */
-	public function getCommands()
-	{
-		return array( 'irc' );
-	}
+    /**
+     * Dostepna lista komend
+     *
+     * @access public
+     * @return array
+     */
+    public function getCommands()
+    {
+        return array('irc');
+    }
 
-	/**
-	 * Zwracanie wersji modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getVersion()
-	{
-		/**
-		 * Wersja Data Autor
-		 */
-		return '1.01 2012-11-10 - <krzotr@gmail.com>';
-	}
+    /**
+     * Zwracanie wersji modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getVersion()
+    {
+        /**
+         * Wersja Data Autor
+         */
+        return '1.01 2012-11-10 - <krzotr@gmail.com>';
+    }
 
-	/**
-	 * Zwracanie pomocy modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getHelp()
-	{
-		return <<<DATA
+    /**
+     * Zwracanie pomocy modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getHelp()
+    {
+        return <<<DATA
 Łączenie się z serwera Irc
 
 	Użycie:
@@ -411,136 +394,118 @@ class ModuleIrc extends ModuleAbstract
 		:ircmgs - wysłanie surowej wiadomośći
 			':ircmgs KICK #kanal nick' - wyrzucenie użytkownika 'nick' z kanału '#kanal'
 DATA;
-	}
+    }
 
-	/**
-	 * Parsowanie wiadomosci
-	 *
-	 * @see   Irc::setCallback
-	 *
-	 * @static
-	 * @access public
-	 * @param  object $oIrc    Obiekt Irc
-	 * @param  array  $aConfig Konfiguracja polaczenia z Irc
-	 * @param  array  $aData   Dane pochodzace z Irc, klucze:
-	 * @return void
-	 */
-	public static function parseMessage( $oIrc, $aConfig, $aData )
-	{
-		static $sCaptcha;
+    /**
+     * Parsowanie wiadomosci
+     *
+     * @see   Irc::setCallback
+     *
+     * @static
+     * @access public
+     * @param  object $oIrc Obiekt Irc
+     * @param  array $aConfig Konfiguracja polaczenia z Irc
+     * @param  array $aData Dane pochodzace z Irc, klucze:
+     * @return void
+     */
+    public static function parseMessage($oIrc, $aConfig, $aData)
+    {
+        static $sCaptcha;
 
-		/**
-		 * ircmsg, surowa wiadomosc
-		 */
-		if( strncmp( $aData['message'], ':ircmsg', 7 ) === 0 )
-		{
-			$oIrc -> sendRawMessage( substr( $aData['message'], 8 ) );
-		}
-		/**
-		 * Polecenie zaczynajace sie od ':'
-		 */
-		else if( preg_match( '~^:[a-z][a-z0-9]{1,}~', $aData['message'] ) )
-		{
-			$aMessageData = array();
+        /**
+         * ircmsg, surowa wiadomosc
+         */
+        if (strncmp($aData['message'], ':ircmsg', 7) === 0) {
+            $oIrc->sendRawMessage(substr($aData['message'], 8));
+        } /**
+         * Polecenie zaczynajace sie od ':'
+         */
+        else if (preg_match('~^:[a-z][a-z0-9]{1,}~', $aData['message'])) {
+            $aMessageData = array();
 
-			/**
-			 * Polecenie EXIT
-			 */
-			if( strncmp( $aData['message'], ':exit', 5 ) === 0 )
-			{
-				if( $sCaptcha === substr( $aData['message'], 6 ) )
-				{
-					exit ;
-				}
-				else
-				{
-					$sCaptcha = md5( microtime( 1 ) );
-					$sData = sprintf( 'Zabij mnie %s !!!', $sCaptcha );
-				}
-			}
-			else
-			{
-				/**
-				 * Tradycyjne polecenie
-				 */
-				$sData = self::$oShelll -> getActionBrowser( $aData['message'] );
-			}
+            /**
+             * Polecenie EXIT
+             */
+            if (strncmp($aData['message'], ':exit', 5) === 0) {
+                if ($sCaptcha === substr($aData['message'], 6)) {
+                    exit;
+                } else {
+                    $sCaptcha = md5(microtime(1));
+                    $sData = sprintf('Zabij mnie %s !!!', $sCaptcha);
+                }
+            } else {
+                /**
+                 * Tradycyjne polecenie
+                 */
+                $sData = self::$oShelll->getActionBrowser($aData['message']);
+            }
 
-			/**
-			 * Wiadomosc publiczna
-			 */
-			if( $aData['type'] === 'public' )
-			{
-				$aMessageData = array
-				(
-					'public',
-					$sData,
-				);
-			}
-			else
-			{
-				/**
-				 * Wiadomosc prywatna
-				 */
-				$aMessageData = array
-				(
-					'private',
-					$sData,
-					$aData['nick']
-				);
-			}
+            /**
+             * Wiadomosc publiczna
+             */
+            if ($aData['type'] === 'public') {
+                $aMessageData = array
+                (
+                    'public',
+                    $sData,
+                );
+            } else {
+                /**
+                 * Wiadomosc prywatna
+                 */
+                $aMessageData = array
+                (
+                    'private',
+                    $sData,
+                    $aData['nick']
+                );
+            }
 
-			/**
-			 * Wysylanie wiadomosci
-			 */
-			call_user_func_array( array( $oIrc, 'sendMessage' ), $aMessageData );
-		}
-	}
+            /**
+             * Wysylanie wiadomosci
+             */
+            call_user_func_array(array($oIrc, 'sendMessage'), $aMessageData);
+        }
+    }
 
-	/**
-	 * Wywolanie modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function get()
-	{
-		/**
-		 * Czy modul jest zaladowany
-		 */
-		if( ! class_exists( 'Irc' ) )
-		{
-			return 'irc - !!! moduł nie został załadowany';
-		}
+    /**
+     * Wywolanie modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function get()
+    {
+        /**
+         * Czy modul jest zaladowany
+         */
+        if (!class_exists('Irc')) {
+            return 'irc - !!! moduł nie został załadowany';
+        }
 
-		/**
-		 * Help
-		 */
-		if( ( $this -> oShell -> iArgc !== 3 ) && ( $this -> oShell -> iArgc !== 4 ) )
-		{
-			return $this -> getHelp();
-		}
+        /**
+         * Help
+         */
+        if (($this->oShell->iArgc !== 3) && ($this->oShell->iArgc !== 4)) {
+            return $this->getHelp();
+        }
 
-		try
-		{
-			$oIrc = new Irc();
-			$oIrc
-			      -> setHost( $this -> oShell -> aArgv[0] )
-			      -> setNick( $this -> oShell -> aArgv[1] )
-			      -> setChannel( $this -> oShell -> aArgv[2] )
-			      -> setCallback( 'ModuleIrc::parseMessage' );
+        try {
+            $oIrc = new Irc();
+            $oIrc
+                ->setHost($this->oShell->aArgv[0])
+                ->setNick($this->oShell->aArgv[1])
+                ->setChannel($this->oShell->aArgv[2])
+                ->setCallback('ModuleIrc::parseMessage');
 
-			if( isset( $this -> oShell -> aArgv[3] ) )
-			{
-				$oIrc -> setPassword( $this -> oShell -> aArgv[3] );
-			}
+            if (isset($this->oShell->aArgv[3])) {
+                $oIrc->setPassword($this->oShell->aArgv[3]);
+            }
 
-			$oIrc -> get();
-		}
-		catch( IrcException $oException )
-		{
-			return $oException -> getMessage();
-		}
-	}
+            $oIrc->get();
+        } catch (IrcException $oException) {
+            return $oException->getMessage();
+        }
+    }
 
 }

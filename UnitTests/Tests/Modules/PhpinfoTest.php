@@ -20,19 +20,19 @@
  */
 class ModulePhpinfoTest extends PHPUnit_Framework_TestCase
 {
-	protected $oShell;
-	protected $oModule;
+    protected $oShell;
+    protected $oModule;
 
-	public function setUp()
-	{
-		$this -> oShell = new Shell();
-		$this -> oModule = new ModulePhpinfo( $this -> oShell );
-	}
+    public function setUp()
+    {
+        $this->oShell = new Shell();
+        $this->oModule = new ModulePhpinfo($this->oShell);
+    }
 
-	public function testModule()
-	{
-		$this -> oShell -> setArgs( ':phpinfo' );
-		$this -> assertRegExp( '~_SERVER\["DOCUMENT_ROOT"\]~', $this -> oModule -> get() );
-	}
+    public function testModule()
+    {
+        $this->oShell->setArgs(':phpinfo');
+        $this->assertRegExp('~_SERVER\["DOCUMENT_ROOT"\]~', $this->oModule->get());
+    }
 
 }

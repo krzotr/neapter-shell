@@ -20,45 +20,45 @@
  */
 class ModuleSocketUpload extends ModuleAbstract
 {
-	/**
-	 * Dostepna lista komend
-	 *
-	 * @access public
-	 * @return array
-	 */
-	public function getCommands()
-	{
-		return array
-		(
-			'socketupload',
-			'socketup',
-			'socketput'
-		);
-	}
+    /**
+     * Dostepna lista komend
+     *
+     * @access public
+     * @return array
+     */
+    public function getCommands()
+    {
+        return array
+        (
+            'socketupload',
+            'socketup',
+            'socketput'
+        );
+    }
 
-	/**
-	 * Zwracanie wersji modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getVersion()
-	{
-		/**
-		 * Wersja Data Autor
-		 */
-		return '1.01 2011-09-08 - <krzotr@gmail.com>';
-	}
+    /**
+     * Zwracanie wersji modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getVersion()
+    {
+        /**
+         * Wersja Data Autor
+         */
+        return '1.01 2011-09-08 - <krzotr@gmail.com>';
+    }
 
-	/**
-	 * Zwracanie pomocy modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function getHelp()
-	{
-		return <<<DATA
+    /**
+     * Zwracanie pomocy modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function getHelp()
+    {
+        return <<<DATA
 Wysyłanie pliku za pomocą protokołu TCP
 
 	Użycie:
@@ -70,66 +70,60 @@ Wysyłanie pliku za pomocą protokołu TCP
 	NetCat:
 		nc -vv -l -p 6666
 DATA;
-	}
+    }
 
-	/**
-	 * Wywolanie modulu
-	 *
-	 * @access public
-	 * @return string
-	 */
-	public function get()
-	{
-		/**
-		 * Help
-		 */
-		if( $this -> oShell -> iArgc !== 2 )
-		{
-			return $this -> getHelp();
-		}
+    /**
+     * Wywolanie modulu
+     *
+     * @access public
+     * @return string
+     */
+    public function get()
+    {
+        /**
+         * Help
+         */
+        if ($this->oShell->iArgc !== 2) {
+            return $this->getHelp();
+        }
 
-		$aHost = $this -> oShell -> getHost( $this -> oShell -> aArgv[0] );
+        $aHost = $this->oShell->getHost($this->oShell->aArgv[0]);
 
-		/**
-		 * Port jest wymagany
-		 */
-		if( $aHost[1] === 0 )
-		{
-			return sprintf( 'Błędny host "%s"', $this -> oShell -> aArgv[0] );
-		}
+        /**
+         * Port jest wymagany
+         */
+        if ($aHost[1] === 0) {
+            return sprintf('Błędny host "%s"', $this->oShell->aArgv[0]);
+        }
 
-		/**
-		 * Plik zrodlowy musi istniec
-		 */
-		if( ! is_file( $this -> oShell -> aArgv[0] ) )
-		{
-		}
+        /**
+         * Plik zrodlowy musi istniec
+         */
+        if (!is_file($this->oShell->aArgv[0])) {
+        }
 
-		/**
-		 * Polaczenie z hostem
-		 */
-		if( ! ( $rSock = fsockopen( $aHost[0], $aHost[1] ) ) )
-		{
-			return sprintf( 'Nie można połączyć się z serwerem "%s"', $this -> oShell -> aArgv[0] );
-		}
+        /**
+         * Polaczenie z hostem
+         */
+        if (!($rSock = fsockopen($aHost[0], $aHost[1]))) {
+            return sprintf('Nie można połączyć się z serwerem "%s"', $this->oShell->aArgv[0]);
+        }
 
-		/**
-		 * File
-		 */
-		if( ! ( $rFile = fopen( $this -> oShell -> aArgv[1], 'r' ) ) )
-		{
-			return sprintf( 'Nie można odczytać pliku "%s"', $this -> oShell -> aArgv[1] );
-		}
+        /**
+         * File
+         */
+        if (!($rFile = fopen($this->oShell->aArgv[1], 'r'))) {
+            return sprintf('Nie można odczytać pliku "%s"', $this->oShell->aArgv[1]);
+        }
 
-		while( ! feof( $rFile ) )
-		{
-			fwrite( $rSock, fread( $rFile, 131072 ) );
-		}
+        while (!feof($rFile)) {
+            fwrite($rSock, fread($rFile, 131072));
+        }
 
-		fclose( $rFile );
-		fclose( $rSock );
+        fclose($rFile);
+        fclose($rSock);
 
-		return 'Plik został przesłany';
-	}
+        return 'Plik został przesłany';
+    }
 
 }

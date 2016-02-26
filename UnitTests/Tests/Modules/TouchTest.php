@@ -20,39 +20,38 @@
  */
 class ModuleTouchTest extends PHPUnit_Framework_TestCase
 {
-	protected $oShell;
-	protected $oModule;
-	protected $sFilePath;
+    protected $oShell;
+    protected $oModule;
+    protected $sFilePath;
 
-	public function setUp()
-	{
-		$this -> oShell = new Shell();
-		$this -> oModule = new ModuleTouch( $this -> oShell );
+    public function setUp()
+    {
+        $this->oShell = new Shell();
+        $this->oModule = new ModuleTouch($this->oShell);
 
-		$this -> sFilePath = sys_get_temp_dir() . '/' . md5( time() );
+        $this->sFilePath = sys_get_temp_dir() . '/' . md5(time());
 
-		touch( $this -> sFilePath );
+        touch($this->sFilePath);
 
-		if( ! is_file( $this -> sFilePath ) )
-		{
-			$this -> fail( 'Nie można utworzyć przykładowego pliku' );
-		}
-	}
+        if (!is_file($this->sFilePath)) {
+            $this->fail('Nie można utworzyć przykładowego pliku');
+        }
+    }
 
-	public function testModule()
-	{
-		$this -> oShell -> setArgs( ':touch 2010-10-10 ' . $this -> sFilePath );
-		
-		$this -> assertSame( 'Data modyfikacji i dostępu została zmieniona', $this -> oModule -> get() );
+    public function testModule()
+    {
+        $this->oShell->setArgs(':touch 2010-10-10 ' . $this->sFilePath);
 
-		clearstatcache();
+        $this->assertSame('Data modyfikacji i dostępu została zmieniona', $this->oModule->get());
 
-		$this -> assertSame( '2010-10-10', date( 'Y-m-d', fileatime( $this -> sFilePath ) ) );
-	}
+        clearstatcache();
 
-	public function tearDown()
-	{
-		@ unlink( $this -> sFilePath );
-	}
+        $this->assertSame('2010-10-10', date('Y-m-d', fileatime($this->sFilePath)));
+    }
+
+    public function tearDown()
+    {
+        @ unlink($this->sFilePath);
+    }
 
 }

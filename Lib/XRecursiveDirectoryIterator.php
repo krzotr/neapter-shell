@@ -18,16 +18,13 @@
  */
 class XRecursiveDirectoryIterator extends RecursiveDirectoryIterator
 {
-	public function getChildren()
-	{
-		try
-		{
-			return parent::getChildren();
-		}
-		catch( UnexpectedValueException $oException )
-		{
-			return new RecursiveArrayIterator( array() );
-		}
-	}
+    public function getChildren()
+    {
+        try {
+            return parent::getChildren();
+        } catch (UnexpectedValueException $oException) {
+            return new RecursiveArrayIterator(array());
+        }
+    }
 
 }

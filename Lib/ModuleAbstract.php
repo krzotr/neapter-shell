@@ -16,64 +16,64 @@
  */
 abstract class ModuleAbstract
 {
-	/**
-	 * Obiekt Shell
-	 *
-	 * @access protected
-	 * @var    object
-	 */
-	protected $oShell;
+    /**
+     * Obiekt Shell
+     *
+     * @access protected
+     * @var    object
+     */
+    protected $oShell;
 
-	/**
-	 * Konstruktor
-	 *
-	 * @access public
-	 * @param  object $oShell Obiekt Shell
-	 * @return void
-	 */
-	public function __construct( Shell $oShell )
-	{
-		$this -> oShell = $oShell;
-	}
+    /**
+     * Konstruktor
+     *
+     * @access public
+     * @param  object $oShell Obiekt Shell
+     * @return void
+     */
+    public function __construct(Shell $oShell)
+    {
+        $this->oShell = $oShell;
+    }
 
-	/**
-	 * Zwracania aliasow dla komendy
-	 *
-	 * @abstract
-	 *
-	 * @access public
-	 * @return array
-	 */
-	abstract public function getCommands();
+    /**
+     * Zwracania aliasow dla komendy
+     *
+     * @abstract
+     *
+     * @access public
+     * @return array
+     */
+    abstract public function getCommands();
 
-	/**
-	 * Zwracanie wersji modulu
-	 *
-	 * @abstract
-	 *
-	 * @access public
-	 * @return string
-	 */
-	abstract public function getVersion();
+    /**
+     * Zwracanie wersji modulu
+     *
+     * @abstract
+     *
+     * @access public
+     * @return string
+     */
+    abstract public function getVersion();
 
-	/**
-	 * Zwracanie pomocy modulu
-	 *
-	 * @abstract
-	 *
-	 * @access public
-	 * @return string
-	 */
-	abstract public function getHelp();
+    /**
+     * Zwracanie pomocy modulu
+     *
+     * @abstract
+     *
+     * @access public
+     * @return string
+     */
+    abstract public function getHelp();
 
-	/**
-	 * Wywolanie modulu
-	 *
-	 * @abstract
-	 *
-	 * @access public
-	 * @return string
-	 */
-	abstract public function get();
+    /**
+     * Wywolanie modulu
+     *
+     * @abstract
+     *
+     * @access public
+     * @return string
+     */
+    abstract public function get();
 
 }

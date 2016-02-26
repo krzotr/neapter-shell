@@ -20,22 +20,22 @@
  */
 class ModuleBackConnectTest extends PHPUnit_Framework_TestCase
 {
-	protected $oShell;
-	protected $oModule;
+    protected $oShell;
+    protected $oModule;
 
-	public function setUp()
-	{
-		$this -> oShell = new Shell();
-		$this -> oModule = new ModuleBackConnect( $this -> oShell );
-	}
+    public function setUp()
+    {
+        $this->oShell = new Shell();
+        $this->oModule = new ModuleBackConnect($this->oShell);
+    }
 
-	public function testModule()
-	{
-		$this -> oShell -> parseCommand( 'bc' );
-		$this -> assertSame( $this -> oModule -> getHelp(), $this -> oModule -> get() );
+    public function testModule()
+    {
+        $this->oShell->parseCommand('bc');
+        $this->assertSame($this->oModule->getHelp(), $this->oModule->get());
 
-		$this -> oShell -> parseCommand( 'backconnect' );
-		$this -> assertSame( $this -> oModule -> getHelp(), $this -> oModule -> get() );
-	}
+        $this->oShell->parseCommand('backconnect');
+        $this->assertSame($this->oModule->getHelp(), $this->oModule->get());
+    }
 
 }
