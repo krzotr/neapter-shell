@@ -26,7 +26,7 @@ class ModuleMd5crack extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('md5crack');
     }
@@ -37,7 +37,7 @@ class ModuleMd5crack extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -51,7 +51,7 @@ class ModuleMd5crack extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Łamanie haszy md5
@@ -75,15 +75,15 @@ DATA;
         /**
          * Help
          */
-        $iParams = $this->oShell->getArgs()->getNumberOfParams();
+        $iParams = $this->oArgs->getNumberOfParams();
 
         if ($iParams === 0) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         $sOutput = NULL;
         for ($i = 0; $i < $iParams; ++$i) {
-            $sHash = $this->oShell->getArgs()->getParam($i);
+            $sHash = $this->oArgs->getParam($i);
             if (!preg_match('~^[a-zA-Z0-9]{32}\z~', $sHash)) {
                 continue;
             }
@@ -100,7 +100,7 @@ DATA;
          * Poprawny hash jest wymagany
          */
         if ($sOutput === NULL) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         return htmlspecialchars($sOutput);

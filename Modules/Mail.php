@@ -278,7 +278,7 @@ class ModuleMail extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array
         (
@@ -294,7 +294,7 @@ class ModuleMail extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -308,7 +308,7 @@ class ModuleMail extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Wysyłanie emaili za pomocą natywnej funkcji mail()
@@ -335,7 +335,7 @@ DATA;
          * Help
          */
         if ($this->oShell->iArgc !== 4) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         try {

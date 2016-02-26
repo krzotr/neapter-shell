@@ -26,7 +26,7 @@ class ModuleMysql extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('mysql');
     }
@@ -37,7 +37,7 @@ class ModuleMysql extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -51,7 +51,7 @@ class ModuleMysql extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Połączenie z bazą MySQL
@@ -76,7 +76,7 @@ DATA;
          * Help
          */
         if ($this->oShell->iArgc !== 4) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         $aHost = $this->oShell->getHost($this->oShell->aArgv[0]);

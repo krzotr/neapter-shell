@@ -43,9 +43,9 @@ class ModuleLs extends ModuleAbstract
      * @param  object $oShell Obiekt Shell
      * @return void
      */
-    public function __construct(Shell $oShell)
+    public function __construct(Shell $oShell, Utils $oUtils, Args $oArgs)
     {
-        parent::__construct($oShell);
+        parent::__construct($oShell, $oUtils, $oArgs);
 
         /**
          * Czy funkcje sa dostepne
@@ -60,9 +60,13 @@ class ModuleLs extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
-        return array('ls');
+        return array(
+            'ls',
+            'dir',
+            'll'
+        );
     }
 
     /**
@@ -71,7 +75,7 @@ class ModuleLs extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -85,7 +89,7 @@ class ModuleLs extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Wyświetlanie informacji o plikach i katalogach
@@ -153,9 +157,9 @@ DATA;
         /**
          * Domyslny katalog jezeli nie podano sciezki
          */
-        $sDir = ($this->oShell->getArgs()->getParam(0) ?: getcwd());
+        $sDir = ($this->oArgs->getParam(0) ?: getcwd());
 
-        $aOptv = $this->oShell->getArgs()->getOptions();
+        $aOptv = $this->oArgs->getOptions();
 
         $bList = array_key_exists('l', $aOptv);
         $bRecursive = array_key_exists('R', $aOptv);
@@ -183,7 +187,7 @@ DATA;
                     /**
                      * Windows ?
                      */
-                    if ($this->oShell->isWindows()) {
+                    if ($this->oUtils->isWindows()) {
                         /**
                          * Wyjatek - nie mamy praw odczytu dla wlasciwosci pliku
                          */

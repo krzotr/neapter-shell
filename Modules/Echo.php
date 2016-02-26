@@ -26,7 +26,7 @@ class ModuleEcho extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('echo');
     }
@@ -37,7 +37,7 @@ class ModuleEcho extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -51,7 +51,7 @@ class ModuleEcho extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Wyświetla tekst
@@ -69,7 +69,7 @@ DATA;
      */
     public function get()
     {
-        return htmlspecialchars(implode(' ', $this->oShell->getArgs()->getParams()));
+        return htmlspecialchars(implode(' ', $this->oArgs->getParams()));
     }
 
 }

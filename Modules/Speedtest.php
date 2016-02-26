@@ -26,7 +26,7 @@ class ModuleSpeedtest extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('speedtest');
     }
@@ -37,7 +37,7 @@ class ModuleSpeedtest extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -51,7 +51,7 @@ class ModuleSpeedtest extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Test prędkości łącza
@@ -78,11 +78,11 @@ DATA;
         /**
          * Help
          */
-        if ($this->oShell->getArgs()->getNumberOfParams() !== 1) {
-            return $this->getHelp();
+        if ($this->oArgs->getNumberOfParams() !== 1) {
+            return self::getHelp();
         }
 
-        $sParam = $this->oShell->getArgs()->getParam(0);
+        $sParam = $this->oArgs->getParam(0);
 
         /**
          * Wspierany jest tylko protokul HTTP

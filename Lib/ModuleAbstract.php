@@ -9,12 +9,45 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
+interface ModuleInterface
+{
+    /**
+     * Zwracania aliasow dla komendy
+     *
+     * @abstract
+     *
+     * @access public
+     * @return array
+     */
+    public static function getCommands();
+
+    /**
+     * Zwracanie wersji modulu
+     *
+     * @abstract
+     *
+     * @access public
+     * @return string
+     */
+    public static function getVersion();
+
+    /**
+     * Zwracanie pomocy modulu
+     *
+     * @abstract
+     *
+     * @access public
+     * @return string
+     */
+    public static function getHelp();
+}
+
 /**
  * interface - ShellInterface interface dla shella
  *
  * @package    NeapterShell
  */
-abstract class ModuleAbstract
+abstract class ModuleAbstract implements ModuleInterface
 {
     /**
      * Obiekt Shell
@@ -25,46 +58,28 @@ abstract class ModuleAbstract
     protected $oShell;
 
     /**
+     * Obiekt Utils
+     *
+     * @access protected
+     * @var    object
+     */
+    protected $oUtils;
+
+    protected $oArgs;
+
+    /**
      * Konstruktor
      *
      * @access public
      * @param  object $oShell Obiekt Shell
      * @return void
      */
-    public function __construct(Shell $oShell)
+    public function __construct(Shell $oShell, Utils $oUtils = NULL, Args $oArgs = NULL)
     {
         $this->oShell = $oShell;
+        $this->oUtils = $oUtils;
+        $this->oArgs = $oArgs;
     }
-
-    /**
-     * Zwracania aliasow dla komendy
-     *
-     * @abstract
-     *
-     * @access public
-     * @return array
-     */
-    abstract public function getCommands();
-
-    /**
-     * Zwracanie wersji modulu
-     *
-     * @abstract
-     *
-     * @access public
-     * @return string
-     */
-    abstract public function getVersion();
-
-    /**
-     * Zwracanie pomocy modulu
-     *
-     * @abstract
-     *
-     * @access public
-     * @return string
-     */
-    abstract public function getHelp();
 
     /**
      * Wywolanie modulu

@@ -26,7 +26,7 @@ class ModuleTouch extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('touch');
     }
@@ -37,7 +37,7 @@ class ModuleTouch extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -51,7 +51,7 @@ class ModuleTouch extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Zmiana czasu dostępu i modyfikacji pliku
@@ -76,16 +76,16 @@ DATA;
         /**
          * Help
          */
-        $iParams = $this->oShell->getArgs()->getNumberOfParams();
+        $iParams = $this->oArgs->getNumberOfParams();
 
         if (($iParams !== 1) && ($iParams !== 2)) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         /**
          * Sprawdzanie czy plik istnieje
          */
-        $sFilePath = $this->oShell->getArgs()->getParam(1);
+        $sFilePath = $this->oArgs->getParam(1);
 
         if (($sFilePath !== FALSE) && !is_file($sFilePath)) {
             return sprintf('Plik "%s" nie istnieje', $sFilePath);
@@ -101,7 +101,7 @@ DATA;
         /**
          * Czas modyfikacji / dostepu
          */
-        $iTime = strtotime($this->oShell->getArgs()->getParam(0));
+        $iTime = strtotime($this->oArgs->getParam(0));
 
         /**
          * Zmiana czasu dostepu i modyfikacji

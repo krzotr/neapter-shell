@@ -31,7 +31,7 @@ class ModuleDummy extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         /**
          * 'dummy' - 'dummy2' oraz 'dummy3' sa aliasami
@@ -52,7 +52,7 @@ class ModuleDummy extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -72,7 +72,7 @@ class ModuleDummy extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Opis Polecenia

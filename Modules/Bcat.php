@@ -26,7 +26,7 @@ class ModuleBcat extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array
         (
@@ -41,7 +41,7 @@ class ModuleBcat extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -55,7 +55,7 @@ class ModuleBcat extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Wyświetlanie zawartości pliku przy użyciu base64
@@ -79,15 +79,15 @@ DATA;
         /**
          * Help
          */
-        if ($this->oShell->getArgs()->getNumberOfParams() === 0) {
-            return $this->getHelp();
+        if ($this->oArgs->getNumberOfParams() === 0) {
+            return self::getHelp();
         }
 
         /**
          * Plik zrodlowy musi istniec
          */
 
-        $sFilePath = $this->oShell->getArgs()->getParam(0);
+        $sFilePath = $this->oArgs->getParam(0);
 
         if (!is_file($sFilePath)) {
             return sprintf('Plik "%s" nie istnieje', $sFilePath);

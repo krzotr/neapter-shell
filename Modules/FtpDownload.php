@@ -26,7 +26,7 @@ class ModuleFtpDownload extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array
         (
@@ -42,7 +42,7 @@ class ModuleFtpDownload extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -56,7 +56,7 @@ class ModuleFtpDownload extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Pobieranie pliku z FTP
@@ -81,7 +81,7 @@ DATA;
          * Help
          */
         if ($this->oShell->iArgc !== 4) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         $aHost = $this->getHost($this->oShell->aArgv[0]);

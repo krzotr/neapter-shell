@@ -26,7 +26,7 @@ class ModuleG4m3 extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('g4m3');
     }
@@ -37,7 +37,7 @@ class ModuleG4m3 extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -51,7 +51,7 @@ class ModuleG4m3 extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Gra z komputerem, wspaniała na samotne wieczory ;)
@@ -74,12 +74,12 @@ DATA;
         /**
          * Help
          */
-        if ($this->oShell->getArgs()->getNumberOfParams() === 0) {
-            return $this->getHelp();
+        if ($this->oArgs->getNumberOfParams() === 0) {
+            return self::getHelp();
         }
 
-        $sParam = $this->oShell->getArgs()->getParam(0);
-        $iLoop = (int)$this->oShell->getArgs()->getParam(1);
+        $sParam = $this->oArgs->getParam(0);
+        $iLoop = (int)$this->oArgs->getParam(1);
 
         /**
          * Jesli 'liczba' jest rowna 'x' to komputer sam losuje liczby

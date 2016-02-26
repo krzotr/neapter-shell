@@ -19,25 +19,21 @@ class LoadModules
 {
     public function __construct()
     {
-        $oDirectory = new DirectoryIterator(__DIR__ . '/../Modules');
+        /* @todo, Why not Recirsive Directory Iterator and .php files? */
 
-        /**
-         * Wczytywanie wszystkich modułów z katalogu Modules
-         */
-        foreach ($oDirectory as $oFile) {
-            if ($oFile->isFile()) {
-                require_once $oFile->getPathname();
-            }
-        }
+        $aDirectories = array(
+            'Modules',
+            'Modules/Basic',
+            'Modules/Trash',
+        );
 
-        $oDirectory = new DirectoryIterator(__DIR__ . '/../Modules/Trash');
+        foreach ($aDirectories as $sDir) {
+            $oDirectory = new DirectoryIterator(__DIR__ . '/../' . $sDir);
 
-        /**
-         * Wczytywanie wszystkich modułów z katalogu Modules/Trash
-         */
-        foreach ($oDirectory as $oFile) {
-            if ($oFile->isFile()) {
-                require_once $oFile->getPathname();
+            foreach ($oDirectory as $oFile) {
+                if ($oFile->isFile()) {
+                    require_once $oFile->getPathname();
+                }
             }
         }
     }

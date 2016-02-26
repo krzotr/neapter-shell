@@ -26,7 +26,7 @@ class ModuleRevip extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('revip');
     }
@@ -37,7 +37,7 @@ class ModuleRevip extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -51,10 +51,10 @@ class ModuleRevip extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
-Revip
+Revip - jakie hosty zawierają podany adres IP
 
 	Użycie:
 		revip host_lub_ip
@@ -75,8 +75,8 @@ DATA;
         /**
          * Help
          */
-        if ($this->oShell->getArgs()->getNumberOfParams() !== 1) {
-            return $this->getHelp();
+        if ($this->oArgs->getNumberOfParams() !== 1) {
+            return self::getHelp();
         }
 
         /**
@@ -95,7 +95,7 @@ DATA;
         /**
          * Pobieranie danych
          */
-        if (($sData = file_get_contents('http://www.ip-adress.com/reverse_ip/' . $this->oShell->getArgs()->getParam(0), FALSE, stream_context_create($aStream))) === FALSE) {
+        if (($sData = file_get_contents('http://www.ip-adress.com/reverse_ip/' . $this->oArgs->getParam(0), FALSE, stream_context_create($aStream))) === FALSE) {
             return 'Nie można połączyć się z serwerem';
         }
 

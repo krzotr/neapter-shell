@@ -39,8 +39,7 @@ class Irc
      * @access protected
      * @var    array
      */
-    protected $aConfig = array
-    (
+    protected $aConfig = array(
         'host' => NULL,
         'port' => 6667,
         'nick' => NULL,
@@ -338,9 +337,9 @@ class ModuleIrc extends ModuleAbstract
      * @param  object $oShell Obiekt Shell
      * @return void
      */
-    public function __construct(Shell $oShell)
+    public function __construct(Shell $oShell, Utils $oUtils, Args $oArgs)
     {
-        parent::__construct($oShell);
+        parent::__construct($oShell, $oUtils, $oArgs);
 
         self::$oShelll = $oShell;
     }
@@ -351,7 +350,7 @@ class ModuleIrc extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('irc');
     }
@@ -362,7 +361,7 @@ class ModuleIrc extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -376,7 +375,7 @@ class ModuleIrc extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Łączenie się z serwera Irc
@@ -487,7 +486,7 @@ DATA;
          * Help
          */
         if (($this->oShell->iArgc !== 3) && ($this->oShell->iArgc !== 4)) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         try {

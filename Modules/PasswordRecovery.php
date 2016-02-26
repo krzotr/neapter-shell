@@ -476,7 +476,7 @@ class ModulePasswordRecovery extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array
         (
@@ -491,7 +491,7 @@ class ModulePasswordRecovery extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -505,7 +505,7 @@ class ModulePasswordRecovery extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Odzyskiwanie haseł, atak słownikowy na mysql, ftp, ssh2 oraz http
@@ -545,7 +545,7 @@ DATA;
          * Help
          */
         if ($this->oShell->iArgc !== 4) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         header('Content-Type: text/plain; charset=utf-8');

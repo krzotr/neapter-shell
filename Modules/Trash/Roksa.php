@@ -26,7 +26,7 @@ class ModuleRoksa extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('roksa');
     }
@@ -37,7 +37,7 @@ class ModuleRoksa extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -51,7 +51,7 @@ class ModuleRoksa extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Ogłoszenia towarzyskie Roksa.pl - Kraków
@@ -84,7 +84,7 @@ DATA;
          * Help
          */
         if ($this->oShell->iArgc > 2) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         $iLimit = 20;

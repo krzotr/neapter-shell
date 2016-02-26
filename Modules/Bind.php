@@ -185,7 +185,7 @@ class ModuleBind extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('bind');
     }
@@ -196,7 +196,7 @@ class ModuleBind extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -210,7 +210,7 @@ class ModuleBind extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Dostęp do powłoki na danym porcie
@@ -248,8 +248,8 @@ DATA;
         /**
          * Help
          */
-        if ($this->oShell->getArgs()->getNumberOfParams() !== 1) {
-            return $this->getHelp();
+        if ($this->oArgs->getNumberOfParams() !== 1) {
+            return self::getHelp();
         }
 
         if (PHP_SAPI !== 'cli') {
@@ -261,7 +261,7 @@ DATA;
 
             $oProxy = new Bind($this->oShell);
             $oProxy
-                ->setPort($this->oShell->getArgs()->getParam(0))
+                ->setPort($this->oArgs->getParam(0))
                 ->get();
 
             ob_end_flush();

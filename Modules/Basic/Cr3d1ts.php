@@ -10,7 +10,7 @@
  */
 
 /**
- * Wyswietlanie zawartosci pliku
+ * Zmienianie uprawnien dla pliku
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
@@ -18,7 +18,7 @@
  * @package    NeapterShell
  * @subpackage Modules
  */
-class ModuleCat extends ModuleAbstract
+class ModuleCr3d1ts extends ModuleAbstract
 {
     /**
      * Dostepna lista komend
@@ -28,7 +28,10 @@ class ModuleCat extends ModuleAbstract
      */
     public static function getCommands()
     {
-        return array('cat');
+        return array(
+            'credits',
+            'cr3d1ts'
+        );
     }
 
     /**
@@ -42,7 +45,7 @@ class ModuleCat extends ModuleAbstract
         /**
          * Wersja Data Autor
          */
-        return '1.01 2011-06-23 - <krzotr@gmail.com>';
+        return '1.0.0 2016-02-26 - <krzotr@gmail.com>';
     }
 
     /**
@@ -54,13 +57,7 @@ class ModuleCat extends ModuleAbstract
     public static function getHelp()
     {
         return <<<DATA
-Wyświetlanie zawartości pliku
-
-	Użycie:
-		cat ścieżka_do_pliku
-
-	Przykład:
-		cat /etc/passwd
+Cr3d1ts - Informacje o autorze
 DATA;
     }
 
@@ -72,23 +69,10 @@ DATA;
      */
     public function get()
     {
-        /**
-         * Help
-         */
-        if ($this->oArgs->getNumberOfParams() !== 1) {
-            return self::getHelp();
-        }
-
-        $sFilePath = $this->oArgs->getParam(0);
-
-        /**
-         * Plik zrodlowy musi istniec
-         */
-        if (!is_file($sFilePath)) {
-            return sprintf('Plik "%s" nie istnieje', $sFilePath);
-        }
-
-        return htmlspecialchars(file_get_contents($sFilePath));
+        return <<<DATA
+Jakieś sugestie, pytania?
+    Pisz śmiało: Krzychu - <a href="mailto:krzotr@gmail.com">krzotr@gmail.com</a>
+DATA;
     }
 
 }

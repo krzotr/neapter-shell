@@ -26,7 +26,7 @@ class ModuleMv extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array(
             'mv',
@@ -40,7 +40,7 @@ class ModuleMv extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -54,7 +54,7 @@ class ModuleMv extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Przenoszenie pliku
@@ -75,12 +75,12 @@ DATA;
         /**
          * Help
          */
-        if ($this->oShell->getArgs()->getNumberOfParams() !== 2) {
-            return $this->getHelp();
+        if ($this->oArgs->getNumberOfParams() !== 2) {
+            return self::getHelp();
         }
 
-        $sSource = $this->oShell->getArgs()->getParam(0);
-        $sDestination = $this->oShell->getArgs()->getParam(1);
+        $sSource = $this->oArgs->getParam(0);
+        $sDestination = $this->oArgs->getParam(1);
 
         if (!@ rename($sSource, $sDestination)) {
             $sMsg = 'Plik "%s" <span class="red">nie został przeniesiony</span> do "%s"';

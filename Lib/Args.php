@@ -53,6 +53,14 @@ class Args
     protected $aSwitches = array();
 
     /**
+     * RAW input data
+     *
+     * @access protected
+     * @var    mixed
+     */
+    protected $mArgv;
+
+    /**
      * Konstruktor
      *
      * @uses   Neapter\Core\Request
@@ -130,6 +138,8 @@ class Args
         }
 
         $this->aArgs = array_values($aArgs);
+
+        $this->mArgv = $mArgv;
     }
 
     /**
@@ -250,6 +260,11 @@ class Args
     public function getNumberOfParams()
     {
         return count($this->aArgs);
+    }
+
+    public function getRawData()
+    {
+        return $this->mArgv;
     }
 
     /**

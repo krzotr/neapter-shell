@@ -26,7 +26,7 @@ class ModuleMkdir extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('mkdir');
     }
@@ -37,7 +37,7 @@ class ModuleMkdir extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -51,7 +51,7 @@ class ModuleMkdir extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Wyświetla tekst
@@ -69,16 +69,16 @@ DATA;
      */
     public function get()
     {
-        $iParams = $this->oShell->getArgs()->getNumberOfParams();
+        $iParams = $this->oArgs->getNumberOfParams();
 
         if ($iParams === 0) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         $sOutput = NULL;
 
         for ($i = 0; $i < $iParams; ++$i) {
-            $sPathName = $this->oShell->getArgs()->getParam($i);
+            $sPathName = $this->oArgs->getParam($i);
             if (!@ mkdir($sPathName, 0777, TRUE)) {
                 $sMsg = "Katalog \"%s\" <span class=\"red\">nie został utworzony</span>\r\n";
             } else {

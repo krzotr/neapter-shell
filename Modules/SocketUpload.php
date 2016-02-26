@@ -26,7 +26,7 @@ class ModuleSocketUpload extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array
         (
@@ -42,7 +42,7 @@ class ModuleSocketUpload extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -56,7 +56,7 @@ class ModuleSocketUpload extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Wysyłanie pliku za pomocą protokołu TCP
@@ -84,7 +84,7 @@ DATA;
          * Help
          */
         if ($this->oShell->iArgc !== 2) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         $aHost = $this->oShell->getHost($this->oShell->aArgv[0]);

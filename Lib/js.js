@@ -1,5 +1,3 @@
-<script type="text/javascript">
-
 /**
  * Automatyczne dopasowanie wielkosci pola konsoli
  */
@@ -360,4 +358,3 @@ function autoPrompt( sCommand )
 		}
 	}
 }
-</script>

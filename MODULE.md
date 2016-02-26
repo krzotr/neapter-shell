@@ -80,7 +80,7 @@ Opierając się na zdobytych wcześniej informacjach plik klasy zapisujemy w `Mo
 
 	class ModuleMd5 extends ModuleAbstract
 	{
-		public function getCommands()
+		public static function getCommands()
 		{
 			return array
 			(
@@ -94,7 +94,7 @@ Opierając się na zdobytych wcześniej informacjach plik klasy zapisujemy w `Mo
 			return '1.00 2013-01-23 - <krzotr@gmail.com>';
 		}
 
-		public function getHelp()
+		public static function getHelp()
 		{
 			return <<<DATA
 	Obliczanie sumy kontrolnej dla pliku
@@ -208,7 +208,7 @@ Kompletny kod modułu
 
 	class ModuleMd5 extends ModuleAbstract
 	{
-		public function getCommands()
+		public static function getCommands()
 		{
 			return array
 			(
@@ -222,7 +222,7 @@ Kompletny kod modułu
 			return '1.00 2013-01-23 - <krzotr@gmail.com>';
 		}
 
-		public function getHelp()
+		public static function getHelp()
 		{
 			return <<<DATA
 	Obliczanie sumy kontrolnej dla pliku

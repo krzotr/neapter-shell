@@ -34,7 +34,7 @@ class ModuleDownload extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array
         (
@@ -50,7 +50,7 @@ class ModuleDownload extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -64,7 +64,7 @@ class ModuleDownload extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Pobieranie pliku
@@ -95,7 +95,7 @@ DATA;
          * Help
          */
         if ($this->oShell->iArgc === 0) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         $bGzip = in_array('g', $this->oShell->aOptv);

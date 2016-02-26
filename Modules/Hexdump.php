@@ -26,7 +26,7 @@ class ModuleHexdump extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array
         (
@@ -41,7 +41,7 @@ class ModuleHexdump extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -55,7 +55,7 @@ class ModuleHexdump extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Wyświetlanie plików w formacie szesnastkowym
@@ -80,15 +80,15 @@ DATA;
         /**
          * Help
          */
-        if ($this->oShell->getArgs()->getNumberOfParams() === 0) {
-            return $this->getHelp();
+        if ($this->oArgs->getNumberOfParams() === 0) {
+            return self::getHelp();
         }
 
         /**
          * Plik zrodlowy musi istniec
          */
 
-        $sFileName = $this->oShell->getArgs()->getParam(0);
+        $sFileName = $this->oArgs->getParam(0);
 
         if (!is_file($sFileName)) {
             return sprintf('Plik "%s" nie istnieje', $sFileName);

