@@ -18,7 +18,7 @@
  * @package    NeapterShell
  * @subpackage UnitTests
  */
-class ModulePhpinfoTest extends PHPUnit_Framework_TestCase
+class ModuleRemoteTest extends PHPUnit_Framework_TestCase
 {
     protected $oShell;
     protected $oModule;

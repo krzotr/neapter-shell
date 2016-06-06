@@ -37,9 +37,9 @@ require_once dirname(__FILE__) . '/Utils.php';
  * class Shell - Zarzadzanie serwerem
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
- * @version 0.60
+ * @version 1.0.0-dev
  *
  * @package NeapterShell
  *
@@ -467,14 +467,14 @@ class Shell
          */
         $sScript = NULL;
         if (!$this->bNoJs) {
-            $sScript = '<script src="./?js"></script>';
+            $sScript = '<script src="?js"></script>';
         }
 
         $sMenu = $this->getMenu();
         $sGeneratedIn = sprintf('%.5f', microtime(1) - $this->fGeneratedIn);
         $sTitle = sprintf('NeapterShell @ %s (%s)', Request::getServer('HTTP_HOST'), Request::getServer('SERVER_ADDR'));
         $sVersion = self::VERSION;
-        return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><link href=\"./?css\" type=\"text/css\" media=\"all\" rel=\"stylesheet\"/></head><body><div id=\"body\">" .
+        return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><link href=\"?css\" type=\"text/css\" media=\"all\" rel=\"stylesheet\"/></head><body><div id=\"body\">" .
         ($bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>" : NULL) .
         "<div id=\"content\">{$sData}</div></div>" .
         ($bExdendedInfo ? "<div id=\"bottom\">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>" : NULL) .

