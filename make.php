@@ -88,6 +88,10 @@ switch ($sType) {
 
         foreach ($oDirectory as $oFile) {
             if ($oFile->isFile() && ($oFile->getFilename() !== 'Dummy.php')) {
+                if (strpos($oFile->getPathname(), '/Trash/') !== FALSE) {
+                    continue;
+                }
+
                 $aFiles[] = 'Modules' . substr($oFile->getPathname(), strlen($sPath), -4);
             }
         }

@@ -43,7 +43,7 @@ class ModuleLogout extends ModuleAbstract
      */
     public static function getVersion()
     {
-        return '1.0.0 2016-02-26 - <krzotr@gmail.com>';
+        return '1.0.0 2016-06-06 - <krzotr@gmail.com>';
     }
 
     /**
@@ -70,29 +70,19 @@ DATA;
      */
     public function get()
     {
-
-        /**
-         * Sciezka do pliku
-         */
-        $sFilepath = $this->sTmp . '/' . $this->sPrefix . md5(Request::getServer('REMOTE_ADDR') . Request::getServer('USER_AGENT')) . '_auth';
+        $sAuthKeyFile = $this->oUtils->getAuthFileKey();
+        $sAuth = $this->oUtils->cacheGet($sAuthKeyFile);
 
         /**
          * Czy plik z autoryzacja istnieje
          */
-        if (is_file($sFilepath)) {
-            /**
-             * Usuwanie pliku
-             */
-            if (unlink($sFilepath)) {
-                echo 'Zostałeś wylogowany';
-                exit;
-            } else {
-                echo 'Nie zostałeś wylogowany';
-                exit;
-            }
+        if ($sAuth) {
+            $this->oUtils->cacheSet($sAuthKeyFile, '');
         }
 
-        echo 'See you (:';
+        @header('Refresh:1;url=' . Request::getCurrentUrl());
+        echo "See you (:\n";
+
         exit;
     }
 

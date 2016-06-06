@@ -134,11 +134,10 @@ DATA;
          */
         else if (!in_array('proc_open', $this->oUtils->getDisabledFunctions())) {
             echo "proc_open():\r\n\r\n";
-            $rFp = proc_open($sCmd, array
-            (
-                array('pipe', 'r'),
-                array('pipe', 'w')
-            ),
+            $rFp = proc_open($sCmd, array(
+                    array('pipe', 'r'),
+                    array('pipe', 'w')
+                ),
                 $aPipe
             );
 

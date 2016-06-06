@@ -204,7 +204,7 @@ class Request
      * @access public
      * @return boolean
      */
-    public static function isAjas()
+    public static function isAjax()
     {
         return (strncasecmp(self::getServer('HTTP_X_REQUESTED_WITH'), 'XMLHttpRequest', 14) === 0);
     }

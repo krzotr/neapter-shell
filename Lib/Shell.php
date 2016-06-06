@@ -188,7 +188,7 @@ class Shell
         /**
          * Tryb deweloperski
          */
-        $this->bDev = isset($_GET['dev']);
+        $this->bDev = isset($_GET['dev']) || isset($_SERVER['dev']);
 
         /**
          * Wylaczenie JavaScript
@@ -305,6 +305,33 @@ class Shell
         }
 
         return FALSE;
+    }
+
+    protected function auth()
+    {
+        $sKey = $this->oUtils->getAuthFileKey();
+
+        $sAuth = $this->oUtils->cacheGet($this->oUtils->getAuthFileKey());
+
+        $sPassword = sha1($this->sAuth . Request::getServer('REMOTE_ADDR'), TRUE);
+
+        if ($sAuth !== $sPassword) {
+            /**
+             * Sprawdzanie poprawnosci sha1( "user\xffpass" );
+             */
+            if ($this->sAuth !== sha1(Request::getPost('user') . "\xff" . Request::getPost('pass'))) {
+                $this->bNoJs = TRUE;
+
+                echo $this->getContent(
+                    sprintf('<form action="%s" method="post"><input type="text" name="user"/><input type="password" name="pass"/><input type="submit" name="submit" value="Go !"/></form>',
+                        Request::getCurrentUrl()
+                    ), FALSE
+                );
+                exit;
+            }
+
+            $this->oUtils->cacheSet($sKey, $sPassword);
+        }
     }
 
     /**
@@ -537,32 +564,7 @@ class Shell
          * Uwierzytelnianie
          */
         if ((PHP_SAPI !== 'cli') && ($this->sAuth !== NULL)) {
-            $sAuth = NULL;
-
-            $sKey = md5(Request::getServer('REMOTE_ADDR') . Request::getServer('USER_AGENT')) . '_auth';
-
-            $sAuth = $this->oUtils->cacheGet($key);
-
-            $sPassword = sha1($this->sAuth . Request::getServer('REMOTE_ADDR'), TRUE);
-
-
-            if ($sAuth !== $sPassword) {
-                /**
-                 * Sprawdzanie poprawnosci sha1( "user\xffpass" );
-                 */
-                if ($this->sAuth !== sha1(Request::getPost('user') . "\xff" . Request::getPost('pass'))) {
-                    $this->bNoJs = TRUE;
-
-                    echo $this->getContent(
-                        sprintf('<form action="%s" method="post"><input type="text" name="user"/><input type="password" name="pass"/><input type="submit" name="submit" value="Go !"/></form>',
-                            Request::getCurrentUrl()
-                        ), FALSE
-                    );
-                    return;
-                }
-
-                $this->oUtils->cacheSet($sKey, $sPassword);
-            }
+            $this->auth();
         }
 
         /**
