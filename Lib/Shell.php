@@ -9,34 +9,33 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
-/*
-
-Required modules:
-- Autoload
-- Cat
-- Cd
-- Chmod
-- Cp
-- Cr3d1ts
-- Download
-- Edit
-- Eval
-- Help
-- Id
-- Info
-- Logout
-- Ls
-- Mkdir
-- Modules
-- Mv
-- Phpinfo
-- Ping
-- Pwd
-- Remove
-- System
-- Upload
-- Version
-*/
+/**
+ * Required modules:
+ * - Autoload
+ * - Cat
+ * - Cd
+ * - Chmod
+ * - Cp
+ * - Cr3d1ts
+ * - Download
+ * - Edit
+ * - Eval
+ * - Help
+ * - Id
+ * - Info
+ * - Logout
+ * - Ls
+ * - Mkdir
+ * - Modules
+ * - Mv
+ * - Phpinfo
+ * - Ping
+ * - Pwd
+ * - Remove
+ * - System
+ * - Upload
+ * - Version
+ */
 
 require_once dirname(__FILE__) . '/Arr.php';
 require_once dirname(__FILE__) . '/Request.php';

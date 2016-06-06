@@ -82,24 +82,6 @@ DATA;
             Request::getCurrentUrl(),
             htmlspecialchars(Request::getPost('cmd'))
         );
-
-
-        // $mContent = $this->getCommandUpload($this->sArgv);
-
-        // if (is_bool($mContent)) {
-        //     $sConsole = sprintf('Plik %szostał wrzucony', (!$mContent ? 'nie ' : NULL));
-        // } /**
-        //  * Help
-        //  */
-        // else if (strncmp($mContent, '<form', 5) !== 0) {
-        //     $sConsole = $mContent;
-        // } /**
-        //  * Formularz sluzacy do wrzucenia pliku
-        //  */
-        // else {
-        //     $bOwnContent = TRUE;
-        //     $sContent = $mContent;
-        // }
     }
 
 }

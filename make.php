@@ -9,8 +9,8 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
-require_once __DIR__ . '/Lib/Request.php';
-require_once __DIR__ . '/Lib/Args.php';
+require_once dirname(__FILE__) . '/Lib/Request.php';
+require_once dirname(__FILE__) . '/Lib/Args.php';
 
 
 /**
@@ -80,7 +80,7 @@ switch ($sType) {
             'Lib/Utils'
         );
 
-        $sPath = __DIR__ . '/Modules';
+        $sPath = dirname(__FILE__) . '/Modules';
 
         $oDirectory = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($sPath)
@@ -203,7 +203,7 @@ if ($sType !== 'modules') {
     }
 }
 
-file_put_contents(__DIR__ . '/Tmp/dev.php', $sData);
+file_put_contents(dirname(__FILE__) . '/Tmp/dev.php', $sData);
 
 if (substr($sData, -2) !== '?>') {
     $sData .= '?>';
@@ -328,10 +328,10 @@ $sData = trim($sOutput);
  * =================================================================================================
  */
 
-file_put_contents(__DIR__ . '/Tmp/prod.php', $sData);
+file_put_contents(dirname(__FILE__) . '/Tmp/prod.php', $sData);
 
 $sData = substr(rtrim($sData), 6, -2);
 
-$sFile = __DIR__ . '/Tmp/' . ((isset($argv[1]) && ($argv[1] === 'modules')) ? 'modules.txt' : 'final.php');
+$sFile = dirname(__FILE__) . '/Tmp/' . ((isset($argv[1]) && ($argv[1] === 'modules')) ? 'modules.txt' : 'final.php');
 
 file_put_contents($sFile, sprintf('<?php $_=%s; $__=create_function("", gzuncompress($_));$__();?>', var_export(gzcompress($sData, 9), 1)));
