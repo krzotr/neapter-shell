@@ -4,21 +4,21 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * Wyswietlanie sciezki, w ktorej sie znajdujemy
+ * Wyswietlanie nazwy uzytkownika, ID uzytkownika oraz ID grupy
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba3
  *
  * @package    NeapterShell
  * @subpackage Modules
  */
-class ModulePwd extends ModuleAbstract
+class ModuleId extends ModuleAbstract
 {
     /**
      * Dostepna lista komend
@@ -28,7 +28,11 @@ class ModulePwd extends ModuleAbstract
      */
     public static function getCommands()
     {
-        return array('pwd');
+        return array
+        (
+            'id',
+            'whoami'
+        );
     }
 
     /**
@@ -39,10 +43,7 @@ class ModulePwd extends ModuleAbstract
      */
     public static function getVersion()
     {
-        /**
-         * Wersja Data Autor
-         */
-        return '1.00 2011-09-11 - <krzotr@gmail.com>';
+        return '1.0.0 2011-10-19 - <krzotr@gmail.com>';
     }
 
     /**
@@ -54,10 +55,10 @@ class ModulePwd extends ModuleAbstract
     public static function getHelp()
     {
         return <<<DATA
-Wyświetlanie ścieżki do katalogu, w którym aktualnie się znajdujemy
+Informacje o uzytkowniku
 
 	Użycie:
-		pwd
+		id
 DATA;
     }
 
@@ -69,14 +70,7 @@ DATA;
      */
     public function get()
     {
-        /**
-         * Help
-         */
-        if ($this->oArgs->getNumberOfParams() !== 0) {
-            return self::getHelp();
-        }
-
-        return getcwd();
+        return sprintf('user=%s uid=%d gid=%d', get_current_user(), getmyuid(), getmygid());
     }
 
 }

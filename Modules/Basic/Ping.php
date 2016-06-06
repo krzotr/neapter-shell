@@ -4,21 +4,21 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * Wyswietlanie nazwy uzytkownika, ID uzytkownika oraz ID grupy
+ * Ping - pong
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba3
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba3
  *
  * @package    NeapterShell
  * @subpackage Modules
  */
-class ModuleId extends ModuleAbstract
+class ModulePing extends ModuleAbstract
 {
     /**
      * Dostepna lista komend
@@ -28,11 +28,7 @@ class ModuleId extends ModuleAbstract
      */
     public static function getCommands()
     {
-        return array
-        (
-            'id',
-            'whoami'
-        );
+        return array('ping');
     }
 
     /**
@@ -43,10 +39,7 @@ class ModuleId extends ModuleAbstract
      */
     public static function getVersion()
     {
-        /**
-         * Wersja Data Autor
-         */
-        return '1.00 2011-10-19 - <krzotr@gmail.com>';
+        return '1.0.0 2011-06-04 - <krzotr@gmail.com>';
     }
 
     /**
@@ -58,10 +51,10 @@ class ModuleId extends ModuleAbstract
     public static function getHelp()
     {
         return <<<DATA
-Informacje o uzytkowniku
+Odpowiedź "pong"
 
 	Użycie:
-		id
+		ping
 DATA;
     }
 
@@ -73,7 +66,7 @@ DATA;
      */
     public function get()
     {
-        return sprintf('user=%s uid=%d gid=%d', get_current_user(), getmyuid(), getmygid());
+        return 'pong';
     }
 
 }

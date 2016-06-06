@@ -188,8 +188,9 @@ class Utils
     public function isUserAgentOnBlacklist($sUserAgent)
     {
         static $aUserAgents = array(
-            'Google',
-            'Bing'
+            'bot',
+            'Yahoo',
+            'spider'
         );
 
         foreach ($aUserAgents as $sUA) {

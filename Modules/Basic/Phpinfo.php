@@ -4,7 +4,7 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
@@ -13,7 +13,7 @@
  * Wyswietlanie PHPinfo
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
  * @package    NeapterShell
  * @subpackage Modules
@@ -39,10 +39,7 @@ class ModulePhpinfo extends ModuleAbstract
      */
     public static function getVersion()
     {
-        /**
-         * Wersja Data Autor
-         */
-        return '1.01 2011-11-20 - <krzotr@gmail.com>';
+        return '1.0.1 2011-11-20 - <krzotr@gmail.com>';
     }
 
     /**

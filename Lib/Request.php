@@ -197,4 +197,16 @@ class Request
         return self::$aServer;
     }
 
+    /**
+     * Request sent via Ajax?
+     *
+     * @static
+     * @access public
+     * @return boolean
+     */
+    public static function isAjas()
+    {
+        return (strncasecmp(self::getServer('HTTP_X_REQUESTED_WITH'), 'XMLHttpRequest', 14) === 0);
+    }
+
 }

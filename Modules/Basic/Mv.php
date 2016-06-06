@@ -4,21 +4,21 @@
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
 /**
- * Tworzenie katalogu
+ * Przenoszenie pliku / katalogu
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
  * @package    NeapterShell
  * @subpackage Modules
  */
-class ModuleMkdir extends ModuleAbstract
+class ModuleMv extends ModuleAbstract
 {
     /**
      * Dostepna lista komend
@@ -28,7 +28,10 @@ class ModuleMkdir extends ModuleAbstract
      */
     public static function getCommands()
     {
-        return array('mkdir');
+        return array(
+            'mv',
+            'move',
+        );
     }
 
     /**
@@ -42,7 +45,7 @@ class ModuleMkdir extends ModuleAbstract
         /**
          * Wersja Data Autor
          */
-        return '1.00 2011-06-04 - <krzotr@gmail.com>';
+        return '1.0.1 2011-06-23 - <krzotr@gmail.com>';
     }
 
     /**
@@ -54,10 +57,10 @@ class ModuleMkdir extends ModuleAbstract
     public static function getHelp()
     {
         return <<<DATA
-Wyświetla tekst
+Przenoszenie pliku
 
 	Użycie:
-		echo tekst do wyświetlenia
+		mv plik_lub_katalog_źródłowy plik_lub_katalog_docelowy
 DATA;
     }
 
@@ -69,26 +72,23 @@ DATA;
      */
     public function get()
     {
-        $iParams = $this->oArgs->getNumberOfParams();
-
-        if ($iParams === 0) {
+        /**
+         * Help
+         */
+        if ($this->oArgs->getNumberOfParams() !== 2) {
             return self::getHelp();
         }
 
-        $sOutput = NULL;
+        $sSource = $this->oArgs->getParam(0);
+        $sDestination = $this->oArgs->getParam(1);
 
-        for ($i = 0; $i < $iParams; ++$i) {
-            $sPathName = $this->oArgs->getParam($i);
-            if (!@ mkdir($sPathName, 0777, TRUE)) {
-                $sMsg = "Katalog \"%s\" <span class=\"red\">nie został utworzony</span>\r\n";
-            } else {
-                $sMsg = "Katalog \"%s\" <span class=\"green\">został utworzony</span>\r\n";
-            }
-
-            $sOutput .= sprintf($sMsg, $sPathName);
+        if (!@ rename($sSource, $sDestination)) {
+            $sMsg = 'Plik "%s" <span class="red">nie został przeniesiony</span> do "%s"';
+        } else {
+            $sMsg = 'Plik "%s" <span class="green">został przeniesiony</span> do "%s"';
         }
 
-        return $sOutput;
+        return sprintf($sMsg, $sSource, $sDestination);
     }
 
 }
