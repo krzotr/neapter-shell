@@ -233,17 +233,17 @@ class Utils
                  */
                 if ((strncmp($sClass, 'Module', 6) === 0) && ($sClass !== 'ModuleDummy') && ($sClass !== 'ModuleAbstract')) {
                     /**
-                     * @todo, Klasa musi implementowac ModuleAbstract
+                     * @todo, Reflection class since PHP 5.3
                      */
-                    if (1 || $oModule instanceof ModuleAbstract) {
+                    $oReflection = new ReflectionClass($sClass);
+
+                    if ($oReflection->isSubclassOf('ModuleAbstract')) {
                         $aCommands = $sClass::getCommands();
 
                         foreach ($aCommands as $sCommand) {
                             $aModules[$sCommand] = $sClass;
                         }
                     }
-
-                    unset($oModule);
                 }
             }
         }
@@ -265,8 +265,15 @@ class Utils
 
     public function getUniquePrefix()
     {
-        $sScriptFilename = Request::getServer('SCRIPT_FILENAME');
+        /**
+         * Fix for phpunit.phar
+         */
+        if (PHP_SAPI === 'cli') {
+            $sPath = Request::getServer('PATH');
+            return substr(sha1($sPath), 0, 10) . '_';
+        }
 
+        $sScriptFilename = Request::getServer('SCRIPT_FILENAME');
         return substr(sha1_file($sScriptFilename), 0, 10) . '_';
     }
 

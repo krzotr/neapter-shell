@@ -69,18 +69,12 @@ DATA;
      */
     public function get()
     {
-        /**
-         * Help
-         */
         if ($this->oArgs->getNumberOfParams() !== 1) {
             return self::getHelp();
         }
 
         $sFilePath = $this->oArgs->getParam(0);
 
-        /**
-         * Plik zrodlowy musi istniec
-         */
         if (!is_file($sFilePath)) {
             return sprintf('Plik "%s" nie istnieje', $sFilePath);
         }

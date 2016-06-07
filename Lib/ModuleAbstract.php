@@ -77,8 +77,14 @@ abstract class ModuleAbstract implements ModuleInterface
     public function __construct(Shell $oShell, Utils $oUtils = NULL, Args $oArgs = NULL)
     {
         $this->oShell = $oShell;
-        $this->oUtils = $oUtils;
-        $this->oArgs = $oArgs;
+        $this->oUtils = ($oUtils === NULL ? new Utils() : $oUtils);
+
+        $this->oArgs = ($oArgs === NULL ? $this->oShell->getArgs() : $oArgs);
+    }
+
+    public function setArgs($sArgs)
+    {
+        $this->oArgs = new Args(preg_replace('~^:[^ ]+\s+~', NULL, $sArgs));
     }
 
     /**

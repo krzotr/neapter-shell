@@ -24,6 +24,11 @@ class LoadModules
         $aDirectories = array(
             'Modules',
             'Modules/Basic',
+            'Modules/Crack',
+            'Modules/DB',
+            'Modules/Files',
+            'Modules/Net',
+            'Modules/Other',
             'Modules/Trash',
         );
 
@@ -31,7 +36,7 @@ class LoadModules
             $oDirectory = new DirectoryIterator(__DIR__ . '/../' . $sDir);
 
             foreach ($oDirectory as $oFile) {
-                if ($oFile->isFile()) {
+                if ($oFile->isFile() && $oFile->getExtension() == 'php') {
                     require_once $oFile->getPathname();
                 }
             }

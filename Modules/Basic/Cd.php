@@ -69,6 +69,10 @@ DATA;
      */
     public function get()
     {
+        if ($this->oArgs->getNumberOfParams() !== 1) {
+            return self::getHelp();
+        }
+
         $sDir = $this->oArgs->getParam(0);
 
         if (@chdir($sDir)) {
