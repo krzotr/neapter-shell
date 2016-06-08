@@ -8,7 +8,6 @@
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
-
 class ModuleIdTest extends PHPUnit_Framework_TestCase
 {
     protected $oShell;
@@ -31,7 +30,8 @@ class ModuleIdTest extends PHPUnit_Framework_TestCase
 
     public function testCd()
     {
-        $sExpected = sprintf("user=%s uid=%d gid=%d\r\n",
+        $sExpected = sprintf(
+            "user=%s uid=%d gid=%d\r\n",
             get_current_user(),
             getmyuid(),
             getmygid()

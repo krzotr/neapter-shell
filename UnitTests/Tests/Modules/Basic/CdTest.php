@@ -8,7 +8,6 @@
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
-
 class ModuleCdTest extends PHPUnit_Framework_TestCase
 {
     protected $oShell;
@@ -37,7 +36,5 @@ class ModuleCdTest extends PHPUnit_Framework_TestCase
         $sOut = $this->oShell->getCommandOutput(':cd /doesn_tExist');
         $this->assertSame("Nie udało się zmienić katalogu!!!\r\n", $sOut);
     }
-
-
 
 }

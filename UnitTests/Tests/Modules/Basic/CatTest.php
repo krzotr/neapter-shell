@@ -8,7 +8,6 @@
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
-
 class ModuleCatTest extends PHPUnit_Framework_TestCase
 {
     protected $oShell;

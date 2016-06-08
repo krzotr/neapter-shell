@@ -1,40 +1,40 @@
 <?php
 
-/* @todo */
-
 /**
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
- */
-
-/**
- * Testy modulu Phpinfo
- *
- * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
- *
- * @package    NeapterShell
- * @subpackage UnitTests
  */
 class ModulePhpinfoTest extends PHPUnit_Framework_TestCase
 {
     protected $oShell;
-    protected $oModule;
 
     public function setUp()
     {
         $this->oShell = new Shell();
-        $this->oModule = new ModulePhpinfo($this->oShell);
+    }
+
+    public function testGetVersion()
+    {
+        ModulePhpinfo::getVersion();
+    }
+
+    public function testHelp()
+    {
+        $sOut = $this->oShell->getCommandOutput(':phpinfo help');
+        $this->assertSame(ModulePhpinfo::getHelp() . "\r\n", $sOut);
     }
 
     public function testModule()
     {
-        $this->oShell->setArgs(':phpinfo');
-        $this->assertRegExp('~_SERVER\["DOCUMENT_ROOT"\]~', $this->oModule->get());
+        $sOut = $this->oShell->getCommandOutput(':phpinfo');
+
+        $this->assertRegExp('~_SERVER~', $sOut);
+        $this->assertRegExp('~session\.name~', $sOut);
+        $this->assertRegExp('~memory_limit~', $sOut);
     }
 
 }

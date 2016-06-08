@@ -17,6 +17,17 @@ class ModuleEchoTest extends PHPUnit_Framework_TestCase
         $this->oShell = new Shell();
     }
 
+    public function testGetVersion()
+    {
+        ModuleEcho::getVersion();
+    }
+
+    public function testHelp()
+    {
+        $sOut = $this->oShell->getCommandOutput(':echo help');
+        $this->assertSame(ModuleEcho::getHelp() . "\r\n", $sOut);
+    }
+
     public function testModule()
     {
         $sOut = $this->oShell->getCommandOutput(':echo TeST');

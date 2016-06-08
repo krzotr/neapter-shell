@@ -69,7 +69,7 @@ DATA;
         return sprintf("SERVER:[%s], IP:[%s], Host:[%s]\r\nPHP:[%s], API:[%s], Url:[%s], Path:[%s]\r\nSAFE_MODE:[%d], EXE:[%d], CURL:[%d], SOCKET:[%d]",
             php_uname(),
             ($sIp = Request::getServer('REMOTE_ADDR')),
-            gethostbyaddr($sIp),
+            @gethostbyaddr($sIp),
             PHP_VERSION,
             php_sapi_name(),
             ((PHP_SAPI === 'cli') ? 'CLI' : Request::getCurrentUrl()),
