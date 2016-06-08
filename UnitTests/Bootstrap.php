@@ -15,6 +15,3 @@ require_once dirname(__FILE__) . '/../Lib/ModuleAbstract.php';
 require_once dirname(__FILE__) . '/../Lib/XRecursiveDirectoryIterator.php';
 require_once dirname(__FILE__) . '/../Lib/LoadModules.php';
 require_once dirname(__FILE__) . '/../Lib/Shell.php';
-
-/* Enable debug mode in shell */
-$_SERVER['dev'] = 1;

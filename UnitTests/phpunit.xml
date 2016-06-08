@@ -25,4 +25,9 @@
     <logging>
         <log type="coverage-html" target="./Report" charset="UTF-8" yui="true" />
     </logging>
+
+    <php>
+        <!-- Enable debug mode in shell -->
+        <server name="dev" value="1" />
+    </php>
 </phpunit>
