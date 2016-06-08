@@ -39,7 +39,7 @@ class ModuleMkdir extends ModuleAbstract
      */
     public static function getVersion()
     {
-        return '1.0.0 2011-06-04 - <krzotr@gmail.com>';
+        return '1.0.1 2016-06-08 - <krzotr@gmail.com>';
     }
 
     /**
@@ -76,13 +76,12 @@ DATA;
 
         for ($i = 0; $i < $iParams; ++$i) {
             $sPathName = $this->oArgs->getParam($i);
-            if (!@ mkdir($sPathName, 0777, TRUE)) {
-                $sMsg = "Katalog \"%s\" <span class=\"red\">nie został utworzony</span>\r\n";
-            } else {
-                $sMsg = "Katalog \"%s\" <span class=\"green\">został utworzony</span>\r\n";
-            }
 
-            $sOutput .= sprintf($sMsg, $sPathName);
+            $sOutput .= sprintf(
+                "Katalog \"%s\" %szostał utworzony\r\n",
+                $sPathName,
+                (! @mkdir($sPathName, 0777, true) ? 'nie ' : '')
+            );
         }
 
         return $sOutput;

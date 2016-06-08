@@ -42,7 +42,7 @@ class ModuleEval extends ModuleAbstract
      */
     public static function getVersion()
     {
-        return '1.0.0 2016-02-26 - <krzotr@gmail.com>';
+        return '1.0.1 2016-06-08 - <krzotr@gmail.com>';
     }
 
     /**
@@ -60,7 +60,7 @@ Wykonanie kodu PHP
         eval skrypt_php
 
     Przykład
-        eval echo md5( 'test' );
+        eval echo md5('test');
 DATA;
     }
 

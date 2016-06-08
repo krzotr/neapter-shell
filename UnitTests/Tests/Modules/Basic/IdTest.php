@@ -28,7 +28,7 @@ class ModuleIdTest extends PHPUnit_Framework_TestCase
         $this->assertSame(ModuleId::getHelp() . "\r\n", $sOut);
     }
 
-    public function testCd()
+    public function testModule()
     {
         $sExpected = sprintf(
             "user=%s uid=%d gid=%d\r\n",

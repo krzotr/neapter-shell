@@ -28,7 +28,7 @@ class ModulePwdTest extends PHPUnit_Framework_TestCase
         $this->assertSame(ModulePwd::getHelp() . "\r\n", $sOut);
     }
 
-    public function testCd()
+    public function testModule()
     {
         $sOut = $this->oShell->getCommandOutput(':cd /tmp');
         $this->assertSame("Katalog zmieniono na:\r\n    /tmp\r\n", $sOut);

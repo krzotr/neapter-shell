@@ -45,7 +45,7 @@ class ModuleRemove extends ModuleAbstract
      */
     public static function getVersion()
     {
-        return '1.0.2 2011-11-02 - <krzotr@gmail.com>';
+        return '1.0.3 2016-06-08 - <krzotr@gmail.com>';
     }
 
     /**
@@ -72,73 +72,78 @@ DATA;
      */
     public function get()
     {
-        /**
-         * Help
-         */
-        if ($this->oShell->iArgc === 0) {
+        if ($this->oArgs->getNumberOfParams() !== 1) {
             return self::getHelp();
         }
 
         $sOutput = NULL;
 
-        /**
-         * Jezeli podana sciezka to plik
-         */
-        if (is_file($this->oShell->sArgv)) {
-            if (!unlink($this->oShell->sArgv)) {
-                return sprintf('Plik "%s" <span class="red">nie został usunięty</span>', $this->oShell->sArgv);
+        $sResource = $this->oArgs->getParam(0);
+
+        if (is_file($sResource) || is_link($sResource)) {
+            if (! @unlink($sResource)) {
+                return sprintf('Plik "%s" nie został usunięty', $sResource);
             }
 
-            return sprintf('Plik "%s" <span class="green">został usunięty</span>', $this->oShell->sArgv);
+            return sprintf('Plik "%s" został usunięty', $sResource);
         }
-        /**
-         * Jezeli podana sciezka to katalog
-         */
-        if (is_dir($this->sArgv)) {
+
+        if (is_dir($sResource)) {
+            /* Remove whole directory */
             try {
-                $oDirectory = new RecursiveIteratorIterator(new XRecursiveDirectoryIterator($this->oShell->sArgv), RecursiveIteratorIterator::CHILD_FIRST);
+                $oDirectory = new RecursiveIteratorIterator(
+                    new XRecursiveDirectoryIterator($sResource),
+                    RecursiveIteratorIterator::CHILD_FIRST
+                );
 
                 foreach ($oDirectory as $oFile) {
                     if ($oFile->isDir()) {
                         /**
-                         * PHP 5.2.X nie posiada stalej RecursiveDirectoryIterator::SKIP_DOTS
+                         * PHP 5.2.X does not contain
+                         * RecursiveDirectoryIterator::SKIP_DOTS
                          */
-                        if (($oFile->getBasename() === '.') || ($oFile->getBasename() === '.')) {
+                        if (($oFile->getBasename() === '.')
+                            || ($oFile->getBasename() === '..')
+                        ) {
                             continue;
                         }
 
-                        /**
-                         * Usuwanie katalogu
-                         */
-                        if (!rmdir($oFile->getPathname())) {
-                            $sOutput .= sprintf("Katalog \"%s\" <span class=\"red\">nie został usunięty</span>\r\n", $oFile->getPathname());
+                        if (! @rmdir($oFile->getPathname())) {
+                            $sOutput .= sprintf(
+                                "Katalog \"%s\" nie został usunięty\r\n",
+                                $oFile->getPathname()
+                            );
                         }
                     } else {
-                        /**
-                         * Usuwanie pliku
-                         */
-                        if (!unlink($oFile->getPathname())) {
-                            $sOutput .= sprintf("Plik    \"%s\" <span class=\"red\">nie został usunięty</span>\r\n", $oFile->getPathname());
+                        if (! @unlink($oFile->getPathname())) {
+                            $sOutput .= sprintf(
+                                "Plik    \"%s\" nie został usunięty\r\n",
+                                $oFile->getPathname()
+                            );
                         }
                     }
                 }
 
                 $oDirectory = NULL;
 
-                /**
-                 * Usuwanie ostatniego katalogu
-                 */
-                if (!rmdir($this->oShell->sArgv)) {
-                    return $sOutput . sprintf('Katalog "%s" <span class="red">nie został usunięty</span>', $this->oShell->sArgv);
+                if (!rmdir($sResource)) {
+                    return $sOutput . sprintf(
+                        'Katalog "%s" nie został usunięty',
+                        $sResource
+                    );
                 }
             } catch (Exception $oException) {
-                return sprintf("Nie można otworzyć katalogu \"%s\"\r\n\r\nErro: %s", $sDir, $oException->getMessage());
+                return sprintf(
+                    "Nie można otworzyć katalogu \"%s\"\r\n\r\nErro: %s",
+                    $sDir,
+                    $oException->getMessage()
+                );
             }
 
-            return sprintf('Katalog "%s" <span class="green">został usunięty</span>', $this->oShell->sArgv);
+            return sprintf('Katalog "%s" został usunięty', $sResource);
         }
 
-        return sprintf('Podana ścieżka "%s" nie istnieje', $this->oShell->sArgv);
+        return sprintf('Podana ścieżka "%s" nie istnieje', $sResource);
     }
 
 }

@@ -45,7 +45,7 @@ class ModuleMv extends ModuleAbstract
         /**
          * Wersja Data Autor
          */
-        return '1.0.1 2011-06-23 - <krzotr@gmail.com>';
+        return '1.0.2 2016-06-08 - <krzotr@gmail.com>';
     }
 
     /**
@@ -72,9 +72,6 @@ DATA;
      */
     public function get()
     {
-        /**
-         * Help
-         */
         if ($this->oArgs->getNumberOfParams() !== 2) {
             return self::getHelp();
         }
@@ -82,13 +79,12 @@ DATA;
         $sSource = $this->oArgs->getParam(0);
         $sDestination = $this->oArgs->getParam(1);
 
-        if (!@ rename($sSource, $sDestination)) {
-            $sMsg = 'Plik "%s" <span class="red">nie został przeniesiony</span> do "%s"';
-        } else {
-            $sMsg = 'Plik "%s" <span class="green">został przeniesiony</span> do "%s"';
-        }
-
-        return sprintf($sMsg, $sSource, $sDestination);
+        return sprintf(
+            'Plik "%s" %szostał przeniesiony do "%s"',
+            $sSource,
+            (!@rename($sSource, $sDestination) ? 'nie ' : ''),
+            $sDestination
+        );
     }
 
 }
