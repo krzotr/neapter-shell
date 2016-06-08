@@ -43,8 +43,11 @@ class ModuleLs extends ModuleAbstract
      * @param  object $oShell Obiekt Shell
      * @return void
      */
-    public function __construct(Shell $oShell, Utils $oUtils, Args $oArgs)
-    {
+    public function __construct(
+        Shell $oShell,
+        Utils $oUtils,
+        Args $oArgs
+    ) {
         parent::__construct($oShell, $oUtils, $oArgs);
 
         /**
@@ -77,7 +80,7 @@ class ModuleLs extends ModuleAbstract
      */
     public static function getVersion()
     {
-        return '1.0.3 2012-11-11 - <krzotr@gmail.com>';
+        return '1.0.4 2016-06-08 - <krzotr@gmail.com>';
     }
 
     /**
@@ -156,9 +159,10 @@ DATA;
          */
         $sDir = ($this->oArgs->getParam(0) ?: getcwd());
 
-        $aOptv = $this->oArgs->getOptions();
+        $aOptv = $this->oArgs->getSwitches();
 
         $bList = array_key_exists('l', $aOptv);
+
         $bRecursive = array_key_exists('R', $aOptv);
 
         try {
@@ -167,7 +171,10 @@ DATA;
              * obiektu RecursiveDirectoryIterator
              */
             if ($bRecursive) {
-                $oDirectory = new RecursiveIteratorIterator(new XRecursiveDirectoryIterator($sDir), RecursiveIteratorIterator::SELF_FIRST | FilesystemIterator::FOLLOW_SYMLINKS);
+                $oDirectory = new RecursiveIteratorIterator(
+                    new XRecursiveDirectoryIterator($sDir),
+                    RecursiveIteratorIterator::SELF_FIRST | FilesystemIterator::FOLLOW_SYMLINKS
+            );
             } else {
                 $oDirectory = new DirectoryIterator($sDir);
             }
@@ -250,7 +257,11 @@ DATA;
 
             return htmlspecialchars($sOutput);
         } catch (Exception $oException) {
-            return sprintf("Nie można otworzyć katalogu \"%s\"\r\n\r\nErro: %s", $sDir, $oException->getMessage());
+            return sprintf(
+                "Nie można otworzyć katalogu \"%s\"\r\n\r\nException: %s",
+                $sDir,
+                $oException->getMessage()
+            );
         }
     }
 
