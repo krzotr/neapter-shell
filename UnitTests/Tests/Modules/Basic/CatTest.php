@@ -18,6 +18,11 @@ class ModuleCatTest extends PHPUnit_Framework_TestCase
         $this->oShell = new Shell();
     }
 
+    public function testGetVersion()
+    {
+        ModuleCat::getVersion();
+    }
+
     public function testHelp()
     {
         $sOut = $this->oShell->getCommandOutput(':cat');

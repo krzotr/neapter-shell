@@ -1,22 +1,12 @@
 <?php
 
 /**
- * Neapter Framework
+ * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2010-2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
- * @link      http://neapter.com
- * @license   http://neapter.com/license
- */
-
-/**
- * Parsowanie argumentow
- *
- * @package    Neapter
- * @subpackage Core
- *
- * @uses       Neapter\Core\Request
+ * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 class Args
 {

@@ -1,25 +1,12 @@
 <?php
 
 /**
- * Neapter Framework
- *
- * @version   $Id: Request.php 533 2011-05-09 10:26:41Z krzotr $
+ * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2010-2011, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
- * @link      http://neapter.com
- * @license   http://neapter.com/license
- */
-
-/**
- * Request - Informacje o zadaniu
- *
- * @package    Neapter
- * @subpackage Core
- *
- * @uses       Neapter\Core\Arr
- * @uses       Neapter\Core\Url
+ * @license   http://www.gnu.org/licenses/gpl-3.0.txt
  */
 class Request
 {
@@ -62,8 +49,6 @@ class Request
     /**
      * Inicjacja
      *
-     * @uses   Neapter\Core\Config
-     *
      * @static
      * @access public
      * @return void
@@ -90,9 +75,9 @@ class Request
      * @param  array $aData Tablica
      * @return void
      */
-    private static function stripSlashes(array & $mData)
+    private static function stripSlashes(array &$mData)
     {
-        array_walk_recursive($mData, create_function('& $sData',
+        array_walk_recursive($mData, create_function('&$sData',
                 '$sData = stripslashes( $sData ); '
             )
         );
@@ -101,8 +86,6 @@ class Request
     /**
      * Pobieranie aktualnego adresu
      *
-     * @uses   Neapter\Core\Url
-     *
      * @static
      * @access public
      *
@@ -110,23 +93,19 @@ class Request
      */
     public static function getCurrentUrl()
     {
-        static $sFullPath;
-
-        if ($sFullPath === NULL) {
-            $sFullPath = sprintf('http%s://%s%s%s',
-                ((strncasecmp(self::getServer('HTTPS'), 'on', 2) === 0) ? 's' : NULL),
-                self::getServer('HTTP_HOST'), self::getServer('SCRIPT_NAME'),
-                ((($sQuery = self::getServer('QUERY_STRING')) === '') ? '' : '?' . $sQuery)
-            );
+        if (PHP_SAPI === 'cli') {
+            return null;
         }
 
-        return $sFullPath;
+        return sprintf('http%s://%s%s%s',
+            ((strncasecmp(self::getServer('HTTPS'), 'on', 2) === 0) ? 's' : NULL),
+            self::getServer('HTTP_HOST'), self::getServer('SCRIPT_NAME'),
+            ((($sQuery = self::getServer('QUERY_STRING')) === '') ? '' : '?' . $sQuery)
+        );
     }
 
     /**
      * Pobieranie klucza ze $_GET
-     *
-     * @uses   Neapter\Core\Arr
      *
      * @static
      * @access public
@@ -155,8 +134,6 @@ class Request
 
     /**
      * Pobieranie klucza ze $_FILES
-     *
-     * @uses   Neapter\Core\Arr
      *
      * @static
      * @access public

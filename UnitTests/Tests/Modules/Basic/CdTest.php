@@ -18,6 +18,11 @@ class ModuleCdTest extends PHPUnit_Framework_TestCase
         $this->oShell = new Shell();
     }
 
+    public function testGetVersion()
+    {
+        ModuleCd::getVersion();
+    }
+
     public function testHelp()
     {
         $sOut = $this->oShell->getCommandOutput(':cd');

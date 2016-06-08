@@ -9,28 +9,24 @@ class Utils
      */
     public function getTmpDir()
     {
-        static $sTmp = NULL;
-
-        if ($sTmp !== NULL) {
-            return $sTmp;
-        }
-
         $aTmpDirs = array(
             @ $_ENV['TMP'],
-            ini_get('session.save_path') .
+            ini_get('session.save_path'),
             ini_get('upload_tmp_dir'),
             ini_get('soap.wsdl_cache_dir'),
-            sys_get_temp_dir()
+            sys_get_temp_dir(),
+            '/tmp'
         );
+
+        $aTmpDirs = array_unique($aTmpDirs);
 
         foreach ($aTmpDirs as $sTmpDir) {
             if (is_readable($sTmpDir) && is_writable($sTmpDir)) {
-                $sTmp = $sTmpDir;
-                break;
+                return $sTmpDir;
             }
         }
 
-        return $sTmp;
+        return null;
     }
 
     /**
@@ -84,7 +80,7 @@ class Utils
 
     public function getPort($iPort)
     {
-        if (!ctype_digit($iPort)) {
+        if (!ctype_digit((string) $iPort)) {
             return 0;
         }
 
@@ -97,11 +93,11 @@ class Utils
         return $iPort;
     }
 
-    public function getHostPort($sHostPort)
+    public function getHostPort($sHost)
     {
-        $sHostPort = trim($sHostPort);
+        $sHost = trim($sHost);
 
-        if (strpos($sHost, ':') === FALSE) {
+        if (strpos($sHost, ':') === false) {
             return array();
         }
 
@@ -127,35 +123,21 @@ class Utils
 
     public function isExecutable()
     {
-        static $bExec;
-
-        if ($bExec !== NULL) {
-            return $bExec;
-        }
-
         if ($this->isSafeMode()) {
-            $bExec = FALSE;
-
-            return FALSE;
+            return false;
         }
 
-        $bExec = count(array_diff($this->getSystemFunctions(), $this->getDisabledFunctions()) > 0);
-
-        return $bExec;
+        return count(array_diff($this->getSystemFunctions(), $this->getDisabledFunctions()) > 0);
     }
 
     public function getDisabledFunctions()
     {
-        static $aDisableFunctions;
+        $aDisableFunctions = array();
 
-        if ($aDisableFunctions === NULL) {
-            $aDisableFunctions = array();
+        if (($sDisableFunctions = ini_get('disable_functions')) !== '') {
+            $aDisableFunctions = explode(',', $sDisableFunctions);
 
-            if (($sDisableFunctions = ini_get('disable_functions')) !== '') {
-                $aDisableFunctions = explode(',', $sDisableFunctions);
-
-                $aDisableFunctions = array_map(create_function('$sValue', 'return strtolower(trim($sValue));'), $aDisableFunctions);
-            }
+            $aDisableFunctions = array_map(create_function('$sValue', 'return strtolower(trim($sValue));'), $aDisableFunctions);
         }
 
         return $aDisableFunctions;
@@ -163,12 +145,6 @@ class Utils
 
     public function getSystemFunctions()
     {
-        static $bExec;
-
-        if ($bExec !== NULL) {
-            return $bExec;
-        }
-
         $aSystemFunctions = array(
             'exec',
             'shell_exec',
@@ -189,19 +165,25 @@ class Utils
     {
         static $aUserAgents = array(
             'bot',
-            'Yahoo',
+            'yahoo',
             'spider'
         );
 
         foreach ($aUserAgents as $sUA) {
-            if (stripos($sUserAgent, $sUA) !== FALSE) {
-                return TRUE;
+            if (stripos($sUserAgent, $sUA) !== false) {
+                return true;
             }
         }
 
-        return FALSE;
+        return false;
     }
 
+    /**
+     * Get all commands assigned to module (class name)
+     *
+     * @param  string $sModule Module name (Class name)
+     * @return array           List of commands
+     */
     public function getCommandsByModule($sModule)
     {
         $aCommands = array();
@@ -215,6 +197,15 @@ class Utils
         return $aCommands;
     }
 
+    /**
+     * Get list of all commands
+     *
+     * @example array(
+     *     'mv' => ModuleMv
+     *     'move' => ModuleMv
+     * )
+     * @return array
+     */
     public function getCommands()
     {
         static $aModules;
@@ -222,18 +213,13 @@ class Utils
         if ($aModules === NULL) {
             $aModules = array();
 
-            /**
-             * Lista dostepnych modulow zewnetrznych
-             */
             $aClasses = get_declared_classes();
 
             foreach ($aClasses as $sClass) {
-                /**
-                 * Wyszukiwanie klas z prefixem Module
-                 */
                 if ((strncmp($sClass, 'Module', 6) === 0) && ($sClass !== 'ModuleDummy') && ($sClass !== 'ModuleAbstract')) {
                     /**
-                     * @todo, Reflection class since PHP 5.3
+                     * @todo, Reflection class since PHP 5.3, I should find
+                     * another way to use PHP 5.2.X
                      */
                     $oReflection = new ReflectionClass($sClass);
 
@@ -251,35 +237,39 @@ class Utils
         return $aModules;
     }
 
+    /**
+     * Get all modules (Classes names)
+     *
+     * @return array
+     */
     public function getModules()
     {
         return array_unique(array_values($this->getCommands()));
     }
 
+    /**
+     * Unique key to encrypt data
+     *
+     * @return string
+     */
     public function getUniqueKey()
     {
-        $sScriptFilename = Request::getServer('SCRIPT_FILENAME');
-
-        return md5_file($sScriptFilename, TRUE);
+        return sha1(Request::getServer('PATH'), true);
     }
 
     public function getUniquePrefix()
     {
-        /**
-         * Fix for phpunit.phar
-         */
-        if (PHP_SAPI === 'cli') {
-            $sPath = Request::getServer('PATH');
-            return substr(sha1($sPath), 0, 10) . '_';
-        }
-
-        $sScriptFilename = Request::getServer('SCRIPT_FILENAME');
-        return substr(sha1_file($sScriptFilename), 0, 10) . '_';
+        return substr(sha1(Request::getServer('PATH')), 0, 10) . '_';
     }
 
+    /**
+     * Location of temporary file
+     *
+     * @return string
+     */
     public function cacheGetFile($sKey)
     {
-        return $this->getTmpDir() . '/' . $this->getUniquePrefix() . $sKey;
+        return $this->getTmpDir() . '/' . $this->getUniquePrefix() . md5($sKey);
     }
 
     public function cacheGet($sKey)
@@ -287,7 +277,7 @@ class Utils
         $sFile = $this->cacheGetFile($sKey);
 
         if (is_file($sFile) && is_readable($sFile)
-            && (($sData = file_get_contents($sFile)) !== FALSE)
+            && (($sData = file_get_contents($sFile)) !== false)
         ) {
             $sData = $this->decrypt($sData);
 
@@ -296,7 +286,7 @@ class Utils
             }
         }
 
-        return FALSE;
+        return false;
     }
 
     public function cacheSet($sKey, $mValue)

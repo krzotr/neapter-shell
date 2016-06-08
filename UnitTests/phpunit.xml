@@ -1,0 +1,28 @@
+<phpunit bootstrap="Bootstrap.php" colors="true">
+    <testsuites>
+        <testsuite name="Modules test">
+            <directory>Tests/Modules</directory>
+            <exclude>Tests/Modules/Crack</exclude>
+            <exclude>Tests/Modules/Db</exclude>
+            <exclude>Tests/Modules/Files</exclude>
+            <exclude>Tests/Modules/Net</exclude>
+            <exclude>Tests/Modules/Other</exclude>
+            <exclude>Tests/Modules/Trash</exclude>
+        </testsuite>
+
+        <testsuite name="Libs test">
+            <directory>Tests/Lib</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">../Lib</directory>
+            <directory suffix=".php">../Modules</directory>
+        </whitelist>
+    </filter>
+
+    <logging>
+        <log type="coverage-html" target="./Report" charset="UTF-8" yui="true" />
+    </logging>
+</phpunit>
