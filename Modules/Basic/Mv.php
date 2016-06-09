@@ -82,7 +82,7 @@ DATA;
         return sprintf(
             'Plik "%s" %szostał przeniesiony do "%s"',
             $sSource,
-            (!@rename($sSource, $sDestination) ? 'nie ' : ''),
+            (! @rename($sSource, $sDestination) ? 'nie ' : ''),
             $sDestination
         );
     }

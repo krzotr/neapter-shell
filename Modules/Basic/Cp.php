@@ -70,9 +70,6 @@ DATA;
      */
     public function get()
     {
-        /**
-         * Help
-         */
         if ($this->oArgs->getNumberOfParams() !== 2) {
             return self::getHelp();
         }
@@ -80,13 +77,12 @@ DATA;
         $sSource = $this->oArgs->getParam(0);
         $sDestination = $this->oArgs->getParam(1);
 
-        if (!@ copy($sSource, $sDestination)) {
-            $sMsg = 'Plik "%s" <span class="red">nie został skopiowany</span> do "%s"';
-        } else {
-            $sMsg = 'Plik "%s" <span class="green">został skopiowany</span> do "%s"';
-        }
-
-        return sprintf($sMsg, $sSource, $sDestination);
+        return sprintf(
+            'Plik "%s" %szostał skopiowany do "%s"',
+            $sSource,
+            (! @copy($sSource, $sDestination) ? 'nie ' : ''),
+            $sDestination
+        );
     }
 
 }
