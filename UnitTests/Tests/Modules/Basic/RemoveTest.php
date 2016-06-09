@@ -49,11 +49,18 @@ class ModuleRemoveTest extends PHPUnit_Framework_TestCase
         $sFile = '/tmp/a/c/d/e/f/g/h';
 
         $sOut = $this->oShell->getCommandOutput(':rm ' . $sFile);
-
         $this->assertSame(
             sprintf("Podana ścieżka \"%s\" nie istnieje\r\n", $sFile),
             $sOut
         );
+
+        $sOut = $this->oShell->getCommandOutput(':rm /proc/cpuinfo');
+        $this->assertSame("Plik \"/proc/cpuinfo\" nie został usunięty\r\n", $sOut);
+    }
+
+    public function testRemoveRecursive()
+    {
+        /* @todo */
     }
 
 }

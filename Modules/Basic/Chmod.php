@@ -39,7 +39,7 @@ class ModuleChmod extends ModuleAbstract
      */
     public static function getVersion()
     {
-        return '1.1.0 2011-09-10 - <krzotr@gmail.com>';
+        return '1.1.1 2016-06-09 - <krzotr@gmail.com>';
     }
 
     /**
@@ -69,54 +69,25 @@ DATA;
      */
     public function get()
     {
-        /**
-         * Help
-         */
-        if ($this->oShell->iArgc !== 2) {
+        if ($this->oArgs->getNumberOfParams() !== 2) {
             return self::getHelp();
         }
 
-        /**
-         * Chmod jest wymagany
-         */
-        if (!ctype_digit($this->oShell->aArgv[0]) || strlen($this->oShell->aArgv[0]) !== 3) {
-            return sprintf('Błędny chmod "%d"', $this->oShell->aArgv[0]);
+        $sChmod = (string) $this->oArgs->getParam(0);
+        $sFile = $this->oArgs->getParam(1);
+
+        if (!preg_match('~^[0-7]{3,4}\z~', $sChmod)) {
+            return sprintf('Błędny chmod "%s"', $sChmod);
         }
 
-        /**
-         * Plik musi istniec
-         */
-        if (!is_file($this->oShell->aArgv[1])) {
-            return sprintf('Plik "%s" nie istnieje', $this->oShell->aArgv[1]);
+        if (!file_exists($sFile)) {
+            return sprintf('Plik "%s" nie istnieje', $sFile);
         }
 
-        if (!((strlen($this->oShell->aArgv[0]) === 3) && ctype_digit($this->oShell->aArgv[0]))) {
-            return 'Wprowadzono błędne uprawnienia!!!';
-        }
-
-        $aChmod = str_split($this->oShell->aArgv[0]);
-
-        $sChmod = 0;
-
-        /**
-         * Zamiana 777 dziesiatkowo na 777 osemkowo
-         */
-        for ($i = 0; $i < 3; ++$i) {
-            if ($aChmod[$i] > 8) {
-                return 'Wprowadzono błędne uprawnienia!!!';
-            }
-
-            $sChmod += $aChmod[$i] * pow(8, $i);
-        }
-
-        /**
-         * Zmiana uprawnien
-         */
-        if (chmod($this->oShell->aArgv[1], $sChmod)) {
-            return 'Uprawnienia <span class="green">zostały zmienione</span>';
-        }
-
-        return 'Uprawnienia <span class="red">nie zostały zmienione</span>';
+        return sprintf(
+            'Uprawnienia %szostały zmienione',
+            (! @chmod($sFile, base_convert($sChmod, 8, 10)) ? 'nie ' : '')
+        );
     }
 
 }
