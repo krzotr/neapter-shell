@@ -61,6 +61,9 @@ class ModuleMvTeCp extends PHPUnit_Framework_TestCase
             str_repeat('x', 1024),
             file_get_contents($sDestination)
         );
+
+        @ unlink($sSource);
+        @ unlink($sDestination);
     }
 
     public function testModuleError()
@@ -82,6 +85,8 @@ class ModuleMvTeCp extends PHPUnit_Framework_TestCase
             ),
             $sOut
         );
+
+        @ unlink($sSource);
     }
 
 }

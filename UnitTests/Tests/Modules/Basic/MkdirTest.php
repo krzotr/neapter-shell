@@ -61,6 +61,9 @@ class ModuleMkdirTest extends PHPUnit_Framework_TestCase
             ),
             $sOut
         );
+
+        @ rmdir($sTmpDir);
+        @ rmdir($sTmpDir2);
     }
 
     public function testCreateInvalidDir()

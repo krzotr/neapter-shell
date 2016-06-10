@@ -56,6 +56,8 @@ class ModuleMvTest extends PHPUnit_Framework_TestCase
             ),
             $sOut
         );
+
+        @ unlink($sDestination);
     }
 
     public function testModuleError()
@@ -77,6 +79,8 @@ class ModuleMvTest extends PHPUnit_Framework_TestCase
             ),
             $sOut
         );
+
+        @ unlink($sSource);
     }
 
 }

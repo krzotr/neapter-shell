@@ -52,6 +52,8 @@ class ModuleChmodTest extends PHPUnit_Framework_TestCase
         $sOut = $this->oShell->getCommandOutput(':chmod 0123 ' . $sFile);
         $this->assertSame("Uprawnienia zostały zmienione\r\n", $sOut);
         $this->assertSame('123', decoct(fileperms($sFile) & 0777));
+
+        @ unlink($sFile);
     }
 
     public function testInvalidChmod()
