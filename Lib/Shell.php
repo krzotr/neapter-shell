@@ -219,8 +219,8 @@ class Shell
          * Uruchomienie shella z domyslna konfiguracja - bez wczytywania ustawien
          * bez rozszerzen i modulow
          */
-        if (!isset($_GET['pure'])) {
-            $this->loadModulesFromFile();
+        if (!(isset($_GET['skip_modules']) || isset($_SERVER['skip_modules']))) {
+            $this->oUtils->loadModules();
         }
 
         if ($sDir = $this->oUtils->cacheGet('chdir')) {
@@ -243,27 +243,6 @@ class Shell
         error_reporting($this->bDev ? -1 : 0);
     }
 
-    /**
-     * Load modules from user space
-     */
-    protected function loadModulesFromFile()
-    {
-        if ($sData = $this->oUtils->cacheGet('modules')) {
-            ob_start();
-            eval('?>' . $sData . '<?');
-            ob_clean();
-            ob_end_flush();
-        }
-
-        if ($aAutoload = $this->oUtils->cacheGet('autoload')) {
-            /**
-             * Wczytywanie rozszerzen
-             */
-            foreach ($aAutoload as $sExtension) {
-                $this->dl($sExtension);
-            }
-        }
-    }
 
     /**
      * Wczytanie rozszerzenia
@@ -447,7 +426,7 @@ class Shell
          * Wykonanie komendy systemowej
          */
         else if (class_exists('ModuleSystem')) {
-            $this->setArgs($sCmd);
+            $this->oArgs = new Args(preg_replace('~^:[^ ]+\s+~', '', $sCmd));
             $oSystem = new ModuleSystem($this, $this->oUtils, $this->oArgs);
 
             $sConsole = $oSystem->get();
@@ -581,20 +560,14 @@ class Shell
         echo $this->getCommandOutput();
     }
 
-    /**
-     * Set command to execute
-     *
-     * @param string $sArgs Command to execute
-     * @return void
-     */
-    public function setArgs($sArgs)
-    {
-        $this->oArgs = new Args(preg_replace('~^:[^ ]+\s+~', NULL, $sArgs));
-    }
-
     public function getArgs()
     {
         return $this->oArgs;
+    }
+
+    public function getUtils()
+    {
+        return $this->oUtils;
     }
 
     /**

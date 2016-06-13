@@ -115,7 +115,11 @@ DATA;
 
             $sHeader = trim(substr($sHelp, 0, $iHeaderPos));
 
-            $sOutput .= sprintf("%-{$iMaxLen}s - %s\r\n", $sModuleCmd, $sHeader);
+            $sOutput .= sprintf(
+                "%-{$iMaxLen}s - %s\r\n",
+                $sModuleCmd,
+                $sHeader
+            );
         }
 
         /**

@@ -45,6 +45,8 @@ class ModuleModules extends ModuleAbstract
     /**
      * Zwracanie pomocy modulu
      *
+     * @todo - remove loaded modules
+     *
      * @access public
      * @return string
      */
@@ -75,68 +77,57 @@ DATA;
      */
     public function get()
     {
+        $sParam = $this->oArgs->getParam(0);
 
 
-        /**
-         * Lista dostepnych modulow
-         */
-        if (($iArgc === 1) && ($sParam === 'loaded')) {
-            $aModules = $this->oUtils->getModules();
-
-            return sprintf("Załadowano %s modułów:\r\n    %s", count($aModules), implode("\r\n    ", $aModules));
+        if ($this->oArgs->getNumberOfParams() !== 1) {
+            return self::getHelp();
         }
 
         /**
-         * Wyswietlanie wersji bibliotek
+         * Get list of all loaded modules
          */
-        if (($iArgc === 1) && ($sParam === 'version')) {
-            /**
-             * Szukanie najdluzszej nazwy modulu
-             */
+        if ($sParam === 'loaded') {
+            $aModules = $this->oUtils->getModules();
+
+            return sprintf(
+                "Załadowano %s modułów:\r\n    %s",
+                count($aModules),
+                implode("\r\n    ", $aModules)
+            );
+        }
+
+        /**
+         * Get details module information
+         *
+         * @example
+         * ModuleEcho - 1.0.0 2011-06-04 - <krzotr@gmail.com>
+         */
+        if ($sParam === 'version') {
             $iMaxLen = 0;
-            foreach ($this->aHelpModules as $sModule => $sModuleCmd) {
+            foreach ($this->oUtils->getModules() as $sModule) {
                 if (($iLen = strlen($sModule)) > $iMaxLen) {
                     $iMaxLen = $iLen;
                 }
             }
 
-            /**
-             * Wersja modulu
-             */
-            $sOutput = NULL;
-            foreach ($this->aHelpModules as $sModule => $sModuleCmd) {
-                $oModule = new $sModule($this);
+            $sOutput = '';
+            foreach ($this->oUtils->getModules() as $sModule) {
+                $sVersion = $sModule::getVersion();
 
-                $sOutput .= str_pad($sModule, $iMaxLen, ' ') . ' - ' . $oModule->getVersion() . "\r\n";
+                $sOutput .= sprintf(
+                    "%-{$iMaxLen}s - %s\r\n",
+                    $sModule,
+                    $sVersion
+                );
             }
 
             return htmlspecialchars($sOutput);
         }
 
-        /**
-         * Pobieranie pliku z http
-         */
-        if (strncmp($sParam, 'http://', 7) === 0) {
-            if (($sData = file_get_contents($sParam)) === FALSE) {
-                return 'Nie można pobrać pliku z modułami';
-            }
-        } /**
-         * Wczytywanie pliku
-         */
-        else {
-            if (!(is_file($sParam) && (($sData = file_get_contents($sParam)) !== FALSE))) {
-                return 'Nie można wczytać pliku z modułami';
-            }
-        }
+        $bLoaded = $this->oUtils->loadModuleFromLocation($sParam);
 
-        /**
-         * Szyfrowanie zawartosci pliku
-         */
-        file_put_contents($this->sTmp . '/' . $this->sPrefix . '_modules', $this->encode($sData));
-
-        header('Refresh:1;url=' . Request::getCurrentUrl());
-
-        return 'Plik z modułami został załadowany';
+        return sprintf("Moduł %szostał załadowany", ( !$bLoaded ? 'nie ' : ''));
     }
 
 }

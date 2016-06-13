@@ -28,7 +28,7 @@ class ModuleAutoload extends ModuleAbstract
      */
     public static function getCommands()
     {
-        return array('eval');
+        return array('autoload');
     }
 
     /**
@@ -73,10 +73,11 @@ DATA;
      */
     public function get()
     {
+        if ($this->oArgs->getNumberOfParams() !== 1) {
+            return self::getHelp();
+        }
 
-        /**
-         * Lista poprzednio wczytanych rozszerzen
-         */
+
         $aAutoload = array();
 
         if (is_file($sFilePath = $this->sTmp . '/' . $this->sPrefix . '_autoload')

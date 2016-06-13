@@ -12,27 +12,25 @@
 interface ModuleInterface
 {
     /**
-     * Zwracania aliasow dla komendy
+     * Get list of all available commands
      *
      * @abstract
      *
-     * @access public
      * @return array
      */
     public static function getCommands();
 
     /**
-     * Zwracanie wersji modulu
+     * Get version of module
      *
      * @abstract
      *
-     * @access public
      * @return string
      */
     public static function getVersion();
 
     /**
-     * Zwracanie pomocy modulu
+     * Get information about module
      *
      * @abstract
      *
@@ -50,25 +48,28 @@ interface ModuleInterface
 abstract class ModuleAbstract implements ModuleInterface
 {
     /**
-     * Obiekt Shell
+     * Shell Object
      *
-     * @access protected
-     * @var    object
+     * @var Shell
      */
     protected $oShell;
 
     /**
-     * Obiekt Utils
+     * Utils Object
      *
-     * @access protected
-     * @var    object
+     * @var Utils
      */
     protected $oUtils;
 
+    /**
+     * Args Object
+     *
+     * @var Args
+     */
     protected $oArgs;
 
     /**
-     * Konstruktor
+     * Create new object of module
      *
      * @access public
      * @param  object $oShell Obiekt Shell
@@ -90,7 +91,7 @@ abstract class ModuleAbstract implements ModuleInterface
     }
 
     /**
-     * Wywolanie modulu
+     * Execute module
      *
      * @abstract
      *
@@ -98,5 +99,4 @@ abstract class ModuleAbstract implements ModuleInterface
      * @return string
      */
     abstract public function get();
-
 }

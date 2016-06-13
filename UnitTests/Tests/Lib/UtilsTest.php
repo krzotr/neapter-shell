@@ -45,7 +45,7 @@ class UtilsTest extends PHPUnit_Framework_TestCase
 
     public function testEncryptEmptyData()
     {
-        $this->assertSame(null, $this->oUtils->encrypt(''));
+        $this->assertSame('', $this->oUtils->encrypt(''));
     }
 
     public function testPort()

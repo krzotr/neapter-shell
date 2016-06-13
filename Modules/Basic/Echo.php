@@ -39,10 +39,7 @@ class ModuleEcho extends ModuleAbstract
      */
     public static function getVersion()
     {
-        /**
-         * Wersja Data Autor
-         */
-        return '1.00 2011-06-04 - <krzotr@gmail.com>';
+        return '1.0.0 2011-06-04 - <krzotr@gmail.com>';
     }
 
     /**
@@ -71,5 +68,4 @@ DATA;
     {
         return htmlspecialchars(implode(' ', $this->oArgs->getParams()));
     }
-
 }
