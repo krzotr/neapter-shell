@@ -29,5 +29,6 @@
     <php>
         <!-- Enable debug mode in shell -->
         <server name="dev" value="1" />
+        <server name="skip_modules" value="1" />
     </php>
 </phpunit>

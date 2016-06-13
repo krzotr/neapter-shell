@@ -61,4 +61,26 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(Request::isAjax());
     }
 
+    public function testStripSlashes()
+    {
+        if (!extension_loaded('runkit')) {
+            $this->markTestIncomplete('Please download runkit PHP extension!');
+            return;
+        }
+
+        if (1 !== (int) ini_get('runkit.internal_override')) {
+            $this->markTestIncomplete(
+                'Please set runkit.internal_override to 1 in php.ini!'
+            );
+            return;
+        }
+
+        runkit_function_redefine('get_magic_quotes_gpc', '', 'return 1;');
+
+
+        $_GET['test_get'] = 'test\\\'get';
+        Request::init();
+
+        $this->assertSame('test\'get', Request::getGet('test_get'));
+    }
 }

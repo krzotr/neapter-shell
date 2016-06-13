@@ -48,4 +48,115 @@ class ModuleSystemTest extends PHPUnit_Framework_TestCase
             $sOut
         );
     }
+
+    protected function overwriteDisableFunctions()
+    {
+        runkit_function_rename('ini_get', '_ini_get');
+
+        function ini_get($sStr) {
+            if ($sStr == 'disable_functions'
+                && isset($_SERVER['disable_functions'])
+            ) {
+                return $_SERVER['disable_functions'];
+            }
+
+            return _ini_get($sStr);
+        }
+    }
+
+    public function testDisableFunctions()
+    {
+        if (!extension_loaded('runkit')) {
+            $this->markTestIncomplete('Please download runkit PHP extension!');
+            return;
+        }
+
+        if (1 !== (int) ini_get('runkit.internal_override')) {
+            $this->markTestIncomplete(
+                'Please set runkit.internal_override to 1 in php.ini!'
+            );
+            return;
+        }
+
+        $sFile = '/tmp/' . md5(microtime(1));
+
+        $sContent = '';
+        for ($i = 0; $i < 10; ++$i) {
+            $sContent .= str_repeat((string) $i, 10) . "\r\n";
+        }
+
+        file_put_contents($sFile, $sContent);
+
+        $_SERVER['disable_functions'] = 'system';
+
+        $this->overwriteDisableFunctions();
+
+
+        $aDisableFunctions = array(
+            'shell_exec',
+            'passthru',
+            'exec',
+            'popen',
+            'proc_open',
+            'pcntl_exec'
+        );
+
+        foreach ($aDisableFunctions as $sFunc) {
+            $oShell = new Shell();
+            $sOut = $oShell->getCommandOutput('cat ' . $sFile);
+
+            $this->assertSame(
+                sprintf(
+                    "Cmd: 'cat %s'\r\nPHPfunc: %s():\r\n\r\n%s\r\n",
+                    $sFile,
+                    $sFunc,
+                    file_get_contents($sFile)
+                ),
+                $sOut,
+                sprintf("Testing %s function", $sFunc)
+            );
+
+            $_SERVER['disable_functions'] .= ',' . $sFunc;
+        }
+
+        $oShell = new Shell();
+        $sOut = $oShell->getCommandOutput('cat ' . $sFile);
+        $this->assertSame(
+            "Cannot execute command. All functions have been blocked!\r\n",
+            $sOut,
+            "Testing all disabled functions"
+        );
+    }
+
+    public function testSafeMode()
+    {
+        if (!extension_loaded('runkit')) {
+            $this->markTestIncomplete('Please download runkit PHP extension!');
+            return;
+        }
+
+        if (1 !== (int) ini_get('runkit.internal_override')) {
+            $this->markTestIncomplete(
+                'Please set runkit.internal_override to 1 in php.ini!'
+            );
+            return;
+        }
+
+        runkit_function_rename('ini_get', '_ini_get_tmp');
+
+        function ini_get($sStr) {
+            if ($sStr == 'safe_mode') {
+                return '1';
+            }
+
+            return _ini_get($sStr);
+        }
+
+        $oShell = new Shell();
+        $sOut = $oShell->getCommandOutput('cat /etc/passwd');
+        $this->assertSame(
+            "Safe mode jest włączone, funkcje systemowe nie działają!\r\n",
+            $sOut
+        );
+    }
 }
