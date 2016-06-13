@@ -68,6 +68,12 @@ DATA;
     {
         $aModulesCommands = array();
 
+        /**
+         * Get all commands assigned to module
+         *
+         * cat - Show file contents
+         * cp, copy - Copy file/directory
+         */
         foreach ($this->oUtils->getCommands() as $sCmd => $sClass) {
             if (!isset($aModulesCommands[$sClass])) {
                 $aModulesCommands[$sClass] = '';
@@ -76,16 +82,17 @@ DATA;
             $aModulesCommands[$sClass] .= $sCmd . ', ';
         }
 
-
         $aModulesCommands = array_map(
             create_function('$a', 'return substr($a, 0, -2);'),
             $aModulesCommands
         );
 
+        ksort($aModulesCommands);
+
         $iMaxLen = 0;
 
         /**
-         * Szukanie najdluzszego ciagu (najdluzsza komenda)
+         * Find the longest commands line
          */
         foreach ($aModulesCommands as $sModuleCmd) {
             if (($iLen = strlen($sModuleCmd)) > $iMaxLen) {
@@ -93,33 +100,37 @@ DATA;
             }
         }
 
-        $sOutput = NULL;
-
+        $sOutput = '';
 
         /**
-         * Formatowanie naglowkow z zewnetrznych modulow
+         * Prepare commands line and header of each module
          */
         foreach ($aModulesCommands as $sModule => $sModuleCmd) {
             $sHelp = $sModule::getHelp();
 
-            $iPos = ((($iPos = strpos($sHelp, "\n")) !== FALSE) ? $iPos : strlen($sHelp));
-            $sOutput .= str_pad($sModuleCmd, $iMaxLen, ' ') . ' - ' . trim(substr($sHelp, 0, $iPos)) . "\r\n";
+            $iHeaderPos = 0;
+            if (($iHeaderPos = strpos($sHelp, "\n")) === false) {
+                $iHeaderPos = strlen($sHelp);
+            }
+
+            $sHeader = trim(substr($sHelp, 0, $iHeaderPos));
+
+            $sOutput .= sprintf("%-{$iMaxLen}s - %s\r\n", $sModuleCmd, $sHeader);
         }
 
-        $sOutput .= "\r\n\r\n";
-
         /**
-         * Szczegolowa pomoc
+         * Details help
          */
         if ($this->oArgs->getParam(0) === 'all') {
+            $sOutput .= "\r\n\r\n" . str_repeat('=', 80) . "\r\n\r\n";
             foreach ($aModulesCommands as $sModule => $sModuleCmd) {
                 $sHelp = $sModule::getHelp();
 
-                $sOutput .= $sModuleCmd . ' - ' . $sHelp . "\r\n\r\n\r\n";
+                $sOutput .= sprintf(">>>>> Module: %s <<<<<\r\n", $sModule);
+                $sOutput .= sprintf("%s - %s\r\n\r\n\r\n", $sModuleCmd, $sHelp);
             }
         }
 
         return htmlspecialchars(substr($sOutput, 0, -6));
     }
-
 }
