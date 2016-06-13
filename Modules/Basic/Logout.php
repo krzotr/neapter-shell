@@ -76,9 +76,6 @@ DATA;
         $sAuthKeyFile = $this->oUtils->getAuthFileKey();
         $sAuth = $this->oUtils->cacheGet($sAuthKeyFile);
 
-        /**
-         * Czy plik z autoryzacja istnieje
-         */
         if ($sAuth) {
             $this->oUtils->cacheSet($sAuthKeyFile, '');
         }
@@ -86,6 +83,6 @@ DATA;
         @header('Refresh:1;url=' . Request::getCurrentUrl());
         echo "See you (:\n";
 
-        exit;
+        $this->oShell->eof();
     }
 }

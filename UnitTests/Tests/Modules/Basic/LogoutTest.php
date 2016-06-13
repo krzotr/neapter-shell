@@ -30,7 +30,13 @@ class ModuleLogoutTest extends PHPUnit_Framework_TestCase
 
     public function testModule()
     {
+        @ob_start();
 
+        $this->oShell->getCommandOutput(':logout');
+        $sOut = ob_get_contents();
+
+        @ob_end_flush();
+
+        $this->assertSame("See you (:\n", $sOut);
     }
-
 }

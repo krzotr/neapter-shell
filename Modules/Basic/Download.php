@@ -21,12 +21,19 @@
 class ModuleDownload extends ModuleAbstract
 {
     /**
-     * Zdalne pobieranie
+     * Temporary file for remote resource
      *
      * @access private
      * @var    boolean
      */
-    private $bRemote = FALSE;
+    private $sTmpFile;
+
+    public function __destruct()
+    {
+        if ($this->sTmpFile) {
+            @ unlink($this->sTmpFile);
+        }
+    }
 
     /**
      * Dostepna lista komend
@@ -36,8 +43,7 @@ class ModuleDownload extends ModuleAbstract
      */
     public static function getCommands()
     {
-        return array
-        (
+        return array(
             'download',
             'down',
             'get'
@@ -88,80 +94,64 @@ DATA;
      */
     public function get()
     {
-        /**
-         * Help
-         */
-        if ($this->oShell->iArgc === 0) {
+        if ($this->oArgs->getNumberOfParams() === 0) {
             return self::getHelp();
         }
 
-        $bGzip = in_array('g', $this->oShell->aOptv);
+        $bGzip = in_array('g', $this->oArgs->getSwitches());
+
+        $sFile = $this->oArgs->getParam(0);
 
         /**
-         * Zdalne pobieranie
+         * Remote download
          */
-        if (preg_match('~^(http|ftp)://~', $this->oShell->sArgv)) {
-            $sFilename = $this->oShell->sTmp . '/' . $this->oShell->sPrefix . 'download';
+        if (preg_match('~^(http|ftp)://~', $sFile)) {
+            $this->sTmpFile = $this->oUtils->cacheGetFile($sFile);
 
-            /**
-             * Odczyt zdalnego pliku
-             */
-            if (($sData = file_get_contents($this->oShell->sArgv)) === FALSE) {
-                return sprintf('Nie można połączyć się ze zdalnym hostem: "%s"', $this->oShell->sArgv);
+            if (($sData = @file_get_contents($sFile)) === false) {
+                return sprintf(
+                    'Nie można pobrać pliku z "%s"',
+                    $sFile
+                );
             }
 
-            /**
-             * Zapis zawartosci do pliku
-             */
-            file_put_contents($sFilename, $sData);
+            file_put_contents($this->sTmpFile, $sData);
 
-            $this->oShell->sArgv = $sFilename;
-
-            $this->bRemote = TRUE;
+            $sFile = $this->sTmpFile;
         }
 
-        /**
-         * Plik zrodlowy musi istniec
-         */
-        if (!is_file($this->oShell->sArgv)) {
-            return sprintf('Plik "%s" nie istnieje', $this->oShell->sArgv);
+        if (($rFile = @fopen($sFile, 'r')) === false) {
+            return sprintf('Błąd odczytu pliku "%s"', $sFile);
         }
 
-        if (($rFile = @ fopen($this->oShell->sArgv, 'r')) === FALSE) {
-            echo "Błąd odczytu pliku";
-        }
-
-        /**
-         * Naglowki
-         */
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header(sprintf('Content-Disposition: attachment; filename="%s"', basename($this->oShell->sArgv)));
-        header('Content-Type: application/octet-stream');
+        @header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        @header('Pragma: no-cache');
+        @header('Content-Type: application/octet-stream');
+        @header(
+            sprintf(
+                'Content-Disposition: attachment; filename="%s"',
+                basename($sFile)
+            )
+        );
 
         /**
          * Kompresja zawartosci strony
          */
-        ob_start($bGzip ? 'ob_gzhandler' : NULL);
+        ob_start($bGzip ? 'ob_gzhandler' : null);
 
         if (!$bGzip) {
-            header(sprintf('Content-Length: %s', filesize($this->oShell->sArgv)), TRUE);
+            @header(sprintf('Content-Length: %s', filesize($sFile)), true);
         }
 
         while (!feof($rFile)) {
             echo fread($rFile, 32768);
-            @ ob_flush();
-            @ flush();
+            @ob_flush();
+            @flush();
         }
 
         ob_end_flush();
 
-        /**
-         * Usuwanie zdalnego pliku z dysku
-         */
-        if ($this->bRemote) {
-            unlink($this->oShell->sArgv);
-        }
-        exit;
-    }
 
+        $this->oShell->eof();
+    }
 }

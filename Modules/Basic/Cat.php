@@ -79,7 +79,7 @@ DATA;
             return sprintf('Plik "%s" nie istnieje', $sFilePath);
         }
 
-        return htmlspecialchars(file_get_contents($sFilePath));
+        return htmlspecialchars(@ file_get_contents($sFilePath));
     }
 
 }

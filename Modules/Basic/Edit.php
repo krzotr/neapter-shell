@@ -69,27 +69,25 @@ DATA;
     {
         $sFile = $this->oArgs->getRawData();
 
-        /**
-         * Zapis do pliku
-         */
-        if (($sFiledata = Request::getPost('filedata')) !== FALSE) {
-            $bSuccess = (bool) file_put_contents($sFile, $sFiledata);
-
-            return sprintf('Plik %szostał zapisany', (!$bSuccess ? 'nie ' : NULL));
+        if (($sFiledata = Request::getPost('filedata')) !== false) {
+            return sprintf(
+                'Plik %szostał zapisany',
+                (! @file_put_contents($sFile, $sFiledata) ? 'nie ' : '')
+            );
         }
 
-        /**
-         * Formularz
-         */
+        if ($this->oArgs->getNumberOfParams() === 0) {
+            return self::getHelp();
+        }
+
         return sprintf('<form action="%s" method="post">' .
             '<textarea id="edit" name="filedata">%s</textarea><br/>' .
             '<input type="text" name="cmd" readonly="readonly" value=":edit %s" size="110" id="cmd" autocomplete="on"/>' .
             '<input type="submit" name="submit" value="Zapisz" /></form>',
             Request::getCurrentUrl(),
-            ((is_file($sFile) && is_readable($sFile)) ? file_get_contents($sFile) : NULL),
+            (string) file_get_contents($sFile),
             $sFile,
             htmlspecialchars(Request::getPost('cmd'))
         );
     }
-
 }

@@ -228,6 +228,12 @@ class Shell
         }
     }
 
+    public function eof()
+    {
+        /* @todo */
+        // exit;
+    }
+
     /**
      * Set display_errors and error_reporting
      */
