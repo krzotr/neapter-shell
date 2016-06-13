@@ -28,8 +28,7 @@ class ModuleRemove extends ModuleAbstract
      */
     public static function getCommands()
     {
-        return array
-        (
+        return array(
             'remove',
             'rm',
             'delete',

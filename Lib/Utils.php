@@ -127,7 +127,12 @@ class Utils
             return false;
         }
 
-        return count(array_diff($this->getSystemFunctions(), $this->getDisabledFunctions()) > 0);
+        $aDiff = array_diff(
+            $this->getSystemFunctions(),
+            $this->getDisabledFunctions()
+        );
+
+        return (count($aDiff) > 0);
     }
 
     public function getDisabledFunctions()
@@ -264,6 +269,8 @@ class Utils
 
     /**
      * Location of temporary file
+     *
+     * @param string $sKey Cache identifier
      *
      * @return string
      */

@@ -72,7 +72,7 @@ class Request
      * Usuwanie backslashow z tablicy
      *
      * @access private
-     * @param  array $aData Tablica
+     * @param  array $mData Tablica
      * @return void
      */
     private static function stripSlashes(array &$mData)

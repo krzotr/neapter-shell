@@ -27,11 +27,11 @@ class Arr
      *
      * @static
      * @access public
-     * @param  string $sData Indeks
-     * @param  array         Tablica
-     * @return mixed         Wartosci tablicy
+     * @param  string $sData       Indeks
+     * @param  array  &$aArrayData Tablica
+     * @return mixed               Wartosci tablicy
      */
-    public static function get($sData, array & $aArrayData)
+    public static function get($sData, array &$aArrayData)
     {
         $mConfig = $aArrayData;
 

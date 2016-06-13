@@ -70,7 +70,12 @@ DATA;
      */
     public function get()
     {
-        return sprintf('user=%s uid=%d gid=%d', get_current_user(), getmyuid(), getmygid());
+        return sprintf(
+            'user=%s uid=%d gid=%d',
+            get_current_user(),
+            getmyuid(),
+            getmygid()
+        );
     }
 
 }

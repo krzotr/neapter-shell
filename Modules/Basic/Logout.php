@@ -3,20 +3,23 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   Neapter_Shell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
- *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @copyright 2012-2016 Krzysztof Otręba
+ * @license   http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link      https://github.com/krzotr/neapter-shell
  */
 
 /**
  * Zmienianie uprawnien dla pliku
  *
+ * @category  WebShell
+ * @package   Neapter_Shell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
- *
- * @package    NeapterShell
- * @subpackage Modules
+ * @copyright 2012-2016 Krzysztof Otręba
+ * @license   http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link      https://github.com/krzotr/neapter-shell
  */
 class ModuleLogout extends ModuleAbstract
 {
@@ -85,5 +88,4 @@ DATA;
 
         exit;
     }
-
 }

@@ -129,10 +129,8 @@ class Shell
     /**
      * Konstruktor
      *
-     * @uses   Request
-     *
+     * @param string $sArgs Arguments to execute commands
      * @access public
-     * @return void
      */
     public function __construct($sArgs = NULL)
     {
@@ -176,7 +174,7 @@ class Shell
         /**
          * Locale
          */
-        setLocale(LC_ALL, 'polish.UTF-8');
+        setlocale(LC_ALL, 'polish.UTF-8');
 
         /**
          * Naglowek UTF-8
@@ -244,11 +242,6 @@ class Shell
      */
     protected function loadModulesFromFile()
     {
-        $sTmp = $this->oUtils->getTmpDir();
-
-        /**
-         * Wczytywanie modulow
-         */
         if ($sData = $this->oUtils->cacheGet('modules')) {
             ob_start();
             eval('?>' . $sData . '<?');
@@ -256,9 +249,6 @@ class Shell
             ob_end_flush();
         }
 
-        /**
-         * Wczytywanie rozszerzen
-         */
         if ($aAutoload = $this->oUtils->cacheGet('autoload')) {
             /**
              * Wczytywanie rozszerzen
@@ -376,8 +366,7 @@ class Shell
     /**
      * Domyslna akcja, dostep do konsoli
      *
-     * @uses   Request
-     * @uses   Form
+     * @param string $sCmd Command to execute
      *
      * @access public
      * @return string
@@ -385,11 +374,6 @@ class Shell
     public function getCommandOutput($sCmd = NULL)
     {
         $bRaw = ($sCmd !== NULL);
-
-        /**
-         * Zawartosc strony
-         */
-        $sContent = NULL;
 
         /**
          * Zawartosc konsoli
@@ -438,7 +422,9 @@ class Shell
                 $sModule = $aModules[$this->sCmd];
                 $oModule = new $sModule($this, $this->oUtils, $this->oArgs);
 
-                if (($this->oArgs->getNumberOfParams() === 1) && ($this->oArgs->getParam(0) === 'help')) {
+                if (($this->oArgs->getNumberOfParams() === 1)
+                    && ($this->oArgs->getParam(0) === 'help')
+                ) {
                     $sConsole = $sModule::getHelp();
 
                     //$sConsole = implode(', ', $this->oUtils->getCommandsByModule($sModule)) . ' - ' . $sHelp;
@@ -560,10 +546,7 @@ class Shell
             $this->getCss();
         }
 
-        /**
-         * Uwierzytelnianie
-         */
-        if ((PHP_SAPI !== 'cli') && ($this->sAuth !== NULL)) {
+        if ((PHP_SAPI !== 'cli') && ($this->sAuth !== null)) {
             $this->auth();
         }
 

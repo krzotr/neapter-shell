@@ -40,8 +40,9 @@ class ModuleLs extends ModuleAbstract
      * Konstruktor
      *
      * @access public
-     * @param  object $oShell Obiekt Shell
-     * @return void
+     * @param  Shell $oShell Shell object
+     * @param  Utils $oUtils Utils object
+     * @param  Args $oArgs Args object
      */
     public function __construct(
         Shell $oShell,
