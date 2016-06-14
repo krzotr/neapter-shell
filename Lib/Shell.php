@@ -221,6 +221,7 @@ class Shell
          */
         if (!(isset($_GET['skip_modules']) || isset($_SERVER['skip_modules']))) {
             $this->oUtils->loadModules();
+            $this->oUtils->autoloadModules();
         }
 
         if ($sDir = $this->oUtils->cacheGet('chdir')) {
@@ -241,45 +242,6 @@ class Shell
     {
         ini_set('display_errors', (int) $this->bDev);
         error_reporting($this->bDev ? -1 : 0);
-    }
-
-
-    /**
-     * Wczytanie rozszerzenia
-     *
-     * @access public
-     * @param  string $sExtension Nazwa rozszerzenia lub sciezka do pliku
-     * @return boolean             TRUE w przypadku pomyslnego zaladowania biblioteki
-     */
-    public function dl($sExtension)
-    {
-        /**
-         * Nazwa rozszerzenia
-         */
-        $sName = basename($sExtension);
-
-        if (($iPos = strrpos($sName, '.')) !== FALSE) {
-            $sName = substr($sName, 0, $iPos - 1);
-        } else {
-            $sExtension .= ($this->oUtils->isWindows() ? '.dll' : '.so');
-        }
-
-        if (extension_loaded($sName)) {
-            return TRUE;
-        }
-
-        /**
-         * Aby `dl` dzialalo poprawnie wymagane jest wylaczone safe_mode,
-         * wlaczenie dyrektywy enable_dl. Funkcja `dl` musi istniec
-         * i nie moze znajdowac sie na liscie wylaczonych funkcji
-         */
-        if (!$this->oUtils->isSafeMode() && function_exists('dl') && ini_get('enable_dl')
-            && !in_array('dl', $this->oUtils->getDisabledFunctions())
-        ) {
-            return dl($sExtension);
-        }
-
-        return FALSE;
     }
 
     protected function auth()

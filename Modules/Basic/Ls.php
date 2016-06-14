@@ -23,18 +23,16 @@ class ModuleLs extends ModuleAbstract
     /**
      * Czy funkcja posix_getpwuid istnieje
      *
-     * @access private
      * @var    boolean
      */
-    private $bFuncOwnerById = FALSE;
+    private $bFuncOwnerById = false;
 
     /**
      * Czy funkcja posix_getgrgid istnieje
      *
-     * @access private
      * @var    boolean
      */
-    private $bFuncGroupById = FALSE;
+    private $bFuncGroupById = false;
 
     /**
      * Konstruktor
@@ -61,7 +59,6 @@ class ModuleLs extends ModuleAbstract
     /**
      * Dostepna lista komend
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -76,7 +73,6 @@ class ModuleLs extends ModuleAbstract
     /**
      * Zwracanie wersji modulu
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
@@ -87,7 +83,6 @@ class ModuleLs extends ModuleAbstract
     /**
      * Zwracanie pomocy modulu
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -114,11 +109,10 @@ DATA;
     /**
      * Pobieranie nazwy uzytkownika po jego ID
      *
-     * @access private
      * @param  integer $iValue ID uzytkownika
-     * @return string|integer         Nazwa uzytkownika / ID uzytkownika
+     * @return string|integer  Nazwa uzytkownika / ID uzytkownika
      */
-    private function getOwnerById($iValue)
+    protected function getOwnerById($iValue)
     {
         if ($this->bFuncOwnerById) {
             $aUser = posix_getpwuid($iValue);
@@ -131,11 +125,10 @@ DATA;
     /**
      * Pobieranie nazwy grupy po jej ID
      *
-     * @access private
      * @param  integer $iValue ID grupy
-     * @return string|integer         Nazwa grupy / ID grupy
+     * @return string|integer  Nazwa grupy / ID grupy
      */
-    private function getGroupById($iValue)
+    protected function getGroupById($iValue)
     {
         if ($this->bFuncGroupById) {
             $aGroup = posix_getgrgid($iValue);
@@ -153,110 +146,21 @@ DATA;
      */
     public function get()
     {
-        $sOutput = NULL;
-
-        /**
-         * Domyslny katalog jezeli nie podano sciezki
-         */
         $sDir = ($this->oArgs->getParam(0) ?: getcwd());
-
         $aOptv = $this->oArgs->getSwitches();
-
-        $bList = array_key_exists('l', $aOptv);
 
         $bRecursive = array_key_exists('R', $aOptv);
 
         try {
-            /**
-             * Jezeli chcemy wyswietlic pliki i katalogi rekurencyjnie to uzywamy
-             * obiektu RecursiveDirectoryIterator
-             */
             if ($bRecursive) {
                 $oDirectory = new RecursiveIteratorIterator(
                     new XRecursiveDirectoryIterator($sDir),
-                    RecursiveIteratorIterator::SELF_FIRST | FilesystemIterator::FOLLOW_SYMLINKS
-            );
+                    RecursiveIteratorIterator::SELF_FIRST
+                        | FilesystemIterator::FOLLOW_SYMLINKS
+                );
             } else {
                 $oDirectory = new DirectoryIterator($sDir);
             }
-
-            /**
-             * Informacja o komendzie jaka wykonalismy
-             */
-            $sOutput .= sprintf("%s\r\n\r\n", $sDir);
-
-            $sFileName = ($bRecursive ? 'getPathname' : 'getBasename');
-
-            foreach ($oDirectory as $oFile) {
-                if ($bList) {
-                    /**
-                     * Windows ?
-                     */
-                    if ($this->oUtils->isWindows()) {
-                        /**
-                         * Wyjatek - nie mamy praw odczytu dla wlasciwosci pliku
-                         */
-                        try {
-                            $sType = (($oFile->getType() === 'file') ? '-' : 'd');
-                            $sSize = $oFile->getSize();
-                            $sDate = date('Y-m-d h:i', $oFile->getCTime());
-                        } catch (Exception $oException) {
-                            $sType = '?';
-                            $sSize = '-1';
-                            $sDate = '0000-00-00 00:00';
-                        }
-
-                        $sOutput .= sprintf("%s %11d %s %s\r\n",
-                            $sType,
-                            $sSize,
-                            $sDate,
-                            $oFile->{$sFileName}()
-                        );
-                    } else {
-                        /**
-                         * Wyjatek - nie mamy praw odczytu dla wlasciwosci pliku
-                         */
-                        try {
-                            $sType = (($oFile->getType() === 'file') ? '-' : 'd');
-                            $sSize = $oFile->getSize();
-                            $sDate = date('Y-m-d h:i', $oFile->getCTime());
-                            $iPerms = $oFile->getPerms();
-                            $iOwner = $oFile->getOwner();
-                            $iGroup = $oFile->getGroup();
-                        } catch (Exception $oException) {
-                            $sSize = '-1';
-                            $sType = '?';
-                            $sDate = '0000-00-00 00:00';
-                            $iPerms = 16384;
-                            $iOwner = -1;
-                            $iGroup = -1;
-                        }
-
-                        $sOutput .= sprintf("%s%s %-10s %-10s %11d %s %s\r\n",
-                            $sType,
-                            substr(sprintf('%o', $iPerms), -4),
-                            $this->getOwnerById($iOwner),
-                            $this->getGroupById($iGroup),
-                            $sSize,
-                            $sDate,
-                            $oFile->{$sFileName}()
-                        );
-                    }
-                } else {
-                    /**
-                     * Wyjatek - nie mamy praw odczytu dla wlasciwosci pliku
-                     */
-                    try {
-                        $sType = (($oFile->getType() === 'file') ? 'fil' : 'dir');
-                    } catch (Exception $oException) {
-                        $sType = '---';
-                    }
-
-                    $sOutput .= sprintf("%s %s\r\n", $sType, $oFile->{$sFileName}());
-                }
-            }
-
-            return htmlspecialchars($sOutput);
         } catch (Exception $oException) {
             return sprintf(
                 "Nie można otworzyć katalogu \"%s\"\r\n\r\nException: %s",
@@ -264,6 +168,59 @@ DATA;
                 $oException->getMessage()
             );
         }
+
+        $sOutput = sprintf("%s\r\n\r\n", $sDir);
+
+        $sFileName = ($bRecursive ? 'getPathname' : 'getBasename');
+
+        foreach ($oDirectory as $oFile) {
+            if ($this->oUtils->isWindows()) {
+                try {
+                    $sType = (($oFile->getType() === 'file') ? '-' : 'd');
+                    $sSize = $oFile->getSize();
+                    $sDate = date('Y-m-d h:i', $oFile->getCTime());
+                } catch (Exception $oException) {
+                    $sType = '?';
+                    $sSize = '-1';
+                    $sDate = '0000-00-00 00:00';
+                }
+
+                $sOutput .= sprintf("%s %11d %s %s\r\n",
+                    $sType,
+                    $sSize,
+                    $sDate,
+                    $oFile->{$sFileName}()
+                );
+            } else {
+                try {
+                    $sType = (($oFile->getType() === 'file') ? '-' : 'd');
+                    $sSize = $oFile->getSize();
+                    $sDate = date('Y-m-d h:i', $oFile->getCTime());
+                    $iPerms = $oFile->getPerms();
+                    $iOwner = $oFile->getOwner();
+                    $iGroup = $oFile->getGroup();
+                } catch (Exception $oException) {
+                    $sSize = '-1';
+                    $sType = '?';
+                    $sDate = '0000-00-00 00:00';
+                    $iPerms = 16384;
+                    $iOwner = -1;
+                    $iGroup = -1;
+                }
+
+                $sOutput .= sprintf("%s%s %-10s %-10s %11d %s %s\r\n",
+                    $sType,
+                    substr(sprintf('%o', $iPerms), -4),
+                    $this->getOwnerById($iOwner),
+                    $this->getGroupById($iGroup),
+                    $sSize,
+                    $sDate,
+                    $oFile->{$sFileName}()
+                );
+            }
+        }
+
+        return htmlspecialchars($sOutput);
     }
 
 }

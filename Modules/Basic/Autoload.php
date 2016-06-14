@@ -73,76 +73,41 @@ DATA;
      */
     public function get()
     {
-        if ($this->oArgs->getNumberOfParams() !== 1) {
+        $iArgs = $this->oArgs->getNumberOfParams();
+        $aSwitches = $this->oArgs->getSwitches();
+
+        if (($iArgs === 0) && !$aSwitches) {
             return self::getHelp();
         }
 
-
         $aAutoload = array();
 
-        if (is_file($sFilePath = $this->sTmp . '/' . $this->sPrefix . '_autoload')
-            && (($sData = file_get_contents($sFilePath)) !== FALSE)
-        ) {
-            $aAutoload = unserialize($this->decode($sData));
-        }
 
-        /**
-         * List
-         */
-        if (array_key_exists('l', $aSwitches)) {
+        if (($iArgs == 0) && array_key_exists('l', $aSwitches)) {
+            $aAutoload = $this->oUtils->autoloadModulesGet();
+
             if ($aAutoload === array()) {
                 return 'Nie wczytano żadnych rozszerzeń';
             }
 
-            /**
-             * Wczytywanie rozszerzen
-             */
-            $sOutput = NULL;
-
-            foreach ($aAutoload as $sExtension) {
-                $sOutput .= $sExtension . "\r\n";
-            }
-
-            return "Wczytane rozszerzenia:\r\n\r\n" . $sOutput;
+            return sprintf(
+                "Wczytane rozszerzenia:\r\n\r\n%s",
+                implode("\r\n", $aAutoload)
+            );
         }
 
-        /**
-         * Flush
-         */
-        if (array_key_exists('f', $aSwitches)) {
-            return sprintf('Plik z rozszerzeniami %szostał usunięty', !unlink($this->sTmp . '/' . $this->sPrefix . '_autoload') ? 'nie ' : NULL);
+        if (($iArgs === 0) && array_key_exists('f', $aSwitches)) {
+            return sprintf(
+                'Plik z rozszerzeniami %szostał usunięty',
+                !$this->oUtils->removeLoadedModules() ? 'nie ' : ''
+            );
         }
 
-        /**
-         * Wczytywanie rozszerzen
-         */
-        $sOutput = NULL;
+        $this->oUtils->autoloadModulesAdd($this->oArgs->getParams());
 
-        foreach ($this->oArgs->getParams() as $sExtension) {
-            /**
-             * Czy rozszerzenie zostalo juz poprzednio wczytane
-             */
-            if (in_array($sExtension, $aAutoload)) {
-                $sOutput .= sprintf("Poprzednio wczytany - %s\r\n", $sExtension);
-                continue;
-            }
-
-            /**
-             * Wczytywanie rozszerzenia
-             */
-            if (($bLoaded = $this->dl($sExtension))) {
-                $aAutoload[] = $sExtension;
-            }
-
-            $sOutput .= sprintf("%s - %s\r\n", ($bLoaded ? '    Wczytano' : 'Nie wczytano'), $sExtension);
-        }
-
-        /**
-         * Zapis rozszerzen do pliku
-         */
-        file_put_contents($this->sTmp . '/' . $this->sPrefix . '_autoload', $this->encode(serialize($aAutoload)));
-
-        return $sOutput;
+        return sprintf(
+            "Wczytane rozszerzenia:\r\n%s",
+            implode("\r\n", $this->oUtils->autoloadModulesGet())
+        );
     }
-
 }

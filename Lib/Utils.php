@@ -303,6 +303,17 @@ class Utils
         return false;
     }
 
+    public function cacheDel($sKey)
+    {
+        $sFile = $this->cacheGetFile($sKey);
+
+        if (!is_file($sFile)) {
+            return true;
+        }
+
+        return (bool) @unlink($sFile);
+    }
+
     public function cacheSet($sKey, $mValue)
     {
         $sFile = $this->cacheGetFile($sKey);
@@ -332,22 +343,123 @@ class Utils
 
     public function removeLoadedModules()
     {
-        $this->cacheSet('modules', '');
+        return $this->cacheDel('modules', '');
+    }
+
+    /**
+     * Wczytanie rozszerzenia
+     *
+     * @access public
+     * @param  string $sExtension Nazwa rozszerzenia lub sciezka do pliku
+     * @return boolean             TRUE w przypadku pomyslnego zaladowania biblioteki
+     */
+    public function dl($sExtension)
+    {
+        /**
+         * Nazwa rozszerzenia
+         */
+        $sName = basename($sExtension);
+
+        if (($iPos = strrpos($sName, '.')) !== false) {
+            $sName = substr($sName, 0, $iPos - 1);
+        } else {
+            $sExtension .= ($this->isWindows() ? '.dll' : '.so');
+        }
+
+        if (extension_loaded($sName)) {
+            return true;
+        }
+
+        /**
+         * Aby `dl` dzialalo poprawnie wymagane jest wylaczone safe_mode,
+         * wlaczenie dyrektywy enable_dl. Funkcja `dl` musi istniec
+         * i nie moze znajdowac sie na liscie wylaczonych funkcji
+         */
+        if (!$this->isSafeMode() && ini_get('enable_dl')
+            && !in_array('dl', $this->oUtils->getDisabledFunctions())
+            && function_exists('dl')
+        ) {
+            return dl($sExtension);
+        }
+
+        return false;
     }
 
     public function loadModules()
     {
-        if ($sData = $this->cacheGet('modules')) {
-            ob_start();
-            eval('?>' . $sData . '<?');
-            ob_clean();
-            ob_end_flush();
+        if (false === $sData = $this->cacheGet('modules')) {
+            return ;
         }
 
-        if ($aAutoload = $this->cacheGet('autoload')) {
-            foreach ($aAutoload as $sExtension) {
-                $this->dl($sExtension);
-            }
+        ob_start();
+        eval('?>' . $sData . '<?');
+        ob_clean();
+        ob_end_flush();
+    }
+
+    public function autoloadModules()
+    {
+        if (false === $aAutoload = $this->cacheGet('autoload')) {
+            return ;
         }
+
+        foreach ($aAutoload as $sExtension) {
+            if (extension_loaded($sExtension)) {
+                continue;
+            }
+
+            $this->dl($sExtension);
+        }
+    }
+
+    public function autoloadModulesAdd(array $aMod)
+    {
+        if (false === $aModules = $this->cacheGet('autoload')) {
+            $aModules = array();
+        }
+
+        foreach ($aMod as $sExtension) {
+            if (in_array($sExtension, $aModules)) {
+                continue;
+            }
+
+            $this->dl($sExtension);
+        }
+
+        $aModules = array_unique($aModules + $aMod);
+
+        return $this->cacheSet('autoload', $aModules);
+    }
+
+    public function autoloadModulesGet()
+    {
+        if (false === $aModules = $this->cacheGet('autoload')) {
+            return array();
+        }
+
+        return $aModules;
+    }
+
+    public function getPathes()
+    {
+        $aPath = array();
+
+        if (!empty($_SERVER['PATH'])) {
+            $aPath = explode(':', $_SERVER['PATH']);
+        } else {
+            $aPath = array();
+        }
+
+        $aPath = $aPath + array(
+            '/usr/bin/',
+            '/usr/local/bin/',
+            '/bin',
+            '/usr/local/sbin',
+            '/usr/sbin',
+            '/sbin'
+        );
+        $aPath = array_unique($aPath);
+
+        return array_filter($aPath, 'is_dir');
     }
 }

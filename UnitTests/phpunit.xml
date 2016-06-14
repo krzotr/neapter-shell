@@ -18,7 +18,7 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">../Lib</directory>
-            <directory suffix=".php">../Modules</directory>
+            <directory suffix=".php">../Modules/Basic</directory>
         </whitelist>
     </filter>
 

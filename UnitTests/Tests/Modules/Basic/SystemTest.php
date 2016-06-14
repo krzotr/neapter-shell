@@ -57,7 +57,7 @@ class ModuleSystemTest extends PHPUnit_Framework_TestCase
             if ($sStr == 'disable_functions'
                 && isset($_SERVER['disable_functions'])
             ) {
-                return $_SERVER['disable_functions'];
+                return implode(',', $_SERVER['disable_functions']);
             }
 
             return _ini_get($sStr);
@@ -87,7 +87,7 @@ class ModuleSystemTest extends PHPUnit_Framework_TestCase
 
         file_put_contents($sFile, $sContent);
 
-        $_SERVER['disable_functions'] = 'system';
+        $_SERVER['disable_functions'] = array('system');
 
         $this->overwriteDisableFunctions();
 
@@ -101,26 +101,35 @@ class ModuleSystemTest extends PHPUnit_Framework_TestCase
             'pcntl_exec'
         );
 
+        $sOutput = shell_exec('ls -la /');
+
+        $i = 0;
         foreach ($aDisableFunctions as $sFunc) {
             $oShell = new Shell();
-            $sOut = $oShell->getCommandOutput('cat ' . $sFile);
+            $sOut = $oShell->getCommandOutput('ls -la /');
 
             $this->assertSame(
                 sprintf(
-                    "Cmd: 'cat %s'\r\nPHPfunc: %s():\r\n\r\n%s\r\n",
-                    $sFile,
+                    "Cmd: 'ls -la /'\r\nPHPfunc: %s():\r\n\r\n%s\r\n",
                     $sFunc,
-                    file_get_contents($sFile)
+                    $sOutput
                 ),
                 $sOut,
                 sprintf("Testing %s function", $sFunc)
             );
 
-            $_SERVER['disable_functions'] .= ',' . $sFunc;
+            $_SERVER['disable_functions'][] = $sFunc;
+            ++$i;
         }
 
+        $this->assertSame(
+            $i,
+            count($aDisableFunctions),
+            "Testing all exec functions"
+        );
+
         $oShell = new Shell();
-        $sOut = $oShell->getCommandOutput('cat ' . $sFile);
+        $sOut = $oShell->getCommandOutput('cat /etc/passwd');
         $this->assertSame(
             "Cannot execute command. All functions have been blocked!\r\n",
             $sOut,
