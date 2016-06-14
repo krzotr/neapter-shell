@@ -365,9 +365,6 @@ class Utils
      */
     public function dl($sExtension)
     {
-        /**
-         * Nazwa rozszerzenia
-         */
         $sName = basename($sExtension);
 
         if (($iPos = strrpos($sName, '.')) !== false) {

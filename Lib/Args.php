@@ -98,10 +98,10 @@ class Args
                  *
                  * [host] => http://neapter.com
                  */
-                if (($iPos = strpos($aArgs[$i], '=')) !== FALSE) {
+                if (($iPos = strpos($aArgs[$i], '=')) !== false) {
                     $this->aOptions[substr($aArgs[$i], 2, $iPos - 2)] = substr($aArgs[$i], $iPos + 1);
                 } else {
-                    $this->aOptions[substr($aArgs[$i], 2)] = TRUE;
+                    $this->aOptions[substr($aArgs[$i], 2)] = true;
                 }
 
                 unset($aArgs[$i]);
@@ -145,7 +145,7 @@ class Args
             return $this->aOptions[$sOption];
         }
 
-        return FALSE;
+        return false;
     }
 
     /**
@@ -183,7 +183,7 @@ class Args
             return $this->aSwitches[$sSwitch];
         }
 
-        return FALSE;
+        return false;
     }
 
     /**
@@ -221,18 +221,18 @@ class Args
             return $this->aArgs[$iParam];
         }
 
-        return FALSE;
+        return false;
     }
 
     /**
      * Pobieranie parametrow
      *
      * @access public
-     * @param  boolean $bRaw [Optional]<br>Domyslnie <b>TRUE</b> - pobieranie wszystkich parametrow<br>
-     * <b>FALSE</b> - pobieranie parametrow bez opcji i przelacznikow
+     * @param  boolean $bRaw [Optional]<br>Domyslnie <b>true</b> - pobieranie wszystkich parametrow<br>
+     * <b>false</b> - pobieranie parametrow bez opcji i przelacznikow
      * @return array         Lista parametrow
      */
-    public function getParams($bRaw = TRUE)
+    public function getParams($bRaw = true)
     {
         if ($bRaw) {
             return $this->aArgv;

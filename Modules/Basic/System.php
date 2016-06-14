@@ -69,6 +69,51 @@ DATA;
         return !in_array($sFunc, $this->oUtils->getDisabledFunctions());
     }
 
+    protected function getPcntl()
+    {
+        echo "pcntl_exec():\r\n\r\n";
+
+        $sFullPath = '';
+        $sBin = '';
+        $aArgs = array();
+
+        if (($iPos = strpos($sCmd, ' ')) === false) {
+            $sBin = $sCmd;
+        } else {
+            $sBin = substr($sCmd, 0, $iPos);
+            $aArgs = explode(' ', substr($sCmd, $iPos + 1));
+        }
+
+        foreach ($this->oUtils->getPathes() as $sDir) {
+            if (is_file($sFile = $sDir . '/' . $sBin)) {
+                $sFullPath = $sFile;
+                break;
+            }
+        }
+
+        $sTmpFile = $this->oUtils->cacheGetFile('exec');
+
+        $rStdOut = null;
+        switch (pcntl_fork()) {
+            case 0:
+                fclose(STDOUT);
+                fclose(STDERR);
+
+                $rStdOut = fopen($sTmpFile, 'w');
+                pcntl_exec($sFullPath, $aArgs);
+            default:
+               break;
+        }
+
+        usleep(10000);
+
+        pcntl_wait($iStatus);
+        fclose($rStdOut);
+        echo file_get_contents($sTmpFile);
+
+        @ unlink($sTmpFile);
+    }
+
     /**
      * Wywolanie modulu
      *
@@ -160,45 +205,7 @@ DATA;
         else if (function_exists('pcntl_exec')
             && $this->isFuncAvailable('pcntl_exec')
         ) {
-            echo "pcntl_exec():\r\n\r\n";
-
-            $sFullPath = '';
-            $sBin = '';
-            $aArgs = array();
-
-            if (($iPos = strpos($sCmd, ' ')) === false) {
-                $sBin = $sCmd;
-            } else {
-                $sBin = substr($sCmd, 0, $iPos);
-                $aArgs = explode(' ', substr($sCmd, $iPos + 1));
-            }
-
-            foreach ($this->oUtils->getPathes() as $sDir) {
-                if (is_file($sFile = $sDir . '/' . $sBin)) {
-                    $sFullPath = $sFile;
-                    break;
-                }
-            }
-
-            $sTmpFile = $this->oUtils->cacheGetFile('exec');
-
-            switch (pcntl_fork()) {
-                case 0:
-                    fclose(STDOUT);
-                    fclose(STDERR);
-
-                    $rStdOut = fopen($sTmpFile, 'w');
-                    pcntl_exec($sFullPath, $aArgs);
-                default:
-                   break;
-            }
-
-            usleep(10000);
-
-            pcntl_wait($status);
-            echo file_get_contents($sTmpFile);
-
-            @ unlink($sTmpFile);
+            $this->getPcntl();
         } else {
             ob_clean();
             ob_end_flush();
