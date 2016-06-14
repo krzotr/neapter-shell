@@ -303,6 +303,18 @@ class Utils
         return false;
     }
 
+    /**
+     * Remove all cache data
+     */
+    public function cacheFlush()
+    {
+        $sPath = $this->getTmpDir() . '/' . $this->getUniquePrefix() . '*';
+
+        foreach (glob($sPath) as $sFile ) {
+            @ unlink($sFile);
+        }
+    }
+
     public function cacheDel($sKey)
     {
         $sFile = $this->cacheGetFile($sKey);
@@ -336,9 +348,7 @@ class Utils
 
         $this->cacheSet('modules', $sData);
 
-        $this->loadModules();
-
-        return true;
+        return $this->loadModules();
     }
 
     public function removeLoadedModules()
@@ -388,13 +398,15 @@ class Utils
     public function loadModules()
     {
         if (false === $sData = $this->cacheGet('modules')) {
-            return ;
+            return false;
         }
 
         ob_start();
         eval('?>' . $sData . '<?');
         ob_clean();
         ob_end_flush();
+
+        return true;
     }
 
     public function autoloadModules()

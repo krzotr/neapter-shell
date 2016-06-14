@@ -162,6 +162,36 @@ class UtilsTest extends PHPUnit_Framework_TestCase
         $this->oUtils->getUniquePrefix();
     }
 
+    public function testCacheDel()
+    {
+        $this->oUtils->cacheSet('test', 'testx');
+
+        $this->assertSame('testx', $this->oUtils->cacheGet('test'));
+        $this->assertTrue(is_file($this->oUtils->cacheGetFile('test')));
+
+        $this->assertTrue($this->oUtils->cacheDel('test'));
+        $this->assertFalse(is_file($this->oUtils->cacheGetFile('test')));
+
+        $this->assertTrue($this->oUtils->cacheDel('T3sT'));
+    }
+
+    public function testCacheFlush()
+    {
+        $this->oUtils->cacheSet('test1', 'test');
+        $this->oUtils->cacheSet('test2', 'test');
+        $this->oUtils->cacheSet('test3', 'test');
+
+        $this->assertTrue(is_file($this->oUtils->cacheGetFile('test1')));
+        $this->assertTrue(is_file($this->oUtils->cacheGetFile('test2')));
+        $this->assertTrue(is_file($this->oUtils->cacheGetFile('test3')));
+
+        $this->oUtils->cacheFlush();
+
+        $this->assertFalse(is_file($this->oUtils->cacheGetFile('test1')));
+        $this->assertFalse(is_file($this->oUtils->cacheGetFile('test2')));
+        $this->assertFalse(is_file($this->oUtils->cacheGetFile('test3')));
+    }
+
     public function testCacheGetSet()
     {
         $sContent = md5(microtime(1));
@@ -185,6 +215,55 @@ class UtilsTest extends PHPUnit_Framework_TestCase
     public function testCacheGetFile()
     {
         $this->oUtils->cacheGetFile('test');
+    }
+
+    public function loadModuleFromLocation()
+    {
+        $this->assertFalse($this->oUtils->loadModuleFromLocation('/ab/cdf/x'));
+    }
+
+    public function dl()
+    {
+
+    }
+
+    public function loadModules()
+    {
+        $this->oUtils->cacheDel('modules');
+        $this->assertfalse($this->oUtils->loadModules());
+    }
+
+    public function autoloadModules()
+    {
+
+    }
+
+    public function autoloadModulesAdd()
+    {
+
+    }
+
+    public function autoloadModulesGet()
+    {
+
+    }
+
+    public function getPathes()
+    {
+        $sCache = $_SERVER['PATH'];
+
+        $_SERVER['PATH'] = '';
+        $aPathes = $this->oUtils->getPathes();
+
+        $_SERVER['PATH'] = '/abc:/fgh';
+        $aPathes = $this->oUtils->getPathes();
+
+        $this->assertTrue(in_array($aPathes), '/abc');
+        $this->assertTrue(in_array($aPathes), '/fgh');
+        $this->assertTrue(in_array($aPathes), '/usr/bin');
+        $this->assertTrue(in_array($aPathes), '/bin');
+
+        $_SERVER['PATH'] = $sCache;
     }
 
 
