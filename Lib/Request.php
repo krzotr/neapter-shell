@@ -11,46 +11,41 @@
 class Request
 {
     /**
-     * Tablica $_GET
+     * Array of $_GET
      *
      * @static
-     * @access private
-     * @var    array
+     * @var array
      */
     private static $aGet = array();
 
     /**
-     * Tablica $_POST
+     * Array of $_POST
      *
      * @static
-     * @access private
-     * @var    array
+     * @var array
      */
     private static $aPost = array();
 
     /**
-     * Tablica $_SERVER
+     * Array of $_SERVER
      *
      * @static
-     * @access private
-     * @var    array
+     * @var array
      */
     private static $aServer = array();
 
     /**
-     * Tablica $_FILES
+     * Array of $_FILES
      *
      * @static
-     * @access private
-     * @var    array
+     * @var array
      */
     private static $aFiles = array();
 
     /**
-     * Inicjacja
+     * Init
      *
      * @static
-     * @access public
      * @return void
      */
     public static function init()
@@ -69,47 +64,50 @@ class Request
     }
 
     /**
-     * Usuwanie backslashow z tablicy
+     * Remove escape charracters
      *
-     * @access private
-     * @param  array $mData Tablica
+     * @param  array $mData Array
      * @return void
      */
     private static function stripSlashes(array &$mData)
     {
-        array_walk_recursive($mData, create_function('&$sData',
+        array_walk_recursive(
+            $mData,
+            create_function(
+                '&$sData',
                 '$sData = stripslashes( $sData ); '
             )
         );
     }
 
     /**
-     * Pobieranie aktualnego adresu
+     * Get URL of current resource
      *
      * @static
-     * @access public
-     *
      * @return string Adres aktualnej strony
      */
     public static function getCurrentUrl()
     {
         if (PHP_SAPI === 'cli') {
-            return null;
+            return '';
         }
 
-        return sprintf('http%s://%s%s%s',
-            ((strncasecmp(self::getServer('HTTPS'), 'on', 2) === 0) ? 's' : NULL),
-            self::getServer('HTTP_HOST'), self::getServer('SCRIPT_NAME'),
+        return sprintf(
+            'http%s://%s%s%s',
+            ((strncasecmp(self::getServer('HTTPS'), 'on', 2) === 0) ? 's' : ''),
+            self::getServer('HTTP_HOST'),
+            self::getServer('SCRIPT_NAME'),
             ((($sQuery = self::getServer('QUERY_STRING')) === '') ? '' : '?' . $sQuery)
         );
     }
 
     /**
-     * Pobieranie klucza ze $_GET
+     * Get value in $_GET
+     *
+     * @uses   Arr
      *
      * @static
-     * @access public
-     * @param  string $sName Nazwa klucza
+     * @param  string $sName Key name
      * @return mixed
      */
     public static function getGet($sName)
@@ -118,13 +116,12 @@ class Request
     }
 
     /**
-     * Pobieranie klucza ze $_POST
+     * Get value in $_POST
      *
      * @uses   Arr
      *
      * @static
-     * @access public
-     * @param  string $sName Nazwa klucza
+     * @param  string $sName Key name
      * @return mixed
      */
     public static function getPost($sName)
@@ -133,24 +130,26 @@ class Request
     }
 
     /**
-     * Pobieranie klucza ze $_FILES
+     * Get value in $_FILES
+     *
+     * @uses   Arr
      *
      * @static
-     * @access public
-     * @param  string $sName Nazwa klucza
+     * @param  string $sName Key name
      * @return mixed
      */
-    public static function getFiles($sName = NULL)
+    public static function getFiles($sName = null)
     {
         return Arr::get($sName, self::$aFiles);
     }
 
     /**
-     * Pobieranie klucza ze $_SERVER
+     * Get value in $_SERVER
+     *
+     * @uses   Arr
      *
      * @static
-     * @access public
-     * @param  string $sName Nazwa klucza
+     * @param  string $sName Key name
      * @return string|boolean
      */
     public static function getServer($sName)
@@ -159,14 +158,15 @@ class Request
             return self::$aServer[$sName];
         }
 
-        return FALSE;
+        return false;
     }
 
     /**
-     * Pobieranie $_SERVER
+     * Get all values of $_SERVER
+     *
+     * @uses   Arr
      *
      * @static
-     * @access public
      * @return array  Tablica $_SERVER
      */
     public static function getServerAll()
@@ -175,15 +175,17 @@ class Request
     }
 
     /**
-     * Request sent via Ajax?
+     * Is request sent via Ajax?
      *
      * @static
-     * @access public
      * @return boolean
      */
     public static function isAjax()
     {
-        return (strncasecmp(self::getServer('HTTP_X_REQUESTED_WITH'), 'XMLHttpRequest', 14) === 0);
+        return strncasecmp(
+            self::getServer('HTTP_X_REQUESTED_WITH'),
+            'XMLHttpRequest',
+            14
+        ) === 0;
     }
-
 }

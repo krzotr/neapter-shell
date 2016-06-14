@@ -129,5 +129,4 @@ DATA;
 
         return sprintf("Moduł %szostał załadowany", ( !$bLoaded ? 'nie ' : ''));
     }
-
 }

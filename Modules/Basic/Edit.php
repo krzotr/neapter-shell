@@ -80,9 +80,10 @@ DATA;
             return self::getHelp();
         }
 
-        return sprintf('<form action="%s" method="post">' .
+        return sprintf(
+            '<form action="%s" method="post" autocomplete="on">' .
             '<textarea id="edit" name="filedata">%s</textarea><br/>' .
-            '<input type="text" name="cmd" readonly="readonly" value=":edit %s" size="110" id="cmd" autocomplete="on"/>' .
+            '<input type="text" name="cmd" readonly="readonly" value=":edit %s" size="110" id="cmd"/>' .
             '<input type="submit" name="submit" value="Zapisz" /></form>',
             Request::getCurrentUrl(),
             (string) file_get_contents($sFile),

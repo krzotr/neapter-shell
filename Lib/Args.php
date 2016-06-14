@@ -108,7 +108,7 @@ class Args
             } /**
              * Switches
              */
-            else if ((strncmp($aArgs[$i], '-', 1) === 0) && (strncmp($aArgs[$i], '--', 2) !== 0)) {
+            elseif ((strncmp($aArgs[$i], '-', 1) === 0) && (strncmp($aArgs[$i], '--', 2) !== 0)) {
                 foreach (str_split(substr($aArgs[$i], 1)) as $sSwitcher) {
                     /**
                      * --vva -c
@@ -260,14 +260,14 @@ class Args
     /**
      * Oczyszczanie argumentow ze zbednych znakow
      *
-     * @access protected
      * @param  string & $sVar Argument
      * @return void
      */
     protected function parseArgv($sVar)
     {
-        $sVar = strtr($sVar, array
-            (
+        $sVar = strtr(
+            $sVar,
+            array(
                 '\\\'' => '\'',
                 '\\"' => '"',
                 '\\\\' => '\\'
@@ -282,5 +282,4 @@ class Args
 
         return $sVar;
     }
-
 }

@@ -68,5 +68,4 @@ DATA;
     {
         return 'pong';
     }
-
 }

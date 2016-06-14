@@ -66,19 +66,22 @@ DATA;
      */
     public function get()
     {
-        return sprintf("SERVER:[%s], IP:[%s], Host:[%s]\r\nPHP:[%s], API:[%s], Url:[%s], Path:[%s]\r\nSAFE_MODE:[%d], EXE:[%d], CURL:[%d], SOCKET:[%d]",
+        return sprintf(
+            "SERVER:[%s], IP:[%s], Host:[%s]\r\nPHP:[%s], API:[%s], " .
+                "Url:[%s], Path:[%s]\r\nSAFE_MODE:[%d], EXE:[%d], CURL:[%d]," .
+                " SOCKET:[%d]",
             php_uname(),
             ($sIp = Request::getServer('REMOTE_ADDR')),
             @gethostbyaddr($sIp),
             PHP_VERSION,
             php_sapi_name(),
             ((PHP_SAPI === 'cli') ? 'CLI' : Request::getCurrentUrl()),
-            ((PHP_SAPI === 'cli') ? Request::getServer('PWD') . '/' : '') . Request::getServer('SCRIPT_FILENAME'),
+            ((PHP_SAPI === 'cli') ? Request::getServer('PWD') . '/' : '')
+                . Request::getServer('SCRIPT_FILENAME'),
             $this->oUtils->isSafeMode(),
             $this->oUtils->isExecutable(),
             function_exists('curl_init'),
             function_exists('socket_create')
         );
     }
-
 }

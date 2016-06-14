@@ -82,5 +82,4 @@ DATA;
 
         return htmlspecialchars(@ file_get_contents($sFilePath));
     }
-
 }

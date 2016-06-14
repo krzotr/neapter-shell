@@ -42,7 +42,6 @@ class LoadModules
             }
         }
     }
-
 }
 
 new LoadModules();

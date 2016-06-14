@@ -84,5 +84,4 @@ DATA;
 
         return htmlspecialchars($sData);
     }
-
 }

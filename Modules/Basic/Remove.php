@@ -75,7 +75,7 @@ DATA;
             return self::getHelp();
         }
 
-        $sOutput = NULL;
+        $sOutput = '';
 
         $sResource = $this->oArgs->getParam(0);
 
@@ -123,7 +123,7 @@ DATA;
                     }
                 }
 
-                $oDirectory = NULL;
+                $oDirectory = '';
 
                 if (!rmdir($sResource)) {
                     return $sOutput . sprintf(
@@ -144,5 +144,4 @@ DATA;
 
         return sprintf('Podana ścieżka "%s" nie istnieje', $sResource);
     }
-
 }

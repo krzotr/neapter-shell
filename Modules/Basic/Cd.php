@@ -83,5 +83,4 @@ DATA;
 
         return 'Nie udało się zmienić katalogu!!!';
     }
-
 }

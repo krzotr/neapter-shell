@@ -310,8 +310,8 @@ class Utils
     {
         $sPath = $this->getTmpDir() . '/' . $this->getUniquePrefix() . '*';
 
-        foreach (glob($sPath) as $sFile ) {
-            @ unlink($sFile);
+        foreach (glob($sPath) as $sFile) {
+            @unlink($sFile);
         }
     }
 

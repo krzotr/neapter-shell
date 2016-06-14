@@ -42,7 +42,7 @@ class Arr
 
         foreach ($aData as $sParam) {
             if (!isset($mConfig[$sParam])) {
-                return FALSE;
+                return false;
             }
 
             $mConfig = $mConfig{$sParam};
@@ -50,5 +50,4 @@ class Arr
 
         return $mConfig;
     }
-
 }

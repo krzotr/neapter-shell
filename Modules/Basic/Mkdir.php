@@ -72,7 +72,7 @@ DATA;
             return self::getHelp();
         }
 
-        $sOutput = NULL;
+        $sOutput = '';
 
         for ($i = 0; $i < $iParams; ++$i) {
             $sPathName = $this->oArgs->getParam($i);
@@ -86,5 +86,4 @@ DATA;
 
         return $sOutput;
     }
-
 }

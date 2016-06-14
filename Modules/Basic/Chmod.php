@@ -90,5 +90,4 @@ DATA;
             (! @chmod($sFile, base_convert($sChmod, 8, 10)) ? 'nie ' : '')
         );
     }
-
 }

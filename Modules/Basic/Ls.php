@@ -185,7 +185,8 @@ DATA;
                     $sDate = '0000-00-00 00:00';
                 }
 
-                $sOutput .= sprintf("%s %11d %s %s\r\n",
+                $sOutput .= sprintf(
+                    "%s %11d %s %s\r\n",
                     $sType,
                     $sSize,
                     $sDate,
@@ -208,7 +209,8 @@ DATA;
                     $iGroup = -1;
                 }
 
-                $sOutput .= sprintf("%s%s %-10s %-10s %11d %s %s\r\n",
+                $sOutput .= sprintf(
+                    "%s%s %-10s %-10s %11d %s %s\r\n",
                     $sType,
                     substr(sprintf('%o', $iPerms), -4),
                     $this->getOwnerById($iOwner),
@@ -222,5 +224,4 @@ DATA;
 
         return htmlspecialchars($sOutput);
     }
-
 }

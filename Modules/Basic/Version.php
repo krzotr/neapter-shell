@@ -72,5 +72,4 @@ DATA;
 
         return 'Neapter shell version: ' . Shell::VERSION;
     }
-
 }

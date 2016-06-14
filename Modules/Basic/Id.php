@@ -77,5 +77,4 @@ DATA;
             getmygid()
         );
     }
-
 }

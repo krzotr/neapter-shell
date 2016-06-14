@@ -26,5 +26,4 @@ class XRecursiveDirectoryIterator extends RecursiveDirectoryIterator
             return new RecursiveArrayIterator(array());
         }
     }
-
 }

@@ -71,5 +71,4 @@ Jakieś sugestie, pytania?
     Pisz śmiało: Krzychu - <a href="mailto:krzotr@gmail.com">krzotr@gmail.com</a>
 DATA;
     }
-
 }

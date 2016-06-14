@@ -101,8 +101,9 @@ DATA;
 
                 $rStdOut = fopen($sTmpFile, 'w');
                 pcntl_exec($sFullPath, $aArgs);
+                break;
             default:
-               break;
+                break;
         }
 
         usleep(10000);
@@ -138,39 +139,20 @@ DATA;
 
         ob_start();
 
-        /**
-         * system
-         */
         if ($this->isFuncAvailable('system')) {
             echo "system():\r\n\r\n";
             system($sCmd);
-        }
-        /**
-         * shell_exec
-         */
-        else if ($this->isFuncAvailable('shell_exec')) {
+        } elseif ($this->isFuncAvailable('shell_exec')) {
             echo "shell_exec():\r\n\r\n";
             echo shell_exec($sCmd);
-        }
-        /**
-         * passthru
-         */
-        else if ($this->isFuncAvailable('passthru')) {
+        } elseif ($this->isFuncAvailable('passthru')) {
             echo "passthru():\r\n\r\n";
             passthru($sCmd);
-        }
-        /**
-         * exec
-         */
-        else if ($this->isFuncAvailable('exec')) {
+        } elseif ($this->isFuncAvailable('exec')) {
             echo "exec():\r\n\r\n";
             exec($sCmd, $aOutput);
             echo implode("\n", $aOutput) . "\n";
-        }
-        /**
-         * popen
-         */
-        else if ($this->isFuncAvailable('popen')) {
+        } elseif ($this->isFuncAvailable('popen')) {
             echo "popen():\r\n\r\n";
             $rFp = popen($sCmd, 'r');
 
@@ -179,13 +161,11 @@ DATA;
                     echo fread($rFp, 1024);
                 }
             }
-        }
-        /**
-         * proc_open
-         */
-        else if ($this->isFuncAvailable('proc_open')) {
+        } elseif ($this->isFuncAvailable('proc_open')) {
             echo "proc_open():\r\n\r\n";
-            $rFp = proc_open($sCmd, array(
+            $rFp = proc_open(
+                $sCmd,
+                array(
                     array('pipe', 'r'),
                     array('pipe', 'w')
                 ),
@@ -198,11 +178,7 @@ DATA;
                     usleep(10000);
                 }
             }
-        }
-        /**
-         * pcntl_exec
-         */
-        else if (function_exists('pcntl_exec')
+        } elseif (function_exists('pcntl_exec')
             && $this->isFuncAvailable('pcntl_exec')
         ) {
             $this->getPcntl();
