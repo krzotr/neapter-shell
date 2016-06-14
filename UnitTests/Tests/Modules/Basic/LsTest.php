@@ -61,5 +61,13 @@ class ModuleLsTest extends PHPUnit_Framework_TestCase
 
         $sOut = $oShell->getCommandOutput(':ls -R /tmp');
         $this->assertNotNull($sOut);
+
+        function posix_getpwuid($iId) {
+            return _posix_getpwuid($iId);
+        }
+
+        function posix_getgrgid($iId) {
+            return _posix_getgrgid($iId);
+        }
     }
 }
