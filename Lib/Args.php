@@ -3,59 +3,66 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
+ */
+
+/**
+ * Parse arguments from string
+ *
+ * @category  WebShell
+ * @package   NeapterShell
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright 2011-2016 Krzysztof Otręba
+ *
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class Args
 {
     /**
      * Surowa lista argumentow
      *
-     * @access protected
-     * @var    array
+     * @var array
      */
     protected $aArgv = array();
 
     /**
      * Przefiltrowana lista argumentow
      *
-     * @access protected
-     * @var    array
+     * @var array
      */
     protected $aArgs = array();
 
     /**
      * Lista opcji
      *
-     * @access protected
-     * @var    array
+     * @var array
      */
     protected $aOptions = array();
 
     /**
      * Lista przelacznikow
      *
-     * @access protected
-     * @var    array
+     * @var array
      */
     protected $aSwitches = array();
 
     /**
      * RAW input data
      *
-     * @access protected
-     * @var    mixed
+     * @var mixed
      */
     protected $mArgv;
 
     /**
      * Konstruktor
      *
-     * @uses   Neapter\Core\Request
-     *
-     * @access public
      * @param  array $aArgv Tablica z lista parametrow
      * @return void
      */
@@ -135,7 +142,6 @@ class Args
     /**
      * Pobieranie opcji
      *
-     * @access public
      * @param  string $sOption Nazwa opcji
      * @return string|boolean
      */
@@ -151,8 +157,7 @@ class Args
     /**
      * Pobieranie wszystkich opcji
      *
-     * @access public
-     * @return array  Lista opcji
+     * @return array Lista opcji
      */
     public function getOptions()
     {
@@ -162,7 +167,6 @@ class Args
     /**
      * Ilosc opcji
      *
-     * @access public
      * @return integer Ilosc parametrow
      */
     public function getNumberOfOptions()
@@ -173,7 +177,6 @@ class Args
     /**
      * Pobieranie przelacznika
      *
-     * @access public
      * @param  string $sOption Nazwa przelacznika
      * @return integer|boolean
      */
@@ -189,8 +192,7 @@ class Args
     /**
      * Pobieranie przelacznikow
      *
-     * @access public
-     * @return array  Lista przelacznikow
+     * @return array Lista przelacznikow
      */
     public function getSwitches()
     {
@@ -200,7 +202,6 @@ class Args
     /**
      * Ilosc przelacznikow
      *
-     * @access public
      * @return integer Ilosc parametrow
      */
     public function getNumberOfSwitches()
@@ -211,7 +212,6 @@ class Args
     /**
      * Pobieranie parametru
      *
-     * @access public
      * @param  string $iParam Parametr
      * @return string|boolean
      */
@@ -227,7 +227,6 @@ class Args
     /**
      * Pobieranie parametrow
      *
-     * @access public
      * @param  boolean $bRaw [Optional]<br>Domyslnie <b>true</b> - pobieranie wszystkich parametrow<br>
      * <b>false</b> - pobieranie parametrow bez opcji i przelacznikow
      * @return array         Lista parametrow
@@ -244,7 +243,6 @@ class Args
     /**
      * Ilosc parametrow
      *
-     * @access public
      * @return integer Ilosc parametrow
      */
     public function getNumberOfParams()
@@ -260,7 +258,7 @@ class Args
     /**
      * Oczyszczanie argumentow ze zbednych znakow
      *
-     * @param  string & $sVar Argument
+     * @param  string &$sVar Argument
      * @return void
      */
     protected function parseArgv($sVar)

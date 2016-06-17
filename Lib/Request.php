@@ -3,10 +3,25 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
+ */
+
+/**
+ * Get access to $_POST, $_GET, $_FILES, $_SERVER
+ *
+ * @category  WebShell
+ * @package   NeapterShell
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright 2011-2016 Krzysztof Otręba
+ *
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class Request
 {
@@ -14,7 +29,7 @@ class Request
      * Array of $_GET
      *
      * @static
-     * @var array
+     * @var    array
      */
     private static $aGet = array();
 
@@ -22,7 +37,7 @@ class Request
      * Array of $_POST
      *
      * @static
-     * @var array
+     * @var    array
      */
     private static $aPost = array();
 
@@ -30,7 +45,7 @@ class Request
      * Array of $_SERVER
      *
      * @static
-     * @var array
+     * @var    array
      */
     private static $aServer = array();
 
@@ -38,7 +53,7 @@ class Request
      * Array of $_FILES
      *
      * @static
-     * @var array
+     * @var    array
      */
     private static $aFiles = array();
 
@@ -104,8 +119,6 @@ class Request
     /**
      * Get value in $_GET
      *
-     * @uses   Arr
-     *
      * @static
      * @param  string $sName Key name
      * @return mixed
@@ -117,8 +130,6 @@ class Request
 
     /**
      * Get value in $_POST
-     *
-     * @uses   Arr
      *
      * @static
      * @param  string $sName Key name
@@ -132,8 +143,6 @@ class Request
     /**
      * Get value in $_FILES
      *
-     * @uses   Arr
-     *
      * @static
      * @param  string $sName Key name
      * @return mixed
@@ -145,8 +154,6 @@ class Request
 
     /**
      * Get value in $_SERVER
-     *
-     * @uses   Arr
      *
      * @static
      * @param  string $sName Key name
@@ -163,8 +170,6 @@ class Request
 
     /**
      * Get all values of $_SERVER
-     *
-     * @uses   Arr
      *
      * @static
      * @return array  Tablica $_SERVER

