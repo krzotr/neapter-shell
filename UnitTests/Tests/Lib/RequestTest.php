@@ -20,7 +20,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
     public function testGetCurrentUrl()
     {
-        $this->assertNull(Request::getCurrentUrl());
+        $this->assertSame('', Request::getCurrentUrl());
     }
 
     public function testGetGet()
