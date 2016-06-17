@@ -69,7 +69,7 @@ DATA;
         return !in_array($sFunc, $this->oUtils->getDisabledFunctions());
     }
 
-    protected function getPcntl()
+    protected function getPcntl($sCmd)
     {
         echo "pcntl_exec():\r\n\r\n";
 
@@ -108,7 +108,6 @@ DATA;
         usleep(10000);
 
         pcntl_wait($iStatus);
-        fclose($rStdOut);
         echo file_get_contents($sTmpFile);
 
         @ unlink($sTmpFile);
@@ -205,7 +204,7 @@ DATA;
         else if (function_exists('pcntl_exec')
             && $this->isFuncAvailable('pcntl_exec')
         ) {
-            $this->getPcntl();
+            $this->getPcntl($sCmd);
         } else {
             ob_clean();
             ob_end_flush();

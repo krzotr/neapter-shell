@@ -1,59 +1,72 @@
 <?php
 
-/* @todo */
-
 /**
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
- */
-
-/**
- * Testy modulu Touch
- *
- * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
- *
- * @package    NeapterShell
- * @subpackage UnitTests
  */
 class ModuleTouchTest extends PHPUnit_Framework_TestCase
 {
     protected $oShell;
-    protected $oModule;
-    protected $sFilePath;
 
     public function setUp()
     {
         $this->oShell = new Shell();
-        $this->oModule = new ModuleTouch($this->oShell);
+    }
 
-        $this->sFilePath = sys_get_temp_dir() . '/' . md5(time());
+    public function testGetVersion()
+    {
+        ModuleTouch::getVersion();
+    }
 
-        touch($this->sFilePath);
+    public function testHelp()
+    {
+        $sOut = $this->oShell->getCommandOutput(':touch help');
+        $this->assertSame(ModuleTouch::getHelp() . "\r\n", $sOut);
 
-        if (!is_file($this->sFilePath)) {
-            $this->fail('Nie można utworzyć przykładowego pliku');
-        }
+        $sOut = $this->oShell->getCommandOutput(':touch');
+        $this->assertSame(ModuleTouch::getHelp() . "\r\n", $sOut);
     }
 
     public function testModule()
     {
-        $this->oShell->setArgs(':touch 2010-10-10 ' . $this->sFilePath);
+        $sTmp = '/tmp/' . md5(microtime(1));
+        file_put_contents($sTmp, str_repeat('x', 1024));
 
-        $this->assertSame('Data modyfikacji i dostępu została zmieniona', $this->oModule->get());
+        $sOut = $this->oShell->getCommandOutput(':touch 2005-05-05 ' . $sTmp);
+        $this->assertSame(
+            "Data modyfikacji i dostępu została zmieniona\r\n",
+            $sOut
+        );
 
         clearstatcache();
 
-        $this->assertSame('2010-10-10', date('Y-m-d', fileatime($this->sFilePath)));
+        $this->assertSame(
+            '2005-05-05',
+            date('Y-m-d', filemtime($sTmp))
+        );
+
+        @unlink($sTmp);
     }
 
-    public function tearDown()
+    public function testFileDoesntExist()
     {
-        @ unlink($this->sFilePath);
+        $sOut = $this->oShell->getCommandOutput(':touch 2016-06-06 /tmp/ad/ax');
+        $this->assertSame("Plik \"/tmp/ad/ax\" nie istnieje\r\n", $sOut);
     }
 
+
+    public function testFail()
+    {
+        $sOut = $this->oShell->getCommandOutput(
+            ':touch 2016-06-06 /etc/passwd'
+        );
+        $this->assertSame(
+            "Data modyfikacji i dostępu nie została zmieniona\r\n",
+            $sOut
+        );
+    }
 }
