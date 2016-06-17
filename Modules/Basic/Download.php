@@ -31,7 +31,7 @@ class ModuleDownload extends ModuleAbstract
     public function __destruct()
     {
         if ($this->sTmpFile) {
-            @ unlink($this->sTmpFile);
+            @unlink($this->sTmpFile);
         }
     }
 

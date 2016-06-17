@@ -69,7 +69,6 @@ DATA;
      */
     public function get()
     {
-
         return 'Neapter shell version: ' . Shell::VERSION;
     }
 
