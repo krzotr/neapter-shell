@@ -37,10 +37,9 @@ class ModuleRemove extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get list of available commands
      *
-     * @access public
-     * @return string
+     * @return array
      */
     public static function getVersion()
     {
@@ -48,9 +47,8 @@ class ModuleRemove extends ModuleAbstract
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -64,9 +62,8 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Execute module
      *
-     * @access public
      * @return string
      */
     public function get()
