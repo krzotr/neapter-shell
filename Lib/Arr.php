@@ -1,22 +1,27 @@
 <?php
 
 /**
- * Neapter Framework
+ * Neapter Shell
  *
- * @version   $Id: Arr.php 466 2011-04-13 15:44:45Z krzotr $
- *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2010-2011, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @link      http://neapter.com
- * @license   http://neapter.com/license
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Arr - Przydatne metody do obslugi tablic
+ * Access to array through index
  *
- * @package    Neapter
- * @subpackage Core
+ * @category  WebShell
+ * @package   NeapterShell
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright 2011-2016 Krzysztof Otręba
+ *
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class Arr
 {
@@ -42,7 +47,7 @@ class Arr
 
         foreach ($aData as $sParam) {
             if (!isset($mConfig[$sParam])) {
-                return FALSE;
+                return false;
             }
 
             $mConfig = $mConfig{$sParam};
@@ -50,5 +55,4 @@ class Arr
 
         return $mConfig;
     }
-
 }

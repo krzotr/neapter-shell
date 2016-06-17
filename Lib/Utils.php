@@ -1,5 +1,29 @@
 <?php
 
+/**
+ * Neapter Shell
+ *
+ * @category  WebShell
+ * @package   NeapterShell
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright 2011-2016 Krzysztof Otręba
+ *
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
+ */
+
+/**
+ * Very usefull operations
+ *
+ * @category  WebShell
+ * @package   NeapterShell
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright 2011-2016 Krzysztof Otręba
+ *
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
+ * @link    http://www.php.net/manual/en/class.recursivedirectoryiterator.php#101654
+ */
 class Utils
 {
     /**
@@ -217,7 +241,7 @@ class Utils
      *     'mv' => ModuleMv
      *     'move' => ModuleMv
      * )
-     * @return array
+     * @return  array
      */
     public function getCommands()
     {
@@ -310,8 +334,8 @@ class Utils
     {
         $sPath = $this->getTmpDir() . '/' . $this->getUniquePrefix() . '*';
 
-        foreach (glob($sPath) as $sFile ) {
-            @ unlink($sFile);
+        foreach (glob($sPath) as $sFile) {
+            @unlink($sFile);
         }
     }
 

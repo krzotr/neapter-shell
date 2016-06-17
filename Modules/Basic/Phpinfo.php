@@ -3,27 +3,31 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Wyswietlanie PHPinfo
+ * Get PHP information
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModulePhpinfo extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -32,9 +36,8 @@ class ModulePhpinfo extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
@@ -43,9 +46,8 @@ class ModulePhpinfo extends ModuleAbstract
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -59,9 +61,8 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Get PHPInfo
      *
-     * @access public
      * @return string
      */
     public function get()
@@ -72,32 +73,21 @@ DATA;
         ob_clean();
         ob_end_flush();
 
-        /**
-         * Wywalanie zbednych tresci, klasy itp
-         * Licencje kazdy zna
-         */
         if (PHP_SAPI !== 'cli') {
-            $sData = str_replace(array
-            (
-                ' class="e"',
-                ' class="v"'
-            ),
+            $sData = str_replace(
+                array(
+                    ' class="e"',
+                    ' class="v"'
+                ),
                 '',
-                substr($sData,
+                substr(
+                    $sData,
                     strpos($sData, '<div class="center">') + 20,
                     -(strlen($sData) - strrpos($sData, '<h2>PHP License</h2>'))
                 )
             );
         }
 
-        /**
-         * logo kazdy widzial, creditsy tez
-         */
-        $sData = preg_replace('~<a href="http://www.php.net/"><img border="0" src="[^"]+" alt="PHP Logo" /></a><h1 class="p">(.+?)</h1>~', '<h1>$1</h1>', $sData);
-        $sData = preg_replace('~<a href=".+?"><img border="0" src=".+?" alt=".+?" /></a>~', NULL, $sData);
-        $sData = preg_replace('~<hr />\s+<h1><a href=".+?">PHP Credits</a></h1>~', NULL, $sData);
-
         return $sData;
     }
-
 }

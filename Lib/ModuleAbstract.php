@@ -3,12 +3,26 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
+/**
+ * Interface for all modules
+ *
+ * @category  WebShell
+ * @package   NeapterShell
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright 2011-2016 Krzysztof Otręba
+ *
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
+ */
 interface ModuleInterface
 {
     /**
@@ -41,9 +55,16 @@ interface ModuleInterface
 }
 
 /**
- * interface - ShellInterface interface dla shella
+ * Abstract method for all modules
  *
- * @package    NeapterShell
+ * @abstract
+ * @category  WebShell
+ * @package   NeapterShell
+ * @author    Krzysztof Otręba <krzotr@gmail.com>
+ * @copyright 2011-2016 Krzysztof Otręba
+ *
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 abstract class ModuleAbstract implements ModuleInterface
 {
@@ -71,18 +92,17 @@ abstract class ModuleAbstract implements ModuleInterface
     /**
      * Create new object of module
      *
-     * @access public
-     * @param  object $oShell Obiekt Shell
+     * @param  object $oShell Shell object
      * @return void
      */
     public function __construct(
         Shell $oShell,
-        Utils $oUtils = NULL,
-        Args $oArgs = NULL
+        Utils $oUtils = null,
+        Args $oArgs = null
     ) {
         $this->oShell = $oShell;
-        $this->oUtils = ($oUtils === NULL ? new Utils() : $oUtils);
-        $this->oArgs = ($oArgs === NULL ? $this->oShell->getArgs() : $oArgs);
+        $this->oUtils = ($oUtils === null ? new Utils() : $oUtils);
+        $this->oArgs = ($oArgs === null ? $this->oShell->getArgs() : $oArgs);
     }
 
     public function setArgs($sArgs)

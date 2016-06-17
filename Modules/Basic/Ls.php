@@ -3,44 +3,48 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Listowanie plikow / katalogow
+ * List files in directory
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleLs extends ModuleAbstract
 {
     /**
-     * Czy funkcja posix_getpwuid istnieje
+     * Does function posix_getpwuid exist?
      *
-     * @var    boolean
+     * @var boolean
      */
-    private $bFuncOwnerById = false;
+    protected $bFuncOwnerById = false;
 
     /**
-     * Czy funkcja posix_getgrgid istnieje
+     * Does function posix_getgrgid exist?
      *
-     * @var    boolean
+     * @var boolean
      */
-    private $bFuncGroupById = false;
+    protected $bFuncGroupById = false;
 
     /**
-     * Konstruktor
+     * Constructor, check if posix_getpwuid and posix_getgrgid exist
      *
-     * @access public
-     * @param  Shell $oShell Shell object
-     * @param  Utils $oUtils Utils object
-     * @param  Args $oArgs Args object
+     * @param Shell $oShell Shell object
+     * @param Utils $oUtils Utils object
+     * @param Args  $oArgs  Args object
      */
     public function __construct(
         Shell $oShell,
@@ -49,29 +53,25 @@ class ModuleLs extends ModuleAbstract
     ) {
         parent::__construct($oShell, $oUtils, $oArgs);
 
-        /**
-         * Czy funkcje sa dostepne
-         */
         $this->bFuncOwnerById = function_exists('posix_getpwuid');
         $this->bFuncGroupById = function_exists('posix_getgrgid');
     }
 
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
      * @return array
      */
     public static function getCommands()
     {
-        return array(
-            'ls',
+        return array('ls',
             'dir',
             'll'
         );
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
      * @return string
      */
@@ -81,7 +81,7 @@ class ModuleLs extends ModuleAbstract
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
      * @return string
      */
@@ -107,10 +107,10 @@ DATA;
     }
 
     /**
-     * Pobieranie nazwy uzytkownika po jego ID
+     * Get username if posix_getpwuid exists otherwise ID
      *
-     * @param  integer $iValue ID uzytkownika
-     * @return string|integer  Nazwa uzytkownika / ID uzytkownika
+     * @param  integer $iValue Owner ID
+     * @return string|integer  owner name / owner ID
      */
     protected function getOwnerById($iValue)
     {
@@ -123,10 +123,10 @@ DATA;
     }
 
     /**
-     * Pobieranie nazwy grupy po jej ID
+     * Get username group if posix_getgrgid exists otherwise ID
      *
-     * @param  integer $iValue ID grupy
-     * @return string|integer  Nazwa grupy / ID grupy
+     * @param  integer $iValue Owner ID
+     * @return string|integer  group name / owner ID
      */
     protected function getGroupById($iValue)
     {
@@ -139,9 +139,8 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Execute module
      *
-     * @access public
      * @return string
      */
     public function get()
@@ -185,7 +184,8 @@ DATA;
                     $sDate = '0000-00-00 00:00';
                 }
 
-                $sOutput .= sprintf("%s %11d %s %s\r\n",
+                $sOutput .= sprintf(
+                    "%s %11d %s %s\r\n",
                     $sType,
                     $sSize,
                     $sDate,
@@ -208,7 +208,8 @@ DATA;
                     $iGroup = -1;
                 }
 
-                $sOutput .= sprintf("%s%s %-10s %-10s %11d %s %s\r\n",
+                $sOutput .= sprintf(
+                    "%s%s %-10s %-10s %11d %s %s\r\n",
                     $sType,
                     substr(sprintf('%o', $iPerms), -4),
                     $this->getOwnerById($iOwner),
@@ -222,5 +223,4 @@ DATA;
 
         return htmlspecialchars($sOutput);
     }
-
 }

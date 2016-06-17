@@ -3,27 +3,31 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Usuwanie pliku / katalogu
+ * Remove file or directory
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleRemove extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -37,9 +41,8 @@ class ModuleRemove extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
@@ -48,9 +51,8 @@ class ModuleRemove extends ModuleAbstract
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -64,9 +66,8 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Get version of Neapter Shell
      *
-     * @access public
      * @return string
      */
     public function get()
@@ -75,7 +76,7 @@ DATA;
             return self::getHelp();
         }
 
-        $sOutput = NULL;
+        $sOutput = '';
 
         $sResource = $this->oArgs->getParam(0);
 
@@ -123,7 +124,7 @@ DATA;
                     }
                 }
 
-                $oDirectory = NULL;
+                $oDirectory = '';
 
                 if (!rmdir($sResource)) {
                     return $sOutput . sprintf(
@@ -144,5 +145,4 @@ DATA;
 
         return sprintf('Podana ścieżka "%s" nie istnieje', $sResource);
     }
-
 }

@@ -3,31 +3,38 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Pobieranie pliku z FTP / HTTP
+ * Local and remote download module
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleDownload extends ModuleAbstract
 {
     /**
      * Temporary file for remote resource
      *
-     * @access private
-     * @var    boolean
+     * @var boolean
      */
     private $sTmpFile;
 
+    /**
+     * Destruct
+     */
     public function __destruct()
     {
         if ($this->sTmpFile) {
@@ -36,9 +43,8 @@ class ModuleDownload extends ModuleAbstract
     }
 
     /**
-     * Dostepna lista komend
+     * List of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -51,9 +57,8 @@ class ModuleDownload extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
@@ -62,9 +67,8 @@ class ModuleDownload extends ModuleAbstract
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -87,10 +91,9 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Execute module
      *
-     * @access public
-     * @return string
+     * @return string|void
      */
     public function get()
     {
@@ -135,7 +138,7 @@ DATA;
         );
 
         /**
-         * Kompresja zawartosci strony
+         * Enable GZip compression
          */
         ob_start($bGzip ? 'ob_gzhandler' : null);
 
