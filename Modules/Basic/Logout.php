@@ -4,29 +4,30 @@
  * Neapter Shell
  *
  * @category  WebShell
- * @package   Neapter_Shell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright 2012-2016 Krzysztof Otręba
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt GPL3
- * @link      https://github.com/krzotr/neapter-shell
+ * @copyright 2011-2016 Krzysztof Otręba
+ *
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Zmienianie uprawnien dla pliku
+ * Logout, remove auth file
  *
  * @category  WebShell
- * @package   Neapter_Shell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright 2012-2016 Krzysztof Otręba
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt GPL3
- * @link      https://github.com/krzotr/neapter-shell
+ * @copyright 2011-2016 Krzysztof Otręba
+ *
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleLogout extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -39,9 +40,8 @@ class ModuleLogout extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
@@ -50,9 +50,8 @@ class ModuleLogout extends ModuleAbstract
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -66,9 +65,8 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Execute module
      *
-     * @access public
      * @return string
      */
     public function get()

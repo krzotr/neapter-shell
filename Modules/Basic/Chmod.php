@@ -13,7 +13,7 @@
  */
 
 /**
- * Get file content
+ * Change file mode
  *
  * @category  WebShell
  * @package   NeapterShell
