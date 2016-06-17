@@ -3,27 +3,31 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Usuwanie pliku / katalogu
+ * Remove file or directory
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleRemove extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -37,9 +41,9 @@ class ModuleRemove extends ModuleAbstract
     }
 
     /**
-     * Get list of available commands
+     * Get module version
      *
-     * @return array
+     * @return string
      */
     public static function getVersion()
     {
@@ -62,7 +66,7 @@ DATA;
     }
 
     /**
-     * Execute module
+     * Get version of Neapter Shell
      *
      * @return string
      */

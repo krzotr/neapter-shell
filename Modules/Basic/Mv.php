@@ -3,27 +3,31 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Przenoszenie pliku / katalogu
+ * Move file or directory
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleMv extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -35,23 +39,18 @@ class ModuleMv extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
     {
-        /**
-         * Wersja Data Autor
-         */
         return '1.0.2 2016-06-08 - <krzotr@gmail.com>';
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -65,9 +64,8 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Get version of Neapter Shell
      *
-     * @access public
      * @return string
      */
     public function get()

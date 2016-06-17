@@ -42,9 +42,9 @@ class ModuleLs extends ModuleAbstract
     /**
      * Constructor, check if posix_getpwuid and posix_getgrgid exist
      *
-     * @param  Shell $oShell Shell object
-     * @param  Utils $oUtils Utils object
-     * @param  Args $oArgs Args object
+     * @param Shell $oShell Shell object
+     * @param Utils $oUtils Utils object
+     * @param Args  $oArgs  Args object
      */
     public function __construct(
         Shell $oShell,

@@ -65,6 +65,7 @@ DATA;
      * Execute module
      *
      * @return stringUpload file via HTML form
+     */
     public function get()
     {
         if (($aFileData = Request::getFiles('file')) !== false) {
