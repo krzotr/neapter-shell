@@ -495,4 +495,16 @@ class Utils
 
         return array_filter($aPath, 'is_dir');
     }
+
+    /**
+     * Get file name of Shell class
+     *
+     * @return string
+     */
+    public function getShellFilename()
+    {
+        $oShell = new ReflectionClass('Shell');
+
+        return $this->sFilename = $oShell->getFilename();
+    }
 }

@@ -4,7 +4,6 @@
             <directory>Tests/Modules</directory>
             <exclude>Tests/Modules/Db</exclude>
             <exclude>Tests/Modules/Net</exclude>
-            <exclude>Tests/Modules/Other</exclude>
             <exclude>Tests/Modules/Trash</exclude>
         </testsuite>
 
@@ -19,6 +18,7 @@
             <directory suffix=".php">../Modules/Basic</directory>
             <directory suffix=".php">../Modules/Crack</directory>
             <directory suffix=".php">../Modules/Files</directory>
+            <directory suffix=".php">../Modules/Other</directory>
         </whitelist>
     </filter>
 

