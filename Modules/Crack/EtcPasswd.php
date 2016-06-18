@@ -91,8 +91,8 @@ DATA;
         $iMax = 65535;
 
         if ($this->oArgs->getNumberOfParams() == 2) {
-            $iMin = $this->oArgs->getParam(0);
-            $iMax = $this->oArgs->getParam(1);
+            $iMin = (int) $this->oArgs->getParam(0);
+            $iMax = (int) $this->oArgs->getParam(1);
 
             if (($iMin < 0) || ($iMin > 65535)) {
                 return 'Błędny zakres dolny';

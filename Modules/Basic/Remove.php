@@ -135,7 +135,7 @@ DATA;
             } catch (Exception $oException) {
                 return sprintf(
                     "Nie można otworzyć katalogu \"%s\"\r\n\r\nErro: %s",
-                    $sDir,
+                    $sResource,
                     $oException->getMessage()
                 );
             }
