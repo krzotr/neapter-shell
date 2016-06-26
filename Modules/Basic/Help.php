@@ -109,7 +109,6 @@ DATA;
         foreach ($aModulesCommands as $sModule => $sModuleCmd) {
             $sHelp = $sModule::getHelp();
 
-            $iHeaderPos = 0;
             if (($iHeaderPos = strpos($sHelp, "\n")) === false) {
                 $iHeaderPos = strlen($sHelp);
             }

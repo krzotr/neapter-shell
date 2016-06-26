@@ -260,7 +260,7 @@ class Shell
                     Request::getCurrentUrl()
                 );
 
-                echo $this->getContent($sCOntent, false);
+                echo $this->getContent($sContent, false);
                 exit;
             }
 
@@ -492,8 +492,8 @@ class Shell
         if (PHP_SAPI === 'cli') {
             print("\r\n");
             print("   .  .          ,          __..     ..\r\n");
-            print("   |\ | _  _.._ -+- _ ._.  (__ |_  _ ||\r\n");
-            print("   | \|(/,(_][_) | (/,[    .__)[ )(/,||\r\n");
+            print("   |\\ | _  _.._ -+- _ ._.  (__ |_  _ ||\r\n");
+            print("   | \\|(/,(_][_) | (/,[    .__)[ )(/,||\r\n");
             printf("             |          v%s\r\n\r\n", self::VERSION);
 
             if (count($GLOBALS['argv']) === 1) {
@@ -512,11 +512,21 @@ class Shell
         echo $this->getCommandOutput();
     }
 
+    /**
+     * Get Args object
+     *
+     * @return Args
+     */
     public function getArgs()
     {
         return $this->oArgs;
     }
 
+    /**
+     * Get Utils object
+     *
+     * @return Utils
+     */
     public function getUtils()
     {
         return $this->oUtils;

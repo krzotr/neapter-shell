@@ -27,6 +27,11 @@
  */
 class XRecursiveDirectoryIterator extends RecursiveDirectoryIterator
 {
+    /**
+     * Returns an iterator for the current entry if it is a directory
+     *
+     * @return mixed
+     */
     public function getChildren()
     {
         try {

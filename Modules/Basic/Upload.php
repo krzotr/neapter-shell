@@ -64,7 +64,7 @@ DATA;
     /**
      * Execute module
      *
-     * @return stringUpload file via HTML form
+     * @return string Upload file via HTML form
      */
     public function get()
     {

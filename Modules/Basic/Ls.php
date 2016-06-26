@@ -110,7 +110,7 @@ DATA;
      * Get username if posix_getpwuid exists otherwise ID
      *
      * @param  integer $iValue Owner ID
-     * @return string|integer  owner name / owner ID
+     * @return string|integer  Owner name / owner ID
      */
     protected function getOwnerById($iValue)
     {
@@ -126,7 +126,7 @@ DATA;
      * Get username group if posix_getgrgid exists otherwise ID
      *
      * @param  integer $iValue Owner ID
-     * @return string|integer  group name / owner ID
+     * @return string|integer  Group name / owner ID
      */
     protected function getGroupById($iValue)
     {

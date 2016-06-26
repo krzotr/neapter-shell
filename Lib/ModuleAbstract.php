@@ -92,8 +92,9 @@ abstract class ModuleAbstract implements ModuleInterface
     /**
      * Create new object of module
      *
-     * @param  object $oShell Shell object
-     * @return void
+     * @param Shell $oShell Shell object
+     * @param Utils $oUtils Utils object
+     * @param Args  $oArgs  Args object
      */
     public function __construct(
         Shell $oShell,
@@ -105,6 +106,13 @@ abstract class ModuleAbstract implements ModuleInterface
         $this->oArgs = ($oArgs === null ? $this->oShell->getArgs() : $oArgs);
     }
 
+    /**
+     * Set command to execute
+     *
+     * @example :ls -la
+     * @param $sArgs Args List of arguments
+     * @return void
+     */
     public function setArgs($sArgs)
     {
         $this->oArgs = new Args(preg_replace('~^:[^ ]+\s+~', null, $sArgs));

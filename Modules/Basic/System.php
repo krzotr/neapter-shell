@@ -70,17 +70,19 @@ DATA;
     /**
      * Does shell function is not blocked?
      *
+     * @param  string $sFunc Function name
      * @return bool
      */
     protected function isFuncAvailable($sFunc)
     {
-        return !in_array($sFunc, $this->oUtils->getDisabledFunctions());
+        return (!in_array($sFunc, $this->oUtils->getDisabledFunctions()));
     }
 
 
     /**
      * Execute shell command via pcntl_exec function
      *
+     * @param  string $sCmd Command to execute
      * @return string
      */
     protected function getPcntl($sCmd)
@@ -88,12 +90,10 @@ DATA;
         echo "pcntl_exec():\r\n\r\n";
 
         $sFullPath = '';
-        $sBin = '';
+        $sBin = $sCmd;
         $aArgs = array();
 
-        if (($iPos = strpos($sCmd, ' ')) === false) {
-            $sBin = $sCmd;
-        } else {
+        if (($iPos = strpos($sCmd, ' ')) !== false) {
             $sBin = substr($sCmd, 0, $iPos);
             $aArgs = explode(' ', substr($sCmd, $iPos + 1));
         }

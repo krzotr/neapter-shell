@@ -124,8 +124,6 @@ DATA;
                     }
                 }
 
-                $oDirectory = '';
-
                 if (!rmdir($sResource)) {
                     return $sOutput . sprintf(
                         'Katalog "%s" nie został usunięty',

@@ -63,8 +63,7 @@ class Args
     /**
      * Konstruktor
      *
-     * @param  array $aArgv Tablica z lista parametrow
-     * @return void
+     * @param mixed $mArgv Tablica z lista parametrow
      */
     public function __construct($mArgv = array())
     {
@@ -177,7 +176,7 @@ class Args
     /**
      * Pobieranie przelacznika
      *
-     * @param  string $sOption Nazwa przelacznika
+     * @param  string $sSwitch Nazwa przelacznika
      * @return integer|boolean
      */
     public function getSwitch($sSwitch)
@@ -250,6 +249,11 @@ class Args
         return count($this->aArgs);
     }
 
+    /**
+     * Get all arguments
+     *
+     * @return mixed
+     */
     public function getRawData()
     {
         return $this->mArgv;
@@ -259,7 +263,7 @@ class Args
      * Oczyszczanie argumentow ze zbednych znakow
      *
      * @param  string &$sVar Argument
-     * @return void
+     * @return string
      */
     protected function parseArgv($sVar)
     {

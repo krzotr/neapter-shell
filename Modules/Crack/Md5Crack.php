@@ -66,6 +66,7 @@ DATA;
     /**
      * Try to crack md5 hash
      *
+     * @param  string $sHash MD5 hash to crack
      * @return string
      */
     protected function crackMd5($sHash)

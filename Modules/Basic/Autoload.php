@@ -81,9 +81,6 @@ DATA;
             return self::getHelp();
         }
 
-        $aAutoload = array();
-
-
         if (($iArgs == 0) && array_key_exists('l', $aSwitches)) {
             $aAutoload = $this->oUtils->autoloadModulesGet();
 

