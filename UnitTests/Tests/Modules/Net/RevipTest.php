@@ -1,49 +1,61 @@
 <?php
 
-/* @todo */
-
 /**
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
- */
-
-/**
- * Testy modulu Revip
- *
- * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
- *
- * @package    NeapterShell
- * @subpackage UnitTests
  */
 class ModuleRevipTest extends PHPUnit_Framework_TestCase
 {
     protected $oShell;
-    protected $oModule;
 
     public function setUp()
     {
         $this->oShell = new Shell();
-        $this->oModule = new ModuleRevip($this->oShell);
+    }
+
+    public function testGetVersion()
+    {
+        ModuleRevip::getVersion();
+    }
+
+    public function testHelp()
+    {
+        $sOut = $this->oShell->getCommandOutput(':revip help');
+        $this->assertSame(ModuleRevip::getHelp() . "\r\n", $sOut);
+
+        $sOut = $this->oShell->getCommandOutput(':revip');
+        $this->assertSame(ModuleRevip::getHelp() . "\r\n", $sOut);
     }
 
     public function testModule()
     {
-        $this->oShell->setArgs(':revip nk.pl');
-        $this->assertSame("Zwrócono 1 witryn:\r\n\r\n\tnk.pl", $this->oModule->get());
+        $sOut = $this->oShell->getCommandOutput(':revip 127.0.0.1');
+        $this->assertSame("Zwrócono 1 witryn:\r\n\r\n  dxhsjlb.com\r\n", $sOut);
 
-        $this->oShell->setArgs(':revip onet.pl');
-        $this->assertSame('Brak adresów IP', $this->oModule->get());
+        $sOut = $this->oShell->getCommandOutput(':revip przemo.org');
+        $this->assertSame("Zwrócono 1 witryn:\r\n\r\n  przemo.org\r\n", $sOut);
     }
 
-    public function testFailModule()
+    public function testFail()
     {
-        $this->oShell->setArgs(':revip ThisnotExists.host');
-        $this->assertSame('Nie można przetłumacz hosta', $this->oModule->get());
+        $sOut = $this->oShell->getCommandOutput(':revip xxxaaaaabb.xc');
+        $this->assertSame("Nie można przetłumacz hosta\r\n", $sOut);
+
+        $sOut = $this->oShell->getCommandOutput(':revip 0.0.0.0');
+        $this->assertSame("Brak hostów na podanym adresie IP\r\n", $sOut);
     }
 
+    public function testConnectionError()
+    {
+        ini_set('default_socket_timeout', '0');
+
+        $sOut = $this->oShell->getCommandOutput(':revip 127.0.0.1');
+        $this->assertSame("Nie można połączyć się z serwerem\r\n", $sOut);
+
+        ini_restore('default_socket_timeout');
+    }
 }

