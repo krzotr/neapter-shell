@@ -128,6 +128,11 @@ class Shell
      */
     public function __construct($sArgs = null)
     {
+        /* Turn off all buffers*/
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
         /**
          * Czas generowania strony a w zasadzie shella
          */
@@ -137,6 +142,8 @@ class Shell
 
         $this->oUtils = new Utils();
         $this->oArgs = new Args($this->sArgs);
+
+        $this->loadConfig();
 
         /**
          * Uwierzytelnianie
@@ -166,50 +173,6 @@ class Shell
         }
 
         /**
-         * Locale
-         */
-        setlocale(LC_ALL, 'polish.UTF-8');
-
-        /**
-         * Naglowek UTF-8
-         */
-        if (PHP_SAPI !== 'cli') {
-            header('Content-type: text/html; charset=utf-8');
-        }
-
-        /**
-         * Tryb deweloperski
-         */
-        $this->bDev = isset($_GET['dev']) || isset($_SERVER['dev']);
-
-        /**
-         * Wylaczenie JavaScript
-         */
-        $this->bNoJs = isset($_GET['nojs']);
-
-
-        /**
-         * Config
-         */
-        $this->loadDevConfig();
-        ignore_user_abort(0);
-
-        /**
-         * Jesli SafeMode jest wylaczony
-         */
-        if (!$this->oUtils->isSafeMode()) {
-            ini_set('max_execution_time', 0);
-            ini_set('memory_limit', '1024M');
-            ini_set('default_socket_timeout', 15);
-            ini_set('date.timezone', 'Europe/Warsaw');
-            ini_set('html_errors', 0);
-            ini_set('log_errors', 0);
-            ini_set('error_log', null);
-        } else {
-            date_default_timezone_set('Europe/Warsaw');
-        }
-
-        /**
          * Uruchomienie shella z domyslna konfiguracja - bez wczytywania ustawien
          * bez rozszerzen i modulow
          */
@@ -229,13 +192,50 @@ class Shell
         // exit;
     }
 
-    /**
-     * Set display_errors and error_reporting
-     */
-    protected function loadDevConfig()
+    protected function loadConfig()
     {
+        setlocale(LC_ALL, 'polish.UTF-8');
+
+        if (PHP_SAPI !== 'cli') {
+            header('Content-type: text/html; charset=utf-8');
+        }
+
+        ini_set('default_charset', 'utf-8');
+        ini_set('default_mimetype', 'text/html');
+
+        $this->bDev = isset($_GET['dev']) || isset($_SERVER['dev']);
+        $this->bNoJs = isset($_GET['nojs']);
+
+        ignore_user_abort(0);
+        ini_set('default_socket_timeout', 15);
+
+        if (!$this->oUtils->isSafeMode()) {
+            ini_set('max_execution_time', 0);
+            ini_set('memory_limit', '1024M');
+            ini_set('default_socket_timeout', 15);
+            ini_set('date.timezone', 'Europe/Warsaw');
+            ini_set('html_errors', 0);
+            ini_set('error_log', null);
+        } else {
+            date_default_timezone_set('Europe/Warsaw');
+        }
+
+        /* Development version */
         ini_set('display_errors', (int) $this->bDev);
         error_reporting($this->bDev ? -1 : 0);
+
+        ini_set('log_errors_max_len', $this->bDev ? 1024 : 1);
+        ini_set('log_errors', (int) !$this->bDev);
+
+        /* Disable opcache extension if is loaded and enabled
+           We create a lot of temporary files. We have to turn off
+           revalidate_path, revalidate_freq, validate_timestamps, use_cwd etc.
+        */
+        if (function_exists('opcache_get_status')
+            && ini_get('opcache.enable')
+        ) {
+            ini_set('opcache.enable', 0);
+        }
     }
 
     protected function auth()
