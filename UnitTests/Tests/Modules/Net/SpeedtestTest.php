@@ -1,57 +1,63 @@
 <?php
 
-/* @todo */
-
 /**
  * Neapter Shell
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright Copyright (c) 2012-2016, Krzysztof Otręba
  *
  * @license   http://www.gnu.org/licenses/gpl-3.0.txt
- */
-
-/**
- * Testy modulu Speedtest
- *
- * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
- *
- * @package    NeapterShell
- * @subpackage UnitTests
  */
 class ModuleSpeedtestTest extends PHPUnit_Framework_TestCase
 {
     protected $oShell;
-    protected $oModule;
-    protected $sFilePath;
+
+    protected $sFormat = "Pobrano: %f KB w %f sekund\r\nŚrednia prędkość:" .
+                         "%f KB/s\r\n";
 
     public function setUp()
     {
         $this->oShell = new Shell();
-        $this->oModule = new ModuleSpeedtest($this->oShell);
-
-        $this->sFilePath = sys_get_temp_dir() . '/' . md5(time());
-
-        touch($this->sFilePath);
-
-        if (!is_file($this->sFilePath)) {
-            $this->fail('Nie można utworzyć przykładowego pliku');
-        }
     }
 
-    public function testModule()
+    public function testGetVersion()
     {
-        $this->oShell->setArgs(':speedtest http://test.online.kz/download/1.test');
-
-        $this->assertRegExp('~^Pobrano: \d+ bajtów w \d+\.\d+ sekundy\r\nŚrednia prędkość to: \d+\.\d+ KB/s\z~', $this->oModule->get());
+        ModuleSpeedtest::getVersion();
     }
 
-    public function testFailModule()
+    public function testHelp()
     {
-        $this->oShell->setArgs(':speedtest http://file.not.found');
+        $sOut = $this->oShell->getCommandOutput(':speedtest help');
+        $this->assertSame(ModuleSpeedtest::getHelp() . "\r\n", $sOut);
 
-        $this->assertSame('Nie można pobrać pliku', $this->oModule->get());
+        $sOut = $this->oShell->getCommandOutput(
+            ':speedtest http://www.google.com http://www.wp.pl'
+        );
+        $this->assertSame(ModuleSpeedtest::getHelp() . "\r\n", $sOut);
     }
 
+    public function testDownload()
+    {
+        $sOut = $this->oShell->getCommandOutput(':speedtest');
+        $this->assertTrue(count(sscanf($sOut, $this->sFormat)) === 3);
+
+        $sOut = $this->oShell->getCommandOutput(
+            ':speedtest http://noc.leon.pl/test/10MB.bin'
+        );
+        $this->assertTrue(count(sscanf($sOut, $this->sFormat)) === 3);
+    }
+
+    public function testErrors()
+    {
+        $sOut = $this->oShell->getCommandOutput(
+            ':speedtest ftp://noc.leon.pl/test/10MB.bin'
+        );
+        $this->assertSame("Wspierany jest tylko protokół http!\r\n", $sOut);
+
+
+        $sOut = $this->oShell->getCommandOutput(
+            ':speedtest http://noc.leon.pl/test/1MB.bin'
+        );
+        $this->assertSame("Nie można pobrać pliku!\r\n", $sOut);
+    }
 }

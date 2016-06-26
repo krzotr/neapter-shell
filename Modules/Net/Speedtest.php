@@ -3,27 +3,31 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Test predkosci lacza
+ * Test network speed
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleSpeedtest extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -32,23 +36,18 @@ class ModuleSpeedtest extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
     {
-        /**
-         * Wersja Data Autor
-         */
-        return '1.00 2011-10-25 - <krzotr@gmail.com>';
+        return '1.0.1 2016-06-26 - <krzotr@gmail.com>';
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -57,91 +56,74 @@ class ModuleSpeedtest extends ModuleAbstract
 Test prędkości łącza
 
 	Użycie:
-		speedtest adres_do_zdalnego_pliku_http
+		speedtest [adres_do_zdalnego_pliku_http]
 
 	Przykład:
-		speedtest http://test.online.kz/download/1.test
-		speedtest http://test.online.kz/download/2.test
-		speedtest http://test.online.kz/download/5mb.test
+		speedtest http://mirror.widexs.nl/ftp/pub/speed/1mb.bin
+		speedtest http://mirror.widexs.nl/ftp/pub/speed/10mb.bin
+		speedtest http://mirror.widexs.nl/ftp/pub/speed/100mb.bin
 
 DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Execute module
      *
-     * @access public
      * @return string
      */
     public function get()
     {
-        /**
-         * Help
-         */
-        if ($this->oArgs->getNumberOfParams() !== 1) {
+        if ($this->oArgs->getNumberOfParams() > 1) {
             return self::getHelp();
         }
 
-        $sParam = $this->oArgs->getParam(0);
+        $sUrl = $this->oArgs->getParam(0);
 
-        /**
-         * Wspierany jest tylko protokul HTTP
-         */
-        if (strncmp($sParam, 'http://', 7) !== 0) {
+        if (!$sUrl) {
+            $sUrl = 'http://mirror.widexs.nl/ftp/pub/speed/10mb.bin';
+        }
+
+        if (strncmp($sUrl, 'http://', 7) !== 0) {
             return 'Wspierany jest tylko protokół http!';
         }
 
-        /**
-         * Naglowki
-         */
-        $aStream = array
-        (
-            'http' => array
-            (
+        $aStream = array(
+            'http' => array(
                 'method' => 'GET',
                 'header' => "Connection: Close\r\n"
             )
         );
 
+        $rFp = @ fopen($sUrl, 'r', false, stream_context_create($aStream));
 
-        /**
-         * Otwieranie polaczenia
-         */
-        if (($rFp = @ fopen($sParam, 'r', FALSE, stream_context_create($aStream))) === FALSE) {
-            return 'Nie można pobrać pliku';
+        if (!$rFp) {
+            return 'Nie można pobrać pliku!';
         }
 
         stream_set_timeout($rFp, 15);
 
-        /**
-         * Pobieranie pliku
-         */
         $fTime = microtime(1);
         $iTotal = 0;
-        $iCount = 0;
+
+        /* Skip HTTP header */
+        fread($rFp, 32768);
 
         while (!feof($rFp)) {
-            /**
-             * Test powinien trwac maksymalnie 5 sekund
-             */
-            if ((($iTotal += strlen(fread($rFp, 2048))) < 2048)
-                || (($iCount > 50) && (microtime(1) - $fTime) > 5)
-            ) {
+            $iTotal += strlen(fread($rFp, 32768));
+
+            /* Run benchmark for 5 seconds */
+            if ((microtime(1) - $fTime) >= 5) {
                 break;
             }
-
-            ++$iCount;
         }
 
-        /**
-         * Zamykanie polaczenia
-         */
         fclose($rFp);
 
-        /**
-         * Statystyki
-         */
-        return sprintf("Pobrano: %d bajtów w %.4f sekundy\r\nŚrednia prędkość to: %.2f KB/s", $iTotal, $fTime = microtime(1) - $fTime, ($iTotal / $fTime) / 1024);
+        return sprintf(
+            "Pobrano: %.2f KB w %.2f sekund\r\nŚrednia prędkość: %.2f KB/s",
+            $iTotal / 1024,
+            $fTime = microtime(1) - $fTime,
+            ($iTotal / $fTime) / 1024
+        );
     }
-
 }
