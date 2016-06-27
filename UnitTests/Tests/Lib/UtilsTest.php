@@ -152,9 +152,9 @@ class UtilsTest extends PHPUnit_Framework_TestCase
         $this->oUtils->getModules();
     }
 
-    public function testGetUniqueKey()
+    public function testGetEncryptionKey()
     {
-        $this->oUtils->getUniqueKey();
+        $this->oUtils->getEncryptionKey();
     }
 
     public function testGetUniquePrefix()
@@ -233,22 +233,22 @@ class UtilsTest extends PHPUnit_Framework_TestCase
         $this->assertfalse($this->oUtils->loadModules());
     }
 
-    public function autoloadModules()
+    public function autoloadExtensions()
     {
 
     }
 
-    public function autoloadModulesAdd()
+    public function autoloadExtensionsAdd()
     {
 
     }
 
-    public function autoloadModulesGet()
+    public function autoloadExtensionsGet()
     {
 
     }
 
-    public function getPathes()
+    public function getEnvironmentPathes()
     {
         $sCache = $_SERVER['PATH'];
 

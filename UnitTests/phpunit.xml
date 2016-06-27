@@ -1,9 +1,27 @@
-<phpunit bootstrap="Bootstrap.php" colors="true">
+<phpunit
+    bootstrap="Bootstrap.php"
+    colors="true"
+    beStrictAboutTestsThatDoNotTestAnything="false"
+>
     <testsuites>
         <testsuite name="Modules test">
             <directory>Tests/Modules</directory>
             <exclude>Tests/Modules/Db</exclude>
             <exclude>Tests/Modules/Trash</exclude>
+
+            <exclude>Tests/Modules/Net/BackConnectTest.php</exclude>
+            <exclude>Tests/Modules/Net/BindConnectTest.php</exclude>
+            <exclude>Tests/Modules/Net/BindTest.php</exclude>
+            <exclude>Tests/Modules/Net/DosTest.php</exclude>
+            <exclude>Tests/Modules/Net/EmailValidatorTest.php</exclude>
+            <exclude>Tests/Modules/Net/FtpDownloadTest.php</exclude>
+            <exclude>Tests/Modules/Net/FtpUploadTest.php</exclude>
+            <exclude>Tests/Modules/Net/IrcTest.php</exclude>
+            <exclude>Tests/Modules/Net/MailTest.php</exclude>
+            <exclude>Tests/Modules/Net/PortscannerTest.php</exclude>
+            <exclude>Tests/Modules/Net/ProxyTest.php</exclude>
+            <exclude>Tests/Modules/Net/SocketDownloadTest.php</exclude>
+            <exclude>Tests/Modules/Net/SocketUploadTest.php</exclude>
         </testsuite>
 
         <testsuite name="Libs test">

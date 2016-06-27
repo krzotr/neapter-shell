@@ -82,7 +82,7 @@ DATA;
         }
 
         if (($iArgs == 0) && array_key_exists('l', $aSwitches)) {
-            $aAutoload = $this->oUtils->autoloadModulesGet();
+            $aAutoload = $this->oUtils->autoloadExtensionsGet();
 
             if ($aAutoload === array()) {
                 return 'Nie wczytano żadnych rozszerzeń';
@@ -101,11 +101,11 @@ DATA;
             );
         }
 
-        $this->oUtils->autoloadModulesAdd($this->oArgs->getParams());
+        $this->oUtils->autoloadExtensionsAdd($this->oArgs->getParams());
 
         return sprintf(
             "Wczytane rozszerzenia:\r\n%s",
-            implode("\r\n", $this->oUtils->autoloadModulesGet())
+            implode("\r\n", $this->oUtils->autoloadExtensionsGet())
         );
     }
 }

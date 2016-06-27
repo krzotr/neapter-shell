@@ -14,5 +14,10 @@
 
 require_once dirname(__FILE__) . '/Lib/Shell.php';
 
+/* Turn off all buffers*/
+while (ob_get_level()) {
+    ob_end_clean();
+}
+
 $oShell = new Shell();
 $oShell->get();

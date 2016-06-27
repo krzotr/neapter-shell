@@ -128,11 +128,6 @@ class Shell
      */
     public function __construct($sArgs = null)
     {
-        /* Turn off all buffers*/
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-
         /**
          * Czas generowania strony a w zasadzie shella
          */
@@ -178,7 +173,7 @@ class Shell
          */
         if (!(isset($_GET['skip_modules']) || isset($_SERVER['skip_modules']))) {
             $this->oUtils->loadModules();
-            $this->oUtils->autoloadModules();
+            $this->oUtils->autoloadExtensions();
         }
 
         if ($sDir = $this->oUtils->cacheGet('chdir')) {

@@ -33,13 +33,12 @@ class ModuleLogoutTest extends PHPUnit_Framework_TestCase
         $sAuthKeyFile = $this->oShell->getUtils()->getAuthFileKey();
         $sAuth = $this->oShell->getUtils()->cacheSet($sAuthKeyFile, 'test');
 
-        @ob_start();
+        @ ob_start();
 
         $this->oShell->getCommandOutput(':logout');
         $sOut = ob_get_contents();
 
-        @ob_end_flush();
-        ob_clean();
+        @ ob_end_clean();
 
         $this->assertSame("See you (:\n", $sOut);
     }

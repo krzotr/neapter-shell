@@ -105,7 +105,7 @@ Trwałe usunięcie NeapterShell. Plik %s zostanie usunięty wraz z wszystkimi pl
         remove key - trwałe usunięcie shella
 DATA;
 
-        return sprintf($sHelp, self::sFilename);
+        return sprintf($sHelp, self::$sFilename);
     }
 
     /**

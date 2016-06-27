@@ -98,7 +98,7 @@ DATA;
             $aArgs = explode(' ', substr($sCmd, $iPos + 1));
         }
 
-        foreach ($this->oUtils->getPathes() as $sDir) {
+        foreach ($this->oUtils->getEnvironmentPathes() as $sDir) {
             if (is_file($sFile = $sDir . '/' . $sBin)) {
                 $sFullPath = $sFile;
                 break;

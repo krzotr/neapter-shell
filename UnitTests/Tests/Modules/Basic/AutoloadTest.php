@@ -50,7 +50,7 @@ class ModuleAutoloadTest extends PHPUnit_Framework_TestCase
     }
 
     /* @todo */
-    public function testAutoloadModules()
+    public function testAutoloadExtensions()
     {
 
     }

@@ -101,16 +101,18 @@ class ModuleSystemTest extends PHPUnit_Framework_TestCase
             'pcntl_exec'
         );
 
-        $sOutput = shell_exec('ls -la /');
+        $sCmd = 'ls -la /var';
+        $sOutput = shell_exec($sCmd);
 
         $i = 0;
         foreach ($aDisableFunctions as $sFunc) {
             $oShell = new Shell();
-            $sOut = $oShell->getCommandOutput('ls -la /');
+            $sOut = $oShell->getCommandOutput($sCmd);
 
             $this->assertSame(
                 sprintf(
-                    "Cmd: 'ls -la /'\r\nPHPfunc: %s():\r\n\r\n%s\r\n",
+                    "Cmd: '%s'\r\nPHPfunc: %s():\r\n\r\n%s\r\n",
+                    $sCmd,
                     $sFunc,
                     $sOutput
                 ),

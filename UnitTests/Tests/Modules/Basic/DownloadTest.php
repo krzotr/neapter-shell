@@ -38,8 +38,7 @@ class ModuleDownloadTest extends PHPUnit_Framework_TestCase
         $this->oShell->getCommandOutput(':download /etc/passwd');
         $sOut = ob_get_contents();
 
-        @ ob_end_flush();
-        @ ob_clean();
+        @ ob_end_clean();
 
         $this->assertSame(file_get_contents('/etc/passwd'), $sOut);
     }
@@ -51,8 +50,7 @@ class ModuleDownloadTest extends PHPUnit_Framework_TestCase
         $this->oShell->getCommandOutput(':download -g /etc/passwd');
         $sOut = ob_get_contents();
 
-        @ ob_end_flush();
-        @ ob_clean();
+        @ ob_end_clean();
 
         $this->assertSame(
             file_get_contents('/etc/passwd'),
@@ -90,8 +88,7 @@ class ModuleDownloadTest extends PHPUnit_Framework_TestCase
         $this->oShell->getCommandOutput(':download http://wklej.to/PVd35/text');
         $sOut = ob_get_contents();
 
-        @ ob_end_flush();
-        @ ob_clean();
+        @ ob_end_clean();
 
         $this->assertSame(str_repeat('x', 50), $sOut);
     }

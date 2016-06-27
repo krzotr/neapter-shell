@@ -3,123 +3,90 @@
 /**
  * Neapter Shell
  *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @license   http://www.gnu.org/licenses/gpl-3.0.txt
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 
 /**
- * Szkielet modulu
+ * Create your own module
  *
- * Klasa musi dzialac na php 5.2.X !!!
+ * Class must work with PHP 5.2.X!. Instead of __FILE__, __DIR__, please
+ * use method $oShell->getShellFilename(), to get path of PHP shell file.
  *
- * Jezeli uzyjemy 'eval' to stale __FILE__, __DIR__ itp nie zadzialaja !!!
- * Zamiast __FILE__ uzyj 'Request::getServer( 'SCRIPT_FILENAME' )'
- *
+ * @category  WebShell
+ * @package   NeapterShell
  * @author    Krzysztof Otręba <krzotr@gmail.com>
- * @copyright Copyright (c) 2012, Krzysztof Otręba
+ * @copyright 2011-2016 Krzysztof Otręba
  *
- * @package    NeapterShell
- * @subpackage Modules
+ * @license http://www.gnu.org/licenses/gpl-3.0.txt GPL3
+ * @link    http://github.com/krzotr/neapter-shell
  */
 class ModuleDummy extends ModuleAbstract
 {
     /**
-     * Dostepna lista komend
+     * Get list of available commands
      *
-     * @access public
+     * @example
+     * <code>
+     * return array(
+     *     'dummy1',
+     *     'dummy2'
+     * );
+     * </code>
      * @return array
      */
     public static function getCommands()
     {
-        /**
-         * 'dummy' - 'dummy2' oraz 'dummy3' sa aliasami
-         *
-         * array
-         * (
-         *      'dummy',
-         *      'dummy2',
-         *      'dummy3'
-         * )
-         */
         return array();
     }
 
     /**
-     * Zwracanie wersji modulu
+     * Get module version
      *
-     * @access public
+     * Please use pattern '1.0.0 2016-06-30 - <your@email.com>'
+     *
      * @return string
      */
     public static function getVersion()
     {
-        /**
-         * Wersja Data Autor
-         *
-         * Formaty:
-         *     Wersja:
-         *         \d{1}\.\d{2}
-         *     Data
-         *         Y-m-d
-         */
-        return '1.00 2011-06-04 - <adres_autora>';
+        return '1.0.0 2016-06-30 - <your@email.com>';
     }
 
     /**
-     * Zwracanie pomocy modulu
+     * Get module details information
      *
-     * @access public
      * @return string
      */
     public static function getHelp()
     {
         return <<<DATA
-Opis Polecenia
+Short information about module.
 
-	Dłuższy Opis Polecenia
+	Extended information
 
-	Użycie:
-		nazwa_polecenia parametr0 parametr1
+	Usage:
+		command_name param1 param2
 
-	Przykład:
-		nazwa_polecenia http://www.wp.pl
+	Example:
+		command_name http://google.com http://google.ru
 DATA;
     }
 
     /**
-     * Wywolanie modulu
+     * Execute module
      *
-     * @access public
+     * You can use $this->oUtils and $this->oArgs to get specified parameters
+     *
      * @return string
      */
     public function get()
     {
-        /**
-         * $this -> oShell -> bSafeMode - SafeMode
-         *   TRUE jezeli wlaczone
-         *
-         * $this -> oShell -> bWindows  - Czy dzialamy na systemie Windows ?
-         *   TRUE jezeli dzialamy na Windowsie
-         *
-         * $this -> oShell -> sCmd      - Komenda - (:test param1 param2)
-         *   test
-         *
-         * $this -> oShell -> aArgv     - Argumenty (:test param1 param2)
-         *   [0] => param1
-         *   [1] => param2
-         *
-         * $this -> oShell -> iArgc     - Ilosc parametrow (:test param1 param2)
-         *   2
-         *
-         * $this -> oShell -> aOptv     - Opcje (:test -ab -c param1 param2)
-         *   [0] => a
-         *   [1] => b
-         *   [2] => c
-         *
-         * $this -> oShell -> sArgv     - Caly ciag parametrow (:test -ab -c param1 param2)
-         *   -ab -c param1 param2
-         */
+        return null;
     }
 
 }
