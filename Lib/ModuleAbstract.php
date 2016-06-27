@@ -109,7 +109,11 @@ abstract class ModuleAbstract implements ModuleInterface
     /**
      * Set command to execute
      *
-     * @example :ls -la
+     * @example
+     * <code>
+     * :ls -la
+     * </code>
+     *
      * @param $sArgs Args List of arguments
      * @return void
      */

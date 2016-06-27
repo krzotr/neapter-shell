@@ -181,18 +181,27 @@ class Shell
         }
     }
 
+    /**
+     * End of file
+     *
+     * todo
+     */
     public function eof()
     {
         /* @todo */
         // exit;
     }
 
+    /**
+     * Change default configuration, set default_socket_timeout, utf8, disable
+     * errors, set memory limit etc
+     */
     protected function loadConfig()
     {
         setlocale(LC_ALL, 'polish.UTF-8');
 
         if (PHP_SAPI !== 'cli') {
-            header('Content-type: text/html; charset=utf-8');
+            @ header('Content-type: text/html; charset=utf-8');
         }
 
         ini_set('default_charset', 'utf-8');
@@ -233,6 +242,9 @@ class Shell
         }
     }
 
+    /**
+     * Authentication - Protect shell by login and password
+     */
     protected function auth()
     {
         $sKey = $this->oUtils->getAuthFileKey();
@@ -439,23 +451,32 @@ class Shell
             "</div>{$sScript}</body></html>";
     }
 
+    /**
+     * Set expiration time to 30 days
+     */
     protected function getHttpCacheHeaders()
     {
-        header('Expires: '. date('D, d M Y H:i:s \G\M\T', time() + (3600*24*365)));
+        @header('Expires: '. date('D, d M Y H:i:s \G\M\T', time() + (2592000)));
     }
 
+    /**
+     * Get js script
+     */
     protected function getJs()
     {
-        header('Content-type: application/javascript');
+        @ header('Content-type: application/javascript');
         $this->getHttpCacheHeaders();
 
         echo file_get_contents(dirname(Request::getServer('SCRIPT_FILENAME')) . '/Lib/js.js');
         exit;
     }
 
+    /**
+     * Get styles
+     */
     protected function getCss()
     {
-        header('Content-type: text/css');
+        @ header('Content-type: text/css');
         $this->getHttpCacheHeaders();
 
         echo file_get_contents(dirname(Request::getServer('SCRIPT_FILENAME')) . '/Styles/haxior.css');
@@ -481,9 +502,6 @@ class Shell
             $this->auth();
         }
 
-        /**
-         * CLI
-         */
         if (PHP_SAPI === 'cli') {
             print("\r\n");
             print("   .  .          ,          __..     ..\r\n");

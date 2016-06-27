@@ -25,6 +25,9 @@
  */
 class LoadModules
 {
+    /**
+     * Load modules in development env
+     */
     public function __construct()
     {
         /* @todo, Why not Recirsive Directory Iterator and .php files? */
